@@ -87,8 +87,24 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
                 minItems: 3, maxItems: 5,
               },
               practice_intro: { type: "string", description: "First practice question/prompt the tutor will ask, in English." },
+              activities: {
+                type: "array",
+                description: "2-3 short interactive practice activities related to the new_words and topic. Use multiple-choice style. Mix types: 'choose_meaning' (translate a word), 'fill_blank' (complete a sentence), 'pick_correct' (choose the correct sentence).",
+                items: {
+                  type: "object",
+                  properties: {
+                    type: { type: "string", enum: ["choose_meaning", "fill_blank", "pick_correct"] },
+                    question_ka: { type: "string", description: "Question text shown to the student in Georgian (or with English target word)." },
+                    options: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 4 },
+                    correct_index: { type: "integer", description: "0-based index of the correct option" },
+                    explanation_ka: { type: "string", description: "Short Georgian explanation of why it's correct" },
+                  },
+                  required: ["type", "question_ka", "options", "correct_index", "explanation_ka"],
+                },
+                minItems: 2, maxItems: 3,
+              },
             },
-            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro"],
+            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro", "activities"],
           },
         },
       }];
