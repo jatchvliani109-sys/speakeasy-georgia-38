@@ -93,13 +93,19 @@ export default function Vocabulary() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-lg break-words">{w.english_word}</div>
+                    <div className="flex items-center gap-2">
+                      <SpeakButton text={w.english_word} />
+                      <div className="font-bold text-lg break-words">{w.english_word}</div>
+                    </div>
                     <div className="text-muted-foreground ka">{w.georgian_meaning}</div>
                   </div>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ka shrink-0 ${b.className}`}>{b.label}</span>
                 </div>
                 {w.example_sentence && (
-                  <div className="text-sm italic mt-2 text-foreground/70">"{w.example_sentence}"</div>
+                  <div className="flex items-start gap-2 mt-2">
+                    <SpeakButton text={w.example_sentence} />
+                    <div className="text-sm italic text-foreground/70">"{w.example_sentence}"</div>
+                  </div>
                 )}
                 <div className="text-[11px] text-muted-foreground/70 mt-2">
                   {new Date(w.created_at).toLocaleDateString("ka-GE")}
