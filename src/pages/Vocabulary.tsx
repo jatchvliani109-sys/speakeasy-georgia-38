@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Repeat, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import SpeakButton from "@/components/SpeakButton";
 
 type Word = {
   id: string;
