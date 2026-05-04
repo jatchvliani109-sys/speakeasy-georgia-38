@@ -359,23 +359,41 @@ function ChatArea({ scrollRef, messages, loading, footer }: any) {
   );
 }
 
-function ChatInput({ input, setInput, send, recording, toggleRecord, loading, disabled }: any) {
+function ChatInput({ input, setInput, send, loading, disabled }: any) {
+  const taRef = useRef<HTMLTextAreaElement>(null);
+  const handleSend = () => {
+    if (!input.trim() || loading) return;
+    const text = input;
+    setInput("");
+    send(text);
+    requestAnimationFrame(() => taRef.current?.focus());
+  };
   return (
-    <div className="flex items-end gap-2">
-      <Button variant={recording ? "accent" : "soft"} size="icon" onClick={toggleRecord} className="shrink-0 h-12 w-12" title="Speak Answer">
-        {recording ? <MicOff /> : <Mic />}
-      </Button>
-      <Textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-        placeholder="Speak or type your answer..."
-        className="min-h-12 max-h-32 rounded-2xl resize-none"
-        rows={1}
-        disabled={disabled}
-      />
-      <Button variant="hero" size="icon" onClick={() => send(input)} disabled={loading || !input.trim()} className="shrink-0 h-12 w-12">
-        <Send />
+    <div className="space-y-2">
+      <div className="flex items-end gap-2">
+        <Textarea
+          ref={taRef}
+          autoFocus
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder="⌨️ Type your answer..."
+          className="min-h-12 max-h-32 rounded-2xl resize-none"
+          rows={1}
+          disabled={disabled}
+        />
+        <Button variant="hero" size="icon" onClick={handleSend} disabled={loading || !input.trim()} className="shrink-0 h-12 w-12">
+          <Send />
+        </Button>
+      </div>
+      <Button
+        variant="soft"
+        size="sm"
+        className="w-full ka opacity-70"
+        onClick={() => toast.info("ხმოვანი შეყვანა მალე დაემატება 🎤")}
+        type="button"
+      >
+        <Mic className="w-4 h-4" /> Speak (coming soon)
       </Button>
     </div>
   );
