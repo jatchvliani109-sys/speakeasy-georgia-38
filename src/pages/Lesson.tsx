@@ -461,6 +461,11 @@ function ChatArea({ scrollRef, messages, loading, footer }: any) {
                 : "bg-card border border-border shadow-card rounded-bl-sm"
             }`}>
               <div className="whitespace-pre-wrap text-base leading-relaxed">{m.content}</div>
+              {m.role === "assistant" && /[a-zA-Z]/.test(m.content) && (
+                <div className="mt-2 flex justify-end">
+                  <SpeakButton text={m.content} />
+                </div>
+              )}
             </div>
           </div>
         ))}
