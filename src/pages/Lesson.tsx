@@ -173,6 +173,19 @@ export default function Lesson() {
           })));
         }
       }
+      // update streak + last_activity
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().slice(0, 10);
+      const { data: prof } = await supabase.from("profiles").select("streak, last_activity").eq("id", user.id).maybeSingle();
+      let newStreak = 1;
+      if (prof?.last_activity) {
+        const last = new Date(prof.last_activity); last.setHours(0, 0, 0, 0);
+        const diffDays = Math.round((today.getTime() - last.getTime()) / 86400000);
+        if (diffDays === 0) newStreak = prof.streak ?? 1;
+        else if (diffDays === 1) newStreak = (prof.streak ?? 0) + 1;
+        else newStreak = 1;
+      }
+      await supabase.from("profiles").update({ streak: newStreak, last_activity: todayStr }).eq("id", user.id);
       navigate(`/summary/${lesson?.id}`);
     } catch (e: any) {
       toast.error(e.message);
