@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Mic, Send, Square, Sparkles, BookOpen, MessageCircle, ClipboardCheck, Clock, Target, ListChecks, Check, X } from "lucide-react";
+import SpeakButton from "@/components/SpeakButton";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Stage = "intro" | "warmup" | "words" | "activities" | "practice" | "review";
@@ -172,6 +173,19 @@ export default function Lesson() {
           })));
         }
       }
+      // update streak + last_activity
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().slice(0, 10);
+      const { data: prof } = await supabase.from("profiles").select("streak, last_activity").eq("id", user.id).maybeSingle();
+      let newStreak = 1;
+      if (prof?.last_activity) {
+        const last = new Date(prof.last_activity); last.setHours(0, 0, 0, 0);
+        const diffDays = Math.round((today.getTime() - last.getTime()) / 86400000);
+        if (diffDays === 0) newStreak = prof.streak ?? 1;
+        else if (diffDays === 1) newStreak = (prof.streak ?? 0) + 1;
+        else newStreak = 1;
+      }
+      await supabase.from("profiles").update({ streak: newStreak, last_activity: todayStr }).eq("id", user.id);
       navigate(`/summary/${lesson?.id}`);
     } catch (e: any) {
       toast.error(e.message);
@@ -266,11 +280,17 @@ export default function Lesson() {
             </div>
             {plan.new_words.map((w, i) => (
               <div key={i} className="p-4 rounded-2xl bg-card border border-border shadow-card">
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="text-lg font-bold">{w.english_word}</div>
-                  <div className="text-sm text-muted-foreground ka">{w.georgian_meaning}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <SpeakButton text={w.english_word} />
+                    <div className="text-lg font-bold truncate">{w.english_word}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground ka shrink-0">{w.georgian_meaning}</div>
                 </div>
-                <div className="text-sm italic text-muted-foreground mt-2">"{w.example_sentence}"</div>
+                <div className="flex items-start gap-2 mt-2">
+                  <SpeakButton text={w.example_sentence} />
+                  <div className="text-sm italic text-muted-foreground">"{w.example_sentence}"</div>
+                </div>
               </div>
             ))}
             <Button variant="hero" size="lg" className="w-full mt-4 ka" onClick={goToActivities}>
@@ -454,6 +474,11 @@ function ChatArea({ scrollRef, messages, loading, footer }: any) {
                 : "bg-card border border-border shadow-card rounded-bl-sm"
             }`}>
               <div className="whitespace-pre-wrap text-base leading-relaxed">{m.content}</div>
+              {m.role === "assistant" && /[a-zA-Z]/.test(m.content) && (
+                <div className="mt-2 flex justify-end">
+                  <SpeakButton text={m.content} />
+                </div>
+              )}
             </div>
           </div>
         ))}
