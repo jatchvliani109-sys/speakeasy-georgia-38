@@ -109,7 +109,9 @@ export default function Summary() {
         {data.useful_phrases?.length > 0 && (
           <Section title="სასარგებლო ფრაზები" icon={Sparkles}>
             <ul className="space-y-1">
-              {data.useful_phrases.map((p: string, i: number) => <li key={i}>• {p}</li>)}
+              {data.useful_phrases.map((p: string, i: number) => (
+                <li key={i} className="flex items-center gap-2"><SpeakButton text={p} /> <span>{p}</span></li>
+              ))}
             </ul>
           </Section>
         )}
