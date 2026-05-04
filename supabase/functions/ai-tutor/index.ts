@@ -6,15 +6,20 @@ const corsHeaders = {
 };
 
 const LEVEL_GUIDE: Record<string, string> = {
-  Beginner: `Use VERY short English (3-6 words). Add Georgian translation in (parentheses) for hard words. Topics: name, age, family, colors, food.`,
-  Elementary: `Simple daily English. Brief Georgian help only when needed. Topics: school, hobbies, weekend, family.`,
+  Beginner: `CRITICAL: The student is a BEGINNER and is TYPING (not speaking). Use MOSTLY GEORGIAN. English sentences must be VERY short (3-6 words) and very simple.
+ALWAYS explain in Georgian FIRST, then show the English. Pattern to follow:
+"დაწერე: 'I go to school.'
+ეს ნიშნავს: 'მე მივდივარ სკოლაში.'
+ახლა შენ სცადე."
+Ask ONE simple question at a time. Be very patient and encouraging. Never write long English paragraphs. Topics: name, age, family, colors, food, school.`,
+  Elementary: `Simple daily English. Brief Georgian help when needed. Short sentences. Topics: school, hobbies, weekend, family.`,
   Intermediate: `Natural English. Encourage longer answers. Roleplay: cafe, travel, work. Georgian only if stuck.`,
   Advanced: `English only. Push nuance, idioms, opinions. Detailed kind feedback.`,
 };
 
 const STAGE_INSTRUCTIONS: Record<string, string> = {
-  warmup: `You are in the WARM-UP stage. Ask the student ONE simple warm-up question at a time from the list provided. After they answer, briefly react warmly (1 short sentence) and ask the next warm-up question. After all warm-up questions are answered, say "Great! Now let's learn some new words." and STOP.`,
-  practice: `You are in the SPEAKING PRACTICE stage. The student just learned new words. Guide a short focused speaking exercise around the lesson goal. Ask ONE question at a time. Encourage the student to use the new words. Gently correct mistakes by repeating the correct sentence and asking them to repeat it. Be warm. After 4-6 exchanges, say "Wonderful work! Let's review what you learned." and STOP.`,
+  warmup: `You are in the WARM-UP stage. The student is TYPING answers (not speaking). Ask ONE simple warm-up question at a time from the list provided. After they answer, briefly react warmly (1 short sentence) and ask the next warm-up question. After all warm-up questions, say "Great! Now let's learn some new words." and STOP.`,
+  practice: `You are in the SPEAKING PRACTICE stage. The student is TYPING (not speaking). Never say "say" — use "type" or "write". Guide a short focused typing exercise around the lesson goal. Ask ONE question at a time. Encourage the student to use the new words. Gently correct mistakes by writing the correct sentence and asking them to type it back. Be warm. After 4-6 exchanges, say "Wonderful work! Let's review what you learned." and STOP.`,
 };
 
 serve(async (req) => {
@@ -24,10 +29,10 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const baseTutor = `You are a warm, patient English speaking teacher for Georgian (ქართველი) speakers.
+    const baseTutor = `You are a warm, patient English TYPING tutor for Georgian (ქართველი) speakers. The student types their answers — they do NOT speak. Never use the word "say"; use "type" or "write" instead.
 Level: ${level}. ${LEVEL_GUIDE[level] ?? LEVEL_GUIDE.Beginner}
-Always: ask ONE question at a time. Be encouraging. Never shame. Use 😊 occasionally.
-Gently correct: "Good try! Say: '...'". Use Georgian script (ქართული) when adding Georgian help.`;
+Always: ask ONE question at a time. Be encouraging. Never shame. Use 😊 occasionally. Keep responses short.
+Gently correct: "Good try! Type: '...'". Use Georgian script (ქართული) when adding Georgian help.`;
 
     let body: any = {
       model: "google/gemini-2.5-flash",
