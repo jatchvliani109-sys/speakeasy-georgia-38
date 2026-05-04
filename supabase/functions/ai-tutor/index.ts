@@ -25,7 +25,7 @@ const STAGE_INSTRUCTIONS: Record<string, string> = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { messages = [], level = "Beginner", mode = "chat", stage, lessonContext } = await req.json();
+    const { messages = [], level = "Beginner", mode = "chat", stage, lessonContext, recentTopics = [], suggestedTopic } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -40,11 +40,16 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
     };
 
     if (mode === "plan") {
-      // Generate a fresh structured lesson plan (title, goal, warmup Qs, new words, practice prompt)
+      const topicHint = suggestedTopic
+        ? `TODAY'S TOPIC MUST BE: "${suggestedTopic}". Build the entire lesson around this topic.`
+        : `Choose a fresh topic appropriate for level ${level}.`;
+      const avoidHint = recentTopics.length
+        ? `AVOID these recently-used topics: ${recentTopics.join(", ")}. Pick something different.`
+        : "";
       body.messages = [
         {
           role: "system",
-          content: `You design a short English speaking lesson plan for a Georgian-speaking student at level: ${level}. Output via the provided tool only. Make it appropriate for ages 10+ (school children to adults). Keep everything simple and warm. Georgian text must be in Georgian script.`,
+          content: `You design a short English speaking lesson plan for a Georgian-speaking student at level: ${level}. Output via the provided tool only. Make it appropriate for ages 10+ (school children to adults). Keep everything simple and warm. Georgian text must be in Georgian script. Do NOT default to introductions/"what is your name" unless the topic is specifically Introductions. ${topicHint} ${avoidHint}`,
         },
         { role: "user", content: `Design today's lesson plan. ${LEVEL_GUIDE[level] ?? ""}` },
       ];
@@ -82,8 +87,24 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
                 minItems: 3, maxItems: 5,
               },
               practice_intro: { type: "string", description: "First practice question/prompt the tutor will ask, in English." },
+              activities: {
+                type: "array",
+                description: "2-3 short interactive practice activities related to the new_words and topic. Use multiple-choice style. Mix types: 'choose_meaning' (translate a word), 'fill_blank' (complete a sentence), 'pick_correct' (choose the correct sentence).",
+                items: {
+                  type: "object",
+                  properties: {
+                    type: { type: "string", enum: ["choose_meaning", "fill_blank", "pick_correct"] },
+                    question_ka: { type: "string", description: "Question text shown to the student in Georgian (or with English target word)." },
+                    options: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 4 },
+                    correct_index: { type: "integer", description: "0-based index of the correct option" },
+                    explanation_ka: { type: "string", description: "Short Georgian explanation of why it's correct" },
+                  },
+                  required: ["type", "question_ka", "options", "correct_index", "explanation_ka"],
+                },
+                minItems: 2, maxItems: 3,
+              },
             },
-            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro"],
+            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro", "activities"],
           },
         },
       }];

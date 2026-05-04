@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BookOpen, AlertCircle, Sparkles, Check, Repeat } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 type WordRow = { id: string; english_word: string; georgian_meaning: string; example_sentence: string | null; status: string };
 
@@ -44,6 +45,7 @@ export default function Summary() {
 
   return (
     <Layout>
+      <PageHeader title="გაკვეთილის შედეგი" backTo="/dashboard" />
       <div className="space-y-4 py-2">
         <div className="text-center py-4">
           <div className="text-5xl mb-2">🌟</div>

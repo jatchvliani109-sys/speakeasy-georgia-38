@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 
 type Mistake = {
   id: string;
@@ -56,7 +57,7 @@ export default function Mistakes() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-extrabold mb-3 ka">ჩემი შეცდომები</h1>
+      <PageHeader title="ჩემი შეცდომები" backTo="/dashboard" />
       <div className="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">
         {TAGS.map((t) => (
           <button

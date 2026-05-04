@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, AlertCircle, MessageCircle, Star, ChevronRight } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 export default function ProgressPage() {
   const { user } = useAuth();
@@ -37,7 +38,7 @@ export default function ProgressPage() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-extrabold mb-4 ka">პროგრესი</h1>
+      <PageHeader title="პროგრესი" backTo="/dashboard" />
 
       <div className="grid grid-cols-2 gap-3">
         {cards.map((c) => {
