@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, AlertCircle, MessageCircle, Star, ChevronRight } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 export default function ProgressPage() {
   const { user } = useAuth();
