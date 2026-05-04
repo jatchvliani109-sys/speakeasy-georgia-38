@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BookOpen, AlertCircle, Sparkles, Check, Repeat } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 type WordRow = { id: string; english_word: string; georgian_meaning: string; example_sentence: string | null; status: string };
 
