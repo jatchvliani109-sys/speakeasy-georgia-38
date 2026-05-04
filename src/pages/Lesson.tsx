@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Mic, Send, Square, Sparkles, BookOpen, MessageCircle, ClipboardCheck, Clock, Target, ListChecks, Check, X } from "lucide-react";
+import SpeakButton from "@/components/SpeakButton";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Stage = "intro" | "warmup" | "words" | "activities" | "practice" | "review";
