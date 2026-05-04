@@ -71,10 +71,13 @@ export default function Summary() {
           </Section>
         )}
 
-        {data.recommended_next && (
-          <Section title="შემდეგი ნაბიჯი">
-            <p>{data.recommended_next}</p>
+        {data.homework_ka && (
+          <Section title="საშინაო დავალება">
+            <p className="ka">{data.homework_ka}</p>
           </Section>
+        )}
+        {data.plan?.title_en && (
+          <div className="text-center text-xs text-muted-foreground ka">გაკვეთილი: {data.plan.title_en}</div>
         )}
 
         <Button asChild variant="hero" size="lg" className="w-full ka">
