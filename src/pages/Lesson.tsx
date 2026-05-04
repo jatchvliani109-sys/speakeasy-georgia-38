@@ -267,11 +267,17 @@ export default function Lesson() {
             </div>
             {plan.new_words.map((w, i) => (
               <div key={i} className="p-4 rounded-2xl bg-card border border-border shadow-card">
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="text-lg font-bold">{w.english_word}</div>
-                  <div className="text-sm text-muted-foreground ka">{w.georgian_meaning}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <SpeakButton text={w.english_word} />
+                    <div className="text-lg font-bold truncate">{w.english_word}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground ka shrink-0">{w.georgian_meaning}</div>
                 </div>
-                <div className="text-sm italic text-muted-foreground mt-2">"{w.example_sentence}"</div>
+                <div className="flex items-start gap-2 mt-2">
+                  <SpeakButton text={w.example_sentence} />
+                  <div className="text-sm italic text-muted-foreground">"{w.example_sentence}"</div>
+                </div>
               </div>
             ))}
             <Button variant="hero" size="lg" className="w-full mt-4 ka" onClick={goToActivities}>
