@@ -211,8 +211,8 @@ export default function Lesson() {
             footer={
               <>
                 <ChatInput
-                  input={input} setInput={setInput} send={(t) => sendWarmup(t, messages, askAI, setMessages)}
-                  recording={recording} toggleRecord={toggleRecord} loading={loading} disabled={false}
+                  input={input} setInput={setInput} send={(t: string) => sendWarmup(t, messages, askAI, setMessages)}
+                  loading={loading} disabled={false}
                 />
                 <Button variant="ghost" size="sm" className="mt-2 ka self-end" onClick={goToWords}>
                   გადასვლა სიტყვებზე →
