@@ -19,7 +19,7 @@ const Index = () => (
       </div>
       <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-5 ka">
         ისწავლე ინგლისურად საუბარი{" "}
-        <span className="bg-clip-text text-transparent gradient-hero">AI მასწავლებელთან</span>
+        <span className="text-primary">AI მასწავლებელთან</span>
       </h1>
       <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto ka">
         ივარჯიშე ყოველდღე, მიიღე შეცდომების გასწორება და ისაუბრე უფრო თავდაჯერებულად.
