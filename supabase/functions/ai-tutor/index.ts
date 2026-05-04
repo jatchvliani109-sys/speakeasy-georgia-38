@@ -119,11 +119,12 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
                 items: {
                   type: "object",
                   properties: {
-                    original_sentence: { type: "string" },
+                     original_sentence: { type: "string" },
                     corrected_sentence: { type: "string" },
                     explanation_ka: { type: "string" },
+                    tag: { type: "string", enum: ["grammar", "vocabulary", "structure"], description: "Category of mistake" },
                   },
-                  required: ["original_sentence", "corrected_sentence", "explanation_ka"],
+                  required: ["original_sentence", "corrected_sentence", "explanation_ka", "tag"],
                 },
               },
               useful_phrases: { type: "array", items: { type: "string" } },
