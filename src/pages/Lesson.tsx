@@ -253,7 +253,7 @@ export default function Lesson() {
               <>
                 <ChatInput
                   input={input} setInput={setInput} send={send}
-                  recording={recording} toggleRecord={toggleRecord} loading={loading} disabled={false}
+                  loading={loading} disabled={false}
                 />
                 <Button variant="ghost" size="sm" className="mt-2 ka self-end" onClick={finishLesson} disabled={ending}>
                   <Square className="w-4 h-4" />{ending ? "..." : "გაკვეთილის დასრულება"}
