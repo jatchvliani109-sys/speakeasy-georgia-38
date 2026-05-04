@@ -227,7 +227,7 @@ export default function Lesson() {
             <div className="text-center mb-2">
               <div className="text-3xl mb-1">📚</div>
               <h2 className="text-xl font-extrabold ka">ახალი სიტყვები</h2>
-              <p className="text-sm text-muted-foreground ka">წაიკითხე ხმამაღლა</p>
+              <p className="text-sm text-muted-foreground ka">დაიმახსოვრე ეს სიტყვები</p>
             </div>
             {plan.new_words.map((w, i) => (
               <div key={i} className="p-4 rounded-2xl bg-card border border-border shadow-card">
