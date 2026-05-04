@@ -40,11 +40,16 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
     };
 
     if (mode === "plan") {
-      // Generate a fresh structured lesson plan (title, goal, warmup Qs, new words, practice prompt)
+      const topicHint = suggestedTopic
+        ? `TODAY'S TOPIC MUST BE: "${suggestedTopic}". Build the entire lesson around this topic.`
+        : `Choose a fresh topic appropriate for level ${level}.`;
+      const avoidHint = recentTopics.length
+        ? `AVOID these recently-used topics: ${recentTopics.join(", ")}. Pick something different.`
+        : "";
       body.messages = [
         {
           role: "system",
-          content: `You design a short English speaking lesson plan for a Georgian-speaking student at level: ${level}. Output via the provided tool only. Make it appropriate for ages 10+ (school children to adults). Keep everything simple and warm. Georgian text must be in Georgian script.`,
+          content: `You design a short English speaking lesson plan for a Georgian-speaking student at level: ${level}. Output via the provided tool only. Make it appropriate for ages 10+ (school children to adults). Keep everything simple and warm. Georgian text must be in Georgian script. Do NOT default to introductions/"what is your name" unless the topic is specifically Introductions. ${topicHint} ${avoidHint}`,
         },
         { role: "user", content: `Design today's lesson plan. ${LEVEL_GUIDE[level] ?? ""}` },
       ];
