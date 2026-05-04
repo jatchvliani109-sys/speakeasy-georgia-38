@@ -38,7 +38,7 @@ export default function ProgressPage() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-extrabold mb-4 ka">პროგრესი</h1>
+      <PageHeader title="პროგრესი" backTo="/dashboard" />
 
       <div className="grid grid-cols-2 gap-3">
         {cards.map((c) => {
