@@ -3,8 +3,19 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { AuthProvider } from "@/lib/auth";
+import RequireAuth from "@/components/RequireAuth";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
+import LevelTest from "./pages/LevelTest";
+import Dashboard from "./pages/Dashboard";
+import Lesson from "./pages/Lesson";
+import Summary from "./pages/Summary";
+import Vocabulary from "./pages/Vocabulary";
+import Mistakes from "./pages/Mistakes";
+import ProgressPage from "./pages/Progress";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -14,11 +25,22 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+            <Route path="/level-test" element={<RequireAuth><LevelTest /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
+            <Route path="/summary/:id" element={<RequireAuth><Summary /></RequireAuth>} />
+            <Route path="/vocabulary" element={<RequireAuth><Vocabulary /></RequireAuth>} />
+            <Route path="/mistakes" element={<RequireAuth><Mistakes /></RequireAuth>} />
+            <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
