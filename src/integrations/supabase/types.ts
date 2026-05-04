@@ -85,6 +85,7 @@ export type Database = {
           id: string
           lesson_id: string | null
           original_sentence: string
+          tag: string
           user_id: string
         }
         Insert: {
@@ -94,6 +95,7 @@ export type Database = {
           id?: string
           lesson_id?: string | null
           original_sentence: string
+          tag?: string
           user_id: string
         }
         Update: {
@@ -103,6 +105,7 @@ export type Database = {
           id?: string
           lesson_id?: string | null
           original_sentence?: string
+          tag?: string
           user_id?: string
         }
         Relationships: [
@@ -193,6 +196,7 @@ export type Database = {
           georgian_meaning: string
           id: string
           lesson_id: string | null
+          status: string
           user_id: string
         }
         Insert: {
@@ -203,6 +207,7 @@ export type Database = {
           georgian_meaning: string
           id?: string
           lesson_id?: string | null
+          status?: string
           user_id: string
         }
         Update: {
@@ -213,6 +218,7 @@ export type Database = {
           georgian_meaning?: string
           id?: string
           lesson_id?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: [

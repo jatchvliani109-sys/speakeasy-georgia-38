@@ -146,7 +146,7 @@ export default function Lesson() {
           await supabase.from("mistakes").insert(summary.mistakes.map((m: any) => ({
             user_id: user.id, lesson_id: lesson.id,
             original_sentence: m.original_sentence, corrected_sentence: m.corrected_sentence,
-            explanation_ka: m.explanation_ka,
+            explanation_ka: m.explanation_ka, tag: m.tag ?? "grammar",
           })));
         }
       }
