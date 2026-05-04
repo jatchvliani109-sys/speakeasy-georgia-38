@@ -45,6 +45,7 @@ export default function Summary() {
 
   return (
     <Layout>
+      <PageHeader title="გაკვეთილის შედეგი" backTo="/dashboard" />
       <div className="space-y-4 py-2">
         <div className="text-center py-4">
           <div className="text-5xl mb-2">🌟</div>
