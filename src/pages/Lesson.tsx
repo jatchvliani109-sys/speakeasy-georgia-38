@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mic, MicOff, Send, Square, Sparkles, BookOpen, MessageCircle, ClipboardCheck, Clock, Target } from "lucide-react";
+import { Mic, Send, Square, Sparkles, BookOpen, MessageCircle, ClipboardCheck, Clock, Target, ListChecks, Check, X } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string };
-type Stage = "intro" | "warmup" | "words" | "practice" | "review";
+type Stage = "intro" | "warmup" | "words" | "activities" | "practice" | "review";
+
+type Activity = {
+  type: "choose_meaning" | "fill_blank" | "pick_correct";
+  question_ka: string;
+  options: string[];
+  correct_index: number;
+  explanation_ka: string;
+};
 
 type Plan = {
   title_en: string;
@@ -20,14 +29,30 @@ type Plan = {
   warmup_questions: string[];
   new_words: { english_word: string; georgian_meaning: string; example_sentence: string }[];
   practice_intro: string;
+  activities?: Activity[];
 };
 
 const STAGES: { key: Stage; label: string; icon: any }[] = [
   { key: "warmup", label: "გახურება", icon: Sparkles },
-  { key: "words", label: "ახალი სიტყვები", icon: BookOpen },
+  { key: "words", label: "სიტყვები", icon: BookOpen },
+  { key: "activities", label: "ვარჯიში", icon: ListChecks },
   { key: "practice", label: "საუბარი", icon: MessageCircle },
   { key: "review", label: "მიმოხილვა", icon: ClipboardCheck },
 ];
+
+const TOPIC_POOL: Record<string, string[]> = {
+  Beginner: ["Introductions", "School", "Family", "Food", "Daily routine", "Hobbies", "Weather", "Shopping", "Colors", "Animals"],
+  Elementary: ["Weekend plans", "Describing people", "Ordering food", "Travel basics", "Daily schedule", "Asking for help", "My city", "Free time"],
+  Intermediate: ["Opinions", "Storytelling", "Job interview", "Problem solving", "Travel situations", "Explaining preferences", "Movies & books"],
+  Advanced: ["Debate", "Professional conversation", "Presenting ideas", "Interview practice", "Cultural discussion", "Current events"],
+};
+
+function pickTopic(level: string, recent: string[]): string {
+  const pool = TOPIC_POOL[level] ?? TOPIC_POOL.Beginner;
+  const fresh = pool.filter((t) => !recent.slice(0, 3).map((r) => r.toLowerCase()).includes(t.toLowerCase()));
+  const list = fresh.length ? fresh : pool;
+  return list[Math.floor(Math.random() * list.length)];
+}
 
 export default function Lesson() {
   const { user } = useAuth();
@@ -40,8 +65,6 @@ export default function Lesson() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [ending, setEnding] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const recRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,10 +73,22 @@ export default function Lesson() {
       const { data: prof } = await supabase.from("profiles").select("english_level").eq("id", user.id).maybeSingle();
       const lvl = prof?.english_level ?? "Beginner";
       setLevel(lvl);
-      const r = await supabase.functions.invoke("ai-tutor", { body: { mode: "plan", level: lvl } });
+      // recent topics for rotation
+      const { data: recent } = await supabase
+        .from("lessons").select("summary").eq("user_id", user.id).eq("completed", true)
+        .order("created_at", { ascending: false }).limit(5);
+      const recentTopics = (recent ?? [])
+        .map((l: any) => l?.summary?.plan?.topic).filter(Boolean) as string[];
+      const suggestedTopic = pickTopic(lvl, recentTopics);
+
+      const r = await supabase.functions.invoke("ai-tutor", {
+        body: { mode: "plan", level: lvl, recentTopics, suggestedTopic },
+      });
       setPlanLoading(false);
       if (r.error || (r.data as any)?.error) { toast.error("ვერ შევქმენი გაკვეთილი"); return; }
-      setPlan((r.data as any).plan);
+      const p = (r.data as any).plan as Plan;
+      if (!p?.topic) p.topic = suggestedTopic;
+      setPlan(p);
     })();
   }, [user]);
 
@@ -78,22 +113,22 @@ export default function Lesson() {
     setStage("warmup");
     const seed: Msg[] = [{
       role: "user",
-      content: `Begin the warm-up. Use these questions in order: ${plan.warmup_questions.map((q, i) => `(${i + 1}) ${q}`).join(" ")}. Greet me first, then ask the first one.`,
+      content: `Today's topic is "${plan.topic}". Begin the warm-up. Use these questions in order: ${plan.warmup_questions.map((q, i) => `(${i + 1}) ${q}`).join(" ")}. Greet me briefly, then ask the first one. Do NOT ask "what is your name" unless the topic is Introductions.`,
     }];
     await askAI(seed, "warmup");
-    // hide the seed prompt from user view
     setMessages((curr) => curr.filter((m) => m !== seed[0]));
   };
 
   const goToWords = () => setStage("words");
+  const goToActivities = () => setStage("activities");
 
   const startPractice = async () => {
     setStage("practice");
     const seed: Msg[] = [{
       role: "user",
-      content: `Start the speaking practice now. Begin with: "${plan?.practice_intro}". Ask one question at a time. Encourage me to use the new words.`,
+      content: `Start the speaking practice now for topic "${plan?.topic}". Begin with: "${plan?.practice_intro}". Ask one short question at a time. Encourage me to use the new words.`,
     }];
-    setMessages([]); // fresh transcript for practice stage
+    setMessages([]);
     await askAI(seed, "practice");
     setMessages((curr) => curr.filter((m) => m !== seed[0]));
   };
@@ -106,18 +141,6 @@ export default function Lesson() {
     await askAI(next, "practice");
   };
 
-  const toggleRecord = () => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) { toast.error("ბრაუზერი არ უჭერს მხარს ხმოვან შეყვანას — დაწერე ტექსტი"); return; }
-    if (recording) { recRef.current?.stop(); return; }
-    const r = new SR();
-    r.lang = "en-US"; r.continuous = false; r.interimResults = false;
-    r.onresult = (e: any) => setInput((prev) => (prev ? prev + " " : "") + e.results[0][0].transcript);
-    r.onend = () => setRecording(false);
-    r.onerror = () => setRecording(false);
-    recRef.current = r; r.start(); setRecording(true);
-  };
-
   const finishLesson = async () => {
     if (!user || !plan) return;
     setEnding(true);
@@ -126,7 +149,6 @@ export default function Lesson() {
       const r = await supabase.functions.invoke("ai-tutor", { body: { messages, level, mode: "summary" } });
       if (r.error || (r.data as any).error) throw new Error((r.data as any)?.error ?? "Summary failed");
       const summary = { ...(r.data as any).summary, plan };
-      // ensure plan words appear in vocabulary
       const planWords = (plan.new_words || []).map((w) => ({ ...w, difficulty: "easy" }));
       summary.new_words = [...planWords, ...(summary.new_words || [])];
 
@@ -158,16 +180,27 @@ export default function Lesson() {
   };
 
   // ===== UI =====
-  if (planLoading) return <Layout><p className="text-center py-12 text-muted-foreground ka">გაკვეთილი მზადდება...</p></Layout>;
-  if (!plan) return <Layout><p className="text-center py-12 text-muted-foreground ka">ვერ შევქმენი გაკვეთილი. სცადე თავიდან.</p></Layout>;
+  if (planLoading) return (
+    <Layout>
+      <PageHeader title="გაკვეთილი" backTo="/dashboard" />
+      <p className="text-center py-12 text-muted-foreground ka">გაკვეთილი მზადდება...</p>
+    </Layout>
+  );
+  if (!plan) return (
+    <Layout>
+      <PageHeader title="გაკვეთილი" backTo="/dashboard" />
+      <p className="text-center py-12 text-muted-foreground ka">ვერ შევქმენი გაკვეთილი. სცადე თავიდან.</p>
+    </Layout>
+  );
 
   // Intro screen
   if (stage === "intro") {
     return (
       <Layout>
+        <PageHeader title="დღევანდელი გაკვეთილი" backTo="/dashboard" />
         <div className="space-y-5 py-2">
           <div className="p-6 rounded-3xl gradient-hero text-primary-foreground shadow-warm">
-            <div className="text-sm opacity-90 ka">დღევანდელი გაკვეთილი</div>
+            <div className="text-sm opacity-90 ka">თემა</div>
             <h1 className="text-2xl font-extrabold mt-1">{plan.title_en}</h1>
             <div className="text-base opacity-95 mt-1 ka">{plan.title_ka}</div>
           </div>
@@ -176,10 +209,11 @@ export default function Lesson() {
             <Row icon={<Target className="w-5 h-5 text-primary" />} label="მიზანი" value={plan.goal_ka} />
             <Row icon={<Clock className="w-5 h-5 text-primary" />} label="ხანგრძლივობა" value={`${plan.estimated_minutes} წუთი`} />
             <Row icon={<Sparkles className="w-5 h-5 text-primary" />} label="დონე" value={level} />
+            <Row icon={<BookOpen className="w-5 h-5 text-primary" />} label="სასწავლი სიტყვები" value={plan.new_words.map(w => w.english_word).join(", ")} />
           </div>
 
           <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
-            <div className="font-bold mb-3 ka">დღეს ვივარჯიშებთ:</div>
+            <div className="font-bold mb-3 ka">გაკვეთილის ნაბიჯები:</div>
             <ul className="space-y-2 text-sm">
               {STAGES.map((s) => (
                 <li key={s.key} className="flex items-center gap-3">
@@ -200,7 +234,8 @@ export default function Lesson() {
 
   return (
     <Layout>
-      <div className="flex flex-col h-[calc(100vh-7rem)]">
+      <PageHeader title={plan.title_ka || "გაკვეთილი"} backTo="/dashboard" />
+      <div className="flex flex-col h-[calc(100vh-9rem)]">
         <Stepper current={stage} />
 
         {stage === "warmup" && (
@@ -238,10 +273,17 @@ export default function Lesson() {
                 <div className="text-sm italic text-muted-foreground mt-2">"{w.example_sentence}"</div>
               </div>
             ))}
-            <Button variant="hero" size="lg" className="w-full mt-4 ka" onClick={startPractice}>
-              დავიწყოთ საუბარი →
+            <Button variant="hero" size="lg" className="w-full mt-4 ka" onClick={goToActivities}>
+              ვარჯიში →
             </Button>
           </div>
+        )}
+
+        {stage === "activities" && (
+          <ActivitiesStage
+            activities={plan.activities ?? []}
+            onDone={startPractice}
+          />
         )}
 
         {stage === "practice" && (
@@ -271,7 +313,6 @@ export default function Lesson() {
   );
 }
 
-// helper for warmup chat (no stage transition needed mid-warmup; user can advance)
 function sendWarmup(
   text: string,
   messages: Msg[],
@@ -288,9 +329,9 @@ function Row({ icon, label, value }: { icon: React.ReactNode; label: string; val
   return (
     <div className="flex items-start gap-3">
       <div className="mt-0.5">{icon}</div>
-      <div>
+      <div className="min-w-0">
         <div className="text-xs text-muted-foreground ka">{label}</div>
-        <div className="font-semibold ka">{value}</div>
+        <div className="font-semibold ka break-words">{value}</div>
       </div>
     </div>
   );
@@ -319,6 +360,81 @@ function Stepper({ current }: { current: Stage }) {
       <div className="h-1 bg-secondary rounded-full mt-2 overflow-hidden">
         <div className="h-full gradient-hero transition-smooth" style={{ width: `${((idx + 1) / STAGES.length) * 100}%` }} />
       </div>
+    </div>
+  );
+}
+
+function ActivitiesStage({ activities, onDone }: { activities: Activity[]; onDone: () => void }) {
+  const [idx, setIdx] = useState(0);
+  const [picked, setPicked] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+
+  if (!activities.length) {
+    return (
+      <div className="flex-1 overflow-y-auto py-2 space-y-3">
+        <p className="text-center text-muted-foreground ka">აქტივობები არ არის. გადავიდეთ საუბარზე.</p>
+        <Button variant="hero" size="lg" className="w-full ka" onClick={onDone}>დავიწყოთ საუბარი →</Button>
+      </div>
+    );
+  }
+
+  const a = activities[idx];
+  const isLast = idx === activities.length - 1;
+  const answered = picked !== null;
+  const correct = picked === a.correct_index;
+
+  const next = () => {
+    if (isLast) { onDone(); return; }
+    setPicked(null);
+    setIdx(idx + 1);
+  };
+
+  const pick = (i: number) => {
+    if (answered) return;
+    setPicked(i);
+    if (i === a.correct_index) setScore((s) => s + 1);
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto py-2 space-y-4">
+      <div className="text-center">
+        <div className="text-xs text-muted-foreground ka">აქტივობა {idx + 1} / {activities.length}</div>
+        <h2 className="text-xl font-extrabold ka mt-1">აირჩიე სწორი პასუხი</h2>
+      </div>
+      <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+        <div className="ka text-base font-semibold mb-4">{a.question_ka}</div>
+        <div className="space-y-2">
+          {a.options.map((opt, i) => {
+            const isCorrect = i === a.correct_index;
+            const isPicked = i === picked;
+            const variant = !answered
+              ? "soft"
+              : isCorrect ? "hero"
+              : isPicked ? "destructive" : "soft";
+            return (
+              <Button
+                key={i}
+                variant={variant as any}
+                className="w-full justify-between ka text-left h-auto py-3"
+                onClick={() => pick(i)}
+                disabled={answered}
+              >
+                <span className="whitespace-normal">{opt}</span>
+                {answered && isCorrect && <Check className="w-4 h-4" />}
+                {answered && isPicked && !isCorrect && <X className="w-4 h-4" />}
+              </Button>
+            );
+          })}
+        </div>
+        {answered && (
+          <div className={`mt-4 p-3 rounded-xl text-sm ka ${correct ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+            {correct ? "🎉 ყოჩაღ! " : "💡 "}{a.explanation_ka}
+          </div>
+        )}
+      </div>
+      <Button variant="hero" size="lg" className="w-full ka" onClick={next} disabled={!answered}>
+        {isLast ? `დავიწყოთ საუბარი (${score}/${activities.length}) →` : "შემდეგი →"}
+      </Button>
     </div>
   );
 }
