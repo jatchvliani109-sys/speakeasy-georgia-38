@@ -59,8 +59,16 @@ export default function Summary() {
             <div className="space-y-2">
               {words.map((w) => (
                 <div key={w.id} className="p-3 bg-secondary/50 rounded-xl">
-                  <div className="font-bold">{w.english_word} <span className="text-muted-foreground font-normal ka">— {w.georgian_meaning}</span></div>
-                  {w.example_sentence && <div className="text-sm text-muted-foreground italic mt-1">"{w.example_sentence}"</div>}
+                  <div className="flex items-center gap-2">
+                    <SpeakButton text={w.english_word} />
+                    <div className="font-bold">{w.english_word} <span className="text-muted-foreground font-normal ka">— {w.georgian_meaning}</span></div>
+                  </div>
+                  {w.example_sentence && (
+                    <div className="flex items-start gap-2 mt-1">
+                      <SpeakButton text={w.example_sentence} />
+                      <div className="text-sm text-muted-foreground italic">"{w.example_sentence}"</div>
+                    </div>
+                  )}
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant={w.status === "learned" ? "hero" : "soft"} className="flex-1 ka" onClick={() => setWordStatus(w.id, "learned")}>
                       <Check className="w-4 h-4" /> ნასწავლი
