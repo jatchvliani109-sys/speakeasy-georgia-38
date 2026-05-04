@@ -92,7 +92,10 @@ export default function Summary() {
               {data.mistakes.map((m: any, i: number) => (
                 <div key={i} className="p-3 bg-secondary/50 rounded-xl">
                   <div>❌ <span className="line-through text-destructive">{m.original_sentence}</span></div>
-                  <div className="font-bold text-success">✅ {m.corrected_sentence}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <SpeakButton text={m.corrected_sentence} />
+                    <div className="font-bold text-success">✅ {m.corrected_sentence}</div>
+                  </div>
                   {m.explanation_ka && <div className="text-sm text-muted-foreground mt-1 ka">🇬🇪 {m.explanation_ka}</div>}
                 </div>
               ))}
