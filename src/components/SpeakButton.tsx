@@ -22,15 +22,23 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
   if (Date.now() < retryAfter) return null;
   if (audioCache.has(text)) return audioCache.get(text)!;
   try {
-    const { data, error } = await supabase.functions.invoke("tts", {
-      body: { text },
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const res = await fetch(`${supabaseUrl}/functions/v1/tts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({ text }),
     });
-    if (error || !data) {
+    if (!res.ok) {
       // Don't permanently disable the real voice; secrets/config can change while the app is open.
       retryAfter = Date.now() + 15_000;
       return null;
     }
-    const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
+    const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     audioCache.set(text, url);
     return url;
