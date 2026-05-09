@@ -24,14 +24,13 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
   try {
     const { data, error } = await supabase.functions.invoke("tts", {
       body: { text },
-      responseType: "arrayBuffer",
     });
     if (error || !data) {
       // Don't permanently disable the real voice; secrets/config can change while the app is open.
       retryAfter = Date.now() + 15_000;
       return null;
     }
-    const blob = new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
+    const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
     const url = URL.createObjectURL(blob);
     audioCache.set(text, url);
     return url;
