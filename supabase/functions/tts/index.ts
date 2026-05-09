@@ -41,8 +41,9 @@ Deno.serve(async (req) => {
     );
     if (!res.ok) {
       const err = await res.text();
-      return new Response(JSON.stringify({ error: err || "TTS failed" }), {
-        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("ElevenLabs TTS unavailable", res.status, err.slice(0, 500));
+      return new Response(JSON.stringify({ error: "TTS_PROVIDER_UNAVAILABLE", fallback: true }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     const buf = await res.arrayBuffer();
@@ -51,8 +52,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "audio/mpeg", "Cache-Control": "public, max-age=86400" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    console.error("TTS function failed", (e as Error).message);
+    return new Response(JSON.stringify({ error: "TTS_SERVICE_FAILED", fallback: true }), {
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

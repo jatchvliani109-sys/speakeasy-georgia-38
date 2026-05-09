@@ -38,7 +38,16 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
       retryAfter = Date.now() + 15_000;
       return null;
     }
+    const contentType = res.headers.get("Content-Type") || "";
+    if (contentType.includes("application/json")) {
+      retryAfter = Date.now() + 15_000;
+      return null;
+    }
     const blob = await res.blob();
+    if (!blob.type.startsWith("audio/")) {
+      retryAfter = Date.now() + 15_000;
+      return null;
+    }
     const url = URL.createObjectURL(blob);
     audioCache.set(text, url);
     return url;
