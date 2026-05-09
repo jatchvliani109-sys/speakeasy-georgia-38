@@ -16,26 +16,34 @@ function extractEnglish(text: string): string {
 
 // Module-level cache so the same phrase isn't re-fetched
 const audioCache = new Map<string, string>();
-let providerAvailable: boolean | null = null;
+let retryAfter = 0;
 
 async function fetchRealisticAudio(text: string): Promise<string | null> {
-  if (providerAvailable === false) return null;
+  if (Date.now() < retryAfter) return null;
   if (audioCache.has(text)) return audioCache.get(text)!;
   try {
-    const { data, error } = await supabase.functions.invoke("tts", {
-      body: { text },
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const res = await fetch(`${supabaseUrl}/functions/v1/tts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({ text }),
     });
-    if (error || !data) {
-      // 503 → provider not configured; stop trying for this session
-      if ((error as any)?.context?.status === 503) providerAvailable = false;
+    if (!res.ok) {
+      // Don't permanently disable the real voice; secrets/config can change while the app is open.
+      retryAfter = Date.now() + 15_000;
       return null;
     }
-    const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
+    const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     audioCache.set(text, url);
-    providerAvailable = true;
     return url;
   } catch {
+    retryAfter = Date.now() + 15_000;
     return null;
   }
 }
