@@ -173,19 +173,32 @@ export default function Lesson() {
           })));
         }
       }
-      // update streak + last_activity
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const todayStr = today.toISOString().slice(0, 10);
-      const { data: prof } = await supabase.from("profiles").select("streak, last_activity").eq("id", user.id).maybeSingle();
+      // update streak + last_activity using LOCAL calendar date
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("streak, longest_streak, last_activity")
+        .eq("id", user.id)
+        .maybeSingle();
+      const prevStreak = prof?.streak ?? 0;
+      const longest = (prof as any)?.longest_streak ?? 0;
       let newStreak = 1;
       if (prof?.last_activity) {
-        const last = new Date(prof.last_activity); last.setHours(0, 0, 0, 0);
+        // Parse YYYY-MM-DD as local date (avoid UTC shift)
+        const [ly, lm, ld] = String(prof.last_activity).slice(0, 10).split("-").map(Number);
+        const last = new Date(ly, (lm || 1) - 1, ld || 1);
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const diffDays = Math.round((today.getTime() - last.getTime()) / 86400000);
-        if (diffDays === 0) newStreak = prof.streak ?? 1;
-        else if (diffDays === 1) newStreak = (prof.streak ?? 0) + 1;
+        if (diffDays === 0) newStreak = prevStreak || 1;
+        else if (diffDays === 1) newStreak = prevStreak + 1;
         else newStreak = 1;
       }
-      await supabase.from("profiles").update({ streak: newStreak, last_activity: todayStr }).eq("id", user.id);
+      const newLongest = Math.max(longest, newStreak);
+      await supabase
+        .from("profiles")
+        .update({ streak: newStreak, longest_streak: newLongest, last_activity: todayStr } as any)
+        .eq("id", user.id);
       navigate(`/summary/${lesson?.id}`);
     } catch (e: any) {
       toast.error(e.message);
