@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Layout from "@/components/Layout";
+import SpeakingShell, { SoundBars } from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
