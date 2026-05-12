@@ -5,6 +5,7 @@ import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { recordSpeakingActivity } from "./lib/tracker";
 
 import { Headphones } from "lucide-react";
 
