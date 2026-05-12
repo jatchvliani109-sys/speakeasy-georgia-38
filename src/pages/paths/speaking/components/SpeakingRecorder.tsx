@@ -258,18 +258,21 @@ export default function SpeakingRecorder({
           <button
             type="button"
             onClick={stop}
-            className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white px-3.5 py-1.5 text-xs font-semibold ka animate-pulse"
+            className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white px-3.5 py-1.5 text-xs font-semibold ka sp-recording"
           >
+            <span className="sp-rec-dot" />
             <Square className="w-3.5 h-3.5" /> ⏹ გაჩერება
           </button>
         )}
         {isProcessing && (
           <span className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-medium ka">
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
+            <span className="sp-spinner" /> Processing...
           </span>
         )}
         {isRecording && (
-          <span className="text-[11px] ka sp-text-soft">Recording... speak now (max 20 წმ)</span>
+          <span className="text-[11px] ka sp-text-soft inline-flex items-center gap-1.5">
+            <span className="sp-rec-dot" /> Recording... speak now (max 20 წმ)
+          </span>
         )}
         {(status === "result" || status === "error") && (
           <button
