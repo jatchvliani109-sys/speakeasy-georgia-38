@@ -1,12 +1,14 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import Layout from "@/components/Layout";
 
 export default function SpeakingShell({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    document.body.classList.add("sp-active");
+    return () => document.body.classList.remove("sp-active");
+  }, []);
   return (
     <Layout>
-      <div className="sp-bg relative -mx-4 -my-6 px-4 py-6 min-h-[calc(100vh-4rem)] rounded-none overflow-hidden">
-        <div className="relative z-[1]">{children}</div>
-      </div>
+      <div className="relative">{children}</div>
     </Layout>
   );
 }

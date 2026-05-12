@@ -100,47 +100,63 @@
   /* ===== Speaking path theme ===== */
   .sp-bg {
     background:
-      radial-gradient(900px 500px at 90% -10%, hsl(190 95% 55% / 0.18), transparent 60%),
-      radial-gradient(700px 500px at -10% 10%, hsl(265 85% 60% / 0.22), transparent 60%),
-      radial-gradient(900px 600px at 50% 110%, hsl(175 75% 50% / 0.18), transparent 60%),
-      linear-gradient(160deg, hsl(258 60% 12%) 0%, hsl(232 55% 14%) 45%, hsl(200 55% 14%) 100%);
+      radial-gradient(900px 500px at 90% -10%, hsl(190 95% 60% / 0.16), transparent 60%),
+      radial-gradient(700px 500px at -10% 10%, hsl(255 75% 65% / 0.18), transparent 60%),
+      radial-gradient(900px 600px at 50% 110%, hsl(180 80% 55% / 0.16), transparent 60%),
+      linear-gradient(160deg, hsl(225 45% 16%) 0%, hsl(220 50% 18%) 45%, hsl(205 50% 18%) 100%);
     color: hsl(220 30% 96%);
   }
-  .sp-bg::before {
+  /* Full-bleed background while a Speaking page is mounted */
+  body.sp-active { background: hsl(225 45% 14%) !important; }
+  body.sp-active::before {
     content: "";
-    position: absolute; inset: 0;
-    pointer-events: none;
-    background-image:
-      repeating-linear-gradient(90deg,
-        hsl(190 100% 70% / 0.06) 0 1px,
-        transparent 1px 7px),
-      repeating-linear-gradient(90deg,
-        hsl(265 100% 80% / 0.05) 0 1px,
-        transparent 1px 13px);
-    mask-image: linear-gradient(180deg, hsl(0 0% 0% / 0.55), transparent 70%);
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(1100px 700px at 85% -10%, hsl(190 95% 60% / 0.18), transparent 60%),
+      radial-gradient(900px 700px at -10% 10%, hsl(255 75% 65% / 0.20), transparent 60%),
+      radial-gradient(1100px 800px at 50% 110%, hsl(180 80% 55% / 0.16), transparent 60%),
+      linear-gradient(160deg, hsl(225 45% 14%) 0%, hsl(220 50% 16%) 45%, hsl(205 50% 16%) 100%);
   }
+  body.sp-active::after {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, hsl(190 100% 75% / 0.04) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(90deg, hsl(255 100% 80% / 0.035) 0 1px, transparent 1px 17px);
+    mask-image: linear-gradient(180deg, hsl(0 0% 0% / 0.5), transparent 75%);
+  }
+  body.sp-active #root { position: relative; z-index: 1; }
+  body.sp-active header {
+    background: hsl(225 45% 14% / 0.65) !important;
+    border-color: hsl(255 70% 75% / 0.18) !important;
+    color: hsl(220 30% 96%);
+  }
+  body.sp-active header a, body.sp-active header span { color: hsl(220 30% 96%); }
+  body.sp-active main { background: transparent; }
+
   .sp-text { color: hsl(220 30% 96%); }
-  .sp-text-muted { color: hsl(220 20% 78%); }
+  .sp-text-muted { color: hsl(220 20% 80%); }
   .sp-card {
-    background: linear-gradient(180deg, hsl(240 40% 18% / 0.75), hsl(232 45% 14% / 0.75));
-    border: 1px solid hsl(265 70% 70% / 0.25);
+    background: linear-gradient(180deg, hsl(225 45% 22% / 0.78), hsl(220 50% 18% / 0.78));
+    border: 1px solid hsl(255 70% 75% / 0.22);
     border-radius: 1.25rem;
-    box-shadow: 0 10px 30px -12px hsl(265 80% 30% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    box-shadow: 0 10px 30px -12px hsl(225 60% 10% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.05);
     backdrop-filter: blur(8px);
     color: hsl(220 30% 96%);
   }
   .sp-card-glow {
     background:
-      linear-gradient(180deg, hsl(255 60% 22% / 0.85), hsl(220 55% 16% / 0.85));
+      linear-gradient(180deg, hsl(235 50% 26% / 0.85), hsl(220 55% 18% / 0.85));
     border: 1px solid transparent;
     background-clip: padding-box;
     border-radius: 1.5rem;
     box-shadow:
-      0 0 0 1px hsl(265 90% 70% / 0.35),
-      0 20px 50px -20px hsl(265 90% 50% / 0.55),
+      0 0 0 1px hsl(255 80% 75% / 0.30),
+      0 20px 50px -20px hsl(225 80% 25% / 0.55),
       inset 0 1px 0 hsl(0 0% 100% / 0.06);
     color: hsl(220 30% 96%);
   }
+
   .sp-btn-primary {
     background: linear-gradient(135deg, hsl(265 85% 60%) 0%, hsl(220 90% 60%) 60%, hsl(190 90% 55%) 100%);
     color: white;
