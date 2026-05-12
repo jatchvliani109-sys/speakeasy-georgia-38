@@ -163,10 +163,10 @@ export default function DailyLesson() {
 
   if (planLoading || !plan) {
     return (
-      <Layout>
+      <SpeakingShell>
         <PageHeader title="დღევანდელი საუბრის გაკვეთილი" backTo="/path/speaking" />
-        <p className="text-center py-12 text-muted-foreground ka">გაკვეთილი მზადდება...</p>
-      </Layout>
+        <p className="text-center py-12 sp-text-muted ka">გაკვეთილი მზადდება...</p>
+      </SpeakingShell>
     );
   }
 
