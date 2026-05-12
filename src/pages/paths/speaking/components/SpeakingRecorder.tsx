@@ -99,12 +99,19 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string>("audio/webm");
+  const recognitionRef = useRef<any>(null);
+  const sawResultRef = useRef(false);
 
-  const supported = typeof window !== "undefined"
+  const SR: any = typeof window !== "undefined"
+    ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+    : null;
+  const browserSupported = !!SR;
+  const recorderSupported = typeof window !== "undefined"
     && !!(navigator as any).mediaDevices?.getUserMedia
     && typeof window.MediaRecorder !== "undefined";
 
   useEffect(() => () => {
+    try { recognitionRef.current?.stop?.(); } catch {}
     try { recorderRef.current?.state === "recording" && recorderRef.current.stop(); } catch {}
     streamRef.current?.getTracks().forEach((t) => t.stop());
   }, []);
@@ -118,17 +125,76 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
     setFeedback("");
   };
 
-  const start = async () => {
-    if (!supported) {
-      setErrorMsg("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome ან Safari.");
-      setStatus("error");
-      return;
+  const finish = async (heard: string) => {
+    setTranscript(heard);
+    const { score: sc, missing: miss } = scorePronunciation(target, heard);
+    const fb = buildFeedback(sc, miss);
+    setScore(sc);
+    setMissing(miss);
+    setFeedback(fb);
+    setStatus("result");
+    onScored?.(sc);
+    if (user) {
+      try {
+        await supabase.from("pronunciation_attempts").insert({
+          user_id: user.id,
+          target_phrase: target,
+          transcript: heard,
+          score: sc,
+          feedback_ka: fb,
+          missing_words: miss,
+          topic: topic ?? null,
+          source: source ?? null,
+        });
+      } catch {}
     }
-    if (!navigator.onLine) {
-      setErrorMsg("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
+  };
+
+  const startBrowserSR = () => {
+    try {
+      const rec = new SR();
+      rec.lang = "en-US";
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      rec.continuous = false;
+      sawResultRef.current = false;
+      rec.onresult = (e: any) => {
+        sawResultRef.current = true;
+        const heard = (e.results?.[0]?.[0]?.transcript ?? "").trim();
+        if (!heard) {
+          setErrorMsg("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
+          setStatus("error");
+          return;
+        }
+        finish(heard);
+      };
+      rec.onerror = (e: any) => {
+        const name = e?.error || "";
+        const msg = name === "not-allowed" || name === "service-not-allowed"
+          ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
+          : name === "no-speech"
+          ? "ვერ გავიგეთ კარგად. სცადე უფრო ნელა."
+          : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
+        setErrorMsg(msg);
+        setStatus("error");
+      };
+      rec.onend = () => {
+        if (!sawResultRef.current && status === "recording") {
+          setErrorMsg("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
+          setStatus("error");
+        }
+      };
+      recognitionRef.current = rec;
+      rec.start();
+      setStatus("recording");
+      setErrorMsg(null);
+    } catch {
+      setErrorMsg("ჩაწერა ვერ დაიწყო. სცადე თავიდან.");
       setStatus("error");
-      return;
     }
+  };
+
+  const startRecorderFallback = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -138,7 +204,7 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
       recorderRef.current = rec;
       chunksRef.current = [];
       rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
-      rec.onstop = () => handleStop();
+      rec.onstop = () => handleRecorderStop();
       rec.start();
       setStatus("recording");
       setErrorMsg(null);
@@ -151,11 +217,24 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
     }
   };
 
+  const start = async () => {
+    if (!navigator.onLine) {
+      setErrorMsg("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
+      setStatus("error");
+      return;
+    }
+    if (browserSupported) return startBrowserSR();
+    if (recorderSupported) return startRecorderFallback();
+    setErrorMsg("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome-ის უახლესი ვერსია.");
+    setStatus("error");
+  };
+
   const stop = () => {
+    try { recognitionRef.current?.stop?.(); } catch {}
     try { recorderRef.current?.stop(); } catch {}
   };
 
-  const handleStop = async () => {
+  const handleRecorderStop = async () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     if (!chunksRef.current.length) {
@@ -175,35 +254,13 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
       const { data, error } = await supabase.functions.invoke("speech-to-text", {
         body: { audioBase64, mimeType: mimeRef.current },
       });
-      if (error || !data || (data as any).error) {
-        setErrorMsg("ვერ გავიგეთ კარგად. სცადე თავიდან, ნელა და გარკვევით.");
+      const payload: any = data ?? {};
+      if (error || payload.fallback || payload.error || !payload.text) {
+        setErrorMsg("ხმოვანი ამოცნობა დროებით მიუწვდომელია. სცადე Chrome ბრაუზერში.");
         setStatus("error");
         return;
       }
-      const heard: string = ((data as any).text ?? "").trim();
-      setTranscript(heard);
-      const { score: sc, missing: miss } = scorePronunciation(target, heard);
-      const fb = buildFeedback(sc, miss);
-      setScore(sc);
-      setMissing(miss);
-      setFeedback(fb);
-      setStatus("result");
-      onScored?.(sc);
-
-      if (user) {
-        try {
-          await supabase.from("pronunciation_attempts").insert({
-            user_id: user.id,
-            target_phrase: target,
-            transcript: heard,
-            score: sc,
-            feedback_ka: fb,
-            missing_words: miss,
-            topic: topic ?? null,
-            source: source ?? null,
-          });
-        } catch {}
-      }
+      await finish((payload.text as string).trim());
     } catch {
       setErrorMsg("ვერ გავიგეთ კარგად. სცადე თავიდან.");
       setStatus("error");
