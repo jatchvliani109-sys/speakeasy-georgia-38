@@ -17,6 +17,7 @@ type Props = {
 type Status = "idle" | "recording" | "processing" | "result" | "error";
 
 const MAX_RECORD_MS = 10_000;
+const BACKUP_RECORD_MS = 20_000;
 
 function normalizeWords(s: string): string[] {
   return s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -37,14 +38,17 @@ function scorePronunciation(target: string, heard: string) {
   const matched = lcs(t, h);
   const coverage = matched / t.length;
   const noise = Math.max(0, h.length - t.length) / Math.max(t.length, 1);
-  const score = Math.max(0, Math.min(100, Math.round(coverage * 100 - noise * 12)));
+  let score = Math.max(0, Math.min(100, Math.round(coverage * 100 - noise * 10)));
   const heardSet = new Set(h);
-  return { score, missing: t.filter((w) => !heardSet.has(w)), matched };
+  const missing = t.filter((w) => !heardSet.has(w));
+  if (missing.length === 1 && matched >= t.length - 1) score = Math.max(score, 82);
+  if (missing.length <= 2 && matched >= Math.max(1, t.length - 2)) score = Math.max(score, 68);
+  return { score, missing, matched };
 }
-function buildFeedback(score: number, missing: string[]): string {
+function buildFeedback(score: number, missing: string[], target: string): string {
   if (score >= 90) return "ძალიან კარგი! შეგიძლია შემდეგ ფრაზაზე გადახვიდე.";
   if (score >= 75) return missing.length
-    ? `კარგია. გამოგრჩა სიტყვა: ${missing.slice(0, 2).join(", ")}.`
+    ? `Good try! Better: “${target}.” სცადე კიდევ ერთხელ ნელა.`
     : "კარგია. სცადე კიდევ ერთხელ უფრო გარკვევით.";
   if (score >= 50) return missing.length
     ? `ცოტა გამოგრჩა. გაიმეორე ეს ნაწილი: ${missing.slice(0, 3).join(", ")}.`
