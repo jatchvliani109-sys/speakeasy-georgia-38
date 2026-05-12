@@ -106,8 +106,12 @@ export default function LevelTest() {
   const [writing, setWriting] = useState("");
   const [result, setResult] = useState<{ level: Level; score: number } | null>(null);
   const [reaction, setReaction] = useState<string>("");
-  const [reactionLoading, setReactionLoading] = useState(false);
+  const [reactionReady, setReactionReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const realReactionArrived = useRef(false);
+
+  const FALLBACK_REACTION = "კარგი დასაწყისია! ახლა ვნახოთ შენი სავარაუდო დონე.";
 
   const submit = async () => {
     if (selfIdx === null) return;
@@ -122,11 +126,38 @@ export default function LevelTest() {
     const level = combineLevel(selfIdx, score, QUESTIONS.length, w.cap);
     setResult({ level, score });
     setStage("done");
-    setReactionLoading(true);
+    setReaction("");
+    setReactionReady(false);
+    realReactionArrived.current = false;
+
+    // Fallback after 2s if real reaction hasn't arrived
+    fallbackTimer.current = setTimeout(() => {
+      if (!realReactionArrived.current) {
+        setReaction(FALLBACK_REACTION);
+        setReactionReady(true);
+      }
+    }, 2000);
+
     supabase.functions.invoke("level-reaction", { body: { writingSample: trimmed, level } })
-      .then(({ data }) => setReaction((data as any)?.reaction || "კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
-      .catch(() => setReaction("კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
-      .finally(() => setReactionLoading(false));
+      .then(({ data }) => {
+        const real = (data as any)?.reaction;
+        if (real) {
+          realReactionArrived.current = true;
+          if (fallbackTimer.current) clearTimeout(fallbackTimer.current);
+          setReaction(real);
+          setReactionReady(true);
+        } else if (!reactionReady) {
+          setReaction(FALLBACK_REACTION);
+          setReactionReady(true);
+        }
+      })
+      .catch(() => {
+        if (!realReactionArrived.current) {
+          setReaction(FALLBACK_REACTION);
+          setReactionReady(true);
+        }
+      });
+
     if (!user) return;
     setSaving(true);
     await supabase.from("level_test_results").insert({
