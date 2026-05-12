@@ -229,12 +229,17 @@ export default function SpeakingProgress() {
           )}
 
           {needsPractice.length > 0 && (
-            <Section title="საჭიროებს ვარჯიშს">
+            <Section title="ფრაზები გადასახედად">
               <ul className="space-y-2 text-sm">
                 {needsPractice.map((p, i) => (
                   <li key={i} className="flex items-center justify-between gap-3">
                     <span className="sp-text truncate">{p.phrase}</span>
-                    <span className="text-xs sp-text-muted shrink-0">{p.score}%</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs sp-text-muted">{p.score}%</span>
+                      <Link to="/path/speaking/pronunciation" className="text-xs font-semibold text-[hsl(175_70%_38%)] hover:underline">
+                        Practice again
+                      </Link>
+                    </div>
                   </li>
                 ))}
               </ul>
