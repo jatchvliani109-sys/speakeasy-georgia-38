@@ -320,6 +320,7 @@ export default function DailyLesson() {
           await supabase.from("mistakes").insert(rows);
         } catch {}
       }
+      await recordSpeakingActivity(user.id, "daily_speaking_lesson");
     } catch (e: any) {
       toast.error(e.message ?? "ვერ შევინახე");
     } finally {
