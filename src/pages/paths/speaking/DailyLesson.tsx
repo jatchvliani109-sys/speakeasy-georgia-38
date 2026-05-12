@@ -301,6 +301,7 @@ export default function DailyLesson() {
         summary: {
           plan: { title_ka: plan.title_ka, topic: plan.topic },
           phrases_practiced: practicedRepeat.filter(Boolean).length,
+          voice_prompts_completed: Object.values(promptResults).filter((r) => r.transcript).length,
           mistakes,
         } as any,
         completed: true,
@@ -336,6 +337,10 @@ export default function DailyLesson() {
 
   const currentIdx = STEPS.findIndex((s) => s.key === step);
   const bestCorrection = mistakes[mistakes.length - 1];
+  const reviewPrompts = makeLessonPrompts(plan, isBeginner);
+  const completedPromptResults = Object.entries(promptResults)
+    .map(([idx, result]) => ({ idx: Number(idx), result }))
+    .filter(({ result }) => Boolean(result.transcript));
 
   return (
     <SpeakingShell>
