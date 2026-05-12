@@ -269,7 +269,7 @@ export default function SpeakingRecorder({
           </span>
         )}
         {isRecording && (
-          <span className="text-[11px] ka sp-text-soft">Recording... (max 10 წმ)</span>
+          <span className="text-[11px] ka sp-text-soft">Recording... speak now (max 20 წმ)</span>
         )}
         {(status === "result" || status === "error") && (
           <button
