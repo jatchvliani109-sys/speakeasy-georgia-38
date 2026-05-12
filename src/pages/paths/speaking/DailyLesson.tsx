@@ -620,12 +620,7 @@ export default function DailyLesson() {
             </div>
           );
         })()}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-        )}
+
 
         {step === "review" && (
           <>
