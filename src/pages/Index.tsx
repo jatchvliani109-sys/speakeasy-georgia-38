@@ -12,7 +12,11 @@ const features = [
   { icon: TrendingUp, title: "პროგრესი", desc: "თვალი ადევნე საკუთარ ზრდას" },
 ];
 
-const Index = () => (
+const Index = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">...</div>;
+  if (user) return <Navigate to="/dashboard" replace />;
+  return (
   <Layout showLogout={false}>
     <section className="py-8 text-center ka">
       <div className="inline-block px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-6">
