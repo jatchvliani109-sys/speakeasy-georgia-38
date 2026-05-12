@@ -55,6 +55,16 @@ function pickTopic(level: string, recent: string[]): string {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function getLocalDateString(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function getYesterdayLocalDateString() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return getLocalDateString(yesterday);
+}
+
 export default function Lesson() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -173,32 +183,40 @@ export default function Lesson() {
           })));
         }
       }
-      // update streak + last_activity using LOCAL calendar date
-      const now = new Date();
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-      const { data: prof } = await supabase
+      // update saved streak immediately after lesson completion using LOCAL calendar dates only
+      const todayStr = getLocalDateString();
+      const yesterdayStr = getYesterdayLocalDateString();
+      const { data: prof, error: profileError } = await supabase
         .from("profiles")
         .select("streak, longest_streak, last_activity")
         .eq("id", user.id)
         .maybeSingle();
-      const prevStreak = prof?.streak ?? 0;
-      const longest = (prof as any)?.longest_streak ?? 0;
-      let newStreak = 1;
-      if (prof?.last_activity) {
-        // Parse YYYY-MM-DD as local date (avoid UTC shift)
-        const [ly, lm, ld] = String(prof.last_activity).slice(0, 10).split("-").map(Number);
-        const last = new Date(ly, (lm || 1) - 1, ld || 1);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const diffDays = Math.round((today.getTime() - last.getTime()) / 86400000);
-        if (diffDays === 0) newStreak = prevStreak || 1;
-        else if (diffDays === 1) newStreak = prevStreak + 1;
-        else newStreak = 1;
+      if (profileError) throw profileError;
+
+      const lastLessonCompletedDate = prof?.last_activity ? String(prof.last_activity).slice(0, 10) : null;
+      const oldCurrentStreak = prof?.streak ?? 0;
+      const oldLongestStreak = prof?.longest_streak ?? 0;
+      let newCurrentStreak = 1;
+
+      if (lastLessonCompletedDate === todayStr) {
+        newCurrentStreak = oldCurrentStreak;
+      } else if (lastLessonCompletedDate === yesterdayStr) {
+        newCurrentStreak = oldCurrentStreak + 1;
       }
-      const newLongest = Math.max(longest, newStreak);
-      await supabase
+
+      const newLongestStreak = Math.max(oldLongestStreak, newCurrentStreak);
+      console.log("[streak update]", {
+        today: todayStr,
+        lastLessonCompletedDate,
+        oldCurrentStreak,
+        newCurrentStreak,
+      });
+
+      const { error: streakError } = await supabase
         .from("profiles")
-        .update({ streak: newStreak, longest_streak: newLongest, last_activity: todayStr } as any)
+        .update({ streak: newCurrentStreak, longest_streak: newLongestStreak, last_activity: todayStr } as any)
         .eq("id", user.id);
+      if (streakError) throw streakError;
       navigate(`/summary/${lesson?.id}`);
     } catch (e: any) {
       toast.error(e.message);
