@@ -51,20 +51,25 @@ export default function Pronunciation() {
   };
 
   return (
-    <Layout>
+    <SpeakingShell>
       <PageHeader title="გამოთქმის პრაქტიკა" backTo="/path/speaking" />
-      <div className="space-y-4 py-2">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-400/30">
-          <div className="text-sm ka">
-            მოუსმინე სიტყვებს და ივარჯიშე ხმამაღლა გამეორებაში. შენი დონე:{" "}
-            <span className="font-bold text-purple-700">{level}</span>
+      <div className="space-y-4">
+        <div className="sp-card-glow p-5 relative overflow-hidden">
+          <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-teal-400/25 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl sp-btn-teal flex items-center justify-center">🔊</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm ka sp-text">
+                მოუსმინე და გაიმეორე ხმამაღლა. დონე:{" "}
+                <span className="font-bold text-teal-200">{level}</span>
+              </div>
+              <div className="text-xs sp-text-muted ka mt-0.5">
+                გავარჯიშებული: <span className="font-bold sp-text">{doneCount}</span> / {items.length}
+              </div>
+            </div>
+            <SoundBars />
           </div>
-          <div className="text-xs text-muted-foreground ka mt-1">
-            გავარჯიშებული: {doneCount} / {items.length}
-          </div>
-          <div className="mt-3">
-            <MicPlaceholder />
-          </div>
+          <div className="mt-3"><MicPlaceholder /></div>
         </div>
 
         <div className="space-y-3">
@@ -84,6 +89,6 @@ export default function Pronunciation() {
           })}
         </div>
       </div>
-    </Layout>
+    </SpeakingShell>
   );
 }
