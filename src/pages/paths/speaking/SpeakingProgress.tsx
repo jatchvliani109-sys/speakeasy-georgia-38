@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
+import { MessageCircle, Repeat2, Volume2, Drama, Flame } from "lucide-react";
+import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
 
 type LessonRow = {
   id: string;
