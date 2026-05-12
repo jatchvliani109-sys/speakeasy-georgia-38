@@ -52,10 +52,10 @@ export default function RoleplaySession() {
 
   if (!scenario) {
     return (
-      <Layout>
+      <SpeakingShell>
         <PageHeader title="როლური საუბარი" backTo="/path/speaking/roleplay" />
-        <p className="text-center py-12 text-muted-foreground ka">სცენარი ვერ მოიძებნა.</p>
-      </Layout>
+        <p className="text-center py-12 sp-text-muted ka">სცენარი ვერ მოიძებნა.</p>
+      </SpeakingShell>
     );
   }
 
