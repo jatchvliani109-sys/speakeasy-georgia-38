@@ -193,6 +193,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pronunciation_attempts: {
+        Row: {
+          created_at: string
+          feedback_ka: string | null
+          id: string
+          missing_words: string[] | null
+          score: number
+          source: string | null
+          target_phrase: string
+          topic: string | null
+          transcript: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_ka?: string | null
+          id?: string
+          missing_words?: string[] | null
+          score?: number
+          source?: string | null
+          target_phrase: string
+          topic?: string | null
+          transcript?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_ka?: string | null
+          id?: string
+          missing_words?: string[] | null
+          score?: number
+          source?: string | null
+          target_phrase?: string
+          topic?: string | null
+          transcript?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vocabulary: {
         Row: {
           created_at: string
