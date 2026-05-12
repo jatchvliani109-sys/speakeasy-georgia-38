@@ -16,7 +16,6 @@ type Props = {
 
 type Status = "idle" | "recording" | "processing" | "result" | "error";
 
-const MAX_RECORD_MS = 10_000;
 const BACKUP_RECORD_MS = 20_000;
 
 function normalizeWords(s: string): string[] {
@@ -90,15 +89,9 @@ export default function SpeakingRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string>("audio/webm");
-  const recognitionRef = useRef<any>(null);
-  const sawResultRef = useRef(false);
   const autoStopTimer = useRef<number | null>(null);
   const watchdog = useRef<number | null>(null);
 
-  const SR: any = typeof window !== "undefined"
-    ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
-    : null;
-  const browserSupported = !!SR;
   const recorderSupported = typeof window !== "undefined"
     && !!(navigator as any).mediaDevices?.getUserMedia
     && typeof window.MediaRecorder !== "undefined";
@@ -106,12 +99,10 @@ export default function SpeakingRecorder({
   const cleanup = () => {
     if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
     if (watchdog.current) { clearTimeout(watchdog.current); watchdog.current = null; }
-    try { recognitionRef.current?.stop?.(); } catch {}
     try { if (recorderRef.current && recorderRef.current.state === "recording") recorderRef.current.stop(); } catch {}
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     recorderRef.current = null;
-    recognitionRef.current = null;
   };
   useEffect(() => () => cleanup(), []);
 
@@ -141,7 +132,7 @@ export default function SpeakingRecorder({
     }
     const t = target ?? "";
     const { score: sc, missing: miss } = scorePronunciation(t, heard);
-    const fb = buildFeedback(sc, miss);
+    const fb = buildFeedback(sc, miss, t);
     setScore(sc); setMissing(miss); setFeedback(fb);
     setS("result");
     onScored?.(sc);
