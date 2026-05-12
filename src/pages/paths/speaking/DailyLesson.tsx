@@ -10,8 +10,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SpeakButton from "@/components/SpeakButton";
 import PhraseCard from "./components/PhraseCard";
-import MicPlaceholder from "./components/MicPlaceholder";
+import SpeakingRecorder from "./components/SpeakingRecorder";
 import { DEFAULT_DAILY_LESSON, SUGGESTED_NEXT_TOPICS, pickDailyTopic } from "./data";
+
+const MAX_VOICE_TURNS = 5;
+
+// Pull a clean English prompt out of an AI message. Picks the line most likely to be English speech.
+function extractEnglishPrompt(text: string): string {
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const scored = lines.map((l) => {
+    const stripped = l.replace(/[^A-Za-z\u10A0-\u10FF]/g, "");
+    if (!stripped) return { l, s: -1 };
+    const ascii = (l.match(/[A-Za-z]/g) || []).length;
+    const total = stripped.length;
+    return { l, s: ascii / total };
+  });
+  const best = scored.filter((x) => x.s > 0.6).pop();
+  return (best?.l ?? lines.find((l) => /[A-Za-z]/.test(l)) ?? text).replace(/^[^A-Za-z"']*/, "").trim();
+}
 
 type Step = "topic" | "phrases" | "repeat" | "conversation" | "review";
 type Msg = { role: "user" | "assistant"; content: string };
