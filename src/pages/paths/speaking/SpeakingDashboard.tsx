@@ -106,6 +106,7 @@ export default function SpeakingDashboard() {
                 <CheckCircle2 className="w-5 h-5" />
                 <div className="font-bold ka text-[15px]">დღეს გაკვეთილი შესრულებულია</div>
               </div>
+              <p className="ka text-sm sp-text mt-2">{getEncouragementKa(dailySeed())}</p>
               <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 {stats?.todayLesson?.topic && (
                   <div className="col-span-2 flex justify-between">
