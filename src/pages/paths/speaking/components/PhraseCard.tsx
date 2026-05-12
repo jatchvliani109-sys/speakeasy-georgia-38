@@ -54,6 +54,17 @@ export default function PhraseCard({ english, georgian, example, practiced, onPr
           )}
         </div>
       )}
+
+      {enableRecording && (
+        <div className="mt-3 pt-3 sp-rule">
+          <SpeakingRecorder
+            target={english}
+            topic={topic}
+            source={source}
+            onScored={(s) => { if (s >= 70 && onPracticed && !practiced) onPracticed(); }}
+          />
+        </div>
+      )}
     </div>
   );
 }
