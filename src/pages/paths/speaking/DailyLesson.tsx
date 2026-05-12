@@ -254,28 +254,11 @@ export default function DailyLesson() {
 
   const goConversation = async () => {
     if (!plan) return;
+    setPromptIdx(0);
+    setPromptResults({});
+    setTypedAnswer("");
+    setMessages([]);
     setStep("conversation");
-    setLoading(true);
-    const seed: Msg[] = [
-      {
-        role: "user",
-        content: `Begin a short guided speaking practice on topic "${plan.topic}". Scenario: ${plan.scenario_ka ?? "—"}. I am the ${plan.user_role_ka ?? "student"}. You are the ${plan.ai_role_ka ?? "coach"}. Ask me a short question to start, like: "${plan.warmup_questions?.[0] ?? plan.practice_intro}". Keep your turns very short.`,
-      },
-    ];
-    const r = await supabase.functions.invoke("ai-tutor", {
-      body: {
-        messages: seed,
-        level,
-        coachMode: "speaking_lesson",
-        lessonContext: { topic: plan.topic, new_words: plan.new_words, scenario: plan.scenario_ka, user_role: plan.user_role_ka, ai_role: plan.ai_role_ka },
-      },
-    });
-    setLoading(false);
-    if (r.error || (r.data as any)?.error) {
-      toast.error((r.data as any)?.error ?? "შეცდომა");
-      return;
-    }
-    setMessages([{ role: "assistant", content: (r.data as any).reply as string }]);
   };
 
   const send = async (text: string) => {
