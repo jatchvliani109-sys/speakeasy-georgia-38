@@ -14,13 +14,7 @@ export default function PhraseCard({ english, georgian, example, practiced, onPr
   return (
     <div className="sp-card p-4 space-y-3">
       <div className="flex items-start gap-3">
-        {/* Big speaker control */}
-        <div className="shrink-0 w-12 h-12 rounded-2xl sp-btn-teal flex items-center justify-center shadow-lg">
-          <div className="[&>button]:!bg-transparent [&>button]:!shadow-none [&_svg]:!text-white">
-            <SpeakButton text={english} />
-          </div>
-          <Volume2 className="w-5 h-5 text-white absolute pointer-events-none opacity-0" />
-        </div>
+        <SpeakButton text={english} size="md" className="!w-12 !h-12 !rounded-2xl sp-btn-teal !text-white" />
         <div className="min-w-0 flex-1">
           <div className="text-base font-bold break-words sp-text">{english}</div>
           <div className="text-sm sp-text-muted ka mt-0.5">{georgian}</div>
