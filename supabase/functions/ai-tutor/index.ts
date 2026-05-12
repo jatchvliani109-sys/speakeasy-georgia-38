@@ -123,6 +123,9 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
                 minItems: 3, maxItems: 5,
               },
               practice_intro: { type: "string", description: "First practice question/prompt the tutor will ask, in English." },
+              scenario_ka: { type: "string", description: "Short Georgian scene-setter for the guided conversation, e.g. 'მე ვარ მიმტანი. შენ ხარ მომხმარებელი.'" },
+              user_role_ka: { type: "string", description: "User's role in Georgian, e.g. 'მომხმარებელი'." },
+              ai_role_ka: { type: "string", description: "AI's role in Georgian, e.g. 'მიმტანი'." },
               activities: {
                 type: "array",
                 description: "2-3 short interactive practice activities related to the new_words and topic. Use multiple-choice style. Mix types: 'choose_meaning' (translate a word), 'fill_blank' (complete a sentence), 'pick_correct' (choose the correct sentence).",
@@ -140,7 +143,7 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
                 minItems: 2, maxItems: 3,
               },
             },
-            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro", "activities"],
+            required: ["title_en", "title_ka", "goal_ka", "topic", "estimated_minutes", "warmup_questions", "new_words", "practice_intro", "scenario_ka", "user_role_ka", "ai_role_ka", "activities"],
           },
         },
       }];
