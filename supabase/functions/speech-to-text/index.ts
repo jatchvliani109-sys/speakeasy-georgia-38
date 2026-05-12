@@ -48,8 +48,9 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const err = await res.text();
       console.error("ElevenLabs STT failed", res.status, err.slice(0, 500));
-      return new Response(JSON.stringify({ error: "STT_PROVIDER_FAILED" }), {
-        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // Return soft 200 with fallback flag so the client can degrade gracefully
+      return new Response(JSON.stringify({ error: "STT_PROVIDER_FAILED", fallback: true }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     const data = await res.json();
@@ -59,8 +60,8 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("STT function failed", (e as Error).message);
-    return new Response(JSON.stringify({ error: "STT_SERVICE_FAILED" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ error: "STT_SERVICE_FAILED", fallback: true }), {
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
