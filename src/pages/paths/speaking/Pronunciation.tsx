@@ -101,6 +101,9 @@ export default function Pronunciation() {
                 practiced={!!practiced[key]}
                 onPracticed={() => toggle(key)}
                 showRepeatHints
+                enableRecording
+                source="pronunciation"
+                topic={level}
               />
             );
           })}
