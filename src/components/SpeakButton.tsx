@@ -8,10 +8,54 @@ type Props = {
   className?: string;
 };
 
-// Strip Georgian characters so the TTS only reads the English parts
+// Clean text for TTS: keep only English-friendly content, drop emojis,
+// markdown, decorative symbols, and punctuation that voices read literally.
 function extractEnglish(text: string): string {
-  const cleaned = text.replace(/[\u10A0-\u10FF\u2D00-\u2D2F]+/g, " ");
-  return cleaned.replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  let s = text;
+
+  // Remove emojis and pictographs (covers most modern emoji ranges).
+  try {
+    s = s.replace(/\p{Extended_Pictographic}/gu, " ");
+    s = s.replace(/[\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]/gu, " ");
+  } catch {
+    // Fallback for engines without Unicode property escapes
+    s = s.replace(
+      /[\u200D\u2600-\u27BF\uFE0F\u{1F000}-\u{1FFFF}]/gu,
+      " "
+    );
+  }
+  // Regional indicator flags
+  s = s.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, " ");
+
+  // Remove Georgian (and related) script
+  s = s.replace(/[\u10A0-\u10FF\u2D00-\u2D2F\u1C90-\u1CBF]+/g, " ");
+
+  // Remove common markdown / decorative symbols
+  s = s.replace(/[*_`~#>|\\/=+^<>{}\[\]()]/g, " ");
+  // Bullets and dashes that get read aloud
+  s = s.replace(/[•·●◦▪►–—−-]+/g, " ");
+  // Quotes (straight + smart) and stray colons/semicolons
+  s = s.replace(/["“”„«»‘’'`]/g, "");
+  s = s.replace(/[:;]/g, ".");
+
+  // If a phrase like Word: 'English part' exists, prefer the quoted English.
+  // Already stripped quotes above; instead try to keep ASCII-letter sequences only.
+  // Drop any leftover non-Latin letters/digits/punctuation we don't want.
+  s = s.replace(/[^A-Za-z0-9 ,.!?']/g, " ");
+
+  // Collapse repeated punctuation (e.g. "!!!" -> ".")
+  s = s.replace(/[!?]+/g, ".");
+  s = s.replace(/\.{2,}/g, ".");
+  s = s.replace(/,+/g, ",");
+
+  // Trim spaces around punctuation
+  s = s.replace(/\s+([,.])/g, "$1");
+  s = s.replace(/\s+/g, " ").trim();
+
+  // If nothing meaningful (no Latin letters), return empty.
+  if (!/[A-Za-z]/.test(s)) return "";
+  return s;
 }
 
 // Module-level cache so the same phrase isn't re-fetched
@@ -81,7 +125,13 @@ export default function SpeakButton({ text, size = "sm", className = "" }: Props
     e.stopPropagation();
     e.preventDefault();
     const clean = extractEnglish(text);
-    if (!clean) return;
+    if (!clean) {
+      try {
+        const { toast } = await import("sonner");
+        toast.message("No English audio available");
+      } catch {}
+      return;
+    }
 
     setSpeaking(true);
     const url = await fetchRealisticAudio(clean);

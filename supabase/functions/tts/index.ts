@@ -20,7 +20,26 @@ Deno.serve(async (req) => {
         status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const cleaned = text.replace(/[\u10A0-\u10FF\u2D00-\u2D2F]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 800);
+    let cleaned = text;
+    try {
+      cleaned = cleaned.replace(/\p{Extended_Pictographic}/gu, " ");
+      cleaned = cleaned.replace(/[\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]/gu, " ");
+    } catch {}
+    cleaned = cleaned
+      .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, " ")
+      .replace(/[\u10A0-\u10FF\u2D00-\u2D2F\u1C90-\u1CBF]+/g, " ")
+      .replace(/[*_`~#>|\\/=+^<>{}\[\]()]/g, " ")
+      .replace(/[•·●◦▪►–—−-]+/g, " ")
+      .replace(/["“”„«»‘’'`]/g, "")
+      .replace(/[:;]/g, ".")
+      .replace(/[^A-Za-z0-9 ,.!?']/g, " ")
+      .replace(/[!?]+/g, ".")
+      .replace(/\.{2,}/g, ".")
+      .replace(/,+/g, ",")
+      .replace(/\s+([,.])/g, "$1")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 800);
     if (!cleaned) {
       return new Response(JSON.stringify({ error: "Empty text" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
