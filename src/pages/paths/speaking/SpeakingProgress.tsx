@@ -17,11 +17,18 @@ type MistakeRow = {
   corrected_sentence: string;
 };
 
+type PronRow = {
+  target_phrase: string;
+  score: number;
+  missing_words: string[] | null;
+  created_at: string;
+};
+
 export default function SpeakingProgress() {
   const { user } = useAuth();
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [mistakes, setMistakes] = useState<MistakeRow[]>([]);
-  const [pronCount, setPronCount] = useState(0);
+  const [pron, setPron] = useState<PronRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,13 +54,13 @@ export default function SpeakingProgress() {
         setMistakes(ms ?? []);
       }
 
-      try {
-        const raw = localStorage.getItem(`speaking:pronunciation:${user.id}`);
-        if (raw) {
-          const obj = JSON.parse(raw) as Record<string, boolean>;
-          setPronCount(Object.values(obj).filter(Boolean).length);
-        }
-      } catch {}
+      const { data: pr } = await supabase
+        .from("pronunciation_attempts")
+        .select("target_phrase, score, missing_words, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      setPron((pr ?? []) as PronRow[]);
 
       setLoading(false);
     })();
