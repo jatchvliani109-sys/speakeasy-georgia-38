@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import SpeakButton from "@/components/SpeakButton";
+import SpeakingRecorder from "./SpeakingRecorder";
 
 type Props = {
   english: string;
@@ -8,9 +9,12 @@ type Props = {
   practiced?: boolean;
   onPracticed?: () => void;
   showRepeatHints?: boolean;
+  enableRecording?: boolean;
+  topic?: string;
+  source?: string;
 };
 
-export default function PhraseCard({ english, georgian, example, practiced, onPracticed, showRepeatHints }: Props) {
+export default function PhraseCard({ english, georgian, example, practiced, onPracticed, showRepeatHints, enableRecording, topic, source }: Props) {
   return (
     <div className="sp-card p-4 sm:p-5">
       <div className="flex items-start gap-4">
@@ -48,6 +52,17 @@ export default function PhraseCard({ english, georgian, example, practiced, onPr
               {practiced ? "გავიმეორე" : "გავიმეორე"}
             </button>
           )}
+        </div>
+      )}
+
+      {enableRecording && (
+        <div className="mt-3 pt-3 sp-rule">
+          <SpeakingRecorder
+            target={english}
+            topic={topic}
+            source={source}
+            onScored={(s) => { if (s >= 70 && onPracticed && !practiced) onPracticed(); }}
+          />
         </div>
       )}
     </div>

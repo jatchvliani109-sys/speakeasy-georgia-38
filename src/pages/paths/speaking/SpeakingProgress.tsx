@@ -17,11 +17,18 @@ type MistakeRow = {
   corrected_sentence: string;
 };
 
+type PronRow = {
+  target_phrase: string;
+  score: number;
+  missing_words: string[] | null;
+  created_at: string;
+};
+
 export default function SpeakingProgress() {
   const { user } = useAuth();
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [mistakes, setMistakes] = useState<MistakeRow[]>([]);
-  const [pronCount, setPronCount] = useState(0);
+  const [pron, setPron] = useState<PronRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,13 +54,13 @@ export default function SpeakingProgress() {
         setMistakes(ms ?? []);
       }
 
-      try {
-        const raw = localStorage.getItem(`speaking:pronunciation:${user.id}`);
-        if (raw) {
-          const obj = JSON.parse(raw) as Record<string, boolean>;
-          setPronCount(Object.values(obj).filter(Boolean).length);
-        }
-      } catch {}
+      const { data: pr } = await supabase
+        .from("pronunciation_attempts")
+        .select("target_phrase, score, missing_words, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      setPron((pr ?? []) as PronRow[]);
 
       setLoading(false);
     })();
@@ -69,6 +76,23 @@ export default function SpeakingProgress() {
     .map((l) => l.summary?.plan?.title_ka)
     .filter(Boolean)
     .slice(0, 5) as string[];
+
+  const pronCount = pron.length;
+  const avgScore = pron.length
+    ? Math.round(pron.reduce((s, p) => s + (p.score || 0), 0) / pron.length)
+    : 0;
+  const recentPron = pron.slice(0, 5);
+  // Phrases needing practice: low score or has missing words, dedup latest by phrase
+  const needsPractice: { phrase: string; score: number }[] = [];
+  const seen = new Set<string>();
+  for (const p of pron) {
+    if (seen.has(p.target_phrase)) continue;
+    if (p.score < 75 || (p.missing_words && p.missing_words.length > 0)) {
+      needsPractice.push({ phrase: p.target_phrase, score: p.score });
+      seen.add(p.target_phrase);
+    }
+    if (needsPractice.length >= 5) break;
+  }
 
   return (
     <SpeakingShell>
@@ -90,9 +114,37 @@ export default function SpeakingProgress() {
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
             <Stat Icon={Repeat2} value={phrasesPracticed} label="ფრაზა გაიმეორე" />
-            <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ვარჯიში" />
+            <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ცდა" />
             <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
+
+          {pronCount > 0 && (
+            <Section title={`საშუალო ქულა: ${avgScore}%`}>
+              <ul className="space-y-2 text-sm">
+                {recentPron.map((p, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3">
+                    <span className="sp-text truncate">{p.target_phrase}</span>
+                    <span className={`font-extrabold shrink-0 ${
+                      p.score >= 80 ? "text-emerald-600" : p.score >= 50 ? "text-amber-600" : "text-rose-600"
+                    }`}>{p.score}%</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {needsPractice.length > 0 && (
+            <Section title="საჭიროებს ვარჯიშს">
+              <ul className="space-y-2 text-sm">
+                {needsPractice.map((p, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3">
+                    <span className="sp-text truncate">{p.phrase}</span>
+                    <span className="text-xs sp-text-muted shrink-0">{p.score}%</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
 
           <Section title="ბოლო თემები">
             {recentTopics.length === 0 ? (

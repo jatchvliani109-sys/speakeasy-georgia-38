@@ -5,7 +5,7 @@ import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import MicPlaceholder from "./components/MicPlaceholder";
+
 import { Headphones } from "lucide-react";
 
 type Level = "Beginner" | "Elementary" | "Intermediate";
@@ -86,7 +86,9 @@ export default function Pronunciation() {
               />
             </div>
           </div>
-          <div className="mt-4"><MicPlaceholder /></div>
+          <div className="mt-4 text-[11px] ka text-[hsl(175_60%_82%)]">
+            🎤 თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
+          </div>
         </section>
 
         <div className="space-y-3">
@@ -101,6 +103,9 @@ export default function Pronunciation() {
                 practiced={!!practiced[key]}
                 onPracticed={() => toggle(key)}
                 showRepeatHints
+                enableRecording
+                source="pronunciation"
+                topic={level}
               />
             );
           })}

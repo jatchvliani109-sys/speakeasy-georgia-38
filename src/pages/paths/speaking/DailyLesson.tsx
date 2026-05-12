@@ -354,8 +354,7 @@ export default function DailyLesson() {
         {step === "repeat" && (
           <>
             <h2 className="text-xl font-extrabold ka sp-text">მოუსმინე და გაიმეორე</h2>
-            <p className="text-sm sp-text-muted ka">დააჭირე 🔊-ს, მოუსმინე და გაიმეორე ხმამაღლა.</p>
-            <div><MicPlaceholder /></div>
+            <p className="text-sm sp-text-muted ka">დააჭირე 🔊-ს, მოუსმინე და გაიმეორე ხმამაღლა. შემდეგ ჩაწერე შენი ხმა და მიიღე უკუკავშირი.</p>
             <div className="space-y-3">
               {phrases.map((w, i) => (
                 <PhraseCard
@@ -370,6 +369,9 @@ export default function DailyLesson() {
                     setPracticedRepeat(next);
                   }}
                   showRepeatHints
+                  enableRecording
+                  topic={plan.topic}
+                  source="daily_lesson"
                 />
               ))}
             </div>
