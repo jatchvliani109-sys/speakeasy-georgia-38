@@ -6,6 +6,7 @@ import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2, Clock } 
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
+import { getEncouragementKa, dailySeed } from "./lib/encouragement";
 
 const SIDE_PATHS = [
   { to: "/path/speaking/pronunciation", Icon: Headphones, title_ka: "მოსმენა და გამეორება", desc_ka: "მოკლე ფრაზები" },
@@ -105,6 +106,7 @@ export default function SpeakingDashboard() {
                 <CheckCircle2 className="w-5 h-5" />
                 <div className="font-bold ka text-[15px]">დღეს გაკვეთილი შესრულებულია</div>
               </div>
+              <p className="ka text-sm sp-text mt-2">{getEncouragementKa(dailySeed())}</p>
               <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 {stats?.todayLesson?.topic && (
                   <div className="col-span-2 flex justify-between">
