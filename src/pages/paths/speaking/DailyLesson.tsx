@@ -463,37 +463,21 @@ export default function DailyLesson() {
         )}
 
         {step === "conversation" && (() => {
-          // Build 3–5 guided English prompts. Prefer plan.warmup_questions, fall back to defaults.
-          const englishOnly = (s: string) => /[A-Za-z]/.test(s) && (s.match(/[A-Za-z]/g)!.length / Math.max(1, s.replace(/\s/g, "").length)) > 0.5;
-          const fromPlan = (plan.warmup_questions || []).map((q) => q.trim()).filter(englishOnly);
-          const fallback = ["What would you like?", "Can you tell me more?", "How are you today?"];
-          const merged = [...fromPlan, ...fallback];
-          const prompts = Array.from(new Set(merged)).slice(0, Math.min(5, Math.max(3, fromPlan.length || 3)));
-          const current = prompts[promptIdx];
+          const prompts = makeLessonPrompts(plan, isBeginner);
+          const current = prompts[promptIdx] ?? prompts[0];
           const result = promptResults[promptIdx];
-          const examples = phrases.map((p) => p.example_sentence).filter(Boolean).slice(0, 3);
+          const examples = current.examples.length ? current.examples : phrases.map((p) => p.example_sentence).filter(Boolean).slice(0, 3);
 
           const submitAnswer = async (text: string) => {
             const t = text.trim();
             if (!t) return;
             console.log("[DailyLesson] Speaking prompt answer submitted", { promptIdx, text: t });
-            setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "", loading: true, typing: false } }));
-            const seedMessages: Msg[] = [
-              { role: "user", content: `English coach. The student is a ${LEVEL_LABEL_KA[level] ?? level} learner. I asked: "${current}". They answered: "${t}". Reply with: 1) one short Georgian sentence of feedback (encouraging, max 12 words). 2) On a new line, if needed, an improved English version using exactly: Better: "..." . Keep it tiny.` },
-            ];
-            try {
-              const r = await supabase.functions.invoke("ai-tutor", {
-                body: { messages: seedMessages, level, coachMode: "speaking_lesson", lessonContext: { topic: plan.topic, new_words: plan.new_words } },
-              });
-              const reply = ((r.data as any)?.reply as string) || "";
-              const m = reply.match(/(?:Better|Try|Type):\s*["“']([^"”']+)["”']/i);
-              const corrected = m?.[1];
-              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: reply, corrected, loading: false, typing: false } }));
-              if (corrected) setMistakes((prev) => [...prev, { original: t, corrected }]);
-              setMessages((prev) => [...prev, { role: "user", content: t }, { role: "assistant", content: reply }]);
-            } catch (e: any) {
-              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "კარგი ცდა! გადადი შემდეგ კითხვაზე.", loading: false, typing: false } }));
+            const { feedback, corrected } = makeLocalFeedback(t, examples);
+            setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback, corrected, loading: false, typing: false } }));
+            if (corrected && normalizeForLesson(corrected).join(" ") !== normalizeForLesson(t).join(" ")) {
+              setMistakes((prev) => [...prev, { original: t, corrected }]);
             }
+            setMessages((prev) => [...prev, { role: "assistant", content: current.question }, { role: "user", content: t }]);
           };
 
           const goNext = () => {
