@@ -89,6 +89,7 @@ export default function SpeakingRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string>("audio/webm");
+  const ignoreStopRef = useRef(false);
   const autoStopTimer = useRef<number | null>(null);
   const watchdog = useRef<number | null>(null);
 
@@ -99,7 +100,12 @@ export default function SpeakingRecorder({
   const cleanup = () => {
     if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
     if (watchdog.current) { clearTimeout(watchdog.current); watchdog.current = null; }
-    try { if (recorderRef.current && recorderRef.current.state === "recording") recorderRef.current.stop(); } catch {}
+    try {
+      if (recorderRef.current && recorderRef.current.state === "recording") {
+        ignoreStopRef.current = true;
+        recorderRef.current.stop();
+      }
+    } catch {}
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     recorderRef.current = null;
@@ -163,6 +169,7 @@ export default function SpeakingRecorder({
       const rec = new MediaRecorder(stream, { mimeType: mime });
       recorderRef.current = rec;
       chunksRef.current = [];
+      ignoreStopRef.current = false;
       rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
       rec.onstop = () => handleRecorderStop();
       rec.start();
@@ -172,7 +179,7 @@ export default function SpeakingRecorder({
     } catch (e: any) {
       const msg = e?.name === "NotAllowedError"
         ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
-        : "მიკროფონი ვერ ჩაირთო. სცადე თავიდან.";
+        : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
       failSafeReset(msg);
     }
   };
@@ -191,40 +198,42 @@ export default function SpeakingRecorder({
     let stopped = false;
     try {
       if (recorderRef.current && recorderRef.current.state === "recording") {
+        recorderRef.current.requestData?.();
         recorderRef.current.stop();
         stopped = true;
         setS("processing");
       }
     } catch {}
-    // Watchdog: if neither path resolves within 4s, hard reset.
+    // Watchdog: keep the UI from getting stuck if the browser never resolves stop/transcription.
     if (watchdog.current) clearTimeout(watchdog.current);
     watchdog.current = window.setTimeout(() => {
       if (statusRef.current === "recording" || statusRef.current === "processing") {
-        failSafeReset();
+        failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       }
-    }, 4000);
+    }, 30000);
     if (!stopped) failSafeReset();
   };
 
   const handleRecorderStop = async () => {
+    if (ignoreStopRef.current) { ignoreStopRef.current = false; return; }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    if (!chunksRef.current.length) return failSafeReset("ჩანაწერი ვერ მოიძებნა. სცადე თავიდან.");
+    if (!chunksRef.current.length) return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
     setS("processing");
     try {
       const blob = new Blob(chunksRef.current, { type: mimeRef.current });
-      if (blob.size < 800) return failSafeReset("ჩანაწერი ძალიან მოკლეა. სცადე თავიდან, ნელა და გარკვევით.");
+      if (blob.size < 800) return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       const audioBase64 = await blobToBase64(blob);
       const { data, error } = await supabase.functions.invoke("speech-to-text", {
         body: { audioBase64, mimeType: mimeRef.current },
       });
       const payload: any = data ?? {};
       if (error || payload.fallback || payload.error || !payload.text) {
-        return failSafeReset("ხმოვანი ამოცნობა დროებით მიუწვდომელია. სცადე Chrome ბრაუზერში.");
+        return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       }
       await finish((payload.text as string).trim());
     } catch {
-      failSafeReset("ვერ გავიგეთ კარგად. სცადე თავიდან.");
+      failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
     }
   };
 
