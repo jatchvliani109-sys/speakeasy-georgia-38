@@ -35,7 +35,64 @@ const SIDE_PATHS: SidePath[] = [
   },
 ];
 
+type DashStats = {
+  lessonsCompleted: number;
+  phrasesPracticed: number;
+  pronAttempts: number;
+  roleplaysCompleted: number;
+  lastTopic: string | null;
+  hasUnfinishedLesson: boolean;
+};
+
 export default function SpeakingDashboard() {
+  const { user } = useAuth();
+  const [streak, setStreak] = useState<SpeakingStats | null>(null);
+  const [stats, setStats] = useState<DashStats | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const [streakRes, lessonsRes, pronRes] = await Promise.all([
+        loadSpeakingStats(user.id),
+        supabase
+          .from("lessons")
+          .select("id, level, summary, completed, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabase
+          .from("pronunciation_attempts")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+      ]);
+      setStreak(streakRes);
+      const lessons = (lessonsRes.data ?? []).filter((l) => (l.level ?? "").startsWith("speaking"));
+      const completed = lessons.filter((l) => l.completed);
+      const dailyCompleted = completed.filter((l) => !(l.level ?? "").includes("roleplay"));
+      const roleplaysCompleted = completed.filter((l) => (l.level ?? "").includes("roleplay")).length;
+      const phrasesPracticed = dailyCompleted.reduce(
+        (sum, l) => sum + (Number((l.summary as any)?.phrases_practiced) || 0),
+        0,
+      );
+      const lastTopic = (completed[0]?.summary as any)?.plan?.title_ka ?? null;
+      const hasUnfinishedLesson = lessons.some((l) => !l.completed && !(l.level ?? "").includes("roleplay"));
+      setStats({
+        lessonsCompleted: dailyCompleted.length,
+        phrasesPracticed,
+        pronAttempts: pronRes.count ?? 0,
+        roleplaysCompleted,
+        lastTopic,
+        hasUnfinishedLesson,
+      });
+    })();
+  }, [user]);
+
+  const continueLabel = stats?.hasUnfinishedLesson
+    ? "Continue Lesson"
+    : streak?.practicedToday
+      ? "Practice more"
+      : "Start Today's Speaking Lesson";
+
   return (
     <SpeakingShell>
       <div className="space-y-8 max-w-3xl mx-auto">
@@ -52,6 +109,47 @@ export default function SpeakingDashboard() {
           </div>
           <PathSwitcher />
         </header>
+
+        {/* Speaking progress snapshot */}
+        {user && (
+          <section className="sp-card p-5 sm:p-6">
+            <div className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-[hsl(20_85%_55%)]" />
+              <div>
+                <div className="text-2xl font-extrabold sp-text leading-none">
+                  🔥 {streak?.currentStreak ?? 0} Day Speaking Streak
+                </div>
+                <div className="text-[11px] sp-text-soft mt-1">
+                  Longest: {streak?.longestStreak ?? 0}
+                  {streak?.practicedToday && <> · <span className="text-[hsl(175_70%_38%)] font-semibold ka">დღეს ნავარჯიშები</span></>}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 text-center">
+              <MiniStat label_ka="გაკვეთილი" value={stats?.lessonsCompleted ?? 0} />
+              <MiniStat label_ka="ფრაზა" value={stats?.phrasesPracticed ?? 0} />
+              <MiniStat label_ka="გამოთქმის ცდა" value={stats?.pronAttempts ?? 0} />
+              <MiniStat label_ka="როლი" value={stats?.roleplaysCompleted ?? 0} />
+            </div>
+            {stats?.lastTopic && (
+              <div className="mt-4 text-xs sp-text-muted ka">
+                ბოლო თემა: <span className="font-semibold sp-text">{stats.lastTopic}</span>
+              </div>
+            )}
+            <Link
+              to="/path/speaking/daily"
+              className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold"
+            >
+              {continueLabel}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            {streak?.practicedToday && (
+              <div className="mt-3 text-xs ka text-[hsl(175_70%_30%)]">
+                ✅ Today's speaking practice completed — Nice work, you kept your Streak alive.
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Today's mission — the one premium block */}
         <section className="sp-card-hero p-6 sm:p-7 relative overflow-hidden">
