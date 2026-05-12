@@ -104,6 +104,7 @@ export default function RoleplaySession() {
         completed: true,
         ended_at: new Date().toISOString(),
       });
+      await recordSpeakingActivity(user.id, "roleplay");
       toast.success("როლური სავარჯიშო დასრულდა! 🎉");
       navigate("/path/speaking/progress");
     } catch (e: any) {
