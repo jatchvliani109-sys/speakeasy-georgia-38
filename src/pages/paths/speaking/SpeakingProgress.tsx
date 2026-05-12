@@ -115,12 +115,103 @@ export default function SpeakingProgress() {
             </p>
           </div>
 
+          {/* Streak overview */}
+          <div className="sp-card p-5 flex items-center gap-3">
+            <Flame className="w-6 h-6 text-[hsl(20_85%_55%)] shrink-0" />
+            <div>
+              <div className="text-xl font-extrabold sp-text leading-none">
+                🔥 {streak?.currentStreak ?? 0} Day Speaking Streak
+              </div>
+              <div className="text-[11px] sp-text-soft mt-1">
+                Longest Streak: {streak?.longestStreak ?? 0}
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
             <Stat Icon={Repeat2} value={phrasesPracticed} label="ფრაზა გაიმეორე" />
             <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ცდა" />
             <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
+
+          {/* Recent practice */}
+          <Section title="ბოლო ვარჯიში">
+            {(() => {
+              type RecentItem = { date: string; type: string; topic: string; meta?: string };
+              const items: RecentItem[] = [];
+              for (const l of lessons.slice(0, 10)) {
+                const isRoleplay = (l.level ?? "").includes("roleplay");
+                const summary = (l.summary as any) ?? {};
+                const topic = summary?.plan?.title_ka || summary?.plan?.topic || "—";
+                const phrases = Number(summary?.phrases_practiced) || 0;
+                const corrections = Array.isArray(summary?.mistakes) ? summary.mistakes.length : 0;
+                items.push({
+                  date: l.created_at,
+                  type: isRoleplay ? "Roleplay" : "Daily Speaking Lesson",
+                  topic,
+                  meta: isRoleplay
+                    ? undefined
+                    : `${phrases} phrases${corrections ? ` · ${corrections} corrections` : ""}`,
+                });
+              }
+              for (const p of pron.slice(0, 5)) {
+                items.push({
+                  date: p.created_at,
+                  type: "Pronunciation",
+                  topic: p.target_phrase,
+                  meta: `${p.score}%`,
+                });
+              }
+              items.sort((a, b) => +new Date(b.date) - +new Date(a.date));
+              const recent = items.slice(0, 5);
+              if (recent.length === 0) return <Empty />;
+              return (
+                <ul className="space-y-3 text-sm">
+                  {recent.map((it, i) => (
+                    <li key={i} className="sp-text">
+                      <div className="font-semibold">
+                        {new Date(it.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {it.type} — <span className="ka">{it.topic}</span>
+                      </div>
+                      {it.meta && <div className="text-xs sp-text-muted">{it.meta}</div>}
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
+          </Section>
+
+          {/* Topics practiced */}
+          <Section title="გავარჯიშებული თემები">
+            {(() => {
+              const map = new Map<string, { count: number; last: string }>();
+              for (const l of lessons) {
+                const t = (l.summary as any)?.plan?.title_ka || (l.summary as any)?.plan?.topic;
+                if (!t) continue;
+                const cur = map.get(t);
+                if (cur) {
+                  cur.count += 1;
+                  if (l.created_at > cur.last) cur.last = l.created_at;
+                } else {
+                  map.set(t, { count: 1, last: l.created_at });
+                }
+              }
+              const arr = Array.from(map.entries()).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
+              if (!arr.length) return <Empty />;
+              return (
+                <ul className="space-y-2 text-sm">
+                  {arr.map(([topic, info]) => (
+                    <li key={topic} className="flex items-center justify-between gap-3">
+                      <span className="ka sp-text truncate">{topic}</span>
+                      <span className="text-xs sp-text-muted shrink-0">
+                        ×{info.count} · {new Date(info.last).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
+          </Section>
 
           {pronCount > 0 && (
             <Section title={`საშუალო ქულა: ${avgScore}%`}>
