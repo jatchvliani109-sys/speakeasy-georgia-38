@@ -673,12 +673,8 @@ export default function DailyLesson() {
         {step === "review" && (
           <>
             <div className="sp-card-hero p-5 sm:p-6">
-              <div className="text-2xl">🎉</div>
-              <h2 className="text-xl font-extrabold ka mt-2 sp-text">მისია დასრულდა!</h2>
-              <p className="text-sm ka mt-1.5 sp-text-muted">
-                შენ მოახერხე დღევანდელი მისია თემაზე "{plan.title_ka}". განაგრძე ყოველდღე —
-                ცოტ-ცოტა ყოველთვის უფრო ეფექტურია, ვიდრე ბევრი ერთჯერ.
-              </p>
+              <h2 className="text-xl font-extrabold ka sp-text">მისია დასრულდა</h2>
+              <p className="text-sm ka mt-2 sp-text-muted">{getEncouragementKa(dailySeed())}</p>
             </div>
 
             <div className="sp-card p-5 space-y-2">
