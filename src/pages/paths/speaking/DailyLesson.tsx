@@ -533,8 +533,8 @@ export default function DailyLesson() {
                     {isBeginner ? "გამოიყენე მაგალითი ან თქვი შენი პასუხი ინგლისურად." : "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითები."}
                   </div>
                   <div className="flex items-start gap-2 mt-3">
-                    <SpeakButton text={current} />
-                    <div className="text-lg font-bold sp-text leading-snug break-words">{current}</div>
+                    <SpeakButton text={current.question} />
+                    <div className="text-lg font-bold sp-text leading-snug break-words">{current.question}</div>
                   </div>
                 </div>
 
@@ -559,7 +559,7 @@ export default function DailyLesson() {
                     <SpeakingRecorder
                       key={`prompt-${promptIdx}`}
                       mode="transcribe"
-                      target={current}
+                      target={current.question}
                       topic={plan.topic}
                       source="daily_lesson_voice"
                       recordLabel="🎤 Record answer"
