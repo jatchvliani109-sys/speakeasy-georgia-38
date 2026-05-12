@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const features = [
   { icon: MessageCircle, title: "AI საუბრის ვარჯიში", desc: "ისაუბრე ნამდვილ AI მასწავლებელთან" },
