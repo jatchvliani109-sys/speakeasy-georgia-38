@@ -180,9 +180,20 @@ export default function LevelTest() {
 
           <div className="text-left bg-accent/30 border border-accent/40 rounded-2xl p-4 mb-6 flex gap-3 items-start">
             <div className="w-9 h-9 rounded-full gradient-hero flex items-center justify-center text-base shrink-0">🦉</div>
-            <p className="text-sm ka leading-relaxed text-foreground">
-              {reactionLoading ? "..." : reaction}
-            </p>
+            {reactionReady ? (
+              <p className="text-sm ka leading-relaxed text-foreground">{reaction}</p>
+            ) : (
+              <div className="flex-1">
+                <p className="text-sm ka leading-relaxed text-foreground">
+                  AI მასწავლებელი კითხულობს შენს პასუხს
+                  <span className="inline-flex ml-1">
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
 
           <p className="text-sm text-muted-foreground ka">სავარაუდო საწყისი დონე:</p>
@@ -192,8 +203,8 @@ export default function LevelTest() {
             <p className="text-sm ka">ეს დონე შეირჩა შენი თვითშეფასების, ტესტის პასუხებისა და მოკლე წერითი პასუხის მიხედვით.</p>
             <p className="text-sm ka text-muted-foreground">AI მასწავლებელი შენს პასუხებსა და გაკვეთილებზე დაყრდნობით დონეს ნელ-ნელა დააზუსტებს.</p>
           </div>
-          <Button variant="hero" size="xl" className="w-full ka mt-6" onClick={() => navigate("/learning-path")} disabled={saving}>
-            გაგრძელება →
+          <Button variant="hero" size="xl" className="w-full ka mt-6" onClick={() => navigate("/learning-path")} disabled={saving || !reactionReady}>
+            {reactionReady ? "გაგრძელება →" : "მზადდება..."}
           </Button>
         </div>
       </Layout>
