@@ -356,12 +356,11 @@ export default function DailyLesson() {
 
         {step === "review" && (
           <>
-            <div className="sp-card-glow p-5 relative overflow-hidden">
-              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-teal-400/25 blur-2xl" />
-              <div className="text-3xl">🎉</div>
+            <div className="sp-card-hero p-5 sm:p-6">
+              <div className="text-2xl">🎉</div>
               <h2 className="text-xl font-extrabold ka mt-2 sp-text">მშვენიერი ვარჯიში!</h2>
-              <p className="text-sm ka mt-1 sp-text-muted">
-                შენ მოახერხე დღევანდელი გაკვეთილი თემაზე "{plan.title_ka}". განაგრძე ყოველდღე —
+              <p className="text-sm ka mt-1.5 sp-text-muted">
+                შენ მოახერხე დღევანდელი მისია თემაზე "{plan.title_ka}". განაგრძე ყოველდღე —
                 ცოტ-ცოტა ყოველთვის უფრო ეფექტურია, ვიდრე ბევრი ერთჯერ.
               </p>
             </div>
