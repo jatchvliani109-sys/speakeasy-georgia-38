@@ -77,6 +77,23 @@ export default function SpeakingProgress() {
     .filter(Boolean)
     .slice(0, 5) as string[];
 
+  const pronCount = pron.length;
+  const avgScore = pron.length
+    ? Math.round(pron.reduce((s, p) => s + (p.score || 0), 0) / pron.length)
+    : 0;
+  const recentPron = pron.slice(0, 5);
+  // Phrases needing practice: low score or has missing words, dedup latest by phrase
+  const needsPractice: { phrase: string; score: number }[] = [];
+  const seen = new Set<string>();
+  for (const p of pron) {
+    if (seen.has(p.target_phrase)) continue;
+    if (p.score < 75 || (p.missing_words && p.missing_words.length > 0)) {
+      needsPractice.push({ phrase: p.target_phrase, score: p.score });
+      seen.add(p.target_phrase);
+    }
+    if (needsPractice.length >= 5) break;
+  }
+
   return (
     <SpeakingShell>
       <PageHeader title="ჩემი საუბრის ზრდა" backTo="/path/speaking" />
