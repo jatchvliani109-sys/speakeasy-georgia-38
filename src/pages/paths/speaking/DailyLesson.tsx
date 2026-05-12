@@ -173,46 +173,64 @@ export default function DailyLesson() {
   const currentIdx = STEPS.findIndex((s) => s.key === step);
 
   return (
-    <Layout>
+    <SpeakingShell>
       <PageHeader title="დღევანდელი საუბრის გაკვეთილი" backTo="/path/speaking" />
-      <div className="space-y-4 py-2">
-        {/* progress */}
-        <div className="flex items-center gap-1">
-          {STEPS.map((s, i) => (
-            <div
-              key={s.key}
-              className={`flex-1 h-1.5 rounded-full ${i <= currentIdx ? "bg-primary" : "bg-secondary"}`}
-              title={s.label}
-            />
-          ))}
+      <div className="space-y-4">
+        {/* Coach header + progress */}
+        <div className="sp-card p-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
+            <Mic className="w-5 h-5 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] sp-text-muted ka">AI Speaking Coach</div>
+            <div className="flex items-center gap-1 mt-1">
+              {STEPS.map((s, i) => (
+                <div key={s.key} className="flex-1 flex flex-col items-center gap-0.5" title={s.label}>
+                  <div
+                    className={`w-full h-1.5 rounded-full ${
+                      i <= currentIdx
+                        ? "bg-gradient-to-r from-purple-400 to-blue-400"
+                        : "bg-white/10"
+                    }`}
+                  />
+                  <span className={`text-[9px] ka ${i === currentIdx ? "sp-text" : "sp-text-muted"}`}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <SoundBars />
         </div>
 
         {step === "topic" && (
           <>
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-500/15 to-blue-500/10 border-2 border-purple-400/40 shadow-card">
-              <div className="text-xs font-semibold ka text-purple-700">დღევანდელი თემა</div>
-              <h2 className="text-2xl font-extrabold mt-1">{plan.title_en}</h2>
-              <div className="text-base ka mt-1">{plan.title_ka}</div>
+            <div className="sp-card-glow p-5 relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-purple-500/25 blur-2xl" />
+              <div className="text-xs font-semibold ka text-purple-200">დღევანდელი თემა</div>
+              <h2 className="text-2xl font-extrabold mt-1 sp-text">{plan.title_en}</h2>
+              <div className="text-base ka mt-1 sp-text-muted">{plan.title_ka}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-card space-y-3">
-              <Row icon={<Target className="w-4 h-4 text-primary" />} label="მიზანი" value={plan.goal_ka} />
+            <div className="sp-card p-4 space-y-3">
+              <Row icon={<Target className="w-4 h-4 text-teal-300" />} label="მიზანი" value={plan.goal_ka} />
               <Row
-                icon={<Clock className="w-4 h-4 text-primary" />}
+                icon={<Clock className="w-4 h-4 text-blue-300" />}
                 label="ხანგრძლივობა"
                 value={`${Math.max(5, Math.min(10, plan.estimated_minutes || 7))} წუთი`}
               />
-              <Row icon={<Sparkles className="w-4 h-4 text-primary" />} label="დონე" value={level} />
+              <Row icon={<Sparkles className="w-4 h-4 text-purple-300" />} label="დონე" value={level} />
             </div>
-            <Button variant="hero" size="xl" className="w-full ka" onClick={() => setStep("phrases")}>
+            <button
+              onClick={() => setStep("phrases")}
+              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-2xl h-14 text-base font-bold ka"
+            >
               დაწყება <ArrowRight className="w-5 h-5" />
-            </Button>
+            </button>
           </>
         )}
 
         {step === "phrases" && (
           <>
-            <h2 className="text-xl font-extrabold ka">სასარგებლო ფრაზები</h2>
-            <p className="text-sm text-muted-foreground ka">მოუსმინე და დაიმახსოვრე.</p>
+            <h2 className="text-xl font-extrabold ka sp-text">სასარგებლო ფრაზები</h2>
+            <p className="text-sm sp-text-muted ka">მოუსმინე და დაიმახსოვრე.</p>
             <div className="space-y-3">
               {phrases.map((w, i) => (
                 <PhraseCard
@@ -223,18 +241,19 @@ export default function DailyLesson() {
                 />
               ))}
             </div>
-            <Button variant="hero" size="lg" className="w-full ka" onClick={() => setStep("repeat")}>
+            <button
+              onClick={() => setStep("repeat")}
+              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-2xl h-12 text-base font-bold ka"
+            >
               გამეორების ვარჯიში →
-            </Button>
+            </button>
           </>
         )}
 
         {step === "repeat" && (
           <>
-            <h2 className="text-xl font-extrabold ka">გაიმეორე ხმამაღლა</h2>
-            <p className="text-sm text-muted-foreground ka">
-              დააჭირე 🔊-ს, მოუსმინე და გაიმეორე ხმამაღლა.
-            </p>
+            <h2 className="text-xl font-extrabold ka sp-text">გაიმეორე ხმამაღლა</h2>
+            <p className="text-sm sp-text-muted ka">დააჭირე 🔊-ს, მოუსმინე და გაიმეორე ხმამაღლა.</p>
             <div><MicPlaceholder /></div>
             <div className="space-y-3">
               {phrases.map((w, i) => (
@@ -253,16 +272,19 @@ export default function DailyLesson() {
                 />
               ))}
             </div>
-            <Button variant="hero" size="lg" className="w-full ka" onClick={goConversation}>
+            <button
+              onClick={goConversation}
+              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-2xl h-12 text-base font-bold ka"
+            >
               საუბარზე გადასვლა →
-            </Button>
+            </button>
           </>
         )}
 
         {step === "conversation" && (
-          <div className="flex flex-col h-[calc(100vh-13rem)]">
-            <div className="p-3 rounded-2xl bg-purple-500/5 border border-purple-400/30 mb-3">
-              <p className="text-xs ka">
+          <div className="flex flex-col h-[calc(100vh-15rem)]">
+            <div className="sp-card p-3 mb-3">
+              <p className="text-xs ka sp-text">
                 {isBeginner ? (
                   <>უპასუხე მარტივად ინგლისურად. AI გასწორებს ნაზად 😊</>
                 ) : (
@@ -275,8 +297,8 @@ export default function DailyLesson() {
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[85%] px-4 py-2 rounded-2xl ${
                     m.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card border border-border shadow-card"
+                      ? "sp-btn-primary"
+                      : "sp-card"
                   }`}>
                     <div className="text-sm whitespace-pre-wrap break-words">{m.content}</div>
                     {m.role === "assistant" && <div className="mt-1"><SpeakButton text={m.content} /></div>}
@@ -285,11 +307,11 @@ export default function DailyLesson() {
               ))}
               {loading && (
                 <div className="flex justify-start">
-                  <div className="px-4 py-2 rounded-2xl bg-card border border-border shadow-card">
+                  <div className="px-4 py-2 rounded-2xl sp-card">
                     <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" />
-                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
-                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
+                      <span className="w-1.5 h-1.5 bg-purple-300 rounded-full animate-bounce" />
+                      <span className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
+                      <span className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
                     </div>
                   </div>
                 </div>
@@ -305,19 +327,23 @@ export default function DailyLesson() {
                   }}
                   rows={1}
                   placeholder={isBeginner ? "მარტივად ინგლისურად..." : "Type your answer..."}
-                  className="resize-none"
+                  className="resize-none bg-white/95 text-foreground"
                   disabled={loading}
                 />
-                <Button onClick={() => send(input)} disabled={!input.trim() || loading} size="icon">
+                <button
+                  onClick={() => send(input)}
+                  disabled={!input.trim() || loading}
+                  className="sp-btn-primary h-12 w-12 inline-flex items-center justify-center rounded-2xl disabled:opacity-50"
+                >
                   <Send className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
               <div className="flex items-center justify-between">
                 <MicPlaceholder />
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="ka"
+                  className="ka sp-text hover:bg-white/10"
                   onClick={goReview}
                   disabled={messages.length < 2}
                 >
@@ -330,65 +356,64 @@ export default function DailyLesson() {
 
         {step === "review" && (
           <>
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-500/15 to-blue-500/10 border-2 border-purple-400/40 shadow-card">
+            <div className="sp-card-glow p-5 relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-teal-400/25 blur-2xl" />
               <div className="text-3xl">🎉</div>
-              <h2 className="text-xl font-extrabold ka mt-2">მშვენიერი ვარჯიში!</h2>
-              <p className="text-sm ka mt-1">
+              <h2 className="text-xl font-extrabold ka mt-2 sp-text">მშვენიერი ვარჯიში!</h2>
+              <p className="text-sm ka mt-1 sp-text-muted">
                 შენ მოახერხე დღევანდელი გაკვეთილი თემაზე "{plan.title_ka}". განაგრძე ყოველდღე —
                 ცოტ-ცოტა ყოველთვის უფრო ეფექტურია, ვიდრე ბევრი ერთჯერ.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-card space-y-2">
-              <div className="font-bold ka">გავარჯიშებული ფრაზები</div>
-              <div className="text-sm">
+            <div className="sp-card p-4 space-y-2">
+              <div className="font-bold ka sp-text">გავარჯიშებული ფრაზები</div>
+              <div className="text-sm sp-text">
                 {practiced.filter(Boolean).length} / {phrases.length}
               </div>
               <ul className="text-sm space-y-1">
                 {phrases.map((w, i) => (
-                  <li key={i} className={practiced[i] ? "" : "text-muted-foreground"}>
+                  <li key={i} className={practiced[i] ? "sp-text" : "sp-text-muted"}>
                     {practiced[i] ? "✅" : "⚪"} {w.english_word}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-card space-y-2">
-              <div className="font-bold ka">გასწორებული შეცდომები</div>
+            <div className="sp-card p-4 space-y-2">
+              <div className="font-bold ka sp-text">გასწორებული შეცდომები</div>
               {mistakes.length === 0 ? (
-                <div className="text-sm text-muted-foreground ka">ამ გაკვეთილზე შეცდომები არ დაფიქსირებულა 👏</div>
+                <div className="text-sm sp-text-muted ka">ამ გაკვეთილზე შეცდომები არ დაფიქსირებულა 👏</div>
               ) : (
                 <ul className="text-sm space-y-2">
                   {mistakes.map((m, i) => (
                     <li key={i}>
-                      <div className="line-through text-muted-foreground">{m.original}</div>
-                      <div className="font-semibold">→ {m.corrected}</div>
+                      <div className="line-through sp-text-muted">{m.original}</div>
+                      <div className="font-semibold sp-text">→ {m.corrected}</div>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-card space-y-2">
-              <div className="font-bold ka">შემდეგი თემა</div>
-              <div className="text-sm">
+            <div className="sp-card p-4 space-y-2">
+              <div className="font-bold ka sp-text">შემდეგი თემა</div>
+              <div className="text-sm sp-text">
                 💡 {SUGGESTED_NEXT_TOPICS[Math.floor(Math.random() * SUGGESTED_NEXT_TOPICS.length)]}
               </div>
             </div>
 
-            <Button
-              variant="hero"
-              size="xl"
-              className="w-full ka"
+            <button
               onClick={() => navigate("/path/speaking")}
               disabled={saving}
+              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-2xl h-14 text-base font-bold ka disabled:opacity-60"
             >
               {saving ? "ვინახავ..." : "დაბრუნება საუბრის გვერდზე"}
-            </Button>
+            </button>
           </>
         )}
       </div>
-    </Layout>
+    </SpeakingShell>
   );
 }
 
@@ -397,8 +422,8 @@ function Row({ icon, label, value }: { icon: React.ReactNode; label: string; val
     <div className="flex items-start gap-3">
       <div className="mt-0.5">{icon}</div>
       <div className="min-w-0">
-        <div className="text-xs text-muted-foreground ka">{label}</div>
-        <div className="font-semibold ka break-words">{value}</div>
+        <div className="text-xs sp-text-muted ka">{label}</div>
+        <div className="font-semibold ka break-words sp-text">{value}</div>
       </div>
     </div>
   );
