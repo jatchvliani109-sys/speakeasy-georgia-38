@@ -1,14 +1,21 @@
 import { ReactNode, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 
 export default function SpeakingShell({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
   useEffect(() => {
     document.body.classList.add("sp-active");
     return () => document.body.classList.remove("sp-active");
   }, []);
   return (
     <Layout>
-      <div className="relative">{children}</div>
+      <div className="relative">
+        {/* keyed wrapper -> retriggers sp-page fade-in on every speaking route change */}
+        <div key={pathname} className="sp-page">
+          {children}
+        </div>
+      </div>
     </Layout>
   );
 }
