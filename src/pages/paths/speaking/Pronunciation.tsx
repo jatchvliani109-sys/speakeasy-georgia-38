@@ -86,7 +86,9 @@ export default function Pronunciation() {
               />
             </div>
           </div>
-          <div className="mt-4"><MicPlaceholder /></div>
+          <div className="mt-4 text-[11px] ka text-[hsl(175_60%_82%)]">
+            🎤 თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
+          </div>
         </section>
 
         <div className="space-y-3">
