@@ -114,9 +114,37 @@ export default function SpeakingProgress() {
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
             <Stat Icon={Repeat2} value={phrasesPracticed} label="ფრაზა გაიმეორე" />
-            <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ვარჯიში" />
+            <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ცდა" />
             <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
+
+          {pronCount > 0 && (
+            <Section title={`საშუალო ქულა: ${avgScore}%`}>
+              <ul className="space-y-2 text-sm">
+                {recentPron.map((p, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3">
+                    <span className="sp-text truncate">{p.target_phrase}</span>
+                    <span className={`font-extrabold shrink-0 ${
+                      p.score >= 80 ? "text-emerald-600" : p.score >= 50 ? "text-amber-600" : "text-rose-600"
+                    }`}>{p.score}%</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {needsPractice.length > 0 && (
+            <Section title="საჭიროებს ვარჯიშს">
+              <ul className="space-y-2 text-sm">
+                {needsPractice.map((p, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3">
+                    <span className="sp-text truncate">{p.phrase}</span>
+                    <span className="text-xs sp-text-muted shrink-0">{p.score}%</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
 
           <Section title="ბოლო თემები">
             {recentTopics.length === 0 ? (
