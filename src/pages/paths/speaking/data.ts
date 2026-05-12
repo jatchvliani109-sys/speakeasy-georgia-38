@@ -169,3 +169,49 @@ export const SUGGESTED_NEXT_TOPICS = [
   "Weekend plans",
   "Travel basics",
 ];
+
+// Daily lesson topic pool — used to rotate fresh topics by level.
+export const DAILY_TOPIC_POOL: Record<"Beginner" | "Elementary" | "Intermediate", string[]> = {
+  Beginner: [
+    "Introducing Yourself",
+    "At School",
+    "Family",
+    "At a Café",
+    "Hobbies",
+    "Daily Routine",
+  ],
+  Elementary: [
+    "Ordering Food",
+    "Asking for Directions",
+    "Shopping",
+    "Weekend Plans",
+    "Travel Basics",
+    "Talking About Likes",
+  ],
+  Intermediate: [
+    "Job Interview Basics",
+    "Giving Opinions",
+    "Making Plans",
+    "Describing Experiences",
+    "Solving Problems",
+    "Travel Conversation",
+  ],
+};
+
+export function pickDailyTopic(
+  level: string,
+  recent: string[],
+): string {
+  const key: "Beginner" | "Elementary" | "Intermediate" = /inter/i.test(level)
+    ? "Intermediate"
+    : /element|pre/i.test(level)
+    ? "Elementary"
+    : /adv/i.test(level)
+    ? "Intermediate"
+    : "Beginner";
+  const pool = DAILY_TOPIC_POOL[key];
+  const recentLower = recent.map((r) => r.toLowerCase().trim());
+  const fresh = pool.filter((t) => !recentLower.includes(t.toLowerCase()));
+  const candidates = fresh.length ? fresh : pool;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
