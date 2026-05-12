@@ -684,6 +684,25 @@ export default function DailyLesson() {
             </div>
 
             <div className="sp-card p-5 space-y-2">
+              <div className="font-bold ka sp-text">საუბრის კითხვები</div>
+              <div className="text-sm sp-text">
+                {completedPromptResults.length} completed
+              </div>
+              {completedPromptResults.length > 0 ? (
+                <ul className="text-sm space-y-2 mt-1">
+                  {completedPromptResults.map(({ idx, result }) => (
+                    <li key={idx} className="sp-text">
+                      <div className="font-semibold">{reviewPrompts[idx]?.question ?? `Question ${idx + 1}`}</div>
+                      <div className="sp-text-muted italic">Heard: {result.transcript}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-sm sp-text-muted ka">ჯერ საუბრის პასუხი არ არის ჩაწერილი.</div>
+              )}
+            </div>
+
+            <div className="sp-card p-5 space-y-2">
               <div className="font-bold ka sp-text">გავარჯიშებული ფრაზები</div>
               <div className="text-sm sp-text">
                 {practicedRepeat.filter(Boolean).length} / {phrases.length}
@@ -705,6 +724,15 @@ export default function DailyLesson() {
                     <span className="font-semibold">{w.english_word}</span>{" "}
                     <span className="sp-text-muted ka">— {w.georgian_meaning}</span>
                   </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="sp-card p-5 space-y-2">
+              <div className="font-bold ka sp-text">სასურველია გადახედო</div>
+              <ul className="text-sm space-y-1">
+                {Array.from(new Set([...mistakes.map((m) => m.corrected), ...phrases.map((w) => w.example_sentence || w.english_word)])).slice(0, 5).map((item, i) => (
+                  <li key={i} className="sp-text">• {item}</li>
                 ))}
               </ul>
             </div>
