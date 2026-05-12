@@ -406,210 +406,220 @@ export default function DailyLesson() {
           </>
         )}
 
-        {step === "conversation" && (
-          <div className="flex flex-col h-[calc(100vh-15rem)]">
-            {/* Scenario setup card */}
-            <div className="sp-card p-4 mb-3">
-              <div className="flex items-start gap-2.5">
-                <div className="w-9 h-9 rounded-lg sp-chip-teal flex items-center justify-center shrink-0">
-                  <Users className="w-4.5 h-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
-                    სცენარი
+        {step === "conversation" && (() => {
+          // Build 3–5 guided English prompts. Prefer plan.warmup_questions, fall back to defaults.
+          const englishOnly = (s: string) => /[A-Za-z]/.test(s) && (s.match(/[A-Za-z]/g)!.length / Math.max(1, s.replace(/\s/g, "").length)) > 0.5;
+          const fromPlan = (plan.warmup_questions || []).map((q) => q.trim()).filter(englishOnly);
+          const fallback = ["What would you like?", "Can you tell me more?", "How are you today?"];
+          const merged = [...fromPlan, ...fallback];
+          const prompts = Array.from(new Set(merged)).slice(0, Math.min(5, Math.max(3, fromPlan.length || 3)));
+          const current = prompts[promptIdx];
+          const result = promptResults[promptIdx];
+          const examples = phrases.map((p) => p.example_sentence).filter(Boolean).slice(0, 3);
+
+          const submitAnswer = async (text: string) => {
+            const t = text.trim();
+            if (!t) return;
+            console.log("[DailyLesson] Speaking prompt answer submitted", { promptIdx, text: t });
+            setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "", loading: true, typing: false } }));
+            const seedMessages: Msg[] = [
+              { role: "user", content: `English coach. The student is a ${LEVEL_LABEL_KA[level] ?? level} learner. I asked: "${current}". They answered: "${t}". Reply with: 1) one short Georgian sentence of feedback (encouraging, max 12 words). 2) On a new line, if needed, an improved English version using exactly: Better: "..." . Keep it tiny.` },
+            ];
+            try {
+              const r = await supabase.functions.invoke("ai-tutor", {
+                body: { messages: seedMessages, level, coachMode: "speaking_lesson", lessonContext: { topic: plan.topic, new_words: plan.new_words } },
+              });
+              const reply = ((r.data as any)?.reply as string) || "";
+              const m = reply.match(/(?:Better|Try|Type):\s*["“']([^"”']+)["”']/i);
+              const corrected = m?.[1];
+              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: reply, corrected, loading: false, typing: false } }));
+              if (corrected) setMistakes((prev) => [...prev, { original: t, corrected }]);
+              setMessages((prev) => [...prev, { role: "user", content: t }, { role: "assistant", content: reply }]);
+            } catch (e: any) {
+              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "კარგი ცდა! გადადი შემდეგ კითხვაზე.", loading: false, typing: false } }));
+            }
+          };
+
+          const goNext = () => {
+            if (promptIdx < prompts.length - 1) {
+              setPromptIdx(promptIdx + 1);
+              setTypedAnswer("");
+            } else {
+              goReview();
+            }
+          };
+
+          return (
+            <div className="space-y-4">
+              {/* Scenario card */}
+              <div className="sp-card p-4">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-9 h-9 rounded-lg sp-chip-teal flex items-center justify-center shrink-0">
+                    <Users className="w-4 h-4" />
                   </div>
-                  {plan.scenario_ka && (
-                    <div className="text-sm ka sp-text mt-0.5">{plan.scenario_ka}</div>
-                  )}
-                  {(plan.user_role_ka || plan.ai_role_ka) && (
-                    <div className="text-xs ka sp-text-muted mt-1">
-                      {plan.user_role_ka && <><span className="font-semibold">შენ:</span> {plan.user_role_ka}</>}
-                      {plan.user_role_ka && plan.ai_role_ka && " · "}
-                      {plan.ai_role_ka && <><span className="font-semibold">AI:</span> {plan.ai_role_ka}</>}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+                      სცენარი
                     </div>
-                  )}
-                  <div className="text-xs ka mt-2 sp-text-muted">
-                    {isBeginner
-                      ? "აირჩიე პასუხი ან დაწერე შენი პასუხი."
-                      : isElementary
-                      ? "გამოიყენე დასაწყისები ან დაწერე საკუთარი პასუხი."
-                      : "Answer naturally in English. Try to use the new phrases."}
+                    {plan.scenario_ka && <div className="text-sm ka sp-text mt-0.5">{plan.scenario_ka}</div>}
+                    {(plan.user_role_ka || plan.ai_role_ka) && (
+                      <div className="text-xs ka sp-text-muted mt-1">
+                        {plan.user_role_ka && <><span className="font-semibold">შენ:</span> {plan.user_role_ka}</>}
+                        {plan.user_role_ka && plan.ai_role_ka && " · "}
+                        {plan.ai_role_ka && <><span className="font-semibold">AI:</span> {plan.ai_role_ka}</>}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1">
-              {messages.map((m, i) => {
-                const display = m.role === "assistant" ? extractChips(m.content).clean : m.content;
-                return (
-                  <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[85%] px-4 py-2 rounded-2xl ${
-                        m.role === "user" ? "sp-btn-primary" : "sp-card"
-                      }`}
-                    >
-                      <div className="text-sm whitespace-pre-wrap break-words">{display}</div>
-                      {m.role === "assistant" && (
-                        <div className="mt-1">
-                          <SpeakButton text={display} />
-                        </div>
-                      )}
-                    </div>
+              {/* Prompt counter */}
+              <div className="flex items-center justify-between">
+                <div className="text-xs sp-text-soft ka">კითხვა {promptIdx + 1} / {prompts.length}</div>
+                <div className="flex gap-1">
+                  {prompts.map((_, i) => (
+                    <div key={i} className={`w-6 h-1 rounded-full ${i <= promptIdx ? "bg-[hsl(175_70%_38%)]" : "bg-[hsl(220_22%_90%)]"}`} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Prompt card */}
+              <div className="sp-card p-5 space-y-4">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+                    Speak in English · უპასუხე ინგლისურად
                   </div>
-                );
-              })}
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="px-4 py-2 rounded-2xl sp-card">
-                    <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(220 50% 30%)" }} />
-                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(175 70% 38%)", animationDelay: "100ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(210 70% 45%)", animationDelay: "200ms" }} />
-                    </div>
+                  <div className="text-xs ka sp-text-muted mt-1">
+                    {isBeginner ? "გამოიყენე მაგალითი ან თქვი შენი პასუხი ინგლისურად." : "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითები."}
+                  </div>
+                  <div className="flex items-start gap-2 mt-3">
+                    <SpeakButton text={current} />
+                    <div className="text-lg font-bold sp-text leading-snug break-words">{current}</div>
                   </div>
                 </div>
-              )}
+
+                {examples.length > 0 && !result?.transcript && (
+                  <div>
+                    <div className="text-[11px] sp-text-soft ka mb-1.5">მაგალითები:</div>
+                    <ul className="space-y-1">
+                      {examples.map((ex, i) => (
+                        <li key={i} className="text-sm sp-text flex items-center gap-2">
+                          <span className="text-[hsl(175_70%_38%)]">•</span>
+                          <span>{ex}</span>
+                          <SpeakButton text={ex} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Recorder (primary) */}
+                {!result?.transcript && !result?.loading && !result?.typing && (
+                  <div className="space-y-2">
+                    <SpeakingRecorder
+                      key={`prompt-${promptIdx}`}
+                      mode="transcribe"
+                      target={current}
+                      topic={plan.topic}
+                      source="daily_lesson_voice"
+                      recordLabel="🎤 Record answer"
+                      onTranscript={(t) => submitAnswer(t)}
+                    />
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: "", feedback: "", loading: false, typing: true } }))}
+                        className="text-xs ka sp-text-soft underline hover:sp-text"
+                      >
+                        ⌨️ Type instead
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Type instead */}
+                {result?.typing && !result?.transcript && (
+                  <div className="space-y-2">
+                    <div className="flex items-end gap-2">
+                      <Textarea
+                        value={typedAnswer}
+                        onChange={(e) => setTypedAnswer(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            submitAnswer(typedAnswer);
+                          }
+                        }}
+                        rows={1}
+                        placeholder={isBeginner ? "მარტივად ინგლისურად..." : "Type your answer..."}
+                        className="resize-none bg-white text-foreground border-[hsl(220_22%_88%)]"
+                      />
+                      <button
+                        onClick={() => submitAnswer(typedAnswer)}
+                        disabled={!typedAnswer.trim()}
+                        className="sp-btn-primary h-12 w-12 inline-flex items-center justify-center rounded-2xl disabled:opacity-50"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: "", feedback: "", loading: false, typing: false } }))}
+                      className="text-xs ka sp-text-soft underline hover:sp-text"
+                    >
+                      🎤 Back to voice
+                    </button>
+                  </div>
+                )}
+
+                {/* Loading feedback */}
+                {result?.loading && (
+                  <div className="flex items-center gap-2 text-sm sp-text-muted ka">
+                    <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(175 70% 38%)" }} />
+                    AI ამოწმებს პასუხს...
+                  </div>
+                )}
+
+                {/* Result */}
+                {result?.transcript && !result?.loading && (
+                  <div className="space-y-3">
+                    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3">
+                      <div className="text-[10px] font-bold uppercase tracking-wider sp-text-soft ka">Heard · გაიგე</div>
+                      <div className="text-sm sp-text mt-0.5 break-words">{result.transcript}</div>
+                    </div>
+                    {result.feedback && (
+                      <div className="rounded-xl bg-[hsl(175_60%_96%)] border border-[hsl(175_40%_85%)] p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>Feedback</div>
+                        <div className="text-sm sp-text mt-0.5 whitespace-pre-wrap break-words">{result.feedback}</div>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: "", feedback: "", loading: false, typing: false } })); setTypedAnswer(""); }}
+                        className="text-xs ka sp-text-soft underline hover:sp-text"
+                      >
+                        🔁 Try again
+                      </button>
+                      <button
+                        onClick={goNext}
+                        className="sp-btn-primary inline-flex items-center justify-center gap-2 rounded-2xl h-11 px-5 text-sm font-bold ka"
+                      >
+                        {promptIdx < prompts.length - 1 ? "შემდეგი კითხვა →" : "მიმოხილვაზე გადასვლა →"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_40%_94%)]" onClick={goReview}>
+                  მიმოხილვაზე გადასვლა →
+                </Button>
+              </div>
             </div>
-
-            <div className="pt-3 space-y-3">
-              {(() => {
-                const userTurns = messages.filter((m) => m.role === "user").length;
-                const lastClean = lastAssistant ? extractChips(lastAssistant.content).clean : "";
-                const englishPrompt = lastClean ? extractEnglishPrompt(lastClean) : "";
-                const reachedLimit = userTurns >= MAX_VOICE_TURNS;
-                return (
-                  <>
-                    {/* Voice-first prompt panel */}
-                    {englishPrompt && !loading && !reachedLimit && (
-                      <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3">
-                        <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
-                          Speak your answer · ხმამაღლა უპასუხე
-                        </div>
-                        <div className="flex items-start gap-2 mt-1.5">
-                          <SpeakButton text={englishPrompt} />
-                          <div className="text-[15px] font-semibold sp-text break-words">{englishPrompt}</div>
-                        </div>
-
-                        {/* Beginner: answer suggestions to choose then speak */}
-                        {isBeginner && lastChips.options.length > 0 && (
-                          <div className="mt-3">
-                            <div className="text-[11px] sp-text-soft ka mb-1.5">აირჩიე და ხმამაღლა თქვი:</div>
-                            <div className="flex flex-wrap gap-2">
-                              {lastChips.options.map((o) => (
-                                <button
-                                  key={o}
-                                  type="button"
-                                  onClick={() => setInput(o)}
-                                  className="sp-chip px-3 py-1.5 rounded-full text-xs hover:bg-[hsl(40_40%_92%)] transition-colors"
-                                >
-                                  {o}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {isElementary && lastChips.starters.length > 0 && (
-                          <div className="mt-3">
-                            <div className="text-[11px] sp-text-soft ka mb-1.5">დასაწყისები:</div>
-                            <div className="flex flex-wrap gap-2">
-                              {lastChips.starters.map((s) => (
-                                <button
-                                  key={s}
-                                  type="button"
-                                  onClick={() => setInput(s)}
-                                  className="sp-chip px-3 py-1.5 rounded-full text-xs hover:bg-[hsl(40_40%_92%)] transition-colors"
-                                >
-                                  {s}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="mt-3">
-                          <SpeakingRecorder
-                            mode="transcribe"
-                            topic={plan.topic}
-                            source="daily_lesson_voice"
-                            recordLabel="Record answer"
-                            onTranscript={(t) => { if (t.trim()) send(t.trim()); }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {reachedLimit && !loading && (
-                      <div className="rounded-xl bg-[hsl(175_60%_96%)] border border-[hsl(175_40%_85%)] p-3 text-sm ka sp-text">
-                        🎉 კარგი ვარჯიში! ({userTurns} პასუხი) — გადადი მიმოხილვაზე.
-                      </div>
-                    )}
-
-                    {/* Type instead - backup */}
-                    {!showType ? (
-                      <div className="flex items-center justify-between">
-                        <button
-                          type="button"
-                          onClick={() => setShowType(true)}
-                          className="text-xs ka sp-text-soft underline hover:sp-text"
-                        >
-                          ⌨️ Type instead
-                        </button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="ka sp-text hover:bg-[hsl(40_40%_94%)]"
-                          onClick={goReview}
-                          disabled={messages.filter((m) => m.role === "user").length < 2}
-                        >
-                          მიმოხილვაზე გადასვლა →
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="flex items-end gap-2">
-                          <Textarea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                send(input);
-                              }
-                            }}
-                            rows={1}
-                            placeholder={isBeginner ? "მარტივად ინგლისურად..." : "Type your answer..."}
-                            className="resize-none bg-white text-foreground border-[hsl(220_22%_88%)]"
-                            disabled={loading}
-                          />
-                          <button
-                            onClick={() => send(input)}
-                            disabled={!input.trim() || loading}
-                            className="sp-btn-primary h-12 w-12 inline-flex items-center justify-center rounded-2xl disabled:opacity-50"
-                          >
-                            <Send className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <button
-                            type="button"
-                            onClick={() => setShowType(false)}
-                            className="text-xs ka sp-text-soft underline hover:sp-text"
-                          >
-                            🎤 Back to voice
-                          </button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="ka sp-text hover:bg-[hsl(40_40%_94%)]"
-                            onClick={goReview}
-                            disabled={messages.filter((m) => m.role === "user").length < 2}
-                          >
-                            მიმოხილვაზე გადასვლა →
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+          );
+        })()}
                   </>
                 );
               })()}
