@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -106,8 +106,12 @@ export default function LevelTest() {
   const [writing, setWriting] = useState("");
   const [result, setResult] = useState<{ level: Level; score: number } | null>(null);
   const [reaction, setReaction] = useState<string>("");
-  const [reactionLoading, setReactionLoading] = useState(false);
+  const [reactionReady, setReactionReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const realReactionArrived = useRef(false);
+
+  const FALLBACK_REACTION = "კარგი დასაწყისია! ახლა ვნახოთ შენი სავარაუდო დონე.";
 
   const submit = async () => {
     if (selfIdx === null) return;
@@ -122,11 +126,38 @@ export default function LevelTest() {
     const level = combineLevel(selfIdx, score, QUESTIONS.length, w.cap);
     setResult({ level, score });
     setStage("done");
-    setReactionLoading(true);
+    setReaction("");
+    setReactionReady(false);
+    realReactionArrived.current = false;
+
+    // Fallback after 2s if real reaction hasn't arrived
+    fallbackTimer.current = setTimeout(() => {
+      if (!realReactionArrived.current) {
+        setReaction(FALLBACK_REACTION);
+        setReactionReady(true);
+      }
+    }, 2000);
+
     supabase.functions.invoke("level-reaction", { body: { writingSample: trimmed, level } })
-      .then(({ data }) => setReaction((data as any)?.reaction || "კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
-      .catch(() => setReaction("კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
-      .finally(() => setReactionLoading(false));
+      .then(({ data }) => {
+        const real = (data as any)?.reaction;
+        if (real) {
+          realReactionArrived.current = true;
+          if (fallbackTimer.current) clearTimeout(fallbackTimer.current);
+          setReaction(real);
+          setReactionReady(true);
+        } else if (!reactionReady) {
+          setReaction(FALLBACK_REACTION);
+          setReactionReady(true);
+        }
+      })
+      .catch(() => {
+        if (!realReactionArrived.current) {
+          setReaction(FALLBACK_REACTION);
+          setReactionReady(true);
+        }
+      });
+
     if (!user) return;
     setSaving(true);
     await supabase.from("level_test_results").insert({
@@ -149,9 +180,20 @@ export default function LevelTest() {
 
           <div className="text-left bg-accent/30 border border-accent/40 rounded-2xl p-4 mb-6 flex gap-3 items-start">
             <div className="w-9 h-9 rounded-full gradient-hero flex items-center justify-center text-base shrink-0">🦉</div>
-            <p className="text-sm ka leading-relaxed text-foreground">
-              {reactionLoading ? "..." : reaction}
-            </p>
+            {reactionReady ? (
+              <p className="text-sm ka leading-relaxed text-foreground">{reaction}</p>
+            ) : (
+              <div className="flex-1">
+                <p className="text-sm ka leading-relaxed text-foreground">
+                  AI მასწავლებელი კითხულობს შენს პასუხს
+                  <span className="inline-flex ml-1">
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1 h-1 rounded-full bg-foreground/70 mx-0.5 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
 
           <p className="text-sm text-muted-foreground ka">სავარაუდო საწყისი დონე:</p>
@@ -161,8 +203,8 @@ export default function LevelTest() {
             <p className="text-sm ka">ეს დონე შეირჩა შენი თვითშეფასების, ტესტის პასუხებისა და მოკლე წერითი პასუხის მიხედვით.</p>
             <p className="text-sm ka text-muted-foreground">AI მასწავლებელი შენს პასუხებსა და გაკვეთილებზე დაყრდნობით დონეს ნელ-ნელა დააზუსტებს.</p>
           </div>
-          <Button variant="hero" size="xl" className="w-full ka mt-6" onClick={() => navigate("/learning-path")} disabled={saving}>
-            გაგრძელება →
+          <Button variant="hero" size="xl" className="w-full ka mt-6" onClick={() => navigate("/learning-path")} disabled={saving || !reactionReady}>
+            {reactionReady ? "გაგრძელება →" : "მზადდება..."}
           </Button>
         </div>
       </Layout>
