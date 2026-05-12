@@ -6,6 +6,7 @@ import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2, Clock } 
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
+import { getEncouragementKa, dailySeed } from "./lib/encouragement";
 
 const SIDE_PATHS = [
   { to: "/path/speaking/pronunciation", Icon: Headphones, title_ka: "მოსმენა და გამეორება", desc_ka: "მოკლე ფრაზები" },
