@@ -3,6 +3,7 @@ import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
 
 type LessonRow = {
   id: string;
@@ -71,25 +72,38 @@ export default function SpeakingProgress() {
 
   return (
     <SpeakingShell>
-      <PageHeader title="ჩემი საუბრის პროგრესი" backTo="/path/speaking" />
+      <PageHeader title="ჩემი საუბრის ზრდა" backTo="/path/speaking" />
       {loading ? (
         <p className="text-center py-12 sp-text-muted ka">იტვირთება...</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6 max-w-3xl mx-auto">
+          <div>
+            <span className="sp-eyebrow ka">პროგრესი</span>
+            <h2 className="text-2xl font-extrabold ka sp-text mt-2 leading-snug">
+              შენი საუბრის გზა
+            </h2>
+            <p className="text-sm sp-text-muted ka mt-1.5">
+              ცოტ-ცოტა ყოველდღე — სწორედ ეს გვაძლევს შედეგს.
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
-            <Stat emoji="💬" value={dailyLessons.length} label="საუბრის გაკვეთილი" tone="purple" />
-            <Stat emoji="🗣️" value={phrasesPracticed} label="ფრაზა გაიმეორე" tone="blue" />
-            <Stat emoji="🔊" value={pronCount} label="გამოთქმის ვარჯიში" tone="teal" />
-            <Stat emoji="🎭" value={roleplays.length} label="როლური საუბარი" tone="indigo" />
+            <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
+            <Stat Icon={Repeat2} value={phrasesPracticed} label="ფრაზა გაიმეორე" />
+            <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ვარჯიში" />
+            <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
 
           <Section title="ბოლო თემები">
             {recentTopics.length === 0 ? (
               <Empty />
             ) : (
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-2 text-sm">
                 {recentTopics.map((t, i) => (
-                  <li key={i} className="ka sp-text">• {t}</li>
+                  <li key={i} className="ka sp-text flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-[hsl(175_70%_38%)]" />
+                    {t}
+                  </li>
                 ))}
               </ul>
             )}
@@ -99,11 +113,11 @@ export default function SpeakingProgress() {
             {mistakes.length === 0 ? (
               <Empty />
             ) : (
-              <ul className="space-y-2 text-sm">
+              <ul className="space-y-3 text-sm">
                 {mistakes.slice(0, 5).map((m, i) => (
-                  <li key={i}>
-                    <div className="line-through sp-text-muted">{m.original_sentence}</div>
-                    <div className="font-semibold sp-text">→ {m.corrected_sentence}</div>
+                  <li key={i} className="pb-3 last:pb-0 sp-rule first:border-t-0 pt-3 first:pt-0">
+                    <div className="line-through sp-text-soft">{m.original_sentence}</div>
+                    <div className="font-semibold sp-text mt-0.5">→ {m.corrected_sentence}</div>
                   </li>
                 ))}
               </ul>
@@ -115,35 +129,27 @@ export default function SpeakingProgress() {
   );
 }
 
-const TONE: Record<string, string> = {
-  purple: "from-purple-500/30 to-purple-500/0",
-  blue: "from-blue-500/30 to-blue-500/0",
-  teal: "from-teal-400/30 to-teal-400/0",
-  indigo: "from-indigo-500/30 to-indigo-500/0",
-};
-
-function Stat({ emoji, value, label, tone = "purple" }: { emoji: string; value: number; label: string; tone?: string }) {
+function Stat({ Icon, value, label }: { Icon: React.ComponentType<{ className?: string }>; value: number; label: string }) {
   return (
-    <div className={`sp-card p-4 relative overflow-hidden`}>
-      <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br ${TONE[tone]} blur-xl`} />
-      <div className="relative">
-        <div className="text-2xl">{emoji}</div>
-        <div className="text-2xl font-extrabold mt-1 sp-text">{value}</div>
-        <div className="text-xs sp-text-muted ka">{label}</div>
+    <div className="sp-card p-4">
+      <div className="w-9 h-9 rounded-lg sp-chip-teal flex items-center justify-center">
+        <Icon className="w-4.5 h-4.5" />
       </div>
+      <div className="text-3xl font-extrabold mt-3 sp-text leading-none">{value}</div>
+      <div className="text-xs sp-text-muted ka mt-1.5">{label}</div>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="sp-card p-4">
-      <div className="font-bold ka mb-2 sp-text">{title}</div>
+    <div className="sp-card p-5">
+      <div className="font-bold ka mb-3 sp-text text-[15px]">{title}</div>
       {children}
     </div>
   );
 }
 
 function Empty() {
-  return <div className="text-sm sp-text-muted ka">ჯერ არ გაქვს დაწყებული.</div>;
+  return <div className="text-sm sp-text-soft ka">ჯერ არ გაქვს დაწყებული.</div>;
 }

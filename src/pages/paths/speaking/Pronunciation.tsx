@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import SpeakingShell, { SoundBars } from "./components/SpeakingShell";
+import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import MicPlaceholder from "./components/MicPlaceholder";
+import { Headphones } from "lucide-react";
 
 type Level = "Beginner" | "Elementary" | "Intermediate";
 
@@ -50,27 +51,43 @@ export default function Pronunciation() {
     } catch {}
   };
 
+  const pct = items.length ? Math.round((doneCount / items.length) * 100) : 0;
+
   return (
     <SpeakingShell>
-      <PageHeader title="გამოთქმის პრაქტიკა" backTo="/path/speaking" />
-      <div className="space-y-4">
-        <div className="sp-card-glow p-5 relative overflow-hidden">
-          <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-teal-400/25 blur-2xl" />
-          <div className="relative flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl sp-btn-teal flex items-center justify-center">🔊</div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm ka sp-text">
-                მოუსმინე და გაიმეორე ხმამაღლა. დონე:{" "}
-                <span className="font-bold text-teal-200">{level}</span>
-              </div>
-              <div className="text-xs sp-text-muted ka mt-0.5">
-                გავარჯიშებული: <span className="font-bold sp-text">{doneCount}</span> / {items.length}
-              </div>
+      <PageHeader title="მოუსმინე და გაიმეორე" backTo="/path/speaking" />
+      <div className="space-y-5 max-w-3xl mx-auto">
+        <section className="sp-card-hero p-5 sm:p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[hsl(175_70%_38%)] text-white flex items-center justify-center shrink-0">
+              <Headphones className="w-6 h-6" />
             </div>
-            <SoundBars />
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+                გამოთქმის ბანკი · {level}
+              </div>
+              <h2 className="text-xl font-extrabold ka sp-text mt-1 leading-snug">
+                მოუსმინე და გაიმეორე ხმამაღლა
+              </h2>
+              <p className="text-sm sp-text-muted ka mt-1.5">
+                შენი დონისთვის შერჩეული მოკლე ფრაზები. დააჭირე ხატულას და გაიმეორე.
+              </p>
+            </div>
           </div>
-          <div className="mt-3"><MicPlaceholder /></div>
-        </div>
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-[11px] ka sp-text-muted mb-1.5">
+              <span>გავარჯიშებული</span>
+              <span className="font-semibold sp-text">{doneCount} / {items.length}</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
+              <div
+                className="h-full bg-[hsl(175_70%_55%)] transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+          <div className="mt-4"><MicPlaceholder /></div>
+        </section>
 
         <div className="space-y-3">
           {items.map((p, i) => {

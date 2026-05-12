@@ -1,126 +1,121 @@
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
-import SpeakingShell, { SoundBars } from "./components/SpeakingShell";
-import { Mic, Headphones, Drama, LineChart, Sparkles, ArrowRight } from "lucide-react";
+import SpeakingShell from "./components/SpeakingShell";
+import { Mic, Headphones, Drama, LineChart, ArrowRight, Clock, Target } from "lucide-react";
 
-type Card = {
+type SidePath = {
   to: string;
   Icon: React.ComponentType<{ className?: string }>;
   title_ka: string;
   desc_ka: string;
-  cta_ka: string;
-  accent: "purple" | "blue" | "teal" | "indigo";
 };
 
-const CARDS: Card[] = [
-  {
-    to: "/path/speaking/daily",
-    Icon: Mic,
-    title_ka: "დღევანდელი საუბრის გაკვეთილი",
-    desc_ka: "ივარჯიშე თემაზე, ისწავლე ფრაზები და მიიღე შეცდომების გასწორება.",
-    cta_ka: "გაკვეთილის დაწყება",
-    accent: "purple",
-  },
+const SIDE_PATHS: SidePath[] = [
   {
     to: "/path/speaking/pronunciation",
     Icon: Headphones,
-    title_ka: "გამოთქმის პრაქტიკა",
-    desc_ka: "მოუსმინე სიტყვებს და ივარჯიშე სწორად წარმოთქმაში.",
-    cta_ka: "გამოთქმის დაწყება",
-    accent: "teal",
+    title_ka: "მოუსმინე და გაიმეორე",
+    desc_ka: "მოკლე ფრაზები სწორი გამოთქმისთვის.",
   },
   {
     to: "/path/speaking/roleplay",
     Icon: Drama,
-    title_ka: "როლური საუბარი",
-    desc_ka: "ივარჯიშე რეალურ სიტუაციებში — კაფე, სკოლა, გასაუბრება.",
-    cta_ka: "როლური პრაქტიკა",
-    accent: "indigo",
+    title_ka: "რეალური სიტუაციები",
+    desc_ka: "ივარჯიშე ცხოვრებისეულ დიალოგებში.",
   },
   {
     to: "/path/speaking/progress",
     Icon: LineChart,
-    title_ka: "ჩემი საუბრის პროგრესი",
-    desc_ka: "ნახე რამდენი ფრაზა, გაკვეთილი და სცენარი ივარჯიშე.",
-    cta_ka: "პროგრესის ნახვა",
-    accent: "blue",
+    title_ka: "ჩემი საუბრის ზრდა",
+    desc_ka: "ნახე რას ისწავლე ბოლო დღეებში.",
   },
 ];
-
-const ACCENT: Record<Card["accent"], string> = {
-  purple: "from-purple-500/30 to-purple-500/0 text-purple-200",
-  blue: "from-blue-500/30 to-blue-500/0 text-blue-200",
-  teal: "from-teal-400/30 to-teal-400/0 text-teal-200",
-  indigo: "from-indigo-500/30 to-indigo-500/0 text-indigo-200",
-};
 
 export default function SpeakingDashboard() {
   return (
     <SpeakingShell>
-      <div className="space-y-5">
-        <div className="flex items-start justify-between gap-2">
+      <div className="space-y-8 max-w-3xl mx-auto">
+        {/* Section header */}
+        <header className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold ka text-purple-200/90 inline-flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> AI Speaking Coach
-            </p>
-            <h1 className="text-2xl font-extrabold mt-1 ka sp-text">საუბრის გაუმჯობესება</h1>
-            <p className="text-sm sp-text-muted ka mt-1">
-              ივარჯიშე ინგლისურად საუბარში, გამოთქმაში და თავდაჯერებულობაში.
+            <span className="sp-eyebrow ka">საუბრის ვარჯიში</span>
+            <h1 className="text-[26px] sm:text-3xl font-extrabold mt-2 ka sp-text leading-tight">
+              ისაუბრე ინგლისურად — ყოველდღე ცოტა.
+            </h1>
+            <p className="text-sm sp-text-muted ka mt-2 max-w-md">
+              შენი პირადი მწვრთნელი ქართველი დამწყებებისთვის. მოკლე გაკვეთილები, რეალური დიალოგები და ნაზი გასწორებები.
             </p>
           </div>
           <PathSwitcher />
-        </div>
+        </header>
 
-        {/* Coach hero */}
-        <div className="sp-card-glow p-5 relative overflow-hidden">
-          <div className="absolute -right-6 -top-6 w-40 h-40 rounded-full bg-purple-500/20 blur-2xl" />
-          <div className="absolute -left-10 bottom-0 w-40 h-40 rounded-full bg-teal-400/15 blur-2xl" />
-          <div className="relative flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
-              <Mic className="w-7 h-7 text-white" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[11px] font-semibold ka text-purple-200/90">შენი AI საუბრის მწვრთნელი</div>
-              <div className="font-bold ka sp-text">დაიწყე ყოველდღიური ვარჯიშით</div>
-            </div>
-            <SoundBars />
+        {/* Today's mission — the one premium block */}
+        <section className="sp-card-hero p-6 sm:p-7 relative overflow-hidden">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(175_70%_55%)] animate-pulse" />
+              დღევანდელი მისია
+            </span>
+            <span className="text-[11px] ka sp-text-muted">~ 7 წუთი</span>
           </div>
+          <h2 className="text-2xl sm:text-[26px] font-extrabold ka sp-text leading-snug">
+            ისწავლე საუბარი ყოველდღიურ თემაზე
+          </h2>
+          <p className="text-sm sp-text-muted ka mt-2 max-w-md">
+            4 ახალი ფრაზა, ხმოვანი გამეორება და 3 მოკლე კითხვა AI მწვრთნელისგან.
+          </p>
+
+          <div className="flex flex-wrap gap-4 mt-5 text-[13px]">
+            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
+              <Target className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> 4 ფრაზა
+            </span>
+            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
+              <Mic className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> ხმოვანი ვარჯიში
+            </span>
+            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
+              <Clock className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> 3 კითხვა
+            </span>
+          </div>
+
           <Link
             to="/path/speaking/daily"
-            className="sp-btn-primary mt-4 w-full inline-flex items-center justify-center gap-2 rounded-2xl h-14 px-6 text-base font-bold ka transition-smooth"
+            className="sp-btn-teal mt-6 inline-flex items-center justify-center gap-2 rounded-xl h-12 px-6 text-[15px] font-bold ka"
           >
-            💬 დღევანდელი გაკვეთილის დაწყება
-            <ArrowRight className="w-5 h-5" />
+            მისიის დაწყება
+            <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {CARDS.map((c) => (
-            <Link
-              key={c.to}
-              to={c.to}
-              className="sp-card p-5 flex flex-col gap-3 transition-smooth hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-15px_hsl(265_90%_50%_/_0.6)]"
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${ACCENT[c.accent]} flex items-center justify-center border border-white/10`}>
-                  <c.Icon className="w-6 h-6" />
+        {/* Practice areas — editorial list, not a card grid */}
+        <section className="space-y-3">
+          <div className="flex items-baseline justify-between">
+            <h3 className="text-base font-bold ka sp-text">სხვა ვარჯიშები</h3>
+            <span className="text-xs sp-text-soft ka">აირჩიე შენი რიტმი</span>
+          </div>
+          <div className="sp-card divide-y divide-[hsl(220_22%_92%)] overflow-hidden">
+            {SIDE_PATHS.map((p) => (
+              <Link
+                key={p.to}
+                to={p.to}
+                className="flex items-center gap-4 px-5 py-4 hover:bg-[hsl(40_40%_96%)] transition-colors"
+              >
+                <div className="w-11 h-11 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+                  <p.Icon className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold ka sp-text">{c.title_ka}</div>
-                  <div className="text-xs sp-text-muted ka mt-1">{c.desc_ka}</div>
+                  <div className="font-bold ka sp-text text-[15px]">{p.title_ka}</div>
+                  <div className="text-xs sp-text-muted ka mt-0.5">{p.desc_ka}</div>
                 </div>
-              </div>
-              <div
-                className={`mt-auto inline-flex items-center justify-center gap-2 rounded-xl h-11 px-4 text-sm font-semibold ka ${
-                  c.accent === "teal" ? "sp-btn-teal" : "sp-btn-primary"
-                }`}
-              >
-                {c.cta_ka}
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </Link>
-          ))}
-        </div>
+                <ArrowRight className="w-4 h-4 sp-text-soft" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Soft footer note — local feel */}
+        <p className="text-xs sp-text-soft ka text-center pt-2">
+          შექმნილია ქართველებისთვის · ისაუბრე თამამად, ნელ-ნელა გამოგივა.
+        </p>
       </div>
     </SpeakingShell>
   );
