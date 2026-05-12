@@ -1,4 +1,4 @@
-import { Check, Volume2 } from "lucide-react";
+import { Check } from "lucide-react";
 import SpeakButton from "@/components/SpeakButton";
 
 type Props = {
