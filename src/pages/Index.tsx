@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const features = [
   { icon: MessageCircle, title: "AI საუბრის ვარჯიში", desc: "ისაუბრე ნამდვილ AI მასწავლებელთან" },
@@ -11,7 +12,11 @@ const features = [
   { icon: TrendingUp, title: "პროგრესი", desc: "თვალი ადევნე საკუთარ ზრდას" },
 ];
 
-const Index = () => (
+const Index = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">...</div>;
+  if (user) return <Navigate to="/dashboard" replace />;
+  return (
   <Layout showLogout={false}>
     <section className="py-8 text-center ka">
       <div className="inline-block px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-6">
@@ -48,6 +53,7 @@ const Index = () => (
       ))}
     </section>
   </Layout>
-);
+  );
+};
 
 export default Index;
