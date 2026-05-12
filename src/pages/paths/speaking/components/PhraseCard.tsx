@@ -15,6 +15,9 @@ type Props = {
 };
 
 export default function PhraseCard({ english, georgian, example, practiced, onPracticed, showRepeatHints, enableRecording, topic, source }: Props) {
+  // Recording target: prefer example sentence (richer practice), fallback to english.
+  const target = (example && example.trim()) || english;
+
   return (
     <div className="sp-card p-4 sm:p-5">
       <div className="flex items-start gap-4">
@@ -56,9 +59,15 @@ export default function PhraseCard({ english, georgian, example, practiced, onPr
       )}
 
       {enableRecording && (
-        <div className="mt-3 pt-3 sp-rule">
+        <div className="mt-3 pt-3 sp-rule space-y-2">
+          <div className="rounded-lg bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-2.5">
+            <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+              თქვი ეს ფრაზა · Say this
+            </div>
+            <div className="text-[15px] font-semibold sp-text mt-0.5 break-words">"{target}"</div>
+          </div>
           <SpeakingRecorder
-            target={english}
+            target={target}
             topic={topic}
             source={source}
             onScored={(s) => { if (s >= 70 && onPracticed && !practiced) onPracticed(); }}

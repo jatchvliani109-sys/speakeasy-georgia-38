@@ -4,77 +4,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
 type Props = {
-  target: string;
+  target?: string;
   topic?: string;
-  source?: string; // e.g. "pronunciation" | "daily_lesson" | "roleplay"
+  source?: string;
+  mode?: "score" | "transcribe";
   onScored?: (score: number) => void;
+  onTranscript?: (text: string) => void;
   compact?: boolean;
+  recordLabel?: string;
 };
 
 type Status = "idle" | "recording" | "processing" | "result" | "error";
 
-// Normalize for comparison: lowercase, strip punctuation + non-letters
-function normalizeWords(s: string): string[] {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9' ]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ")
-    .filter(Boolean);
-}
+const MAX_RECORD_MS = 10_000;
 
-// LCS length for word arrays
+function normalizeWords(s: string): string[] {
+  return s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+}
 function lcs(a: string[], b: string[]): number {
   const m = a.length, n = b.length;
   if (!m || !n) return 0;
   const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
-    }
-  }
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
   return dp[m][n];
 }
-
 function scorePronunciation(target: string, heard: string) {
   const t = normalizeWords(target);
   const h = normalizeWords(heard);
   if (!t.length) return { score: 0, missing: [] as string[], matched: 0 };
   if (!h.length) return { score: 0, missing: t, matched: 0 };
   const matched = lcs(t, h);
-  // Coverage of target words (in order) with a penalty for extra/wrong words.
   const coverage = matched / t.length;
   const noise = Math.max(0, h.length - t.length) / Math.max(t.length, 1);
-  const raw = coverage * 100 - noise * 12;
-  const score = Math.max(0, Math.min(100, Math.round(raw)));
+  const score = Math.max(0, Math.min(100, Math.round(coverage * 100 - noise * 12)));
   const heardSet = new Set(h);
-  const missing = t.filter((w) => !heardSet.has(w));
-  return { score, missing, matched };
+  return { score, missing: t.filter((w) => !heardSet.has(w)), matched };
 }
-
 function buildFeedback(score: number, missing: string[]): string {
   if (score >= 90) return "ძალიან კარგი! შეგიძლია შემდეგ ფრაზაზე გადახვიდე.";
-  if (score >= 75) {
-    if (missing.length) return `კარგია. გამოგრჩა სიტყვა: ${missing.slice(0, 2).join(", ")}.`;
-    return "კარგია. სცადე კიდევ ერთხელ უფრო გარკვევით.";
-  }
-  if (score >= 50) {
-    if (missing.length) return `ცოტა გამოგრჩა. გაიმეორე ეს ნაწილი: ${missing.slice(0, 3).join(", ")}.`;
-    return "კარგი ცდა. სცადე უფრო ნელა და გარკვევით.";
-  }
+  if (score >= 75) return missing.length
+    ? `კარგია. გამოგრჩა სიტყვა: ${missing.slice(0, 2).join(", ")}.`
+    : "კარგია. სცადე კიდევ ერთხელ უფრო გარკვევით.";
+  if (score >= 50) return missing.length
+    ? `ცოტა გამოგრჩა. გაიმეორე ეს ნაწილი: ${missing.slice(0, 3).join(", ")}.`
+    : "კარგი ცდა. სცადე უფრო ნელა და გარკვევით.";
   return "სცადე თავიდან. ჯერ მოუსმინე ფრაზას და შემდეგ ნელა გაიმეორე.";
 }
-
 function pickMimeType(): string {
   const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
   if (typeof MediaRecorder === "undefined") return "audio/webm";
-  for (const t of types) {
-    try { if ((MediaRecorder as any).isTypeSupported?.(t)) return t; } catch {}
-  }
+  for (const t of types) { try { if ((MediaRecorder as any).isTypeSupported?.(t)) return t; } catch {} }
   return "audio/webm";
 }
-
 async function blobToBase64(blob: Blob): Promise<string> {
   const buf = await blob.arrayBuffer();
   const bytes = new Uint8Array(buf);
@@ -86,9 +68,14 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(bin);
 }
 
-export default function SpeakingRecorder({ target, topic, source, onScored, compact }: Props) {
+export default function SpeakingRecorder({
+  target, topic, source, mode = "score", onScored, onTranscript, compact, recordLabel,
+}: Props) {
   const { user } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
+  const statusRef = useRef<Status>("idle");
+  const setS = (s: Status) => { statusRef.current = s; setStatus(s); };
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [transcript, setTranscript] = useState("");
   const [score, setScore] = useState<number | null>(null);
@@ -101,6 +88,8 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
   const mimeRef = useRef<string>("audio/webm");
   const recognitionRef = useRef<any>(null);
   const sawResultRef = useRef(false);
+  const autoStopTimer = useRef<number | null>(null);
+  const watchdog = useRef<number | null>(null);
 
   const SR: any = typeof window !== "undefined"
     ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
@@ -110,44 +99,64 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
     && !!(navigator as any).mediaDevices?.getUserMedia
     && typeof window.MediaRecorder !== "undefined";
 
-  useEffect(() => () => {
+  const cleanup = () => {
+    if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
+    if (watchdog.current) { clearTimeout(watchdog.current); watchdog.current = null; }
     try { recognitionRef.current?.stop?.(); } catch {}
-    try { recorderRef.current?.state === "recording" && recorderRef.current.stop(); } catch {}
+    try { if (recorderRef.current && recorderRef.current.state === "recording") recorderRef.current.stop(); } catch {}
     streamRef.current?.getTracks().forEach((t) => t.stop());
-  }, []);
+    streamRef.current = null;
+    recorderRef.current = null;
+    recognitionRef.current = null;
+  };
+  useEffect(() => () => cleanup(), []);
 
   const reset = () => {
-    setStatus("idle");
+    cleanup();
     setErrorMsg(null);
     setTranscript("");
     setScore(null);
     setMissing([]);
     setFeedback("");
+    setS("idle");
+  };
+
+  const failSafeReset = (msg = "ჩაწერა ვერ დასრულდა სწორად. სცადე თავიდან.") => {
+    cleanup();
+    setErrorMsg(msg);
+    setS("error");
   };
 
   const finish = async (heard: string) => {
+    cleanup();
     setTranscript(heard);
-    const { score: sc, missing: miss } = scorePronunciation(target, heard);
+    if (mode === "transcribe") {
+      setS("result");
+      onTranscript?.(heard);
+      return;
+    }
+    const t = target ?? "";
+    const { score: sc, missing: miss } = scorePronunciation(t, heard);
     const fb = buildFeedback(sc, miss);
-    setScore(sc);
-    setMissing(miss);
-    setFeedback(fb);
-    setStatus("result");
+    setScore(sc); setMissing(miss); setFeedback(fb);
+    setS("result");
     onScored?.(sc);
-    if (user) {
+    if (user && t) {
       try {
         await supabase.from("pronunciation_attempts").insert({
-          user_id: user.id,
-          target_phrase: target,
-          transcript: heard,
-          score: sc,
-          feedback_ka: fb,
-          missing_words: miss,
-          topic: topic ?? null,
-          source: source ?? null,
+          user_id: user.id, target_phrase: t, transcript: heard,
+          score: sc, feedback_ka: fb, missing_words: miss,
+          topic: topic ?? null, source: source ?? null,
         });
       } catch {}
     }
+  };
+
+  const armAutoStop = () => {
+    if (autoStopTimer.current) clearTimeout(autoStopTimer.current);
+    autoStopTimer.current = window.setTimeout(() => {
+      if (statusRef.current === "recording") stop();
+    }, MAX_RECORD_MS);
   };
 
   const startBrowserSR = () => {
@@ -161,36 +170,30 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
       rec.onresult = (e: any) => {
         sawResultRef.current = true;
         const heard = (e.results?.[0]?.[0]?.transcript ?? "").trim();
-        if (!heard) {
-          setErrorMsg("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
-          setStatus("error");
-          return;
-        }
+        if (!heard) { failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა."); return; }
         finish(heard);
       };
       rec.onerror = (e: any) => {
         const name = e?.error || "";
         const msg = name === "not-allowed" || name === "service-not-allowed"
           ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
-          : name === "no-speech"
-          ? "ვერ გავიგეთ კარგად. სცადე უფრო ნელა."
+          : name === "no-speech" ? "ვერ გავიგეთ კარგად. სცადე უფრო ნელა."
           : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
-        setErrorMsg(msg);
-        setStatus("error");
+        failSafeReset(msg);
       };
       rec.onend = () => {
-        if (!sawResultRef.current && status === "recording") {
-          setErrorMsg("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
-          setStatus("error");
+        if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
+        if (!sawResultRef.current && statusRef.current === "recording") {
+          failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
         }
       };
       recognitionRef.current = rec;
       rec.start();
-      setStatus("recording");
+      setS("recording");
       setErrorMsg(null);
+      armAutoStop();
     } catch {
-      setErrorMsg("ჩაწერა ვერ დაიწყო. სცადე თავიდან.");
-      setStatus("error");
+      failSafeReset("ჩაწერა ვერ დაიწყო. სცადე თავიდან.");
     }
   };
 
@@ -206,82 +209,88 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
       rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
       rec.onstop = () => handleRecorderStop();
       rec.start();
-      setStatus("recording");
+      setS("recording");
       setErrorMsg(null);
+      armAutoStop();
     } catch (e: any) {
       const msg = e?.name === "NotAllowedError"
         ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
         : "მიკროფონი ვერ ჩაირთო. სცადე თავიდან.";
-      setErrorMsg(msg);
-      setStatus("error");
+      failSafeReset(msg);
     }
   };
 
   const start = async () => {
-    if (!navigator.onLine) {
-      setErrorMsg("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
-      setStatus("error");
-      return;
-    }
+    if (statusRef.current === "recording" || statusRef.current === "processing") return;
+    reset();
+    if (!navigator.onLine) return failSafeReset("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
     if (browserSupported) return startBrowserSR();
     if (recorderSupported) return startRecorderFallback();
-    setErrorMsg("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome-ის უახლესი ვერსია.");
-    setStatus("error");
+    failSafeReset("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome-ის უახლესი ვერსია.");
   };
 
   const stop = () => {
-    try { recognitionRef.current?.stop?.(); } catch {}
-    try { recorderRef.current?.stop(); } catch {}
+    if (statusRef.current !== "recording") return;
+    if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
+    let stopped = false;
+    try { recognitionRef.current?.stop?.(); stopped = true; } catch {}
+    try {
+      if (recorderRef.current && recorderRef.current.state === "recording") {
+        recorderRef.current.stop();
+        stopped = true;
+        setS("processing");
+      }
+    } catch {}
+    // Watchdog: if neither path resolves within 4s, hard reset.
+    if (watchdog.current) clearTimeout(watchdog.current);
+    watchdog.current = window.setTimeout(() => {
+      if (statusRef.current === "recording" || statusRef.current === "processing") {
+        failSafeReset();
+      }
+    }, 4000);
+    if (!stopped) failSafeReset();
   };
 
   const handleRecorderStop = async () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    if (!chunksRef.current.length) {
-      setErrorMsg("ჩანაწერი ვერ მოიძებნა. სცადე თავიდან.");
-      setStatus("error");
-      return;
-    }
-    setStatus("processing");
+    if (!chunksRef.current.length) return failSafeReset("ჩანაწერი ვერ მოიძებნა. სცადე თავიდან.");
+    setS("processing");
     try {
       const blob = new Blob(chunksRef.current, { type: mimeRef.current });
-      if (blob.size < 800) {
-        setErrorMsg("ჩანაწერი ძალიან მოკლეა. სცადე თავიდან, ნელა და გარკვევით.");
-        setStatus("error");
-        return;
-      }
+      if (blob.size < 800) return failSafeReset("ჩანაწერი ძალიან მოკლეა. სცადე თავიდან, ნელა და გარკვევით.");
       const audioBase64 = await blobToBase64(blob);
       const { data, error } = await supabase.functions.invoke("speech-to-text", {
         body: { audioBase64, mimeType: mimeRef.current },
       });
       const payload: any = data ?? {};
       if (error || payload.fallback || payload.error || !payload.text) {
-        setErrorMsg("ხმოვანი ამოცნობა დროებით მიუწვდომელია. სცადე Chrome ბრაუზერში.");
-        setStatus("error");
-        return;
+        return failSafeReset("ხმოვანი ამოცნობა დროებით მიუწვდომელია. სცადე Chrome ბრაუზერში.");
       }
       await finish((payload.text as string).trim());
     } catch {
-      setErrorMsg("ვერ გავიგეთ კარგად. სცადე თავიდან.");
-      setStatus("error");
+      failSafeReset("ვერ გავიგეთ კარგად. სცადე თავიდან.");
     }
   };
 
   const scoreColor = score == null ? "" : score >= 80 ? "text-emerald-600" : score >= 50 ? "text-amber-600" : "text-rose-600";
+  const isRecording = status === "recording";
+  const isProcessing = status === "processing";
 
   return (
-    <div className={compact ? "" : "mt-3"}>
+    <div className={compact ? "" : "mt-1"}>
       <div className="flex flex-wrap items-center gap-2">
-        {status !== "recording" && status !== "processing" && (
+        {!isRecording && !isProcessing && (
           <button
             type="button"
             onClick={start}
-            className="inline-flex items-center gap-1.5 rounded-full sp-btn-teal px-3.5 py-1.5 text-xs font-semibold ka"
+            disabled={isRecording || isProcessing}
+            className="inline-flex items-center gap-1.5 rounded-full sp-btn-teal px-3.5 py-1.5 text-xs font-semibold ka disabled:opacity-50"
           >
-            <Mic className="w-3.5 h-3.5" /> 🎤 ჩაწერა
+            <Mic className="w-3.5 h-3.5" /> 🎤 {recordLabel ?? "ჩაწერა"}
           </button>
         )}
-        {status === "recording" && (
+        {isRecording && (
           <button
             type="button"
             onClick={stop}
@@ -290,10 +299,13 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
             <Square className="w-3.5 h-3.5" /> ⏹ გაჩერება
           </button>
         )}
-        {status === "processing" && (
+        {isProcessing && (
           <span className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-medium ka">
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> ვამუშავებთ...
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
           </span>
+        )}
+        {isRecording && (
+          <span className="text-[11px] ka sp-text-soft">Recording... (max 10 წმ)</span>
         )}
         {(status === "result" || status === "error") && (
           <button
@@ -301,7 +313,7 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
             onClick={reset}
             className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-semibold ka"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> 🔁 თავიდან
+            <RotateCcw className="w-3.5 h-3.5" /> 🔁 Try again
           </button>
         )}
       </div>
@@ -313,7 +325,14 @@ export default function SpeakingRecorder({ target, topic, source, onScored, comp
         </div>
       )}
 
-      {status === "result" && score != null && (
+      {status === "result" && mode === "transcribe" && transcript && (
+        <div className="mt-3 rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "hsl(220 20% 50%)" }}>Heard</span>
+          <div className="sp-text italic">{transcript}</div>
+        </div>
+      )}
+
+      {status === "result" && mode === "score" && score != null && (
         <div className="mt-3 rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3.5">
           <div className="flex items-center justify-between">
             <div className="text-[11px] uppercase tracking-wider font-bold ka" style={{ color: "hsl(220 25% 45%)" }}>
