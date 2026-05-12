@@ -99,8 +99,13 @@ export default function DailyLesson() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [mistakes, setMistakes] = useState<{ original: string; corrected: string }[]>([]);
-  const [showType, setShowType] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Voice-first guided prompts state
+  type PromptResult = { transcript: string; feedback: string; corrected?: string; loading: boolean; typing: boolean };
+  const [promptIdx, setPromptIdx] = useState(0);
+  const [promptResults, setPromptResults] = useState<Record<number, PromptResult>>({});
+  const [typedAnswer, setTypedAnswer] = useState("");
 
   useEffect(() => {
     if (!user) return;
