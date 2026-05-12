@@ -1,28 +1,36 @@
-// Calm, natural encouragement messages for Speaking path completions.
-// Use one at a time, rotated.
+// Friendly, casual Georgian-coach encouragement messages for the Speaking path.
+// Mix of casual slang and clean messages. One sentence max, at most one slang phrase per message.
 
 const KA_MESSAGES = [
-  "კარგია — დღეს საუბარში ივარჯიშე.",
-  "ყოჩაღ. ერთი ნაბიჯით წინ ხარ.",
-  "დღეს ივარჯიშე — ეს უკვე პროგრესია.",
-  "კარგი სამუშაოა. ნელ-ნელა თავდაჯერებულობა გაიზრდება.",
-  "დღევანდელი პრაქტიკა შესრულებულია. ხვალ გააგრძელე.",
-  "კარგად გამოგივიდა. განაგრძე ასევე.",
-  "მოკლე ვარჯიში ყოველდღე — სწორი გზაა.",
-  "შენ მოხვედი დღეს. ეს მთავარია.",
-  "კარგი რიტმია. შეინარჩუნე ის.",
-  "კიდევ ერთი დღე ინგლისურთან. კარგია.",
+  // casual / slang
+  "საღოლ, ბრო! დღევანდელი პრაქტიკა შესრულებულია.",
+  "ვაა, კარგი გამოვიდა! დღეს საუბარში ივარჯიშე.",
+  "შეხე ამას — კიდევ ერთი გაკვეთილი შესრულებულია.",
+  "კარგია, ძმობილო! ნელ-ნელა ინგლისური მოდის.",
+  "საღოლ! დღეს კარგი speaking practice გამოვიდა.",
+  "ბრო, კარგი იყო — ხვალაც გააგრძელე და Streak არ დაკარგო.",
+  "სიმონ, ეგრე გააგრძელე — დღევანდელი გაკვეთილი შესრულებულია.",
+  "კარგი სამუშაოა, ტო. დღეს რეალურად ივარჯიშე.",
+  "ჰაჰა, მშვენიერია — ინგლისური უკვე მოძრაობაშია.",
+  "შესანიშნავია! დღეს ერთი ნაბიჯით წინ წახვედი.",
+  "ვაა, ეგრე! დღევანდელი მისია შესრულდა.",
+  "ბრატ, კარგად მიდიხარ — განაგრძე ასევე.",
+  // cleaner / balanced
+  "ყოჩაღ! დღევანდელი პრაქტიკა დასრულებულია.",
+  "კარგია! დღეს საუბარში ივარჯიშე.",
+  "ძალიან კარგი — ასე გააგრძელე.",
+  "დღევანდელი გაკვეთილი შესრულებულია.",
+  "კარგი რიტმია, შეინარჩუნე ის.",
+  "ერთი ნაბიჯით წინ ხარ. ხვალაც მოდი.",
 ];
 
 const EN_MESSAGES = [
-  "Good work — you practiced speaking today.",
-  "Nice job. One step forward.",
-  "You showed up today. That matters.",
-  "Solid work — keep building confidence.",
-  "Good practice today. Come back tomorrow and keep your Streak alive.",
-  "You completed today's speaking practice. Well done.",
-  "Nice progress. Keep going tomorrow.",
+  "Nice one — speaking practice done.",
   "Good work today.",
+  "You showed up today. That counts.",
+  "Solid practice. Keep it going.",
+  "Done for today — see you tomorrow.",
+  "Nice progress today.",
 ];
 
 function pick<T>(arr: T[], seed?: number): T {
