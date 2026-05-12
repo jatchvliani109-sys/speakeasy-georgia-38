@@ -151,45 +151,7 @@ export default function SpeakingRecorder({
     if (autoStopTimer.current) clearTimeout(autoStopTimer.current);
     autoStopTimer.current = window.setTimeout(() => {
       if (statusRef.current === "recording") stop();
-    }, MAX_RECORD_MS);
-  };
-
-  const startBrowserSR = () => {
-    try {
-      const rec = new SR();
-      rec.lang = "en-US";
-      rec.interimResults = false;
-      rec.maxAlternatives = 1;
-      rec.continuous = false;
-      sawResultRef.current = false;
-      rec.onresult = (e: any) => {
-        sawResultRef.current = true;
-        const heard = (e.results?.[0]?.[0]?.transcript ?? "").trim();
-        if (!heard) { failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა."); return; }
-        finish(heard);
-      };
-      rec.onerror = (e: any) => {
-        const name = e?.error || "";
-        const msg = name === "not-allowed" || name === "service-not-allowed"
-          ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
-          : name === "no-speech" ? "ვერ გავიგეთ კარგად. სცადე უფრო ნელა."
-          : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
-        failSafeReset(msg);
-      };
-      rec.onend = () => {
-        if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
-        if (!sawResultRef.current && statusRef.current === "recording") {
-          failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
-        }
-      };
-      recognitionRef.current = rec;
-      rec.start();
-      setS("recording");
-      setErrorMsg(null);
-      armAutoStop();
-    } catch {
-      failSafeReset("ჩაწერა ვერ დაიწყო. სცადე თავიდან.");
-    }
+    }, BACKUP_RECORD_MS);
   };
 
   const startRecorderFallback = async () => {
@@ -219,7 +181,6 @@ export default function SpeakingRecorder({
     if (statusRef.current === "recording" || statusRef.current === "processing") return;
     reset();
     if (!navigator.onLine) return failSafeReset("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
-    if (browserSupported) return startBrowserSR();
     if (recorderSupported) return startRecorderFallback();
     failSafeReset("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome-ის უახლესი ვერსია.");
   };
@@ -228,7 +189,6 @@ export default function SpeakingRecorder({
     if (statusRef.current !== "recording") return;
     if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
     let stopped = false;
-    try { recognitionRef.current?.stop?.(); stopped = true; } catch {}
     try {
       if (recorderRef.current && recorderRef.current.state === "recording") {
         recorderRef.current.stop();
