@@ -1,6 +1,5 @@
-import { Check } from "lucide-react";
+import { Check, Volume2 } from "lucide-react";
 import SpeakButton from "@/components/SpeakButton";
-import { Button } from "@/components/ui/button";
 
 type Props = {
   english: string;
@@ -13,41 +12,58 @@ type Props = {
 
 export default function PhraseCard({ english, georgian, example, practiced, onPracticed, showRepeatHints }: Props) {
   return (
-    <div className="p-4 rounded-2xl bg-card border border-border shadow-card space-y-2">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+    <div className="sp-card p-4 space-y-3">
+      <div className="flex items-start gap-3">
+        {/* Big speaker control */}
+        <div className="shrink-0 w-12 h-12 rounded-2xl sp-btn-teal flex items-center justify-center shadow-lg">
+          <div className="[&>button]:!bg-transparent [&>button]:!shadow-none [&_svg]:!text-white">
             <SpeakButton text={english} />
-            <div className="text-base font-bold break-words">{english}</div>
           </div>
-          <div className="text-sm text-muted-foreground ka mt-1">{georgian}</div>
+          <Volume2 className="w-5 h-5 text-white absolute pointer-events-none opacity-0" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-base font-bold break-words sp-text">{english}</div>
+          <div className="text-sm sp-text-muted ka mt-0.5">{georgian}</div>
           {example && (
             <div className="flex items-start gap-2 mt-2">
               <SpeakButton text={example} />
-              <div className="text-xs italic text-muted-foreground">"{example}"</div>
+              <div className="text-xs italic sp-text-muted">"{example}"</div>
             </div>
           )}
         </div>
       </div>
 
+      {/* sound-wave visual */}
+      <div className="flex items-center gap-1 h-3 opacity-70">
+        {Array.from({ length: 28 }).map((_, i) => (
+          <span
+            key={i}
+            className="block w-[3px] rounded-full bg-gradient-to-b from-blue-300 to-purple-400"
+            style={{ height: `${20 + Math.abs(Math.sin(i * 0.7)) * 80}%` }}
+          />
+        ))}
+      </div>
+
       {showRepeatHints && (
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
-          <span className="text-xs text-muted-foreground ka">🔊 მოუსმინე • 🗣️ გაიმეორე ხმამაღლა</span>
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t sp-divider">
+          <span className="text-xs sp-text-muted ka">🔊 მოუსმინე • 🗣️ გაიმეორე ხმამაღლა</span>
         </div>
       )}
 
       {onPracticed && (
-        <div className="flex items-center justify-between pt-1">
-          <Button
+        <div className="flex items-center justify-end pt-1">
+          <button
             type="button"
-            size="sm"
-            variant={practiced ? "default" : "soft"}
-            className="ka"
             onClick={onPracticed}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ka transition-smooth ${
+              practiced
+                ? "sp-btn-teal"
+                : "sp-chip hover:bg-purple-400/30"
+            }`}
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-3.5 h-3.5" />
             {practiced ? "გავიმეორე ✓" : "I practiced"}
-          </Button>
+          </button>
         </div>
       )}
     </div>
