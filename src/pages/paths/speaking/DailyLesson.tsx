@@ -12,6 +12,7 @@ import SpeakButton from "@/components/SpeakButton";
 import PhraseCard from "./components/PhraseCard";
 import SpeakingRecorder from "./components/SpeakingRecorder";
 import { DEFAULT_DAILY_LESSON, SUGGESTED_NEXT_TOPICS, pickDailyTopic } from "./data";
+import { recordSpeakingActivity } from "./lib/tracker";
 
 const MAX_VOICE_TURNS = 5;
 
