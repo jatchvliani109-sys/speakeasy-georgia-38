@@ -105,6 +105,8 @@ export default function LevelTest() {
   const [answers, setAnswers] = useState<(number | null)[]>(Array(QUESTIONS.length).fill(null));
   const [writing, setWriting] = useState("");
   const [result, setResult] = useState<{ level: Level; score: number } | null>(null);
+  const [reaction, setReaction] = useState<string>("");
+  const [reactionLoading, setReactionLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
@@ -119,6 +121,12 @@ export default function LevelTest() {
     const w = evaluateWriting(trimmed);
     const level = combineLevel(selfIdx, score, QUESTIONS.length, w.cap);
     setResult({ level, score });
+    setStage("done");
+    setReactionLoading(true);
+    supabase.functions.invoke("level-reaction", { body: { writingSample: trimmed, level } })
+      .then(({ data }) => setReaction((data as any)?.reaction || "კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
+      .catch(() => setReaction("კარგია, რომ დაიწყე! ერთად გავაუმჯობესებთ შენს ინგლისურს 😊"))
+      .finally(() => setReactionLoading(false));
     if (!user) return;
     setSaving(true);
     await supabase.from("level_test_results").insert({
@@ -130,7 +138,6 @@ export default function LevelTest() {
     });
     await supabase.from("profiles").update({ english_level: level, level_test_completed: true }).eq("id", user.id);
     setSaving(false);
-    setStage("done");
   };
 
   if (stage === "done" && result) {
@@ -138,8 +145,16 @@ export default function LevelTest() {
       <Layout>
         <div className="py-12 text-center">
           <div className="text-6xl mb-4">🎯</div>
-          <h1 className="text-2xl font-bold mb-2 ka">შენი შედეგი</h1>
-          <p className="text-sm text-muted-foreground ka mt-2">სავარაუდო საწყისი დონე:</p>
+          <h1 className="text-2xl font-bold mb-4 ka">შენი შედეგი</h1>
+
+          <div className="text-left bg-accent/30 border border-accent/40 rounded-2xl p-4 mb-6 flex gap-3 items-start">
+            <div className="w-9 h-9 rounded-full gradient-hero flex items-center justify-center text-base shrink-0">🦉</div>
+            <p className="text-sm ka leading-relaxed text-foreground">
+              {reactionLoading ? "..." : reaction}
+            </p>
+          </div>
+
+          <p className="text-sm text-muted-foreground ka">სავარაუდო საწყისი დონე:</p>
           <div className="text-4xl font-extrabold text-primary my-3">{result.level}</div>
           <p className="text-sm text-muted-foreground ka">ქულა: {result.score} / {QUESTIONS.length}</p>
           <div className="text-left bg-muted/40 rounded-2xl p-4 mt-6 space-y-2">
