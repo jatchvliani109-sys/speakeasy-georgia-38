@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Mic, Headphones, Drama, LineChart, ArrowRight, Clock, Target } from "lucide-react";
+import { Mic, Headphones, Drama, LineChart, ArrowRight, Clock, Target, Flame } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
 
 type SidePath = {
   to: string;
