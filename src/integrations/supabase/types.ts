@@ -162,6 +162,9 @@ export type Database = {
           longest_streak: number
           onboarding_completed: boolean
           selected_learning_path: string | null
+          speaking_current_streak: number
+          speaking_last_practice_date: string | null
+          speaking_longest_streak: number
           streak: number
           updated_at: string
         }
@@ -175,6 +178,9 @@ export type Database = {
           longest_streak?: number
           onboarding_completed?: boolean
           selected_learning_path?: string | null
+          speaking_current_streak?: number
+          speaking_last_practice_date?: string | null
+          speaking_longest_streak?: number
           streak?: number
           updated_at?: string
         }
@@ -188,6 +194,9 @@ export type Database = {
           longest_streak?: number
           onboarding_completed?: boolean
           selected_learning_path?: string | null
+          speaking_current_streak?: number
+          speaking_last_practice_date?: string | null
+          speaking_longest_streak?: number
           streak?: number
           updated_at?: string
         }

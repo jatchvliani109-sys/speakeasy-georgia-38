@@ -12,6 +12,7 @@ import SpeakButton from "@/components/SpeakButton";
 import PhraseCard from "./components/PhraseCard";
 import SpeakingRecorder from "./components/SpeakingRecorder";
 import { DEFAULT_DAILY_LESSON, SUGGESTED_NEXT_TOPICS, pickDailyTopic } from "./data";
+import { recordSpeakingActivity } from "./lib/tracker";
 
 const MAX_VOICE_TURNS = 5;
 
@@ -319,6 +320,7 @@ export default function DailyLesson() {
           await supabase.from("mistakes").insert(rows);
         } catch {}
       }
+      await recordSpeakingActivity(user.id, "daily_speaking_lesson");
     } catch (e: any) {
       toast.error(e.message ?? "ვერ შევინახე");
     } finally {

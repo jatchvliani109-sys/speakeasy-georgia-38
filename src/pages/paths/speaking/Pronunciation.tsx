@@ -5,6 +5,7 @@ import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { recordSpeakingActivity } from "./lib/tracker";
 
 import { Headphones } from "lucide-react";
 
@@ -44,11 +45,15 @@ export default function Pronunciation() {
 
   const toggle = (key: string) => {
     if (!user) return;
-    const next = { ...practiced, [key]: !practiced[key] };
+    const wasPracticed = !!practiced[key];
+    const next = { ...practiced, [key]: !wasPracticed };
     setPracticed(next);
     try {
       localStorage.setItem(storageKey(user.id), JSON.stringify(next));
     } catch {}
+    if (!wasPracticed) {
+      void recordSpeakingActivity(user.id, "pronunciation_practice");
+    }
   };
 
   const pct = items.length ? Math.round((doneCount / items.length) * 100) : 0;

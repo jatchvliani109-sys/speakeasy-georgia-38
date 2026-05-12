@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SpeakButton from "@/components/SpeakButton";
 import MicPlaceholder from "./components/MicPlaceholder";
+import { recordSpeakingActivity } from "./lib/tracker";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -103,6 +104,7 @@ export default function RoleplaySession() {
         completed: true,
         ended_at: new Date().toISOString(),
       });
+      await recordSpeakingActivity(user.id, "roleplay");
       toast.success("როლური სავარჯიშო დასრულდა! 🎉");
       navigate("/path/speaking/progress");
     } catch (e: any) {
