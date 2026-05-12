@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Layout from "@/components/Layout";
+import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,10 +52,10 @@ export default function RoleplaySession() {
 
   if (!scenario) {
     return (
-      <Layout>
+      <SpeakingShell>
         <PageHeader title="როლური საუბარი" backTo="/path/speaking/roleplay" />
-        <p className="text-center py-12 text-muted-foreground ka">სცენარი ვერ მოიძებნა.</p>
-      </Layout>
+        <p className="text-center py-12 sp-text-muted ka">სცენარი ვერ მოიძებნა.</p>
+      </SpeakingShell>
     );
   }
 
@@ -114,19 +114,22 @@ export default function RoleplaySession() {
   const isBeginner = scenario.level === "Beginner";
 
   return (
-    <Layout>
+    <SpeakingShell>
       <PageHeader title={scenario.title_ka} backTo="/path/speaking/roleplay" />
-      <div className="flex flex-col h-[calc(100vh-9rem)]">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-400/30 mb-3">
-          <div className="flex items-center gap-3">
-            <div className="text-3xl">{scenario.emoji}</div>
+      <div className="flex flex-col h-[calc(100vh-11rem)]">
+        <div className="sp-card-glow p-4 mb-3 relative overflow-hidden">
+          <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-indigo-500/25 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/40 to-blue-500/40 border border-white/10 flex items-center justify-center text-3xl">
+              {scenario.emoji}
+            </div>
             <div className="min-w-0 text-sm">
-              <div className="ka">
-                <span className="font-bold">სცენარი:</span> {scenario.description_ka}
+              <div className="ka sp-text">
+                <span className="font-bold">სცენარი:</span> <span className="sp-text-muted">{scenario.description_ka}</span>
               </div>
-              <div className="ka mt-1">
-                <span className="font-bold">შენ:</span> {scenario.userRole_ka} ·{" "}
-                <span className="font-bold">AI:</span> {scenario.aiRole_ka}
+              <div className="ka mt-1 sp-text">
+                <span className="font-bold">შენ:</span> <span className="sp-text-muted">{scenario.userRole_ka}</span> ·{" "}
+                <span className="font-bold">AI:</span> <span className="sp-text-muted">{scenario.aiRole_ka}</span>
               </div>
             </div>
           </div>
@@ -136,9 +139,7 @@ export default function RoleplaySession() {
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] px-4 py-2 rounded-2xl ${
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border shadow-card"
+                m.role === "user" ? "sp-btn-primary" : "sp-card"
               }`}>
                 <div className="text-sm whitespace-pre-wrap break-words">{m.content}</div>
                 {m.role === "assistant" && (
@@ -149,11 +150,11 @@ export default function RoleplaySession() {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="px-4 py-2 rounded-2xl bg-card border border-border shadow-card">
+              <div className="px-4 py-2 rounded-2xl sp-card">
                 <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" />
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
+                  <span className="w-1.5 h-1.5 bg-purple-300 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
+                  <span className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
                 </div>
               </div>
             </div>
@@ -168,7 +169,7 @@ export default function RoleplaySession() {
                   key={s}
                   type="button"
                   onClick={() => send(s)}
-                  className="px-3 py-1.5 rounded-full bg-secondary hover:bg-primary/10 text-xs"
+                  className="sp-chip px-3 py-1.5 rounded-full text-xs hover:bg-purple-400/30 transition-smooth"
                 >
                   {s}
                 </button>
@@ -187,21 +188,25 @@ export default function RoleplaySession() {
               }}
               rows={1}
               placeholder={isBeginner ? "მარტივად ინგლისურად..." : "Type your reply..."}
-              className="resize-none"
+              className="resize-none bg-white/95 text-foreground"
               disabled={loading}
             />
-            <Button onClick={() => send(input)} disabled={!input.trim() || loading} size="icon">
+            <button
+              onClick={() => send(input)}
+              disabled={!input.trim() || loading}
+              className="sp-btn-primary h-12 w-12 inline-flex items-center justify-center rounded-2xl disabled:opacity-50"
+            >
               <Send className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
           <div className="flex items-center justify-between">
             <MicPlaceholder />
-            <Button variant="ghost" size="sm" className="ka" onClick={finish} disabled={ending || messages.length < 2}>
+            <Button variant="ghost" size="sm" className="ka sp-text hover:bg-white/10" onClick={finish} disabled={ending || messages.length < 2}>
               <Square className="w-4 h-4" /> {ending ? "..." : "დასრულება"}
             </Button>
           </div>
         </div>
       </div>
-    </Layout>
+    </SpeakingShell>
   );
 }
