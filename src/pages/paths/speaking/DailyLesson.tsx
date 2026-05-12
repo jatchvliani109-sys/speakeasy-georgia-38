@@ -530,7 +530,7 @@ export default function DailyLesson() {
                     Speak in English · უპასუხე ინგლისურად
                   </div>
                   <div className="text-xs ka sp-text-muted mt-1">
-                    {isBeginner ? "გამოიყენე მაგალითი ან თქვი შენი პასუხი ინგლისურად." : "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითები."}
+                    {current.instruction_ka}
                   </div>
                   <div className="flex items-start gap-2 mt-3">
                     <SpeakButton text={current.question} />
@@ -562,7 +562,7 @@ export default function DailyLesson() {
                       target={current.question}
                       topic={plan.topic}
                       source="daily_lesson_voice"
-                      recordLabel="🎤 Record answer"
+                      recordLabel="Record"
                       onTranscript={(t) => submitAnswer(t)}
                     />
                     <div className="flex items-center justify-between">
@@ -645,7 +645,7 @@ export default function DailyLesson() {
                         onClick={goNext}
                         className="sp-btn-primary inline-flex items-center justify-center gap-2 rounded-2xl h-11 px-5 text-sm font-bold ka"
                       >
-                        {promptIdx < prompts.length - 1 ? "შემდეგი კითხვა →" : "მიმოხილვაზე გადასვლა →"}
+                        {promptIdx < prompts.length - 1 ? "Next Question →" : "Finish Lesson →"}
                       </button>
                     </div>
                   </div>
@@ -654,7 +654,7 @@ export default function DailyLesson() {
 
               <div className="flex justify-end">
                 <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_40%_94%)]" onClick={goReview}>
-                  მიმოხილვაზე გადასვლა →
+                  Finish Lesson
                 </Button>
               </div>
             </div>
