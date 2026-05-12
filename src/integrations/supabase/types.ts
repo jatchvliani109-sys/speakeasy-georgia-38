@@ -161,6 +161,7 @@ export type Database = {
           level_test_completed: boolean
           longest_streak: number
           onboarding_completed: boolean
+          selected_learning_path: string | null
           streak: number
           updated_at: string
         }
@@ -173,6 +174,7 @@ export type Database = {
           level_test_completed?: boolean
           longest_streak?: number
           onboarding_completed?: boolean
+          selected_learning_path?: string | null
           streak?: number
           updated_at?: string
         }
@@ -185,6 +187,7 @@ export type Database = {
           level_test_completed?: boolean
           longest_streak?: number
           onboarding_completed?: boolean
+          selected_learning_path?: string | null
           streak?: number
           updated_at?: string
         }

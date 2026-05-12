@@ -66,7 +66,7 @@ export default function LevelTest() {
           <h1 className="text-2xl font-bold mb-2 ka">შენი დონე</h1>
           <div className="text-5xl font-extrabold bg-clip-text text-transparent gradient-hero my-4">{done.level}</div>
           <p className="text-muted-foreground mb-8 ka">ქულა: {done.score} / {QUESTIONS.length}</p>
-          <Button variant="hero" size="xl" className="w-full ka" onClick={() => navigate("/dashboard")} disabled={saving}>
+          <Button variant="hero" size="xl" className="w-full ka" onClick={() => navigate("/learning-path")} disabled={saving}>
             დაწყება →
           </Button>
         </div>
