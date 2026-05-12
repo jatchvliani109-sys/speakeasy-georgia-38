@@ -125,7 +125,13 @@ export default function SpeakButton({ text, size = "sm", className = "" }: Props
     e.stopPropagation();
     e.preventDefault();
     const clean = extractEnglish(text);
-    if (!clean) return;
+    if (!clean) {
+      try {
+        const { toast } = await import("sonner");
+        toast.message("No English audio available");
+      } catch {}
+      return;
+    }
 
     setSpeaking(true);
     const url = await fetchRealisticAudio(clean);
