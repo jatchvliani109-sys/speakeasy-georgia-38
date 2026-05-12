@@ -309,9 +309,9 @@ export default function DailyLesson() {
                 <div className="flex justify-start">
                   <div className="px-4 py-2 rounded-2xl sp-card">
                     <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 bg-purple-300 rounded-full animate-bounce" />
-                      <span className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "100ms" }} />
-                      <span className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(220 50% 30%)" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(175 70% 38%)", animationDelay: "100ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(210 70% 45%)", animationDelay: "200ms" }} />
                     </div>
                   </div>
                 </div>
@@ -327,7 +327,7 @@ export default function DailyLesson() {
                   }}
                   rows={1}
                   placeholder={isBeginner ? "მარტივად ინგლისურად..." : "Type your answer..."}
-                  className="resize-none bg-white/95 text-foreground"
+                  className="resize-none bg-white text-foreground border-[hsl(220_22%_88%)]"
                   disabled={loading}
                 />
                 <button
@@ -343,7 +343,7 @@ export default function DailyLesson() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="ka sp-text hover:bg-white/10"
+                  className="ka sp-text hover:bg-[hsl(40_40%_94%)]"
                   onClick={goReview}
                   disabled={messages.length < 2}
                 >
