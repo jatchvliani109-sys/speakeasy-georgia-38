@@ -16,7 +16,6 @@ const TODAY_TOPIC_BY_LEVEL: Record<string, string[]> = {
 function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-
 export default function Dashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
@@ -60,19 +59,8 @@ export default function Dashboard() {
 
   const completedToday = !!todayLesson;
   const lastTopic = todayLesson?.summary?.plan?.title_ka || todayLesson?.summary?.plan?.title_en;
-  // Compute live streak: if last activity is older than yesterday, the streak is broken
-  const liveStreak = (() => {
-    const stored = profile?.streak ?? 0;
-    if (!profile?.last_activity) return 0;
-    const [ly, lm, ld] = String(profile.last_activity).slice(0, 10).split("-").map(Number);
-    const last = new Date(ly, (lm || 1) - 1, ld || 1);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diff = Math.round((today.getTime() - last.getTime()) / 86400000);
-    if (diff <= 1) return stored;
-    return 0;
-  })();
-  const longest = Math.max((profile as any)?.longest_streak ?? 0, liveStreak);
+  const currentStreak = profile?.streak ?? 0;
+  const longest = profile?.longest_streak ?? 0;
 
   return (
     <Layout>
@@ -90,7 +78,7 @@ export default function Dashboard() {
           </div>
           <div className="p-4 rounded-2xl bg-card border border-border shadow-card">
             <div className="flex items-center gap-2 text-sm text-muted-foreground"><Flame className="w-4 h-4 text-accent" /> Streak</div>
-            <div className="text-2xl font-extrabold mt-1">🔥 {liveStreak} Day{liveStreak === 1 ? "" : "s"}</div>
+            <div className="text-2xl font-extrabold mt-1">🔥 {currentStreak} Day{currentStreak === 1 ? "" : "s"}</div>
             {longest > 0 && <div className="text-[11px] text-muted-foreground mt-0.5">Longest: {longest}</div>}
           </div>
         </div>
