@@ -5,7 +5,7 @@ import PhraseCard from "./components/PhraseCard";
 import { PRONUNCIATION_BANK } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import MicPlaceholder from "./components/MicPlaceholder";
+
 import { Headphones } from "lucide-react";
 
 type Level = "Beginner" | "Elementary" | "Intermediate";
