@@ -16,10 +16,13 @@ export default function LearningPathSelection() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase.from("profiles").select("selected_learning_path").eq("id", user.id).maybeSingle();
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      if (!data) return;
+      if (!data.onboarding_completed) return navigate("/onboarding", { replace: true });
+      if (!data.level_test_completed) return navigate("/level-test", { replace: true });
       setCurrent((data as any)?.selected_learning_path ?? null);
     })();
-  }, [user]);
+  }, [user, navigate]);
 
   const choose = async (id: LearningPathId, route: string) => {
     if (!user) return;
