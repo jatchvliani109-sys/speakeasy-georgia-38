@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Layout from "@/components/Layout";
+import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
