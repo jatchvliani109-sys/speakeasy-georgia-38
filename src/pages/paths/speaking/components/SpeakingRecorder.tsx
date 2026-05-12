@@ -16,7 +16,7 @@ type Props = {
 
 type Status = "idle" | "recording" | "processing" | "result" | "error";
 
-const MAX_RECORD_MS = 10_000;
+const BACKUP_RECORD_MS = 20_000;
 
 function normalizeWords(s: string): string[] {
   return s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -37,14 +37,17 @@ function scorePronunciation(target: string, heard: string) {
   const matched = lcs(t, h);
   const coverage = matched / t.length;
   const noise = Math.max(0, h.length - t.length) / Math.max(t.length, 1);
-  const score = Math.max(0, Math.min(100, Math.round(coverage * 100 - noise * 12)));
+  let score = Math.max(0, Math.min(100, Math.round(coverage * 100 - noise * 10)));
   const heardSet = new Set(h);
-  return { score, missing: t.filter((w) => !heardSet.has(w)), matched };
+  const missing = t.filter((w) => !heardSet.has(w));
+  if (missing.length === 1 && matched >= t.length - 1) score = Math.max(score, 82);
+  if (missing.length <= 2 && matched >= Math.max(1, t.length - 2)) score = Math.max(score, 68);
+  return { score, missing, matched };
 }
-function buildFeedback(score: number, missing: string[]): string {
+function buildFeedback(score: number, missing: string[], target: string): string {
   if (score >= 90) return "ძალიან კარგი! შეგიძლია შემდეგ ფრაზაზე გადახვიდე.";
   if (score >= 75) return missing.length
-    ? `კარგია. გამოგრჩა სიტყვა: ${missing.slice(0, 2).join(", ")}.`
+    ? `Good try! Better: “${target}.” სცადე კიდევ ერთხელ ნელა.`
     : "კარგია. სცადე კიდევ ერთხელ უფრო გარკვევით.";
   if (score >= 50) return missing.length
     ? `ცოტა გამოგრჩა. გაიმეორე ეს ნაწილი: ${missing.slice(0, 3).join(", ")}.`
@@ -86,15 +89,10 @@ export default function SpeakingRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string>("audio/webm");
-  const recognitionRef = useRef<any>(null);
-  const sawResultRef = useRef(false);
+  const ignoreStopRef = useRef(false);
   const autoStopTimer = useRef<number | null>(null);
   const watchdog = useRef<number | null>(null);
 
-  const SR: any = typeof window !== "undefined"
-    ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
-    : null;
-  const browserSupported = !!SR;
   const recorderSupported = typeof window !== "undefined"
     && !!(navigator as any).mediaDevices?.getUserMedia
     && typeof window.MediaRecorder !== "undefined";
@@ -102,12 +100,15 @@ export default function SpeakingRecorder({
   const cleanup = () => {
     if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
     if (watchdog.current) { clearTimeout(watchdog.current); watchdog.current = null; }
-    try { recognitionRef.current?.stop?.(); } catch {}
-    try { if (recorderRef.current && recorderRef.current.state === "recording") recorderRef.current.stop(); } catch {}
+    try {
+      if (recorderRef.current && recorderRef.current.state === "recording") {
+        ignoreStopRef.current = true;
+        recorderRef.current.stop();
+      }
+    } catch {}
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     recorderRef.current = null;
-    recognitionRef.current = null;
   };
   useEffect(() => () => cleanup(), []);
 
@@ -137,7 +138,7 @@ export default function SpeakingRecorder({
     }
     const t = target ?? "";
     const { score: sc, missing: miss } = scorePronunciation(t, heard);
-    const fb = buildFeedback(sc, miss);
+    const fb = buildFeedback(sc, miss, t);
     setScore(sc); setMissing(miss); setFeedback(fb);
     setS("result");
     onScored?.(sc);
@@ -156,45 +157,7 @@ export default function SpeakingRecorder({
     if (autoStopTimer.current) clearTimeout(autoStopTimer.current);
     autoStopTimer.current = window.setTimeout(() => {
       if (statusRef.current === "recording") stop();
-    }, MAX_RECORD_MS);
-  };
-
-  const startBrowserSR = () => {
-    try {
-      const rec = new SR();
-      rec.lang = "en-US";
-      rec.interimResults = false;
-      rec.maxAlternatives = 1;
-      rec.continuous = false;
-      sawResultRef.current = false;
-      rec.onresult = (e: any) => {
-        sawResultRef.current = true;
-        const heard = (e.results?.[0]?.[0]?.transcript ?? "").trim();
-        if (!heard) { failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა."); return; }
-        finish(heard);
-      };
-      rec.onerror = (e: any) => {
-        const name = e?.error || "";
-        const msg = name === "not-allowed" || name === "service-not-allowed"
-          ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
-          : name === "no-speech" ? "ვერ გავიგეთ კარგად. სცადე უფრო ნელა."
-          : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
-        failSafeReset(msg);
-      };
-      rec.onend = () => {
-        if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
-        if (!sawResultRef.current && statusRef.current === "recording") {
-          failSafeReset("ვერ გავიგეთ კარგად. სცადე უფრო ნელა.");
-        }
-      };
-      recognitionRef.current = rec;
-      rec.start();
-      setS("recording");
-      setErrorMsg(null);
-      armAutoStop();
-    } catch {
-      failSafeReset("ჩაწერა ვერ დაიწყო. სცადე თავიდან.");
-    }
+    }, BACKUP_RECORD_MS);
   };
 
   const startRecorderFallback = async () => {
@@ -206,6 +169,7 @@ export default function SpeakingRecorder({
       const rec = new MediaRecorder(stream, { mimeType: mime });
       recorderRef.current = rec;
       chunksRef.current = [];
+      ignoreStopRef.current = false;
       rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
       rec.onstop = () => handleRecorderStop();
       rec.start();
@@ -215,7 +179,7 @@ export default function SpeakingRecorder({
     } catch (e: any) {
       const msg = e?.name === "NotAllowedError"
         ? "მიკროფონის გამოყენებისთვის საჭიროა ნებართვა."
-        : "მიკროფონი ვერ ჩაირთო. სცადე თავიდან.";
+        : "ჩაწერა ვერ მოხერხდა. სცადე თავიდან.";
       failSafeReset(msg);
     }
   };
@@ -224,7 +188,6 @@ export default function SpeakingRecorder({
     if (statusRef.current === "recording" || statusRef.current === "processing") return;
     reset();
     if (!navigator.onLine) return failSafeReset("ინტერნეტი ვერ მოიძებნა. ჩაწერისთვის საჭიროა ქსელი.");
-    if (browserSupported) return startBrowserSR();
     if (recorderSupported) return startRecorderFallback();
     failSafeReset("შენი ბრაუზერი არ უჭერს მხარს ჩაწერას. სცადე Chrome-ის უახლესი ვერსია.");
   };
@@ -233,43 +196,44 @@ export default function SpeakingRecorder({
     if (statusRef.current !== "recording") return;
     if (autoStopTimer.current) { clearTimeout(autoStopTimer.current); autoStopTimer.current = null; }
     let stopped = false;
-    try { recognitionRef.current?.stop?.(); stopped = true; } catch {}
     try {
       if (recorderRef.current && recorderRef.current.state === "recording") {
+        recorderRef.current.requestData?.();
         recorderRef.current.stop();
         stopped = true;
         setS("processing");
       }
     } catch {}
-    // Watchdog: if neither path resolves within 4s, hard reset.
+    // Watchdog: keep the UI from getting stuck if the browser never resolves stop/transcription.
     if (watchdog.current) clearTimeout(watchdog.current);
     watchdog.current = window.setTimeout(() => {
       if (statusRef.current === "recording" || statusRef.current === "processing") {
-        failSafeReset();
+        failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       }
-    }, 4000);
+    }, 30000);
     if (!stopped) failSafeReset();
   };
 
   const handleRecorderStop = async () => {
+    if (ignoreStopRef.current) { ignoreStopRef.current = false; return; }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    if (!chunksRef.current.length) return failSafeReset("ჩანაწერი ვერ მოიძებნა. სცადე თავიდან.");
+    if (!chunksRef.current.length) return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
     setS("processing");
     try {
       const blob = new Blob(chunksRef.current, { type: mimeRef.current });
-      if (blob.size < 800) return failSafeReset("ჩანაწერი ძალიან მოკლეა. სცადე თავიდან, ნელა და გარკვევით.");
+      if (blob.size < 800) return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       const audioBase64 = await blobToBase64(blob);
       const { data, error } = await supabase.functions.invoke("speech-to-text", {
         body: { audioBase64, mimeType: mimeRef.current },
       });
       const payload: any = data ?? {};
       if (error || payload.fallback || payload.error || !payload.text) {
-        return failSafeReset("ხმოვანი ამოცნობა დროებით მიუწვდომელია. სცადე Chrome ბრაუზერში.");
+        return failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
       }
       await finish((payload.text as string).trim());
     } catch {
-      failSafeReset("ვერ გავიგეთ კარგად. სცადე თავიდან.");
+      failSafeReset("ვერ გავიგეთ კარგად. სცადე ნელა და ახლოს მიკროფონთან.");
     }
   };
 
@@ -305,7 +269,7 @@ export default function SpeakingRecorder({
           </span>
         )}
         {isRecording && (
-          <span className="text-[11px] ka sp-text-soft">Recording... (max 10 წმ)</span>
+          <span className="text-[11px] ka sp-text-soft">Recording... speak now (max 20 წმ)</span>
         )}
         {(status === "result" || status === "error") && (
           <button

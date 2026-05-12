@@ -46,6 +46,12 @@ type Plan = {
   ai_role_ka?: string;
 };
 
+type LessonPrompt = {
+  question: string;
+  instruction_ka: string;
+  examples: string[];
+};
+
 const STEPS: { key: Step; label: string }[] = [
   { key: "topic", label: "თემა" },
   { key: "phrases", label: "ფრაზები" },
@@ -60,6 +66,73 @@ const LEVEL_LABEL_KA: Record<string, string> = {
   Intermediate: "საშუალო",
   Advanced: "მაღალი",
 };
+
+const CAFE_PROMPTS: LessonPrompt[] = [
+  { question: "What would you like?", instruction_ka: "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი.", examples: ["I want coffee.", "I want tea.", "I want water."] },
+  { question: "Would you like coffee or tea?", instruction_ka: "აირჩიე ერთი სასმელი და უპასუხე ინგლისურად.", examples: ["I would like coffee.", "I would like tea.", "Coffee, please."] },
+  { question: "Do you want water?", instruction_ka: "უპასუხე მოკლედ ინგლისურად.", examples: ["Yes, please.", "No, thank you.", "I want water."] },
+  { question: "Can I have your name?", instruction_ka: "თქვი შენი სახელი ინგლისურად.", examples: ["My name is Ana.", "I am Nika.", "Ana, please."] },
+  { question: "Do you want sugar?", instruction_ka: "უპასუხე გინდა თუ არა შაქარი.", examples: ["Yes, please.", "No sugar, please.", "A little sugar, please."] },
+  { question: "Do you want milk?", instruction_ka: "უპასუხე გინდა თუ არა რძე.", examples: ["Yes, with milk.", "No milk, please.", "A little milk, please."] },
+  { question: "Is that all?", instruction_ka: "უპასუხე და დაასრულე შეკვეთა.", examples: ["Yes, that is all.", "That is all, thank you.", "No, I want cake too."] },
+  { question: "How would you pay?", instruction_ka: "თქვი როგორ გადაიხდი.", examples: ["By card, please.", "I will pay cash.", "Card, please."] },
+  { question: "Do you want a receipt?", instruction_ka: "უპასუხე გინდა თუ არა ქვითარი.", examples: ["Yes, please.", "No, thank you.", "A receipt, please."] },
+  { question: "Thank you. Have a nice day.", instruction_ka: "უპასუხე ზრდილობიანად ინგლისურად.", examples: ["Thank you.", "You too.", "Have a nice day too."] },
+];
+
+const DEFAULT_PROMPTS: LessonPrompt[] = [
+  { question: "What is your name?", instruction_ka: "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი.", examples: ["My name is Ana.", "I am Nika.", "My name is Mari."] },
+  { question: "Where are you from?", instruction_ka: "თქვი საიდან ხარ ინგლისურად.", examples: ["I am from Georgia.", "I am from Tbilisi.", "I am from Batumi."] },
+  { question: "How are you today?", instruction_ka: "უპასუხე მოკლედ ინგლისურად.", examples: ["I am good.", "I am fine, thank you.", "I am happy."] },
+  { question: "What do you like?", instruction_ka: "თქვი რა მოგწონს ინგლისურად.", examples: ["I like English.", "I like music.", "I like football."] },
+  { question: "What do you want?", instruction_ka: "თქვი რა გინდა ინგლისურად.", examples: ["I want water.", "I want coffee.", "I want help."] },
+  { question: "Can you say that again?", instruction_ka: "ივარჯიშე თავაზიანი თხოვნა ინგლისურად.", examples: ["Can you say that again?", "Again, please.", "Please say that again."] },
+  { question: "Do you need help?", instruction_ka: "უპასუხე გჭირდება თუ არა დახმარება.", examples: ["Yes, I need help.", "No, thank you.", "I need help, please."] },
+  { question: "What time is it?", instruction_ka: "უპასუხე მარტივი დროით ინგლისურად.", examples: ["It is two o'clock.", "It is morning.", "I don't know."] },
+  { question: "What is your favorite thing?", instruction_ka: "თქვი შენი საყვარელი რამ ინგლისურად.", examples: ["My favorite thing is my phone.", "I like books.", "My favorite thing is music."] },
+  { question: "Thank you. See you later.", instruction_ka: "უპასუხე დამშვიდობებით ინგლისურად.", examples: ["See you later.", "Thank you.", "Goodbye."] },
+];
+
+function isMostlyEnglish(s: string) {
+  const letters = s.replace(/[^A-Za-z\u10A0-\u10FF]/g, "");
+  if (!letters) return false;
+  return ((s.match(/[A-Za-z]/g) || []).length / letters.length) > 0.55;
+}
+
+function makeLessonPrompts(plan: Plan, isBeginner: boolean): LessonPrompt[] {
+  const topic = (plan.topic || plan.title_en || "").toLowerCase();
+  const base = topic.includes("café") || topic.includes("cafe") || topic.includes("coffee") ? CAFE_PROMPTS : DEFAULT_PROMPTS;
+  const fromPlan = (plan.warmup_questions || [])
+    .map((q) => q.trim())
+    .filter(isMostlyEnglish)
+    .slice(0, 4)
+    .map((question) => ({
+      question,
+      instruction_ka: isBeginner ? "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი." : "უპასუხე ინგლისურად.",
+      examples: plan.new_words.map((w) => w.example_sentence).filter(Boolean).slice(0, 3),
+    }));
+  const merged = [...fromPlan, ...base];
+  const seen = new Set<string>();
+  return merged.filter((p) => {
+    const key = p.question.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 10);
+}
+
+function makeLocalFeedback(answer: string, examples: string[]) {
+  const clean = answer.trim();
+  const better = examples[0] || "I would like coffee.";
+  const words = normalizeForLesson(clean);
+  if (words.length >= 4) return { feedback: "Good answer! კარგი ცდა — გააგრძელე ნელა და გარკვევით.", corrected: undefined as string | undefined };
+  if (words.length >= 2) return { feedback: `Good try! Better: “${better}” სცადე კიდევ ერთხელ ნელა.`, corrected: better };
+  return { feedback: `Good try! Better: “${better}” თქვი სრული მოკლე წინადადება.`, corrected: better };
+}
+
+function normalizeForLesson(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+}
 
 // Parse a trailing OPTIONS: [...] or STARTERS: [...] block out of an AI reply.
 function extractChips(reply: string): { clean: string; options: string[]; starters: string[] } {
@@ -181,28 +254,11 @@ export default function DailyLesson() {
 
   const goConversation = async () => {
     if (!plan) return;
+    setPromptIdx(0);
+    setPromptResults({});
+    setTypedAnswer("");
+    setMessages([]);
     setStep("conversation");
-    setLoading(true);
-    const seed: Msg[] = [
-      {
-        role: "user",
-        content: `Begin a short guided speaking practice on topic "${plan.topic}". Scenario: ${plan.scenario_ka ?? "—"}. I am the ${plan.user_role_ka ?? "student"}. You are the ${plan.ai_role_ka ?? "coach"}. Ask me a short question to start, like: "${plan.warmup_questions?.[0] ?? plan.practice_intro}". Keep your turns very short.`,
-      },
-    ];
-    const r = await supabase.functions.invoke("ai-tutor", {
-      body: {
-        messages: seed,
-        level,
-        coachMode: "speaking_lesson",
-        lessonContext: { topic: plan.topic, new_words: plan.new_words, scenario: plan.scenario_ka, user_role: plan.user_role_ka, ai_role: plan.ai_role_ka },
-      },
-    });
-    setLoading(false);
-    if (r.error || (r.data as any)?.error) {
-      toast.error((r.data as any)?.error ?? "შეცდომა");
-      return;
-    }
-    setMessages([{ role: "assistant", content: (r.data as any).reply as string }]);
   };
 
   const send = async (text: string) => {
@@ -245,6 +301,7 @@ export default function DailyLesson() {
         summary: {
           plan: { title_ka: plan.title_ka, topic: plan.topic },
           phrases_practiced: practicedRepeat.filter(Boolean).length,
+          voice_prompts_completed: Object.values(promptResults).filter((r) => r.transcript).length,
           mistakes,
         } as any,
         completed: true,
@@ -280,6 +337,10 @@ export default function DailyLesson() {
 
   const currentIdx = STEPS.findIndex((s) => s.key === step);
   const bestCorrection = mistakes[mistakes.length - 1];
+  const reviewPrompts = makeLessonPrompts(plan, isBeginner);
+  const completedPromptResults = Object.entries(promptResults)
+    .map(([idx, result]) => ({ idx: Number(idx), result }))
+    .filter(({ result }) => Boolean(result.transcript));
 
   return (
     <SpeakingShell>
@@ -407,37 +468,21 @@ export default function DailyLesson() {
         )}
 
         {step === "conversation" && (() => {
-          // Build 3–5 guided English prompts. Prefer plan.warmup_questions, fall back to defaults.
-          const englishOnly = (s: string) => /[A-Za-z]/.test(s) && (s.match(/[A-Za-z]/g)!.length / Math.max(1, s.replace(/\s/g, "").length)) > 0.5;
-          const fromPlan = (plan.warmup_questions || []).map((q) => q.trim()).filter(englishOnly);
-          const fallback = ["What would you like?", "Can you tell me more?", "How are you today?"];
-          const merged = [...fromPlan, ...fallback];
-          const prompts = Array.from(new Set(merged)).slice(0, Math.min(5, Math.max(3, fromPlan.length || 3)));
-          const current = prompts[promptIdx];
+          const prompts = makeLessonPrompts(plan, isBeginner);
+          const current = prompts[promptIdx] ?? prompts[0];
           const result = promptResults[promptIdx];
-          const examples = phrases.map((p) => p.example_sentence).filter(Boolean).slice(0, 3);
+          const examples = current.examples.length ? current.examples : phrases.map((p) => p.example_sentence).filter(Boolean).slice(0, 3);
 
           const submitAnswer = async (text: string) => {
             const t = text.trim();
             if (!t) return;
             console.log("[DailyLesson] Speaking prompt answer submitted", { promptIdx, text: t });
-            setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "", loading: true, typing: false } }));
-            const seedMessages: Msg[] = [
-              { role: "user", content: `English coach. The student is a ${LEVEL_LABEL_KA[level] ?? level} learner. I asked: "${current}". They answered: "${t}". Reply with: 1) one short Georgian sentence of feedback (encouraging, max 12 words). 2) On a new line, if needed, an improved English version using exactly: Better: "..." . Keep it tiny.` },
-            ];
-            try {
-              const r = await supabase.functions.invoke("ai-tutor", {
-                body: { messages: seedMessages, level, coachMode: "speaking_lesson", lessonContext: { topic: plan.topic, new_words: plan.new_words } },
-              });
-              const reply = ((r.data as any)?.reply as string) || "";
-              const m = reply.match(/(?:Better|Try|Type):\s*["“']([^"”']+)["”']/i);
-              const corrected = m?.[1];
-              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: reply, corrected, loading: false, typing: false } }));
-              if (corrected) setMistakes((prev) => [...prev, { original: t, corrected }]);
-              setMessages((prev) => [...prev, { role: "user", content: t }, { role: "assistant", content: reply }]);
-            } catch (e: any) {
-              setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback: "კარგი ცდა! გადადი შემდეგ კითხვაზე.", loading: false, typing: false } }));
+            const { feedback, corrected } = makeLocalFeedback(t, examples);
+            setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: t, feedback, corrected, loading: false, typing: false } }));
+            if (corrected && normalizeForLesson(corrected).join(" ") !== normalizeForLesson(t).join(" ")) {
+              setMistakes((prev) => [...prev, { original: t, corrected }]);
             }
+            setMessages((prev) => [...prev, { role: "assistant", content: current.question }, { role: "user", content: t }]);
           };
 
           const goNext = () => {
@@ -490,11 +535,11 @@ export default function DailyLesson() {
                     Speak in English · უპასუხე ინგლისურად
                   </div>
                   <div className="text-xs ka sp-text-muted mt-1">
-                    {isBeginner ? "გამოიყენე მაგალითი ან თქვი შენი პასუხი ინგლისურად." : "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითები."}
+                    {current.instruction_ka}
                   </div>
                   <div className="flex items-start gap-2 mt-3">
-                    <SpeakButton text={current} />
-                    <div className="text-lg font-bold sp-text leading-snug break-words">{current}</div>
+                    <SpeakButton text={current.question} />
+                    <div className="text-lg font-bold sp-text leading-snug break-words">{current.question}</div>
                   </div>
                 </div>
 
@@ -519,10 +564,10 @@ export default function DailyLesson() {
                     <SpeakingRecorder
                       key={`prompt-${promptIdx}`}
                       mode="transcribe"
-                      target={current}
+                      target={current.question}
                       topic={plan.topic}
                       source="daily_lesson_voice"
-                      recordLabel="🎤 Record answer"
+                      recordLabel="Record"
                       onTranscript={(t) => submitAnswer(t)}
                     />
                     <div className="flex items-center justify-between">
@@ -605,7 +650,7 @@ export default function DailyLesson() {
                         onClick={goNext}
                         className="sp-btn-primary inline-flex items-center justify-center gap-2 rounded-2xl h-11 px-5 text-sm font-bold ka"
                       >
-                        {promptIdx < prompts.length - 1 ? "შემდეგი კითხვა →" : "მიმოხილვაზე გადასვლა →"}
+                        {promptIdx < prompts.length - 1 ? "Next Question →" : "Finish Lesson →"}
                       </button>
                     </div>
                   </div>
@@ -614,7 +659,7 @@ export default function DailyLesson() {
 
               <div className="flex justify-end">
                 <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_40%_94%)]" onClick={goReview}>
-                  მიმოხილვაზე გადასვლა →
+                  Finish Lesson
                 </Button>
               </div>
             </div>
@@ -639,6 +684,25 @@ export default function DailyLesson() {
             </div>
 
             <div className="sp-card p-5 space-y-2">
+              <div className="font-bold ka sp-text">საუბრის კითხვები</div>
+              <div className="text-sm sp-text">
+                {completedPromptResults.length} completed
+              </div>
+              {completedPromptResults.length > 0 ? (
+                <ul className="text-sm space-y-2 mt-1">
+                  {completedPromptResults.map(({ idx, result }) => (
+                    <li key={idx} className="sp-text">
+                      <div className="font-semibold">{reviewPrompts[idx]?.question ?? `Question ${idx + 1}`}</div>
+                      <div className="sp-text-muted italic">Heard: {result.transcript}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-sm sp-text-muted ka">ჯერ საუბრის პასუხი არ არის ჩაწერილი.</div>
+              )}
+            </div>
+
+            <div className="sp-card p-5 space-y-2">
               <div className="font-bold ka sp-text">გავარჯიშებული ფრაზები</div>
               <div className="text-sm sp-text">
                 {practicedRepeat.filter(Boolean).length} / {phrases.length}
@@ -660,6 +724,15 @@ export default function DailyLesson() {
                     <span className="font-semibold">{w.english_word}</span>{" "}
                     <span className="sp-text-muted ka">— {w.georgian_meaning}</span>
                   </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="sp-card p-5 space-y-2">
+              <div className="font-bold ka sp-text">სასურველია გადახედო</div>
+              <ul className="text-sm space-y-1">
+                {Array.from(new Set([...mistakes.map((m) => m.corrected), ...phrases.map((w) => w.example_sentence || w.english_word)])).slice(0, 5).map((item, i) => (
+                  <li key={i} className="sp-text">• {item}</li>
                 ))}
               </ul>
             </div>
