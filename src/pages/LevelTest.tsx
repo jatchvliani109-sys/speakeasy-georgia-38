@@ -140,7 +140,7 @@ export default function LevelTest() {
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-2xl font-bold mb-2 ka">შენი შედეგი</h1>
           <p className="text-sm text-muted-foreground ka mt-2">სავარაუდო საწყისი დონე:</p>
-          <div className="text-4xl font-extrabold bg-clip-text text-transparent gradient-hero my-3">{result.level}</div>
+          <div className="text-4xl font-extrabold text-primary my-3">{result.level}</div>
           <p className="text-sm text-muted-foreground ka">ქულა: {result.score} / {QUESTIONS.length}</p>
           <div className="text-left bg-muted/40 rounded-2xl p-4 mt-6 space-y-2">
             <p className="text-sm ka">ეს დონე შეირჩა შენი თვითშეფასების, ტესტის პასუხებისა და მოკლე წერითი პასუხის მიხედვით.</p>
