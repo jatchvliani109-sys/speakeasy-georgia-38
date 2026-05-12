@@ -222,3 +222,12 @@ export default function SpeakingDashboard() {
     </SpeakingShell>
   );
 }
+
+function MiniStat({ label_ka, value }: { label_ka: string; value: number | string }) {
+  return (
+    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] py-3">
+      <div className="text-xl font-extrabold sp-text leading-none">{value}</div>
+      <div className="text-[10px] sp-text-muted ka mt-1">{label_ka}</div>
+    </div>
+  );
+}
