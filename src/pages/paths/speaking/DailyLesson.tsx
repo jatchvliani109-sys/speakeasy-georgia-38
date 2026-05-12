@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SpeakingShell, { SoundBars } from "./components/SpeakingShell";
+import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -164,8 +164,8 @@ export default function DailyLesson() {
   if (planLoading || !plan) {
     return (
       <SpeakingShell>
-        <PageHeader title="დღევანდელი საუბრის გაკვეთილი" backTo="/path/speaking" />
-        <p className="text-center py-12 sp-text-muted ka">გაკვეთილი მზადდება...</p>
+        <PageHeader title="დღევანდელი საუბრის მისია" backTo="/path/speaking" />
+        <p className="text-center py-12 sp-text-muted ka">მისია მზადდება...</p>
       </SpeakingShell>
     );
   }
@@ -174,49 +174,49 @@ export default function DailyLesson() {
 
   return (
     <SpeakingShell>
-      <PageHeader title="დღევანდელი საუბრის გაკვეთილი" backTo="/path/speaking" />
-      <div className="space-y-4">
+      <PageHeader title="დღევანდელი საუბრის მისია" backTo="/path/speaking" />
+      <div className="space-y-5 max-w-3xl mx-auto">
         {/* Coach header + progress */}
-        <div className="sp-card p-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
-            <Mic className="w-5 h-5 text-white" />
+        <div className="sp-card p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+            <Mic className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] sp-text-muted ka">AI Speaking Coach</div>
-            <div className="flex items-center gap-1 mt-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+              საუბრის მწვრთნელი
+            </div>
+            <div className="flex items-center gap-1 mt-1.5">
               {STEPS.map((s, i) => (
-                <div key={s.key} className="flex-1 flex flex-col items-center gap-0.5" title={s.label}>
+                <div key={s.key} className="flex-1 flex flex-col items-center gap-1" title={s.label}>
                   <div
-                    className={`w-full h-1.5 rounded-full ${
-                      i <= currentIdx
-                        ? "bg-gradient-to-r from-purple-400 to-blue-400"
-                        : "bg-white/10"
+                    className={`w-full h-1 rounded-full ${
+                      i <= currentIdx ? "bg-[hsl(175_70%_38%)]" : "bg-[hsl(220_22%_90%)]"
                     }`}
                   />
-                  <span className={`text-[9px] ka ${i === currentIdx ? "sp-text" : "sp-text-muted"}`}>{s.label}</span>
+                  <span className={`text-[9px] ka font-medium ${i === currentIdx ? "sp-text" : "sp-text-soft"}`}>{s.label}</span>
                 </div>
               ))}
             </div>
           </div>
-          <SoundBars />
         </div>
 
         {step === "topic" && (
           <>
-            <div className="sp-card-glow p-5 relative overflow-hidden">
-              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-purple-500/25 blur-2xl" />
-              <div className="text-xs font-semibold ka text-purple-200">დღევანდელი თემა</div>
-              <h2 className="text-2xl font-extrabold mt-1 sp-text">{plan.title_en}</h2>
-              <div className="text-base ka mt-1 sp-text-muted">{plan.title_ka}</div>
+            <div className="sp-card-hero p-5 sm:p-6">
+              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+                დღევანდელი თემა
+              </div>
+              <h2 className="text-2xl font-extrabold mt-2 sp-text leading-snug">{plan.title_en}</h2>
+              <div className="text-base ka mt-1.5 sp-text-muted">{plan.title_ka}</div>
             </div>
-            <div className="sp-card p-4 space-y-3">
-              <Row icon={<Target className="w-4 h-4 text-teal-300" />} label="მიზანი" value={plan.goal_ka} />
+            <div className="sp-card p-5 space-y-3">
+              <Row icon={<Target className="w-4 h-4" style={{ color: "hsl(175 70% 38%)" }} />} label="მიზანი" value={plan.goal_ka} />
               <Row
-                icon={<Clock className="w-4 h-4 text-blue-300" />}
+                icon={<Clock className="w-4 h-4" style={{ color: "hsl(210 70% 45%)" }} />}
                 label="ხანგრძლივობა"
                 value={`${Math.max(5, Math.min(10, plan.estimated_minutes || 7))} წუთი`}
               />
-              <Row icon={<Sparkles className="w-4 h-4 text-purple-300" />} label="დონე" value={level} />
+              <Row icon={<Sparkles className="w-4 h-4" style={{ color: "hsl(220 50% 30%)" }} />} label="დონე" value={level} />
             </div>
             <button
               onClick={() => setStep("phrases")}
