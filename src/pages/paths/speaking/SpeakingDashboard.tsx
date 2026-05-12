@@ -2,45 +2,34 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Mic, Headphones, Drama, LineChart, ArrowRight, Clock, Target, Flame } from "lucide-react";
+import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2, Clock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
 
-type SidePath = {
-  to: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  title_ka: string;
-  desc_ka: string;
-};
-
-const SIDE_PATHS: SidePath[] = [
-  {
-    to: "/path/speaking/pronunciation",
-    Icon: Headphones,
-    title_ka: "მოუსმინე და გაიმეორე",
-    desc_ka: "მოკლე ფრაზები სწორი გამოთქმისთვის.",
-  },
-  {
-    to: "/path/speaking/roleplay",
-    Icon: Drama,
-    title_ka: "რეალური სიტუაციები",
-    desc_ka: "ივარჯიშე ცხოვრებისეულ დიალოგებში.",
-  },
-  {
-    to: "/path/speaking/progress",
-    Icon: LineChart,
-    title_ka: "ჩემი საუბრის ზრდა",
-    desc_ka: "ნახე რას ისწავლე ბოლო დღეებში.",
-  },
+const SIDE_PATHS = [
+  { to: "/path/speaking/pronunciation", Icon: Headphones, title_ka: "მოსმენა და გამეორება", desc_ka: "მოკლე ფრაზები" },
+  { to: "/path/speaking/roleplay", Icon: Drama, title_ka: "რეალური სიტუაციები", desc_ka: "დიალოგები" },
+  { to: "/path/speaking/progress", Icon: LineChart, title_ka: "ჩემი პროგრესი", desc_ka: "ისტორია და სტატისტიკა" },
 ];
+
+function localDateString(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 type DashStats = {
   lessonsCompleted: number;
   phrasesPracticed: number;
   pronAttempts: number;
-  roleplaysCompleted: number;
-  lastTopic: string | null;
+  todayLesson: {
+    topic: string | null;
+    phrases: number;
+    prompts: number;
+    corrections: number;
+  } | null;
   hasUnfinishedLesson: boolean;
 };
 
@@ -67,167 +56,148 @@ export default function SpeakingDashboard() {
       ]);
       setStreak(streakRes);
       const lessons = (lessonsRes.data ?? []).filter((l) => (l.level ?? "").startsWith("speaking"));
-      const completed = lessons.filter((l) => l.completed);
-      const dailyCompleted = completed.filter((l) => !(l.level ?? "").includes("roleplay"));
-      const roleplaysCompleted = completed.filter((l) => (l.level ?? "").includes("roleplay")).length;
-      const phrasesPracticed = dailyCompleted.reduce(
+      const dailyLessons = lessons.filter((l) => !(l.level ?? "").includes("roleplay"));
+      const completed = dailyLessons.filter((l) => l.completed);
+      const phrasesPracticed = completed.reduce(
         (sum, l) => sum + (Number((l.summary as any)?.phrases_practiced) || 0),
         0,
       );
-      const lastTopic = (completed[0]?.summary as any)?.plan?.title_ka ?? null;
-      const hasUnfinishedLesson = lessons.some((l) => !l.completed && !(l.level ?? "").includes("roleplay"));
+      const today = localDateString();
+      const todayDone = completed.find((l) => localDateString(new Date(l.created_at)) === today);
+      const todayLesson = todayDone
+        ? {
+            topic: (todayDone.summary as any)?.plan?.title_ka ?? null,
+            phrases: Number((todayDone.summary as any)?.phrases_practiced) || 0,
+            prompts: Number((todayDone.summary as any)?.voice_prompts_completed) || 0,
+            corrections: ((todayDone.summary as any)?.mistakes ?? []).length || 0,
+          }
+        : null;
+      const hasUnfinishedLesson = dailyLessons.some((l) => !l.completed);
       setStats({
-        lessonsCompleted: dailyCompleted.length,
+        lessonsCompleted: completed.length,
         phrasesPracticed,
         pronAttempts: pronRes.count ?? 0,
-        roleplaysCompleted,
-        lastTopic,
+        todayLesson,
         hasUnfinishedLesson,
       });
     })();
   }, [user]);
 
-  const continueLabel = stats?.hasUnfinishedLesson
-    ? "Continue Lesson"
-    : streak?.practicedToday
-      ? "Practice more"
-      : "Start Today's Speaking Lesson";
+  const todayDone = !!stats?.todayLesson;
 
   return (
     <SpeakingShell>
-      <div className="space-y-8 max-w-3xl mx-auto">
-        {/* Section header */}
+      <div className="space-y-6 max-w-2xl mx-auto">
+        {/* Header */}
         <header className="flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <span className="sp-eyebrow ka">საუბრის ვარჯიში</span>
-            <h1 className="text-[26px] sm:text-3xl font-extrabold mt-2 ka sp-text leading-tight">
-              ისაუბრე ინგლისურად — ყოველდღე ცოტა.
-            </h1>
-            <p className="text-sm sp-text-muted ka mt-2 max-w-md">
-              შენი პირადი მწვრთნელი ქართველი დამწყებებისთვის. მოკლე გაკვეთილები, რეალური დიალოგები და ნაზი გასწორებები.
-            </p>
+          <div>
+            <h1 className="text-2xl font-extrabold ka sp-text leading-tight">საუბრის პრაქტიკა</h1>
+            <p className="text-sm sp-text-muted ka mt-1">ივარჯიშე ინგლისურად ყოველდღე.</p>
           </div>
           <PathSwitcher />
         </header>
 
-        {/* Speaking progress snapshot */}
-        {user && (
-          <section className="sp-card p-5 sm:p-6">
-            <div className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-[hsl(20_85%_55%)]" />
-              <div>
-                <div className="text-2xl font-extrabold sp-text leading-none">
-                  🔥 {streak?.currentStreak ?? 0} Day Speaking Streak
-                </div>
-                <div className="text-[11px] sp-text-soft mt-1">
-                  Longest: {streak?.longestStreak ?? 0}
-                  {streak?.practicedToday && <> · <span className="text-[hsl(175_70%_38%)] font-semibold ka">დღეს ნავარჯიშები</span></>}
-                </div>
+        {/* Today card */}
+        <section className="sp-card p-5">
+          {todayDone ? (
+            <>
+              <div className="flex items-center gap-2 text-[hsl(175_70%_30%)]">
+                <CheckCircle2 className="w-5 h-5" />
+                <div className="font-bold ka text-[15px]">დღეს გაკვეთილი შესრულებულია</div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 text-center">
-              <MiniStat label_ka="გაკვეთილი" value={stats?.lessonsCompleted ?? 0} />
-              <MiniStat label_ka="ფრაზა" value={stats?.phrasesPracticed ?? 0} />
-              <MiniStat label_ka="გამოთქმის ცდა" value={stats?.pronAttempts ?? 0} />
-              <MiniStat label_ka="როლი" value={stats?.roleplaysCompleted ?? 0} />
-            </div>
-            {stats?.lastTopic && (
-              <div className="mt-4 text-xs sp-text-muted ka">
-                ბოლო თემა: <span className="font-semibold sp-text">{stats.lastTopic}</span>
+              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                {stats?.todayLesson?.topic && (
+                  <div className="col-span-2 flex justify-between">
+                    <dt className="sp-text-muted ka">თემა</dt>
+                    <dd className="font-semibold sp-text truncate ml-2">{stats.todayLesson.topic}</dd>
+                  </div>
+                )}
+                <Row label_ka="ფრაზები" value={stats?.todayLesson?.phrases ?? 0} />
+                <Row label_ka="მცდელობები" value={stats?.todayLesson?.prompts ?? 0} />
+                <Row label_ka="გასწორებები" value={stats?.todayLesson?.corrections ?? 0} />
+              </dl>
+              <div className="flex gap-2 mt-5">
+                <Link
+                  to="/path/speaking/daily"
+                  className="sp-btn-primary inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka flex-1"
+                >
+                  ივარჯიშე კიდევ
+                </Link>
+                <Link
+                  to="/path/speaking/daily?next=1"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_40%_96%)]"
+                >
+                  შემდეგი თემა
+                </Link>
               </div>
-            )}
-            <Link
-              to="/path/speaking/daily"
-              className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold"
-            >
-              {continueLabel}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            {streak?.practicedToday && (
-              <div className="mt-3 text-xs ka text-[hsl(175_70%_30%)]">
-                ✅ Today's speaking practice completed — Nice work, you kept your Streak alive.
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 sp-text">
+                <Clock className="w-5 h-5 text-[hsl(175_70%_38%)]" />
+                <div className="font-bold ka text-[15px]">დღევანდელი გაკვეთილი მზადაა</div>
               </div>
-            )}
-          </section>
-        )}
-
-        {/* Today's mission — the one premium block */}
-        <section className="sp-card-hero p-6 sm:p-7 relative overflow-hidden">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(175_70%_55%)] animate-pulse" />
-              დღევანდელი მისია
-            </span>
-            <span className="text-[11px] ka sp-text-muted">~ 7 წუთი</span>
-          </div>
-          <h2 className="text-2xl sm:text-[26px] font-extrabold ka sp-text leading-snug">
-            ისწავლე საუბარი ყოველდღიურ თემაზე
-          </h2>
-          <p className="text-sm sp-text-muted ka mt-2 max-w-md">
-            4 ახალი ფრაზა, ხმოვანი გამეორება და 3 მოკლე კითხვა AI მწვრთნელისგან.
-          </p>
-
-          <div className="flex flex-wrap gap-4 mt-5 text-[13px]">
-            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
-              <Target className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> 4 ფრაზა
-            </span>
-            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
-              <Mic className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> ხმოვანი ვარჯიში
-            </span>
-            <span className="inline-flex items-center gap-1.5 sp-text-muted ka">
-              <Clock className="w-3.5 h-3.5 text-[hsl(175_70%_55%)]" /> 3 კითხვა
-            </span>
-          </div>
-
-          <Link
-            to="/path/speaking/daily"
-            className="sp-btn-teal mt-6 inline-flex items-center justify-center gap-2 rounded-xl h-12 px-6 text-[15px] font-bold ka"
-          >
-            მისიის დაწყება
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+              <div className="mt-3 text-xs sp-text-muted ka">~ 7 წუთი · 4 ფრაზა · 3 კითხვა</div>
+              <Link
+                to="/path/speaking/daily"
+                className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka w-full"
+              >
+                {stats?.hasUnfinishedLesson ? "გაკვეთილის გაგრძელება" : "გაკვეთილის დაწყება"}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </>
+          )}
         </section>
 
-        {/* Practice areas — editorial list, not a card grid */}
-        <section className="space-y-3">
-          <div className="flex items-baseline justify-between">
-            <h3 className="text-base font-bold ka sp-text">სხვა ვარჯიშები</h3>
-            <span className="text-xs sp-text-soft ka">აირჩიე შენი რიტმი</span>
-          </div>
+        {/* Compact stats */}
+        <section className="grid grid-cols-4 gap-2">
+          <Stat label={<span className="inline-flex items-center gap-1"><Flame className="w-3 h-3" />Streak</span>} value={`${streak?.currentStreak ?? 0}`} />
+          <Stat label="Lessons" value={stats?.lessonsCompleted ?? 0} />
+          <Stat label="Phrases" value={stats?.phrasesPracticed ?? 0} />
+          <Stat label="Attempts" value={stats?.pronAttempts ?? 0} />
+        </section>
+
+        {/* Other practice */}
+        <section>
+          <h3 className="text-xs font-bold ka sp-text-muted uppercase tracking-wider mb-2">სხვა ვარჯიშები</h3>
           <div className="sp-card divide-y divide-[hsl(220_22%_92%)] overflow-hidden">
             {SIDE_PATHS.map((p) => (
               <Link
                 key={p.to}
                 to={p.to}
-                className="flex items-center gap-4 px-5 py-4 hover:bg-[hsl(40_40%_96%)] transition-colors"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[hsl(40_40%_96%)] transition-colors"
               >
-                <div className="w-11 h-11 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
-                  <p.Icon className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-lg sp-chip-teal flex items-center justify-center shrink-0">
+                  <p.Icon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold ka sp-text text-[15px]">{p.title_ka}</div>
-                  <div className="text-xs sp-text-muted ka mt-0.5">{p.desc_ka}</div>
+                  <div className="font-bold ka sp-text text-sm">{p.title_ka}</div>
+                  <div className="text-[11px] sp-text-muted ka">{p.desc_ka}</div>
                 </div>
                 <ArrowRight className="w-4 h-4 sp-text-soft" />
               </Link>
             ))}
           </div>
         </section>
-
-        {/* Soft footer note — local feel */}
-        <p className="text-xs sp-text-soft ka text-center pt-2">
-          შექმნილია ქართველებისთვის · ისაუბრე თამამად, ნელ-ნელა გამოგივა.
-        </p>
       </div>
     </SpeakingShell>
   );
 }
 
-function MiniStat({ label_ka, value }: { label_ka: string; value: number | string }) {
+function Stat({ label, value }: { label: React.ReactNode; value: number | string }) {
   return (
-    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] py-3">
-      <div className="text-xl font-extrabold sp-text leading-none">{value}</div>
-      <div className="text-[10px] sp-text-muted ka mt-1">{label_ka}</div>
+    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] py-2.5 text-center">
+      <div className="text-lg font-extrabold sp-text leading-none">{value}</div>
+      <div className="text-[10px] sp-text-muted mt-1">{label}</div>
+    </div>
+  );
+}
+
+function Row({ label_ka, value }: { label_ka: string; value: number }) {
+  return (
+    <div className="flex justify-between">
+      <dt className="sp-text-muted ka">{label_ka}</dt>
+      <dd className="font-semibold sp-text">{value}</dd>
     </div>
   );
 }
