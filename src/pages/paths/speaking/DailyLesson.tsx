@@ -46,6 +46,12 @@ type Plan = {
   ai_role_ka?: string;
 };
 
+type LessonPrompt = {
+  question: string;
+  instruction_ka: string;
+  examples: string[];
+};
+
 const STEPS: { key: Step; label: string }[] = [
   { key: "topic", label: "თემა" },
   { key: "phrases", label: "ფრაზები" },
@@ -60,6 +66,73 @@ const LEVEL_LABEL_KA: Record<string, string> = {
   Intermediate: "საშუალო",
   Advanced: "მაღალი",
 };
+
+const CAFE_PROMPTS: LessonPrompt[] = [
+  { question: "What would you like?", instruction_ka: "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი.", examples: ["I want coffee.", "I want tea.", "I want water."] },
+  { question: "Would you like coffee or tea?", instruction_ka: "აირჩიე ერთი სასმელი და უპასუხე ინგლისურად.", examples: ["I would like coffee.", "I would like tea.", "Coffee, please."] },
+  { question: "Do you want water?", instruction_ka: "უპასუხე მოკლედ ინგლისურად.", examples: ["Yes, please.", "No, thank you.", "I want water."] },
+  { question: "Can I have your name?", instruction_ka: "თქვი შენი სახელი ინგლისურად.", examples: ["My name is Ana.", "I am Nika.", "Ana, please."] },
+  { question: "Do you want sugar?", instruction_ka: "უპასუხე გინდა თუ არა შაქარი.", examples: ["Yes, please.", "No sugar, please.", "A little sugar, please."] },
+  { question: "Do you want milk?", instruction_ka: "უპასუხე გინდა თუ არა რძე.", examples: ["Yes, with milk.", "No milk, please.", "A little milk, please."] },
+  { question: "Is that all?", instruction_ka: "უპასუხე და დაასრულე შეკვეთა.", examples: ["Yes, that is all.", "That is all, thank you.", "No, I want cake too."] },
+  { question: "How would you pay?", instruction_ka: "თქვი როგორ გადაიხდი.", examples: ["By card, please.", "I will pay cash.", "Card, please."] },
+  { question: "Do you want a receipt?", instruction_ka: "უპასუხე გინდა თუ არა ქვითარი.", examples: ["Yes, please.", "No, thank you.", "A receipt, please."] },
+  { question: "Thank you. Have a nice day.", instruction_ka: "უპასუხე ზრდილობიანად ინგლისურად.", examples: ["Thank you.", "You too.", "Have a nice day too."] },
+];
+
+const DEFAULT_PROMPTS: LessonPrompt[] = [
+  { question: "What is your name?", instruction_ka: "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი.", examples: ["My name is Ana.", "I am Nika.", "My name is Mari."] },
+  { question: "Where are you from?", instruction_ka: "თქვი საიდან ხარ ინგლისურად.", examples: ["I am from Georgia.", "I am from Tbilisi.", "I am from Batumi."] },
+  { question: "How are you today?", instruction_ka: "უპასუხე მოკლედ ინგლისურად.", examples: ["I am good.", "I am fine, thank you.", "I am happy."] },
+  { question: "What do you like?", instruction_ka: "თქვი რა მოგწონს ინგლისურად.", examples: ["I like English.", "I like music.", "I like football."] },
+  { question: "What do you want?", instruction_ka: "თქვი რა გინდა ინგლისურად.", examples: ["I want water.", "I want coffee.", "I want help."] },
+  { question: "Can you say that again?", instruction_ka: "ივარჯიშე თავაზიანი თხოვნა ინგლისურად.", examples: ["Can you say that again?", "Again, please.", "Please say that again."] },
+  { question: "Do you need help?", instruction_ka: "უპასუხე გჭირდება თუ არა დახმარება.", examples: ["Yes, I need help.", "No, thank you.", "I need help, please."] },
+  { question: "What time is it?", instruction_ka: "უპასუხე მარტივი დროით ინგლისურად.", examples: ["It is two o'clock.", "It is morning.", "I don't know."] },
+  { question: "What is your favorite thing?", instruction_ka: "თქვი შენი საყვარელი რამ ინგლისურად.", examples: ["My favorite thing is my phone.", "I like books.", "My favorite thing is music."] },
+  { question: "Thank you. See you later.", instruction_ka: "უპასუხე დამშვიდობებით ინგლისურად.", examples: ["See you later.", "Thank you.", "Goodbye."] },
+];
+
+function isMostlyEnglish(s: string) {
+  const letters = s.replace(/[^A-Za-z\u10A0-\u10FF]/g, "");
+  if (!letters) return false;
+  return ((s.match(/[A-Za-z]/g) || []).length / letters.length) > 0.55;
+}
+
+function makeLessonPrompts(plan: Plan, isBeginner: boolean): LessonPrompt[] {
+  const topic = (plan.topic || plan.title_en || "").toLowerCase();
+  const base = topic.includes("café") || topic.includes("cafe") || topic.includes("coffee") ? CAFE_PROMPTS : DEFAULT_PROMPTS;
+  const fromPlan = (plan.warmup_questions || [])
+    .map((q) => q.trim())
+    .filter(isMostlyEnglish)
+    .slice(0, 4)
+    .map((question) => ({
+      question,
+      instruction_ka: isBeginner ? "უპასუხე ინგლისურად. შეგიძლია გამოიყენო მაგალითი." : "უპასუხე ინგლისურად.",
+      examples: plan.new_words.map((w) => w.example_sentence).filter(Boolean).slice(0, 3),
+    }));
+  const merged = [...fromPlan, ...base];
+  const seen = new Set<string>();
+  return merged.filter((p) => {
+    const key = p.question.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 10);
+}
+
+function makeLocalFeedback(answer: string, examples: string[]) {
+  const clean = answer.trim();
+  const better = examples[0] || "I would like coffee.";
+  const words = normalizeForLesson(clean);
+  if (words.length >= 4) return { feedback: "Good answer! კარგი ცდა — გააგრძელე ნელა და გარკვევით.", corrected: undefined as string | undefined };
+  if (words.length >= 2) return { feedback: `Good try! Better: “${better}” სცადე კიდევ ერთხელ ნელა.`, corrected: better };
+  return { feedback: `Good try! Better: “${better}” თქვი სრული მოკლე წინადადება.`, corrected: better };
+}
+
+function normalizeForLesson(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+}
 
 // Parse a trailing OPTIONS: [...] or STARTERS: [...] block out of an AI reply.
 function extractChips(reply: string): { clean: string; options: string[]; starters: string[] } {
