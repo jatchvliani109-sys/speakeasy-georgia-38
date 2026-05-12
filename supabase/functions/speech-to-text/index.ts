@@ -60,8 +60,8 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("STT function failed", (e as Error).message);
-    return new Response(JSON.stringify({ error: "STT_SERVICE_FAILED" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ error: "STT_SERVICE_FAILED", fallback: true }), {
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
