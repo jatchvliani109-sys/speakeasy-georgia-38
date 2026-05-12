@@ -99,6 +99,7 @@ export default function DailyLesson() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [mistakes, setMistakes] = useState<{ original: string; corrected: string }[]>([]);
+  const [showType, setShowType] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
