@@ -13,9 +13,9 @@ export default function SpeakingShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function SoundBars({ count = 5, className = "" }: { count?: number; className?: string }) {
+export function SoundBars({ count = 4, className = "" }: { count?: number; className?: string }) {
   return (
-    <div className={`flex items-end gap-1 h-6 ${className}`}>
+    <div className={`flex items-end gap-1 h-5 ${className}`}>
       {Array.from({ length: count }).map((_, i) => (
         <span
           key={i}

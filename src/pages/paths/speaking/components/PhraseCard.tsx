@@ -12,52 +12,42 @@ type Props = {
 
 export default function PhraseCard({ english, georgian, example, practiced, onPracticed, showRepeatHints }: Props) {
   return (
-    <div className="sp-card p-4 space-y-3">
-      <div className="flex items-start gap-3">
-        <SpeakButton text={english} size="md" className="!w-12 !h-12 !rounded-2xl sp-btn-teal !text-white" />
+    <div className="sp-card p-4 sm:p-5">
+      <div className="flex items-start gap-4">
+        <SpeakButton
+          text={english}
+          size="md"
+          className="!w-11 !h-11 !rounded-xl sp-btn-teal !text-white shrink-0"
+        />
         <div className="min-w-0 flex-1">
-          <div className="text-base font-bold break-words sp-text">{english}</div>
-          <div className="text-sm sp-text-muted ka mt-0.5">{georgian}</div>
+          <div className="text-[17px] font-bold leading-snug break-words sp-text">{english}</div>
+          <div className="text-sm ka mt-1" style={{ color: "hsl(220 15% 42%)" }}>{georgian}</div>
           {example && (
-            <div className="flex items-start gap-2 mt-2">
+            <div className="flex items-start gap-2 mt-3 pt-3 sp-rule">
               <SpeakButton text={example} />
-              <div className="text-xs italic sp-text-muted">"{example}"</div>
+              <div className="text-[13px] italic" style={{ color: "hsl(220 18% 50%)" }}>"{example}"</div>
             </div>
           )}
         </div>
       </div>
 
-      {/* sound-wave visual */}
-      <div className="flex items-center gap-1 h-3 opacity-70">
-        {Array.from({ length: 28 }).map((_, i) => (
-          <span
-            key={i}
-            className="block w-[3px] rounded-full bg-gradient-to-b from-blue-300 to-purple-400"
-            style={{ height: `${20 + Math.abs(Math.sin(i * 0.7)) * 80}%` }}
-          />
-        ))}
-      </div>
-
-      {showRepeatHints && (
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t sp-divider">
-          <span className="text-xs sp-text-muted ka">🔊 მოუსმინე • 🗣️ გაიმეორე ხმამაღლა</span>
-        </div>
-      )}
-
-      {onPracticed && (
-        <div className="flex items-center justify-end pt-1">
-          <button
-            type="button"
-            onClick={onPracticed}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ka transition-smooth ${
-              practiced
-                ? "sp-btn-teal"
-                : "sp-chip hover:bg-purple-400/30"
-            }`}
-          >
-            <Check className="w-3.5 h-3.5" />
-            {practiced ? "გავიმეორე ✓" : "I practiced"}
-          </button>
+      {(showRepeatHints || onPracticed) && (
+        <div className="flex items-center justify-between gap-3 mt-4 pt-3 sp-rule">
+          {showRepeatHints ? (
+            <span className="text-[11px] sp-text-soft ka">🔊 მოუსმინე · 🗣️ გაიმეორე ხმამაღლა</span>
+          ) : <span />}
+          {onPracticed && (
+            <button
+              type="button"
+              onClick={onPracticed}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ka transition-colors ${
+                practiced ? "sp-btn-teal" : "sp-chip hover:bg-[hsl(40_40%_92%)]"
+              }`}
+            >
+              <Check className="w-3.5 h-3.5" />
+              {practiced ? "გავიმეორე" : "გავიმეორე"}
+            </button>
+          )}
         </div>
       )}
     </div>
