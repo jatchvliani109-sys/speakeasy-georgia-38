@@ -435,6 +435,7 @@ function CallScreen({
         <div className="mt-4 mb-2">
           <div className="flex items-center justify-center">
             <SpeakingRecorder
+              key={`rec-${messages.length}`}
               mode="transcribe"
               source="speaking_call"
               topic={topic.title_en}
