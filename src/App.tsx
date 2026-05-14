@@ -14,6 +14,7 @@ import LearningPathSelection from "./pages/LearningPathSelection";
 import GeneralEnglishDashboard from "./pages/paths/GeneralEnglish";
 import SpeakingDashboard from "./pages/paths/speaking/SpeakingDashboard";
 import SpeakingDailyLesson from "./pages/paths/speaking/DailyLesson";
+import AISpeakingCall from "./pages/paths/speaking/AISpeakingCall";
 import SpeakingPronunciation from "./pages/paths/speaking/Pronunciation";
 import SpeakingRoleplayList from "./pages/paths/speaking/RoleplayList";
 import SpeakingRoleplaySession from "./pages/paths/speaking/RoleplaySession";
