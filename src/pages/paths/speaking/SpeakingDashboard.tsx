@@ -98,16 +98,27 @@ export default function SpeakingDashboard() {
           <PathSwitcher />
         </header>
 
-        {/* Today card */}
-        <section className="sp-card p-5">
+        {/* Today / AI Speaking Session card */}
+        <section className="sp-card-hero p-5">
+          <div className="flex items-center gap-2 sp-text">
+            <span className="inline-flex w-9 h-9 rounded-xl items-center justify-center text-lg"
+              style={{ background: "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(175 70% 42%))", color: "white" }}>
+              🎙️
+            </span>
+            <div>
+              <div className="font-extrabold sp-text text-[16px]">AI Speaking Session</div>
+              <div className="text-[12px] sp-text-muted ka">ინგლისურად საუბრის პრაქტიკა რეალურ საუბარში.</div>
+            </div>
+          </div>
+
           {todayDone ? (
             <>
-              <div className="flex items-center gap-2 text-[hsl(175_70%_30%)]">
-                <CheckCircle2 className="w-5 h-5" />
-                <div className="font-bold ka text-[15px]">დღეს გაკვეთილი შესრულებულია</div>
+              <div className="mt-4 flex items-center gap-2 text-[hsl(175_70%_30%)]">
+                <CheckCircle2 className="w-4 h-4" />
+                <div className="font-semibold ka text-[13px]">დღეს უკვე ივარჯიშე</div>
               </div>
-              <p className="ka text-sm sp-text mt-2">{getEncouragementKa(dailySeed())}</p>
-              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <p className="ka text-sm sp-text mt-1">{getEncouragementKa(dailySeed())}</p>
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
                 {stats?.todayLesson?.topic && (
                   <div className="col-span-2 flex justify-between">
                     <dt className="sp-text-muted ka">თემა</dt>
@@ -116,37 +127,30 @@ export default function SpeakingDashboard() {
                 )}
                 <Row label_ka="ფრაზები" value={stats?.todayLesson?.phrases ?? 0} />
                 <Row label_ka="მცდელობები" value={stats?.todayLesson?.prompts ?? 0} />
-                <Row label_ka="გასწორებები" value={stats?.todayLesson?.corrections ?? 0} />
               </dl>
-              <div className="flex gap-2 mt-5">
-                <Link
-                  to="/path/speaking/daily"
-                  className="sp-btn-primary inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka flex-1"
-                >
-                  ივარჯიშე კიდევ
-                </Link>
-                <Link
-                  to="/path/speaking/daily?next=1"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_40%_96%)]"
-                >
-                  შემდეგი თემა
-                </Link>
-              </div>
+              <Link
+                to="/path/speaking/call"
+                className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka w-full"
+              >
+                ახალი სესიის დაწყება
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2 sp-text">
-                <Clock className="w-5 h-5 text-[hsl(175_70%_38%)]" />
-                <div className="font-bold ka text-[15px]">დღევანდელი გაკვეთილი მზადაა</div>
-              </div>
-              <div className="mt-3 text-xs sp-text-muted ka">~ 7 წუთი · 4 ფრაზა · 3 კითხვა</div>
+              <p className="ka text-[13px] sp-text-muted mt-3 leading-relaxed">
+                ესაუბრე AI მასწავლებელს ინგლისურად. თუ გაიჭედები, შეგიძლია ქართულად ითხოვო დახმარება.
+              </p>
               <Link
-                to="/path/speaking/daily"
-                className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka w-full"
+                to="/path/speaking/call"
+                className="sp-btn-primary mt-4 inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold ka w-full"
               >
-                {stats?.hasUnfinishedLesson ? "გაკვეთილის გაგრძელება" : "გაკვეთილის დაწყება"}
+                საუბრის დაწყება
                 <ArrowRight className="w-4 h-4" />
               </Link>
+              <div className="mt-3 text-[11px] sp-text-soft ka text-center">
+                აირჩევ თემას და დაიწყებ AI-სთან ხმოვან საუბარს.
+              </div>
             </>
           )}
         </section>
