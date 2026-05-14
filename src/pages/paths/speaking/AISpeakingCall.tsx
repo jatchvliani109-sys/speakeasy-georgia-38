@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb,
-  Loader2, Type as TypeIcon, MessageSquare, RotateCcw, Volume2, X,
+  ArrowLeft, ArrowRight, Mic, PhoneOff, Lightbulb,
+  Loader2, Type as TypeIcon, RotateCcw, X,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakingRecorder from "./components/SpeakingRecorder";
