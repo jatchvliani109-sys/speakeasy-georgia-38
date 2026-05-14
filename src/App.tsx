@@ -14,6 +14,7 @@ import LearningPathSelection from "./pages/LearningPathSelection";
 import GeneralEnglishDashboard from "./pages/paths/GeneralEnglish";
 import SpeakingDashboard from "./pages/paths/speaking/SpeakingDashboard";
 import SpeakingDailyLesson from "./pages/paths/speaking/DailyLesson";
+import AISpeakingCall from "./pages/paths/speaking/AISpeakingCall";
 import SpeakingPronunciation from "./pages/paths/speaking/Pronunciation";
 import SpeakingRoleplayList from "./pages/paths/speaking/RoleplayList";
 import SpeakingRoleplaySession from "./pages/paths/speaking/RoleplaySession";
@@ -47,7 +48,9 @@ const App = () => (
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
             <Route path="/path/general" element={<RequireAuth><GeneralEnglishDashboard /></RequireAuth>} />
             <Route path="/path/speaking" element={<RequireAuth><SpeakingDashboard /></RequireAuth>} />
-            <Route path="/path/speaking/daily" element={<RequireAuth><SpeakingDailyLesson /></RequireAuth>} />
+            <Route path="/path/speaking/call" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
+            <Route path="/path/speaking/daily" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
+            <Route path="/path/speaking/daily-legacy" element={<RequireAuth><SpeakingDailyLesson /></RequireAuth>} />
             <Route path="/path/speaking/pronunciation" element={<RequireAuth><SpeakingPronunciation /></RequireAuth>} />
             <Route path="/path/speaking/roleplay" element={<RequireAuth><SpeakingRoleplayList /></RequireAuth>} />
             <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
