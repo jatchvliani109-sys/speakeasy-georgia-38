@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2, Clock } from "lucide-react";
+import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
