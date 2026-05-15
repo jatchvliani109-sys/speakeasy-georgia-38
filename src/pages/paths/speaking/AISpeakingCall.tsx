@@ -573,7 +573,7 @@ function CallScreen({
 
               {helpLoading || !helpData ? (
                 <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
-                  <Loader2 className="w-4 h-4 animate-spin" /> ვამზადებ რჩევას…
+                  <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
                 </div>
               ) : (
                 <>
