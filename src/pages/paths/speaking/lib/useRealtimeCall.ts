@@ -55,11 +55,11 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   }, [onError]);
 
   const cleanup = useCallback(() => {
-    dlog("cleanup");
+    dlog("cleanup → closing data channel, peer connection, mic tracks");
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
-    micRef.current?.getTracks().forEach((t) => t.stop());
+    micRef.current?.getTracks().forEach((t) => { t.stop(); dlog("mic track stopped"); });
     if (audioRef.current) {
       try { audioRef.current.pause(); } catch {}
       try { audioRef.current.srcObject = null; } catch {}
@@ -69,9 +69,13 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     micRef.current = null;
     audioRef.current = null;
     responseActiveRef.current = false;
+    startingRef.current = false;
+    setMicOn(false);
   }, []);
 
   const stop = useCallback(() => {
+    if (endedRef.current) return;
+    dlog("stop() called → ending session");
     endedRef.current = true;
     cleanup();
     setStatus("ended");
@@ -79,11 +83,13 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
 
   // Toggle mic track without tearing down the call (push-to-talk / manual mode).
   const setMicEnabled = useCallback((enabled: boolean) => {
-    micRef.current?.getAudioTracks().forEach((t) => { t.enabled = enabled; });
-    dlog("mic enabled =", enabled);
+    const tracks = micRef.current?.getAudioTracks() ?? [];
+    tracks.forEach((t) => { t.enabled = enabled; });
+    setMicOn(enabled && tracks.length > 0);
+    dlog(enabled ? "mic track enabled (sending audio)" : "mic track muted (silence)");
   }, []);
 
-  useEffect(() => () => { endedRef.current = true; cleanup(); }, [cleanup]);
+  useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
   const handleServerEvent = useCallback((ev: any) => {
     if (DEBUG && ev?.type && ev.type !== "response.audio.delta" && !ev.type.endsWith(".delta")) {
