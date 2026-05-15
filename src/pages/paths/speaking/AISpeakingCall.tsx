@@ -383,11 +383,6 @@ function CallScreen({
     });
   };
 
-  const endSession = () => {
-    stop();
-    const dur = Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000));
-    onEnd(messagesRef.current, dur);
-  };
 
   const isConnected = status === "ready" || status === "listening" || status === "ai_speaking" || status === "thinking";
 
