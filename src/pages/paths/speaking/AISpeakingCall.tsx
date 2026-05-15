@@ -439,7 +439,16 @@ function CallScreen({
 
         {showTimeWarn && isConnected && (
           <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[12px] text-amber-900 ka text-center">
-            სესია მალე დასრულდება. შეგიძლია გააგრძელო ან დაასრულო.
+            სესია მალე დასრულდება.
+          </div>
+        )}
+
+        {import.meta.env.DEV && (
+          <div className="mb-3 rounded-md bg-slate-900/90 text-slate-100 px-2 py-1 font-mono text-[10px] flex flex-wrap items-center gap-x-3 gap-y-0.5 justify-center">
+            <span>status: {status}</span>
+            <span>mic: {micOn ? "on" : "off"}</span>
+            <span>time: {elapsed}s / 120s</span>
+            <span>model: {model ?? "-"}</span>
           </div>
         )}
 
