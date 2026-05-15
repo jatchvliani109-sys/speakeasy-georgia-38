@@ -195,7 +195,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const resp = await fetch(`https://api.openai.com/v1/realtime?model=${encodeURIComponent(model!)}`, {
+      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(model!)}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${clientSecret}`,
