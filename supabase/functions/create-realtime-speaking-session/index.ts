@@ -5,7 +5,8 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
-const MODEL = "gpt-4o-realtime-preview-2024-12-17";
+const PRIMARY_MODEL = "gpt-realtime-mini";
+const FALLBACK_MODEL = "gpt-realtime-2";
 
 function instructionsFor(level: string, topic: string, learningPath?: string) {
   const lvl = (level || "Beginner").toLowerCase();
