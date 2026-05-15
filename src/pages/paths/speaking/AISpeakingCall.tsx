@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Mic, PhoneOff, Lightbulb,
-  Loader2, Type as TypeIcon, RotateCcw, X,
+  Loader2, RotateCcw, X, Radio,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
-import SpeakingRecorder from "./components/SpeakingRecorder";
 import SpeakButton from "@/components/SpeakButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { toast } from "sonner";
 import { recordSpeakingActivity } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
+import { useRealtimeCall, type RtStatus } from "./lib/useRealtimeCall";
 
 // --- Topics --------------------------------------------------------------
 
