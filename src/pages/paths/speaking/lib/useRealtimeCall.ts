@@ -170,11 +170,17 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   }, [onError, onEvent]);
 
   const start = useCallback(async () => {
-    if (status === "connecting" || status === "ready" || status === "ai_speaking" ||
-        status === "listening" || status === "thinking") return;
+    if (startingRef.current || pcRef.current ||
+        status === "connecting" || status === "ready" || status === "ai_speaking" ||
+        status === "listening" || status === "thinking") {
+      console.log("[rt] Realtime session already active — not creating another.");
+      return;
+    }
+    startingRef.current = true;
     setErrorMsg(null);
     endedRef.current = false;
     setStatus("connecting");
+    dlog("creating realtime session");
 
     let mic: MediaStream;
     try {
@@ -182,24 +188,30 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       micRef.current = mic;
-      dlog("mic stream active");
+      // Start MUTED — caller decides when to enable (push-to-talk default).
+      mic.getAudioTracks().forEach((t) => { t.enabled = false; });
+      setMicOn(false);
+      dlog("mic track started (muted by default)");
     } catch {
+      startingRef.current = false;
       return fail("მიკროფონის გამოყენებისთვის საჭიროა ნებართვა.");
     }
 
     let clientSecret: string | undefined;
-    let model: string | undefined;
+    let usedModel: string | undefined;
     try {
       const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
         body: { topic, level, selectedLearningPath },
       });
       if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
       clientSecret = (data as any).client_secret?.value;
-      model = (data as any).model;
+      usedModel = (data as any).model;
       if (!clientSecret) throw new Error("Missing client secret");
-      dlog("session created, model =", model);
+      setModel(usedModel ?? null);
+      dlog("realtime session created, model =", usedModel);
     } catch (e: any) {
       console.error("[rt] session creation failed", e);
+      startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
 
