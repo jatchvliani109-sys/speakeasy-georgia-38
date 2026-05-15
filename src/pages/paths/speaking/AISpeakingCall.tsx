@@ -249,6 +249,10 @@ function CallScreen({
   const [showHelp, setShowHelp] = useState(false);
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
+  const [manualMode, setManualMode] = useState(false);
+  const [pttActive, setPttActive] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [showTimeWarn, setShowTimeWarn] = useState(false);
   const startedAtRef = useRef<number>(Date.now());
   const transcriptRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<Msg[]>([]);
