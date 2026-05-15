@@ -293,12 +293,28 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled } = useRealtimeCall({
     topic: topic.title_en,
     level,
     selectedLearningPath: learningPath,
     onEvent: handleEvent,
   });
+
+  // Session timer + 4-min soft warning.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const sec = Math.floor((Date.now() - startedAtRef.current) / 1000);
+      setElapsed(sec);
+      if (sec >= 240 && !showTimeWarn) setShowTimeWarn(true);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [showTimeWarn]);
+
+  // Manual mode: keep mic muted until user holds the talk button.
+  useEffect(() => {
+    if (manualMode) setMicEnabled(pttActive);
+    else setMicEnabled(true);
+  }, [manualMode, pttActive, setMicEnabled, status]);
 
   // auto scroll
   useEffect(() => {
