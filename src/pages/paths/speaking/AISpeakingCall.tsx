@@ -293,22 +293,48 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, model, micOn } = useRealtimeCall({
     topic: topic.title_en,
     level,
     selectedLearningPath: learningPath,
     onEvent: handleEvent,
   });
 
-  // Session timer + 4-min soft warning.
+  const isConnectedRef = useRef(false);
+  const endingRef = useRef(false);
+
+  const endSession = useCallback(() => {
+    if (endingRef.current) return;
+    endingRef.current = true;
+    console.log("[rt] session ended (user / timer / unmount)");
+    stop();
+    const dur = Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000));
+    onEnd(messagesRef.current, dur);
+  }, [stop, onEnd]);
+
+  // Hard safety: 2-min cap + 90s warn. Cleanup on unmount + tab close.
   useEffect(() => {
+    startedAtRef.current = Date.now();
     const id = setInterval(() => {
       const sec = Math.floor((Date.now() - startedAtRef.current) / 1000);
       setElapsed(sec);
-      if (sec >= 240 && !showTimeWarn) setShowTimeWarn(true);
+      if (sec >= 90 && !showTimeWarn) setShowTimeWarn(true);
+      if (sec >= 120) {
+        console.log("[rt] session ended by timer (120s hard cap)");
+        clearInterval(id);
+        endSession();
+      }
     }, 1000);
-    return () => clearInterval(id);
-  }, [showTimeWarn]);
+    const onBeforeUnload = () => { console.log("[rt] tab closing — cleanup"); stop(); };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      console.log("[rt] CallScreen unmount → stop()");
+      stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Manual mode: keep mic muted until user holds the talk button.
   useEffect(() => {
