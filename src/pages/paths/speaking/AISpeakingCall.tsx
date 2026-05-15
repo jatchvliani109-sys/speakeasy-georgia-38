@@ -394,6 +394,34 @@ function CallScreen({
           )}
         </header>
 
+        {isConnected && (
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full sp-chip px-2.5 py-1 text-[11px] font-mono">
+              <Clock className="w-3 h-3" />
+              {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
+            </div>
+            <button
+              type="button"
+              onClick={() => setManualMode((v) => !v)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ka border transition-colors ${
+                manualMode
+                  ? "bg-[hsl(175_70%_38%)] text-white border-transparent"
+                  : "sp-chip border-[hsl(220_22%_88%)]"
+              }`}
+              title="Manual speaking mode"
+            >
+              {manualMode ? <Mic className="w-3 h-3" /> : <MicOff className="w-3 h-3" />}
+              {manualMode ? "ხელით რეჟიმი" : "ავტო რეჟიმი"}
+            </button>
+          </div>
+        )}
+
+        {showTimeWarn && isConnected && (
+          <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[12px] text-amber-900 ka text-center">
+            სესია მალე დასრულდება. შეგიძლია გააგრძელო ან დაასრულო.
+          </div>
+        )}
+
         {/* AI Tutor area */}
         <div className="flex-1 flex flex-col items-center justify-start pt-4">
           <div
