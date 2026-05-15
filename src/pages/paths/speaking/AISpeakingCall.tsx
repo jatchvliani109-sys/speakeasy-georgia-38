@@ -503,6 +503,23 @@ function CallScreen({
             <div className="text-center text-xs sp-text-muted ka inline-flex items-center justify-center gap-2 w-full h-12">
               <Loader2 className="w-4 h-4 animate-spin" /> ვუკავშირდები...
             </div>
+          ) : manualMode ? (
+            <button
+              type="button"
+              onMouseDown={() => setPttActive(true)}
+              onMouseUp={() => setPttActive(false)}
+              onMouseLeave={() => setPttActive(false)}
+              onTouchStart={(e) => { e.preventDefault(); setPttActive(true); }}
+              onTouchEnd={(e) => { e.preventDefault(); setPttActive(false); }}
+              className={`w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka transition-all select-none ${
+                pttActive
+                  ? "bg-[hsl(175_70%_38%)] text-white scale-[0.99] shadow-inner"
+                  : "sp-btn-primary"
+              }`}
+            >
+              <Mic className="w-5 h-5" />
+              {pttActive ? "ვლაპარაკობ..." : "დაიჭირე და ილაპარაკე"}
+            </button>
           ) : (
             <div className="flex items-center justify-center gap-2">
               <div className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-2 text-xs font-bold ka">
