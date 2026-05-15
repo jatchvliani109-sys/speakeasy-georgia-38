@@ -583,7 +583,7 @@ function CallScreen({
                     <SpeakButton text={helpData.english} />
                   </div>
                   <div className="mt-2 text-sm sp-text ka">
-                    ეს ნიშნავს: „{helpData.georgian}“
+                    <span className="sp-text-muted">ნიშნავს:</span> „{helpData.georgian}“
                   </div>
 
                   <button
