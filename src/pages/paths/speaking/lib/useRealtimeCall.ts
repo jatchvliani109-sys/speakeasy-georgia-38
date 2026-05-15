@@ -34,6 +34,9 @@ const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
 export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [model, setModel] = useState<string | null>(null);
+  const [micOn, setMicOn] = useState(false);
+  const startingRef = useRef(false);
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -52,11 +55,11 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   }, [onError]);
 
   const cleanup = useCallback(() => {
-    dlog("cleanup");
+    dlog("cleanup → closing data channel, peer connection, mic tracks");
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
-    micRef.current?.getTracks().forEach((t) => t.stop());
+    micRef.current?.getTracks().forEach((t) => { t.stop(); dlog("mic track stopped"); });
     if (audioRef.current) {
       try { audioRef.current.pause(); } catch {}
       try { audioRef.current.srcObject = null; } catch {}
@@ -66,9 +69,13 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     micRef.current = null;
     audioRef.current = null;
     responseActiveRef.current = false;
+    startingRef.current = false;
+    setMicOn(false);
   }, []);
 
   const stop = useCallback(() => {
+    if (endedRef.current) return;
+    dlog("stop() called → ending session");
     endedRef.current = true;
     cleanup();
     setStatus("ended");
@@ -76,11 +83,13 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
 
   // Toggle mic track without tearing down the call (push-to-talk / manual mode).
   const setMicEnabled = useCallback((enabled: boolean) => {
-    micRef.current?.getAudioTracks().forEach((t) => { t.enabled = enabled; });
-    dlog("mic enabled =", enabled);
+    const tracks = micRef.current?.getAudioTracks() ?? [];
+    tracks.forEach((t) => { t.enabled = enabled; });
+    setMicOn(enabled && tracks.length > 0);
+    dlog(enabled ? "mic track enabled (sending audio)" : "mic track muted (silence)");
   }, []);
 
-  useEffect(() => () => { endedRef.current = true; cleanup(); }, [cleanup]);
+  useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
   const handleServerEvent = useCallback((ev: any) => {
     if (DEBUG && ev?.type && ev.type !== "response.audio.delta" && !ev.type.endsWith(".delta")) {
@@ -161,11 +170,17 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   }, [onError, onEvent]);
 
   const start = useCallback(async () => {
-    if (status === "connecting" || status === "ready" || status === "ai_speaking" ||
-        status === "listening" || status === "thinking") return;
+    if (startingRef.current || pcRef.current ||
+        status === "connecting" || status === "ready" || status === "ai_speaking" ||
+        status === "listening" || status === "thinking") {
+      console.log("[rt] Realtime session already active — not creating another.");
+      return;
+    }
+    startingRef.current = true;
     setErrorMsg(null);
     endedRef.current = false;
     setStatus("connecting");
+    dlog("creating realtime session");
 
     let mic: MediaStream;
     try {
@@ -173,24 +188,30 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       micRef.current = mic;
-      dlog("mic stream active");
+      // Start MUTED — caller decides when to enable (push-to-talk default).
+      mic.getAudioTracks().forEach((t) => { t.enabled = false; });
+      setMicOn(false);
+      dlog("mic track started (muted by default)");
     } catch {
+      startingRef.current = false;
       return fail("მიკროფონის გამოყენებისთვის საჭიროა ნებართვა.");
     }
 
     let clientSecret: string | undefined;
-    let model: string | undefined;
+    let usedModel: string | undefined;
     try {
       const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
         body: { topic, level, selectedLearningPath },
       });
       if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
       clientSecret = (data as any).client_secret?.value;
-      model = (data as any).model;
+      usedModel = (data as any).model;
       if (!clientSecret) throw new Error("Missing client secret");
-      dlog("session created, model =", model);
+      setModel(usedModel ?? null);
+      dlog("realtime session created, model =", usedModel);
     } catch (e: any) {
       console.error("[rt] session creation failed", e);
+      startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
 
@@ -229,7 +250,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(model!)}`, {
+      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(usedModel!)}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${clientSecret}`,
@@ -240,16 +261,19 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       if (!resp.ok) {
         const t = await resp.text().catch(() => "");
         console.error("[rt] sdp exchange failed", resp.status, t);
+        startingRef.current = false;
         return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
       }
       const answerSdp = await resp.text();
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      dlog("connection opened");
+      startingRef.current = false;
+      dlog("WebRTC connected");
     } catch (e: any) {
       console.error("[rt] webrtc error", e);
+      startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
   }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
 
-  return { status, errorMsg, start, stop, setMicEnabled };
+  return { status, errorMsg, start, stop, setMicEnabled, model, micOn };
 }
