@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Mic, PhoneOff, Lightbulb,
-  Loader2, Type as TypeIcon, RotateCcw, X,
+  Loader2, RotateCcw, X, Radio,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
-import SpeakingRecorder from "./components/SpeakingRecorder";
 import SpeakButton from "@/components/SpeakButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { toast } from "sonner";
 import { recordSpeakingActivity } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
+import { useRealtimeCall, type RtStatus } from "./lib/useRealtimeCall";
 
 // --- Topics --------------------------------------------------------------
 
@@ -59,7 +58,6 @@ const LEVEL_LABEL_KA: Record<Topic["level"], string> = {
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Step = "setup" | "explain" | "call" | "summary";
-type CallStatus = "ready" | "ai_speaking" | "listening" | "thinking";
 
 // --- Component ----------------------------------------------------------
 
@@ -222,6 +220,21 @@ function ExplainItem({ text }: { text: string }) {
 
 // --- Call screen --------------------------------------------------------
 
+const STATUS_LABEL_KA: Record<RtStatus, string> = {
+  idle: "მზად",
+  connecting: "ვუკავშირდები...",
+  ready: "AI მზად არის",
+  listening: "გისმენ...",
+  ai_speaking: "AI ლაპარაკობს...",
+  thinking: "ვფიქრობ...",
+  ended: "სესია დასრულდა",
+  error: "კავშირის შეცდომა",
+};
+
+function detectGeorgian(text: string) {
+  return /[\u10A0-\u10FF\u2D00-\u2D2F]/.test(text);
+}
+
 function CallScreen({
   topic, level, onBack, onEnd,
 }: {
@@ -230,75 +243,69 @@ function CallScreen({
   onBack: () => void;
   onEnd: (messages: Msg[], durationSec: number) => void;
 }) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [status, setStatus] = useState<CallStatus>("ready");
+  const [partial, setPartial] = useState<{ user: string; ai: string }>({ user: "", ai: "" });
   const [showHelp, setShowHelp] = useState(false);
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
-  const [showText, setShowText] = useState(false);
-  const [textInput, setTextInput] = useState("");
   const startedAtRef = useRef<number>(Date.now());
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<Msg[]>([]);
+  messagesRef.current = messages;
+
+  const [learningPath, setLearningPath] = useState<string | undefined>();
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("selected_learning_path")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data?.selected_learning_path) setLearningPath(data.selected_learning_path);
+    })();
+  }, [user]);
+
+  const handleEvent = useCallback((e: any) => {
+    if (e.kind === "ai_text") {
+      if (e.final) {
+        setMessages((prev) => [...prev, { role: "assistant", content: e.text }]);
+        setPartial((p) => ({ ...p, ai: "" }));
+      } else {
+        setPartial((p) => ({ ...p, ai: e.text }));
+      }
+    } else if (e.kind === "user_text") {
+      if (e.final) {
+        setMessages((prev) => [...prev, { role: "user", content: e.text }]);
+        setPartial((p) => ({ ...p, user: "" }));
+        // Detect Georgian — show help card automatically.
+        if (detectGeorgian(e.text)) {
+          requestGeorgianHelpFromText(e.text);
+        }
+      } else {
+        setPartial((p) => ({ ...p, user: e.text }));
+      }
+    }
+  }, []);
+
+  const { status, errorMsg, start, stop } = useRealtimeCall({
+    topic: topic.title_en,
+    level,
+    selectedLearningPath: learningPath,
+    onEvent: handleEvent,
+  });
 
   // auto scroll
   useEffect(() => {
     transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, partial]);
 
-  // Kick off AI greeting
-  useEffect(() => {
-    void askAI([{
-      role: "user",
-      content:
-        `Start an English speaking practice call about "${topic.title_en}". ` +
-        `Greet me warmly in 1 short English sentence and ask ONE simple opening question. Stay on topic.`,
-    }], true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const askAI = async (next: Msg[], hideSeed = false) => {
-    setStatus("thinking");
-    const r = await supabase.functions.invoke("ai-tutor", {
-      body: {
-        messages: next,
-        level,
-        coachMode: "speaking_lesson",
-        lessonContext: { topic: topic.title_en, mode: "voice_call" },
-      },
-    });
-    if (r.error || (r.data as any)?.error) {
-      toast.error((r.data as any)?.error ?? "AI შეცდომა");
-      setStatus("ready");
-      return;
-    }
-    const reply = (r.data as any).reply as string;
-    // strip OPTIONS:/STARTERS: helper lines for voice-first feel
-    const clean = reply
-      .split("\n")
-      .filter((l) => !/^\s*(OPTIONS|STARTERS)\s*:/i.test(l))
-      .join("\n")
-      .trim();
-    const visible = hideSeed ? next.slice(0, -1) : next;
-    setMessages([...visible, { role: "assistant", content: clean }]);
-    setStatus("ai_speaking");
-    // auto-revert to ready after a moment
-    window.setTimeout(() => setStatus("ready"), 1200);
-  };
-
-  const handleUserUtterance = (text: string) => {
-    if (!text.trim()) return;
-    setShowHelp(false);
-    setHelpData(null);
-    const next: Msg[] = [...messages, { role: "user", content: text }];
-    setMessages(next);
-    void askAI(next);
-  };
-
-  const requestGeorgianHelp = async () => {
+  const requestGeorgianHelpFromText = async (georgianAsk?: string) => {
     setShowHelp(true);
     setHelpLoading(true);
     setHelpData(null);
-    const last = messages[messages.length - 1];
+    const last = messagesRef.current[messagesRef.current.length - 1];
     const lastAi = last && last.role === "assistant" ? last.content : "";
     const r = await supabase.functions.invoke("ai-tutor", {
       body: {
@@ -308,9 +315,10 @@ function CallScreen({
             role: "user",
             content:
               `The student is practicing English speaking about "${topic.title_en}". ` +
+              (georgianAsk ? `The student just said in Georgian: "${georgianAsk}". ` : "") +
               `The AI tutor's last line was: "${lastAi}". ` +
-              `The student is stuck. Suggest ONE short, natural English reply (max 8 words) the student can say next, ` +
-              `and a Georgian translation. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
+              `Suggest ONE short, natural English reply (max 8 words) the student can say next, ` +
+              `and a short Georgian translation. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
           },
         ],
       },
@@ -329,24 +337,13 @@ function CallScreen({
     });
   };
 
-  const sendText = () => {
-    const t = textInput.trim();
-    if (!t) return;
-    setTextInput("");
-    handleUserUtterance(t);
-  };
-
   const endSession = () => {
+    stop();
     const dur = Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000));
-    onEnd(messages, dur);
+    onEnd(messagesRef.current, dur);
   };
 
-  const statusLabel: Record<CallStatus, string> = {
-    ready: "AI is ready",
-    ai_speaking: "AI is speaking…",
-    listening: "Listening…",
-    thinking: "Thinking…",
-  };
+  const isConnected = status === "ready" || status === "listening" || status === "ai_speaking" || status === "thinking";
 
   return (
     <SpeakingShell>
@@ -354,7 +351,7 @@ function CallScreen({
         {/* Top bar */}
         <header className="flex items-center justify-between gap-3 mb-4">
           <button
-            onClick={onBack}
+            onClick={() => { stop(); onBack(); }}
             className="w-9 h-9 rounded-full sp-chip inline-flex items-center justify-center"
             aria-label="Back"
           >
@@ -364,13 +361,17 @@ function CallScreen({
             <div className="text-[10px] uppercase tracking-wider sp-text-muted ka">თემა</div>
             <div className="font-bold sp-text text-sm truncate">{topic.title_en}</div>
           </div>
-          <button
-            onClick={endSession}
-            className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white px-3 h-9 text-xs font-bold ka"
-          >
-            <PhoneOff className="w-3.5 h-3.5" />
-            დასრულება
-          </button>
+          {isConnected ? (
+            <button
+              onClick={endSession}
+              className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white px-3 h-9 text-xs font-bold ka"
+            >
+              <PhoneOff className="w-3.5 h-3.5" />
+              დასრულება
+            </button>
+          ) : (
+            <div className="w-[88px]" />
+          )}
         </header>
 
         {/* AI Tutor area */}
@@ -386,7 +387,7 @@ function CallScreen({
             }}
           >
             <span aria-hidden>🎙️</span>
-            {status === "thinking" && (
+            {(status === "thinking" || status === "connecting") && (
               <span className="absolute inset-0 rounded-full border-4 border-white/40 border-t-transparent animate-spin" />
             )}
           </div>
@@ -394,13 +395,15 @@ function CallScreen({
           <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full sp-chip text-xs ka">
             <span
               className={`w-1.5 h-1.5 rounded-full ${
-                status === "listening" ? "bg-emerald-500" :
-                status === "ai_speaking" ? "bg-violet-500" :
-                status === "thinking" ? "bg-amber-500" :
+                status === "listening" ? "bg-emerald-500 animate-pulse" :
+                status === "ai_speaking" ? "bg-violet-500 animate-pulse" :
+                status === "thinking" || status === "connecting" ? "bg-amber-500 animate-pulse" :
+                status === "ready" ? "bg-emerald-500" :
+                status === "error" ? "bg-rose-500" :
                 "bg-slate-400"
               }`}
             />
-            {statusLabel[status]}
+            {STATUS_LABEL_KA[status]}
           </div>
 
           {/* Transcript (secondary) */}
@@ -408,89 +411,77 @@ function CallScreen({
             ref={transcriptRef}
             className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(40_30%_88%)] p-3 space-y-2 text-[13px]"
           >
-            {messages.length === 0 && (
+            {messages.length === 0 && !partial.ai && !partial.user && (
               <p className="text-center sp-text-muted ka text-xs py-6">
-                საუბარი დაიწყება როცა AI მოგესალმება.
+                {status === "idle" ? "დააჭირე „დაიწყე“ რომ დაიწყო საუბარი."
+                  : status === "connecting" ? "ვუკავშირდები AI-ს..."
+                  : "Transcript will appear here."}
               </p>
             )}
             {messages.map((m, i) => (
-              <div key={i} className="flex gap-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-                  m.role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(175_70%_30%)]"
-                }`}>
-                  {m.role === "assistant" ? "AI" : "You"}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="sp-text whitespace-pre-wrap break-words">{m.content}</div>
-                  {m.role === "assistant" && (
-                    <div className="mt-0.5"><SpeakButton text={m.content} /></div>
-                  )}
-                </div>
-              </div>
+              <TranscriptLine key={i} role={m.role} text={m.content} />
             ))}
+            {partial.user && <TranscriptLine role="user" text={partial.user} faded />}
+            {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
           </div>
         </div>
 
-        {/* Mic area */}
+        {/* Bottom controls */}
         <div className="mt-4 mb-2">
-          <div className="flex items-center justify-center">
-            <SpeakingRecorder
-              key={`rec-${messages.length}`}
-              mode="transcribe"
-              source="speaking_call"
-              topic={topic.title_en}
-              recordLabel="დააჭირე და ილაპარაკე"
-              onTranscript={handleUserUtterance}
-            />
-          </div>
-          <p className="text-center text-[11px] sp-text-muted ka mt-2">
-            დააჭირე მიკროფონს და ილაპარაკე ინგლისურად
-          </p>
-
-          {/* Help + Text fallback */}
-          <div className="mt-3 flex items-center justify-center gap-2">
+          {status === "idle" || status === "ended" ? (
             <button
-              type="button"
-              onClick={requestGeorgianHelp}
-              className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-1.5 text-xs font-bold ka"
+              onClick={start}
+              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka"
             >
-              <Lightbulb className="w-3.5 h-3.5" />
-              დახმარება ქართულად
+              <Mic className="w-5 h-5" />
+              {status === "ended" ? "თავიდან დაიწყე" : "დაიწყე საუბარი"}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowText((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-semibold ka"
-            >
-              <TypeIcon className="w-3.5 h-3.5" />
-              {showText ? "Hide typing" : "Type instead"}
-            </button>
-          </div>
-
-          {showText && (
-            <div className="mt-3 flex gap-2">
-              <input
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") { e.preventDefault(); sendText(); }
-                }}
-                placeholder="Type in English…"
-                className="flex-1 rounded-xl border border-[hsl(220_22%_88%)] px-3 h-10 text-sm bg-white"
-              />
+          ) : status === "error" ? (
+            <div className="space-y-2">
+              {errorMsg && (
+                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 ka">
+                  {errorMsg}
+                </div>
+              )}
               <button
-                onClick={sendText}
-                disabled={!textInput.trim() || status === "thinking"}
-                className="sp-btn-primary h-10 px-4 rounded-xl text-sm font-bold disabled:opacity-50"
+                onClick={start}
+                className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-xl h-12 text-sm font-bold ka"
               >
-                Send
+                <RotateCcw className="w-4 h-4" />
+                სცადე თავიდან
               </button>
+            </div>
+          ) : status === "connecting" ? (
+            <div className="text-center text-xs sp-text-muted ka inline-flex items-center justify-center gap-2 w-full h-12">
+              <Loader2 className="w-4 h-4 animate-spin" /> ვუკავშირდები...
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-2 text-xs font-bold ka">
+                <Radio className="w-3.5 h-3.5" /> ცოცხალი ხმოვანი კავშირი
+              </div>
             </div>
           )}
 
-          <p className="text-center text-[10px] sp-text-soft mt-3 ka">
-            სრული რეალური ხმოვანი კავშირი მალე დაემატება.
+          <p className="text-center text-[11px] sp-text-muted ka mt-2">
+            {isConnected
+              ? "ილაპარაკე ინგლისურად — AI გისმენს. თუ გაგიჭირდა, დააჭირე „დახმარებას“."
+              : ""}
           </p>
+
+          {/* Help */}
+          {isConnected && (
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => requestGeorgianHelpFromText()}
+                className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-1.5 text-xs font-bold ka"
+              >
+                <Lightbulb className="w-3.5 h-3.5" />
+                დახმარება ქართულად
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Georgian help card overlay */}
@@ -546,6 +537,22 @@ function CallScreen({
     </SpeakingShell>
   );
 }
+
+function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; text: string; faded?: boolean }) {
+  return (
+    <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
+      <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
+        role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(175_70%_30%)]"
+      }`}>
+        {role === "assistant" ? "AI" : "You"}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="sp-text whitespace-pre-wrap break-words">{text}</div>
+      </div>
+    </div>
+  );
+}
+
 
 // --- Summary screen -----------------------------------------------------
 
