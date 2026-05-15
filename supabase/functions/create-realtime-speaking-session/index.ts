@@ -1,5 +1,11 @@
 // Creates an ephemeral OpenAI Realtime client secret for the AI Speaking Call.
 // Uses the GA Realtime API: POST /v1/realtime/client_secrets
+//
+// Optimized for low cost + natural conversation:
+// - Cheapest model first (gpt-realtime-mini), fallback gpt-realtime-2
+// - Short, focused tutor instructions (no long prompts)
+// - Faster turn detection (shorter silence padding)
+// - Hard cap on response length (max_response_output_tokens)
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
@@ -7,34 +13,25 @@ const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
 const PRIMARY_MODEL = "gpt-realtime-mini";
 const FALLBACK_MODEL = "gpt-realtime-2";
 
-function instructionsFor(level: string, topic: string, learningPath?: string) {
+function instructionsFor(level: string, topic: string) {
   const lvl = (level || "Beginner").toLowerCase();
   const beginner = lvl.includes("begin") || lvl.includes("a1") || lvl.includes("a2");
-  const pace = beginner
-    ? "Speak slowly and clearly with very simple English (A1-A2). Use short sentences."
-    : "Use natural conversational English (B1-B2). Encourage longer answers.";
+  const pace = beginner ? "Very simple English. Short sentences." : "Natural English (B1-B2).";
 
+  // Keep instructions tight to save tokens.
   return [
-    `You are a warm, natural English-speaking tutor for a Georgian (ქართული) learner.`,
-    `You are having a real spoken conversation about: "${topic}". Stay on this topic.`,
-    `Level: ${level}. ${pace}`,
-    ``,
-    `CONVERSATION STYLE — VERY IMPORTANT:`,
-    `- Always speak ENGLISH out loud. Never speak Georgian aloud.`,
-    `- Have a real back-and-forth conversation. Move the conversation forward.`,
-    `- Ask ONE short question per turn. Keep replies to 1-2 short sentences.`,
-    `- Do NOT act like a pronunciation drill. Do NOT keep asking the student to "repeat after me".`,
-    `- Do NOT over-correct. Only correct grammar gently when it really helps, then continue naturally.`,
-    `- React to what the student said before asking the next question (e.g. "Nice!", "Cool.", "Oh, really?").`,
-    `- Wait until the student is clearly finished before answering. Do not interrupt.`,
-    ``,
-    `IF THE STUDENT SPEAKS GEORGIAN OR ASKS FOR HELP:`,
-    `- Do NOT speak Georgian aloud.`,
-    `- Reply with ONE short English line like: "Try saying: <short English phrase>." Then stop and let them try.`,
-    ``,
-    learningPath ? `Learning path context: ${learningPath}.` : "",
-    `Begin now: greet the student warmly in ONE short English sentence and ask ONE simple opening question about "${topic}".`,
-  ].filter(Boolean).join("\n");
+    `English-speaking tutor for a Georgian learner.`,
+    `Topic: "${topic}". Level: ${level}. ${pace}`,
+    `Rules:`,
+    `- Always speak ENGLISH. Never speak Georgian aloud.`,
+    `- Reply in 1-2 SHORT sentences. Ask ONE short question.`,
+    `- React briefly ("Nice.", "Cool.") then ask next question.`,
+    `- Do NOT do "repeat after me" drills.`,
+    `- Do NOT over-correct. Only fix errors that block meaning, briefly, then move on.`,
+    `- Do NOT repeat your previous sentence.`,
+    `- If student speaks Georgian: say one short English bridge like "Try this in English." then wait. Do NOT translate aloud.`,
+    `Start: greet in ONE short sentence and ask ONE simple question about "${topic}".`,
+  ].join("\n");
 }
 
 Deno.serve(async (req) => {
@@ -49,11 +46,10 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const topic = String(body?.topic ?? "Free conversation").slice(0, 200);
-    const level = String(body?.level ?? "Beginner").slice(0, 60);
-    const learningPath = body?.selectedLearningPath ? String(body.selectedLearningPath).slice(0, 60) : undefined;
+    const topic = String(body?.topic ?? "Free conversation").slice(0, 120);
+    const level = String(body?.level ?? "Beginner").slice(0, 40);
     const voice = "alloy";
-    const instructions = instructionsFor(level, topic, learningPath);
+    const instructions = instructionsFor(level, topic);
 
     async function createClientSecret(model: string) {
       const res = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
@@ -67,16 +63,18 @@ Deno.serve(async (req) => {
             type: "realtime",
             model,
             instructions,
+            // Hard cap to keep voice replies short and cheap.
+            max_response_output_tokens: 120,
             audio: {
               input: {
                 transcription: { model: "whisper-1" },
                 turn_detection: {
                   type: "server_vad",
-                  threshold: 0.6,
-                  prefix_padding_ms: 350,
-                  silence_duration_ms: 900,
+                  threshold: 0.55,
+                  prefix_padding_ms: 250,
+                  silence_duration_ms: 550,
                   create_response: true,
-                  interrupt_response: false,
+                  interrupt_response: true,
                 },
               },
               output: { voice },
