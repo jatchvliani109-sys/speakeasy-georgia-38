@@ -74,6 +74,12 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     setStatus("ended");
   }, [cleanup]);
 
+  // Toggle mic track without tearing down the call (push-to-talk / manual mode).
+  const setMicEnabled = useCallback((enabled: boolean) => {
+    micRef.current?.getAudioTracks().forEach((t) => { t.enabled = enabled; });
+    dlog("mic enabled =", enabled);
+  }, []);
+
   useEffect(() => () => { endedRef.current = true; cleanup(); }, [cleanup]);
 
   const handleServerEvent = useCallback((ev: any) => {
@@ -245,5 +251,5 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     }
   }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
 
-  return { status, errorMsg, start, stop };
+  return { status, errorMsg, start, stop, setMicEnabled };
 }

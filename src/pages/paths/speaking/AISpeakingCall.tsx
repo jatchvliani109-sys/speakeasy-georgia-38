@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, ArrowRight, Mic, PhoneOff, Lightbulb,
-  Loader2, RotateCcw, X, Radio,
+  ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb,
+  Loader2, RotateCcw, X, Radio, Clock,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakButton from "@/components/SpeakButton";
@@ -249,6 +249,10 @@ function CallScreen({
   const [showHelp, setShowHelp] = useState(false);
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
+  const [manualMode, setManualMode] = useState(false);
+  const [pttActive, setPttActive] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [showTimeWarn, setShowTimeWarn] = useState(false);
   const startedAtRef = useRef<number>(Date.now());
   const transcriptRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<Msg[]>([]);
@@ -289,12 +293,28 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled } = useRealtimeCall({
     topic: topic.title_en,
     level,
     selectedLearningPath: learningPath,
     onEvent: handleEvent,
   });
+
+  // Session timer + 4-min soft warning.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const sec = Math.floor((Date.now() - startedAtRef.current) / 1000);
+      setElapsed(sec);
+      if (sec >= 240 && !showTimeWarn) setShowTimeWarn(true);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [showTimeWarn]);
+
+  // Manual mode: keep mic muted until user holds the talk button.
+  useEffect(() => {
+    if (manualMode) setMicEnabled(pttActive);
+    else setMicEnabled(true);
+  }, [manualMode, pttActive, setMicEnabled, status]);
 
   // auto scroll
   useEffect(() => {
@@ -373,6 +393,34 @@ function CallScreen({
             <div className="w-[88px]" />
           )}
         </header>
+
+        {isConnected && (
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full sp-chip px-2.5 py-1 text-[11px] font-mono">
+              <Clock className="w-3 h-3" />
+              {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
+            </div>
+            <button
+              type="button"
+              onClick={() => setManualMode((v) => !v)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ka border transition-colors ${
+                manualMode
+                  ? "bg-[hsl(175_70%_38%)] text-white border-transparent"
+                  : "sp-chip border-[hsl(220_22%_88%)]"
+              }`}
+              title="Manual speaking mode"
+            >
+              {manualMode ? <Mic className="w-3 h-3" /> : <MicOff className="w-3 h-3" />}
+              {manualMode ? "ხელით რეჟიმი" : "ავტო რეჟიმი"}
+            </button>
+          </div>
+        )}
+
+        {showTimeWarn && isConnected && (
+          <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[12px] text-amber-900 ka text-center">
+            სესია მალე დასრულდება. შეგიძლია გააგრძელო ან დაასრულო.
+          </div>
+        )}
 
         {/* AI Tutor area */}
         <div className="flex-1 flex flex-col items-center justify-start pt-4">
@@ -455,6 +503,23 @@ function CallScreen({
             <div className="text-center text-xs sp-text-muted ka inline-flex items-center justify-center gap-2 w-full h-12">
               <Loader2 className="w-4 h-4 animate-spin" /> ვუკავშირდები...
             </div>
+          ) : manualMode ? (
+            <button
+              type="button"
+              onMouseDown={() => setPttActive(true)}
+              onMouseUp={() => setPttActive(false)}
+              onMouseLeave={() => setPttActive(false)}
+              onTouchStart={(e) => { e.preventDefault(); setPttActive(true); }}
+              onTouchEnd={(e) => { e.preventDefault(); setPttActive(false); }}
+              className={`w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka transition-all select-none ${
+                pttActive
+                  ? "bg-[hsl(175_70%_38%)] text-white scale-[0.99] shadow-inner"
+                  : "sp-btn-primary"
+              }`}
+            >
+              <Mic className="w-5 h-5" />
+              {pttActive ? "ვლაპარაკობ..." : "დაიჭირე და ილაპარაკე"}
+            </button>
           ) : (
             <div className="flex items-center justify-center gap-2">
               <div className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-2 text-xs font-bold ka">
@@ -508,7 +573,7 @@ function CallScreen({
 
               {helpLoading || !helpData ? (
                 <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
-                  <Loader2 className="w-4 h-4 animate-spin" /> ვამზადებ რჩევას…
+                  <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
                 </div>
               ) : (
                 <>
@@ -518,7 +583,7 @@ function CallScreen({
                     <SpeakButton text={helpData.english} />
                   </div>
                   <div className="mt-2 text-sm sp-text ka">
-                    ეს ნიშნავს: „{helpData.georgian}“
+                    <span className="sp-text-muted">ნიშნავს:</span> „{helpData.georgian}“
                   </div>
 
                   <button
