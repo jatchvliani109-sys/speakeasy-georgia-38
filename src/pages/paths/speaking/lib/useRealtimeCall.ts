@@ -250,7 +250,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(model!)}`, {
+      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(usedModel!)}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${clientSecret}`,
@@ -261,16 +261,19 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       if (!resp.ok) {
         const t = await resp.text().catch(() => "");
         console.error("[rt] sdp exchange failed", resp.status, t);
+        startingRef.current = false;
         return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
       }
       const answerSdp = await resp.text();
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      dlog("connection opened");
+      startingRef.current = false;
+      dlog("WebRTC connected");
     } catch (e: any) {
       console.error("[rt] webrtc error", e);
+      startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
   }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
 
-  return { status, errorMsg, start, stop, setMicEnabled };
+  return { status, errorMsg, start, stop, setMicEnabled, model, micOn };
 }
