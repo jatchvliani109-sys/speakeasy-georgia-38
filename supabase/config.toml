@@ -1,1 +1,4 @@
 project_id = "hmpwjhzrmfyapijikkuc"
+
+[functions.create-realtime-speaking-session]
+verify_jwt = false
