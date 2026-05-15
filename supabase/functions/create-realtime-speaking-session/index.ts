@@ -46,28 +46,41 @@ Deno.serve(async (req) => {
     const learningPath = body?.selectedLearningPath ? String(body.selectedLearningPath).slice(0, 60) : undefined;
     const voice = "alloy";
 
-    const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        voice,
-        modalities: ["audio", "text"],
-        instructions: instructionsFor(level, topic, learningPath),
-        input_audio_transcription: { model: "whisper-1" },
-        turn_detection: {
-          type: "server_vad",
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 700,
+    async function createSession(model: string) {
+      const res = await fetch("https://api.openai.com/v1/realtime/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_KEY}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({
+          model,
+          voice,
+          modalities: ["audio", "text"],
+          instructions: instructionsFor(level, topic, learningPath),
+          input_audio_transcription: { model: "whisper-1" },
+          turn_detection: {
+            type: "server_vad",
+            threshold: 0.5,
+            prefix_padding_ms: 300,
+            silence_duration_ms: 700,
+          },
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      return { res, json };
+    }
 
-    const data = await r.json();
+    let { res: r, json: data } = await createSession(PRIMARY_MODEL);
+    let usedModel = PRIMARY_MODEL;
+    if (!r.ok) {
+      console.warn("[realtime] primary model failed, trying fallback", r.status, data);
+      const retry = await createSession(FALLBACK_MODEL);
+      r = retry.res;
+      data = retry.json;
+      usedModel = FALLBACK_MODEL;
+    }
+
     if (!r.ok) {
       console.error("[realtime] openai error", r.status, data);
       return new Response(
@@ -79,7 +92,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         client_secret: data.client_secret, // { value, expires_at }
-        model: MODEL,
+        model: usedModel,
         voice,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
