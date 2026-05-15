@@ -11,19 +11,30 @@ function instructionsFor(level: string, topic: string, learningPath?: string) {
   const lvl = (level || "Beginner").toLowerCase();
   const beginner = lvl.includes("begin") || lvl.includes("a1") || lvl.includes("a2");
   const pace = beginner
-    ? "Speak slowly and clearly. Use very simple English (A1-A2). Short sentences (max 8 words). Ask one easy question at a time."
-    : "Use natural conversational English (B1-B2). Ask follow-up questions. Encourage longer answers. Gently correct grammar.";
+    ? "Speak slowly and clearly with very simple English (A1-A2). Use short sentences."
+    : "Use natural conversational English (B1-B2). Encourage longer answers.";
 
   return [
-    `You are a friendly English speaking tutor for Georgian (ქართული) speakers.`,
-    `The student is practicing the topic: "${topic}". Stay focused on this topic.`,
+    `You are a warm, natural English-speaking tutor for a Georgian (ქართული) learner.`,
+    `You are having a real spoken conversation about: "${topic}". Stay on this topic.`,
     `Level: ${level}. ${pace}`,
-    `Always speak ENGLISH out loud. Keep replies short (1-2 sentences). Ask only ONE question per turn.`,
-    `Be warm and encouraging. Never lecture.`,
-    `If the student speaks Georgian or asks for help, say briefly in English: "Try saying: <short English phrase>." Then invite them to repeat.`,
+    ``,
+    `CONVERSATION STYLE — VERY IMPORTANT:`,
+    `- Always speak ENGLISH out loud. Never speak Georgian aloud.`,
+    `- Have a real back-and-forth conversation. Move the conversation forward.`,
+    `- Ask ONE short question per turn. Keep replies to 1-2 short sentences.`,
+    `- Do NOT act like a pronunciation drill. Do NOT keep asking the student to "repeat after me".`,
+    `- Do NOT over-correct. Only correct grammar gently when it really helps, then continue naturally.`,
+    `- React to what the student said before asking the next question (e.g. "Nice!", "Cool.", "Oh, really?").`,
+    `- Wait until the student is clearly finished before answering. Do not interrupt.`,
+    ``,
+    `IF THE STUDENT SPEAKS GEORGIAN OR ASKS FOR HELP:`,
+    `- Do NOT speak Georgian aloud.`,
+    `- Reply with ONE short English line like: "Try saying: <short English phrase>." Then stop and let them try.`,
+    ``,
     learningPath ? `Learning path context: ${learningPath}.` : "",
-    `Start by greeting the student warmly in one short English sentence and asking one simple opening question about "${topic}".`,
-  ].filter(Boolean).join(" ");
+    `Begin now: greet the student warmly in ONE short English sentence and ask ONE simple opening question about "${topic}".`,
+  ].filter(Boolean).join("\n");
 }
 
 Deno.serve(async (req) => {
@@ -57,6 +68,17 @@ Deno.serve(async (req) => {
             model,
             instructions,
             audio: {
+              input: {
+                transcription: { model: "whisper-1" },
+                turn_detection: {
+                  type: "server_vad",
+                  threshold: 0.6,
+                  prefix_padding_ms: 350,
+                  silence_duration_ms: 900,
+                  create_response: true,
+                  interrupt_response: false,
+                },
+              },
               output: { voice },
             },
           },
@@ -84,7 +106,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // GA response shape: { value, expires_at, session: {...} }
     const clientSecretValue = json?.value ?? json?.client_secret?.value;
     const expiresAt = json?.expires_at ?? json?.client_secret?.expires_at;
 

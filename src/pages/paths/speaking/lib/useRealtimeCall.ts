@@ -8,8 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 export type RtStatus =
   | "idle"
   | "connecting"
-  | "ready"          // connected, awaiting next turn
-  | "listening"     // user speaking detected
+  | "ready"
+  | "listening"
   | "ai_speaking"
   | "thinking"
   | "ended"
@@ -28,6 +28,9 @@ type Args = {
   onError?: (msg: string) => void;
 };
 
+const DEBUG = true;
+const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
+
 export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -36,8 +39,9 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   const dcRef = useRef<RTCDataChannel | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const endedRef = useRef(false);
+  const responseActiveRef = useRef(false);
 
-  // accumulators per response/item
   const aiBufRef = useRef<Map<string, string>>(new Map());
   const userBufRef = useRef<Map<string, string>>(new Map());
 
@@ -48,44 +52,57 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   }, [onError]);
 
   const cleanup = useCallback(() => {
+    dlog("cleanup");
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
     micRef.current?.getTracks().forEach((t) => t.stop());
     if (audioRef.current) {
       try { audioRef.current.pause(); } catch {}
-      audioRef.current.srcObject = null;
+      try { audioRef.current.srcObject = null; } catch {}
     }
     pcRef.current = null;
     dcRef.current = null;
     micRef.current = null;
+    audioRef.current = null;
+    responseActiveRef.current = false;
   }, []);
 
   const stop = useCallback(() => {
+    endedRef.current = true;
     cleanup();
     setStatus("ended");
   }, [cleanup]);
 
-  useEffect(() => () => cleanup(), [cleanup]);
+  useEffect(() => () => { endedRef.current = true; cleanup(); }, [cleanup]);
 
   const handleServerEvent = useCallback((ev: any) => {
+    if (DEBUG && ev?.type && ev.type !== "response.audio.delta" && !ev.type.endsWith(".delta")) {
+      dlog("event", ev.type);
+    }
     switch (ev?.type) {
       case "session.created":
       case "session.updated":
-        setStatus("ready");
+        if (!responseActiveRef.current) setStatus("ready");
         break;
       case "input_audio_buffer.speech_started":
+        dlog("user speech started");
         setStatus("listening");
         break;
       case "input_audio_buffer.speech_stopped":
+        dlog("user speech stopped");
         setStatus("thinking");
         break;
       case "response.created":
+        dlog("AI response started");
+        responseActiveRef.current = true;
         setStatus("thinking");
         break;
+      case "response.output_audio.delta":
       case "response.audio.delta":
         setStatus("ai_speaking");
         break;
+      case "response.output_audio_transcript.delta":
       case "response.audio_transcript.delta": {
         const id = ev.response_id ?? ev.item_id ?? "current";
         const cur = aiBufRef.current.get(id) ?? "";
@@ -94,10 +111,12 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         onEvent?.({ kind: "ai_text", text: next, final: false });
         break;
       }
+      case "response.output_audio_transcript.done":
       case "response.audio_transcript.done": {
         const id = ev.response_id ?? ev.item_id ?? "current";
         const text = ev.transcript ?? aiBufRef.current.get(id) ?? "";
         aiBufRef.current.delete(id);
+        dlog("AI transcript done:", text);
         if (text) onEvent?.({ kind: "ai_text", text, final: true });
         break;
       }
@@ -113,36 +132,46 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         const id = ev.item_id ?? "current";
         const text = ev.transcript ?? userBufRef.current.get(id) ?? "";
         userBufRef.current.delete(id);
+        dlog("user transcript completed:", text);
         if (text) onEvent?.({ kind: "user_text", text, final: true });
         break;
       }
       case "response.done":
+      case "response.completed":
+        dlog("AI response completed");
+        responseActiveRef.current = false;
+        setStatus("ready");
+        break;
+      case "response.cancelled":
+        dlog("response cancelled");
+        responseActiveRef.current = false;
         setStatus("ready");
         break;
       case "error":
-        console.warn("[realtime] server error", ev);
-        if (ev.error?.message) fail(ev.error.message);
+        console.warn("[rt] server error", ev);
+        if (ev.error?.message) onError?.(ev.error.message);
         break;
     }
-  }, [fail, onEvent]);
+  }, [onError, onEvent]);
 
   const start = useCallback(async () => {
-    if (status === "connecting" || status === "ready" || status === "ai_speaking" || status === "listening") return;
+    if (status === "connecting" || status === "ready" || status === "ai_speaking" ||
+        status === "listening" || status === "thinking") return;
     setErrorMsg(null);
+    endedRef.current = false;
     setStatus("connecting");
 
-    // 1. Mic
     let mic: MediaStream;
     try {
       mic = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       micRef.current = mic;
+      dlog("mic stream active");
     } catch {
       return fail("მიკროფონის გამოყენებისთვის საჭიროა ნებართვა.");
     }
 
-    // 2. Ephemeral session
     let clientSecret: string | undefined;
     let model: string | undefined;
     try {
@@ -153,43 +182,42 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       clientSecret = (data as any).client_secret?.value;
       model = (data as any).model;
       if (!clientSecret) throw new Error("Missing client secret");
+      dlog("session created, model =", model);
     } catch (e: any) {
-      console.error("[realtime] session creation failed", e);
+      console.error("[rt] session creation failed", e);
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
 
-    // 3. WebRTC
     try {
       const pc = new RTCPeerConnection();
       pcRef.current = pc;
 
-      // remote audio
-      const audioEl = audioRef.current ?? new Audio();
+      // Persistent remote audio element
+      const audioEl = document.createElement("audio");
       audioEl.autoplay = true;
+      (audioEl as any).playsInline = true;
       audioRef.current = audioEl;
       pc.ontrack = (e) => {
+        dlog("remote track");
         audioEl.srcObject = e.streams[0];
+        audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
       };
 
-      // mic track
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));
 
-      // datachannel for events
       const dc = pc.createDataChannel("oai-events");
       dcRef.current = dc;
       dc.onmessage = (e) => {
-        try { handleServerEvent(JSON.parse(e.data)); } catch {}
+        try { handleServerEvent(JSON.parse(e.data)); } catch (err) { console.warn("[rt] parse fail", err); }
       };
-      dc.onopen = () => {
-        // session.update is optional; instructions already set server-side.
-        // We can still tell it to start by requesting an initial response if needed.
-      };
+      dc.onopen = () => { dlog("data channel opened"); };
+      dc.onclose = () => { dlog("data channel closed"); };
 
       pc.onconnectionstatechange = () => {
         const s = pc.connectionState;
-        if (s === "failed" || s === "disconnected" || s === "closed") {
-          if (status !== "ended") fail("სესია შეწყდა. შეგიძლია თავიდან სცადო.");
-        }
+        dlog("pc state", s);
+        if (endedRef.current) return;
+        if (s === "failed") fail("კავშირი გაწყდა. სცადე თავიდან.");
       };
 
       const offer = await pc.createOffer();
@@ -205,13 +233,14 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       });
       if (!resp.ok) {
         const t = await resp.text().catch(() => "");
-        console.error("[realtime] sdp exchange failed", resp.status, t);
+        console.error("[rt] sdp exchange failed", resp.status, t);
         return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
       }
       const answerSdp = await resp.text();
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
+      dlog("connection opened");
     } catch (e: any) {
-      console.error("[realtime] webrtc error", e);
+      console.error("[rt] webrtc error", e);
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
   }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
