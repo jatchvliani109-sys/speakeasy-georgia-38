@@ -47,8 +47,6 @@ Deno.serve(async (req) => {
             type: "realtime",
             model,
             instructions,
-            // Hard cap to keep voice replies short and cheap.
-            max_response_output_tokens: 120,
             audio: {
               input: {
                 transcription: { model: "whisper-1" },
