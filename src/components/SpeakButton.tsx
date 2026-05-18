@@ -68,7 +68,7 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
   try {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    const res = await fetch(`${supabaseUrl}/functions/v1/tts`, {
+    const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -78,12 +78,11 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
       body: JSON.stringify({ text }),
     });
     if (!res.ok) {
-      // Don't permanently disable the real voice; secrets/config can change while the app is open.
       retryAfter = Date.now() + 15_000;
       return null;
     }
     const contentType = res.headers.get("Content-Type") || "";
-    if (contentType.includes("application/json")) {
+    if (!contentType.startsWith("audio/")) {
       retryAfter = Date.now() + 15_000;
       return null;
     }
