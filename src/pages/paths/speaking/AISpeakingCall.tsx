@@ -344,12 +344,18 @@ function CallScreen({
     transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, partial]);
 
-  const requestGeorgianHelpFromText = async (georgianAsk?: string) => {
+  const openHelp = () => {
     setShowHelp(true);
+    setHelpInput("");
+    setHelpData(null);
+    setHelpLoading(false);
+  };
+
+  const submitHelp = async () => {
+    const georgianAsk = helpInput.trim();
+    if (!georgianAsk) return;
     setHelpLoading(true);
     setHelpData(null);
-    const last = messagesRef.current[messagesRef.current.length - 1];
-    const lastAi = last && last.role === "assistant" ? last.content : "";
     const r = await supabase.functions.invoke("ai-tutor", {
       body: {
         level,
@@ -357,27 +363,35 @@ function CallScreen({
           {
             role: "user",
             content:
-              `The student is practicing English speaking about "${topic.title_en}". ` +
-              (georgianAsk ? `The student just said in Georgian: "${georgianAsk}". ` : "") +
-              `The AI tutor's last line was: "${lastAi}". ` +
-              `Suggest ONE short, natural English reply (max 8 words) the student can say next, ` +
-              `and a short Georgian translation. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
+              `The student is practicing English (topic: "${topic.title_en}"). ` +
+              `They want to say this in English: "${georgianAsk}". ` +
+              `Give ONE short, natural English sentence they can say (max 10 words), ` +
+              `and the Georgian meaning. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
           },
         ],
       },
     });
     setHelpLoading(false);
     if (r.error || (r.data as any)?.error) {
-      setHelpData({ english: "I'm not sure. Can you repeat?", georgian: "არ ვარ დარწმუნებული. შეგიძლია გაიმეორო?" });
+      setHelpData({ english: "Sorry, I'm not sure.", georgian: "ბოდიში, ვერ მივხვდი." });
       return;
     }
     const reply = ((r.data as any).reply as string) ?? "";
     const en = (reply.match(/EN:\s*(.+)/i)?.[1] ?? "").trim().replace(/^["']|["']$/g, "");
     const ka = (reply.match(/KA:\s*(.+)/i)?.[1] ?? "").trim().replace(/^["']|["']$/g, "");
     setHelpData({
-      english: en || "Can you say that again, please?",
-      georgian: ka || "შეგიძლია გაიმეორო?",
+      english: en || "Can you help me, please?",
+      georgian: ka || georgianAsk,
     });
+  };
+
+  const submitCorrection = () => {
+    const text = correctInput.trim();
+    if (!text) return;
+    sendUserText(text);
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setCorrectInput("");
+    setShowCorrect(false);
   };
 
 
