@@ -231,9 +231,7 @@ const STATUS_LABEL_KA: Record<RtStatus, string> = {
   error: "კავშირის შეცდომა",
 };
 
-function detectGeorgian(text: string) {
-  return /[\u10A0-\u10FF\u2D00-\u2D2F]/.test(text);
-}
+// Automatic Georgian detection removed — user manually requests Georgian help.
 
 function CallScreen({
   topic, level, onBack, onEnd,
