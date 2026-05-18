@@ -245,8 +245,11 @@ function CallScreen({
   const [messages, setMessages] = useState<Msg[]>([]);
   const [partial, setPartial] = useState<{ user: string; ai: string }>({ user: "", ai: "" });
   const [showHelp, setShowHelp] = useState(false);
+  const [helpInput, setHelpInput] = useState("");
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [correctInput, setCorrectInput] = useState("");
   const [manualMode, setManualMode] = useState(true); // safety: push-to-talk by default
   const [pttActive, setPttActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
