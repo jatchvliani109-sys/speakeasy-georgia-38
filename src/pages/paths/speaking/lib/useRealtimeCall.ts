@@ -222,6 +222,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     startingRef.current = true;
     setErrorMsg(null);
     endedRef.current = false;
+    greetedRef.current = false;
     setStatus("connecting");
     dlog("creating realtime session");
 
