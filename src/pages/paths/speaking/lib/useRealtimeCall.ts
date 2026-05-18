@@ -89,6 +89,24 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     dlog(enabled ? "mic track enabled (sending audio)" : "mic track muted (silence)");
   }, []);
 
+  // Inject a typed user message into the conversation and request a response.
+  const sendUserText = useCallback((text: string) => {
+    const dc = dcRef.current;
+    if (!dc || dc.readyState !== "open" || !text.trim()) return;
+    try {
+      dc.send(JSON.stringify({
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text }],
+        },
+      }));
+      dc.send(JSON.stringify({ type: "response.create" }));
+      dlog("sent typed user text:", text);
+    } catch (e) { console.warn("[rt] sendUserText failed", e); }
+  }, []);
+
   useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
   const handleServerEvent = useCallback((ev: any) => {
