@@ -170,6 +170,12 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         userBufRef.current.delete(id);
         dlog("user transcript completed:", text);
         if (text) onEvent?.({ kind: "user_text", text, final: true });
+        else onEvent?.({ kind: "user_text_failed" });
+        break;
+      }
+      case "conversation.item.input_audio_transcription.failed": {
+        dlog("user transcript failed");
+        onEvent?.({ kind: "user_text_failed" });
         break;
       }
       case "response.done":
