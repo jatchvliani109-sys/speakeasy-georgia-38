@@ -575,16 +575,24 @@ function CallScreen({
               : ""}
           </p>
 
-          {/* Help */}
+          {/* Help + Correction */}
           {isConnected && (
-            <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => requestGeorgianHelpFromText()}
+                onClick={openHelp}
                 className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-1.5 text-xs font-bold ka"
               >
                 <Lightbulb className="w-3.5 h-3.5" />
                 დახმარება ქართულად
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCorrectInput(""); setShowCorrect(true); }}
+                className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-bold ka border border-[hsl(220_22%_88%)]"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                AI-მ არასწორად გაიგო
               </button>
             </div>
           )}
@@ -612,11 +620,33 @@ function CallScreen({
                 </button>
               </div>
 
-              {helpLoading || !helpData ? (
+              {!helpData && !helpLoading && (
+                <>
+                  <label className="text-xs sp-text ka block mb-2">რისი თქმა გინდა ინგლისურად?</label>
+                  <textarea
+                    value={helpInput}
+                    onChange={(e) => setHelpInput(e.target.value)}
+                    rows={3}
+                    placeholder="მაგ: მინდა პიცის შეკვეთა"
+                    className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                  />
+                  <button
+                    onClick={submitHelp}
+                    disabled={!helpInput.trim()}
+                    className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+                  >
+                    მაჩვენე ინგლისურად
+                  </button>
+                </>
+              )}
+
+              {helpLoading && (
                 <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
                   <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
                 </div>
-              ) : (
+              )}
+
+              {helpData && !helpLoading && (
                 <>
                   <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
                   <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3 flex items-center justify-between gap-2">
@@ -636,6 +666,40 @@ function CallScreen({
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* "AI heard me wrong" correction overlay */}
+        {showCorrect && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowCorrect(false)}
+          >
+            <div
+              className="sp-card max-w-md w-full p-5 sp-pop-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <h3 className="font-bold sp-text ka">დაწერე რისი თქმაც გინდოდა</h3>
+                <button onClick={() => setShowCorrect(false)} className="sp-text-soft p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <textarea
+                value={correctInput}
+                onChange={(e) => setCorrectInput(e.target.value)}
+                rows={3}
+                placeholder="I would like to order pizza."
+                className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+              />
+              <button
+                onClick={submitCorrection}
+                disabled={!correctInput.trim()}
+                className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+              >
+                გაგზავნა
+              </button>
             </div>
           </div>
         )}
