@@ -43,7 +43,7 @@ const App = () => (
             <Route path="/level-test" element={<RequireAuth><LevelTest /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
-            <Route path="/path/general" element={<RequireAuth><GeneralEnglishDashboard /></RequireAuth>} />
+            
             <Route path="/path/speaking" element={<RequireAuth><SpeakingDashboard /></RequireAuth>} />
             <Route path="/path/speaking/call" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
             <Route path="/path/speaking/daily" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
