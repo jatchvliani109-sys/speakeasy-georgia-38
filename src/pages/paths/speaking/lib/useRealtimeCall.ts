@@ -46,6 +46,9 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
+  const greetedRef = useRef(false);
+  const topicRef = useRef(topic);
+  topicRef.current = topic;
 
   const aiBufRef = useRef<Map<string, string>>(new Map());
   const userBufRef = useRef<Map<string, string>>(new Map());
