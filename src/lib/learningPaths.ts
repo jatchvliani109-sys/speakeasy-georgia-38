@@ -1,9 +1,6 @@
 export type LearningPathId =
-  | "general_english"
   | "speaking"
-  | "writing"
   | "business_english"
-  | "school_children"
   | "national_exam";
 
 export type LearningPath = {
@@ -15,13 +12,30 @@ export type LearningPath = {
 };
 
 export const LEARNING_PATHS: LearningPath[] = [
-  { id: "general_english",  title: "ზოგადი ინგლისური",                       description: "გააუმჯობესე გრამატიკა, ლექსიკა და ყოველდღიური ინგლისური.",                                icon: "🌍", route: "/path/general" },
-  { id: "speaking",         title: "საუბრის გაუმჯობესება",                   description: "ივარჯიშე საუბარში, გამოთქმაში და თავდაჯერებულობაში.",                                    icon: "🎙️", route: "/path/speaking" },
-  { id: "writing",          title: "წერის გაუმჯობესება",                     description: "ისწავლე ესეების, იმეილების და სწორი წინადადებების წერა.",                                icon: "✍️", route: "/path/writing" },
-  { id: "business_english", title: "ბიზნეს ინგლისური",                       description: "მოემზადე გასაუბრებისთვის, სამსახურისთვის, შეხვედრებისთვის და პროფესიული კომუნიკაციისთვის.", icon: "💼", route: "/path/business" },
-  { id: "school_children",  title: "სკოლის ინგლისური",                       description: "მარტივი და სახალისო ინგლისური სკოლის მოსწავლეებისთვის.",                                  icon: "🎒", route: "/path/school" },
-  { id: "national_exam",    title: "ეროვნული გამოცდები / აბიტურიენტები",     description: "მოემზადე ინგლისურის ეროვნული გამოცდისთვის სტრუქტურირებული გაკვეთილებით, ტესტებით და ახსნებით.", icon: "🎓", route: "/path/exam" },
+  {
+    id: "speaking",
+    title: "საუბრის გაუმჯობესება",
+    description: "ივარჯიშე ინგლისურად საუბარში AI მასწავლებელთან.",
+    icon: "🎙️",
+    route: "/path/speaking",
+  },
+  {
+    id: "business_english",
+    title: "ბიზნეს ინგლისური",
+    description: "გასაუბრება, სამუშაო იმეილები, შეხვედრები და პროფესიული კომუნიკაცია.",
+    icon: "💼",
+    route: "/path/business",
+  },
+  {
+    id: "national_exam",
+    title: "ეროვნული გამოცდები / აბიტურიენტები",
+    description: "მოემზადე ინგლისურის გამოცდისთვის გრამატიკით, ტექსტებით და ტესტებით.",
+    icon: "🎓",
+    route: "/path/exam",
+  },
 ];
+
+export const VALID_PATH_IDS: LearningPathId[] = LEARNING_PATHS.map((p) => p.id);
 
 export function pathById(id?: string | null): LearningPath | undefined {
   return LEARNING_PATHS.find((p) => p.id === id);

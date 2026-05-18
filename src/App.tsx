@@ -11,7 +11,6 @@ import Onboarding from "./pages/Onboarding";
 import LevelTest from "./pages/LevelTest";
 import Dashboard from "./pages/Dashboard";
 import LearningPathSelection from "./pages/LearningPathSelection";
-import GeneralEnglishDashboard from "./pages/paths/GeneralEnglish";
 import SpeakingDashboard from "./pages/paths/speaking/SpeakingDashboard";
 import SpeakingDailyLesson from "./pages/paths/speaking/DailyLesson";
 import AISpeakingCall from "./pages/paths/speaking/AISpeakingCall";
@@ -19,9 +18,7 @@ import SpeakingPronunciation from "./pages/paths/speaking/Pronunciation";
 import SpeakingRoleplayList from "./pages/paths/speaking/RoleplayList";
 import SpeakingRoleplaySession from "./pages/paths/speaking/RoleplaySession";
 import SpeakingProgress from "./pages/paths/speaking/SpeakingProgress";
-import WritingDashboard from "./pages/paths/Writing";
 import BusinessDashboard from "./pages/paths/Business";
-import SchoolDashboard from "./pages/paths/School";
 import NationalExamDashboard from "./pages/paths/NationalExam";
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
@@ -46,7 +43,7 @@ const App = () => (
             <Route path="/level-test" element={<RequireAuth><LevelTest /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
-            <Route path="/path/general" element={<RequireAuth><GeneralEnglishDashboard /></RequireAuth>} />
+            
             <Route path="/path/speaking" element={<RequireAuth><SpeakingDashboard /></RequireAuth>} />
             <Route path="/path/speaking/call" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
             <Route path="/path/speaking/daily" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
@@ -55,9 +52,9 @@ const App = () => (
             <Route path="/path/speaking/roleplay" element={<RequireAuth><SpeakingRoleplayList /></RequireAuth>} />
             <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
             <Route path="/path/speaking/progress" element={<RequireAuth><SpeakingProgress /></RequireAuth>} />
-            <Route path="/path/writing" element={<RequireAuth><WritingDashboard /></RequireAuth>} />
+            
             <Route path="/path/business" element={<RequireAuth><BusinessDashboard /></RequireAuth>} />
-            <Route path="/path/school" element={<RequireAuth><SchoolDashboard /></RequireAuth>} />
+            
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
             <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
             <Route path="/summary/:id" element={<RequireAuth><Summary /></RequireAuth>} />
