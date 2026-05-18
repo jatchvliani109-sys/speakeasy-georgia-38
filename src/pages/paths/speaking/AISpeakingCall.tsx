@@ -250,7 +250,7 @@ function CallScreen({
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
   const [showCorrect, setShowCorrect] = useState(false);
   const [correctInput, setCorrectInput] = useState("");
-  const [manualMode, setManualMode] = useState(true); // safety: push-to-talk by default
+  const manualMode = true; // push-to-talk only (free/auto listening disabled)
   const [pttActive, setPttActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [showTimeWarn, setShowTimeWarn] = useState(false);
@@ -476,19 +476,6 @@ function CallScreen({
               <Clock className="w-3 h-3" />
               {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
             </div>
-            <button
-              type="button"
-              onClick={() => setManualMode((v) => !v)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ka border transition-colors ${
-                manualMode
-                  ? "bg-[hsl(175_70%_38%)] text-white border-transparent"
-                  : "sp-chip border-[hsl(220_22%_88%)]"
-              }`}
-              title="Manual speaking mode"
-            >
-              {manualMode ? <Mic className="w-3 h-3" /> : <MicOff className="w-3 h-3" />}
-              {manualMode ? "ხელით რეჟიმი" : "ავტო რეჟიმი"}
-            </button>
           </div>
         )}
 
@@ -614,7 +601,7 @@ function CallScreen({
 
           <p className="text-center text-[11px] sp-text-muted ka mt-2">
             {isConnected
-              ? "ილაპარაკე ინგლისურად — AI გისმენს. თუ გაგიჭირდა, დააჭირე „დახმარებას“."
+              ? "AI დაიწყებს საუბარს. შენ პასუხისთვის დააჭირე ღილაკს და ილაპარაკე."
               : ""}
           </p>
 
