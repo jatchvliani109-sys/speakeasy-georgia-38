@@ -16,7 +16,9 @@ export type RtStatus =
   | "error";
 
 export type RtEvent =
+  | { kind: "user_turn_started" }
   | { kind: "user_text"; text: string; final: boolean }
+  | { kind: "user_text_failed" }
   | { kind: "ai_text"; text: string; final: boolean }
   | { kind: "georgian_help"; english: string; georgian: string };
 
@@ -119,8 +121,9 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         if (!responseActiveRef.current) setStatus("ready");
         break;
       case "input_audio_buffer.speech_started":
-        dlog("user speech started");
+        dlog("user speech started → pending transcript");
         setStatus("listening");
+        onEvent?.({ kind: "user_turn_started" });
         break;
       case "input_audio_buffer.speech_stopped":
         dlog("user speech stopped");
@@ -167,6 +170,12 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         userBufRef.current.delete(id);
         dlog("user transcript completed:", text);
         if (text) onEvent?.({ kind: "user_text", text, final: true });
+        else onEvent?.({ kind: "user_text_failed" });
+        break;
+      }
+      case "conversation.item.input_audio_transcription.failed": {
+        dlog("user transcript failed");
+        onEvent?.({ kind: "user_text_failed" });
         break;
       }
       case "response.done":
