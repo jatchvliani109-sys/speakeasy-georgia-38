@@ -121,8 +121,9 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
         if (!responseActiveRef.current) setStatus("ready");
         break;
       case "input_audio_buffer.speech_started":
-        dlog("user speech started");
+        dlog("user speech started → pending transcript");
         setStatus("listening");
+        onEvent?.({ kind: "user_turn_started" });
         break;
       case "input_audio_buffer.speech_stopped":
         dlog("user speech stopped");
