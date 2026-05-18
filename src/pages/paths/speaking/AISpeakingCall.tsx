@@ -273,8 +273,17 @@ function CallScreen({
   }, [user]);
 
   const handleEvent = useCallback((e: any) => {
-    if (e.kind === "ai_text") {
+    if (e.kind === "user_turn_started") {
+      // Reserve user's slot BEFORE the AI starts answering so transcript order stays correct.
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last && last.role === "user" && last.pending) return prev;
+        console.log("[rt] pending transcript created");
+        return [...prev, { role: "user", content: "Transcribing…", pending: true }];
+      });
+    } else if (e.kind === "ai_text") {
       if (e.final) {
+        console.log("[rt] AI response appended");
         setMessages((prev) => [...prev, { role: "assistant", content: e.text }]);
         setPartial((p) => ({ ...p, ai: "" }));
       } else {
@@ -282,11 +291,46 @@ function CallScreen({
       }
     } else if (e.kind === "user_text") {
       if (e.final) {
-        setMessages((prev) => [...prev, { role: "user", content: e.text }]);
+        console.log("[rt] user transcript finalized → updating pending");
+        setMessages((prev) => {
+          // Update the most recent pending user message in place.
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i].role === "user" && prev[i].pending) {
+              const copy = prev.slice();
+              copy[i] = { role: "user", content: e.text };
+              return copy;
+            }
+          }
+          // No pending slot — append (fallback).
+          return [...prev, { role: "user", content: e.text }];
+        });
         setPartial((p) => ({ ...p, user: "" }));
       } else {
+        // Live partial — also update the pending slot text so order stays right.
+        setMessages((prev) => {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i].role === "user" && prev[i].pending) {
+              const copy = prev.slice();
+              copy[i] = { role: "user", content: e.text || "Transcribing…", pending: true };
+              return copy;
+            }
+          }
+          return prev;
+        });
         setPartial((p) => ({ ...p, user: e.text }));
       }
+    } else if (e.kind === "user_text_failed") {
+      setMessages((prev) => {
+        for (let i = prev.length - 1; i >= 0; i--) {
+          if (prev[i].role === "user" && prev[i].pending) {
+            const copy = prev.slice();
+            copy[i] = { role: "user", content: "Could not transcribe clearly" };
+            return copy;
+          }
+        }
+        return prev;
+      });
+      setPartial((p) => ({ ...p, user: "" }));
     }
   }, []);
 
