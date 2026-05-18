@@ -52,7 +52,7 @@ const App = () => (
             <Route path="/path/speaking/roleplay" element={<RequireAuth><SpeakingRoleplayList /></RequireAuth>} />
             <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
             <Route path="/path/speaking/progress" element={<RequireAuth><SpeakingProgress /></RequireAuth>} />
-            <Route path="/path/writing" element={<RequireAuth><WritingDashboard /></RequireAuth>} />
+            
             <Route path="/path/business" element={<RequireAuth><BusinessDashboard /></RequireAuth>} />
             <Route path="/path/school" element={<RequireAuth><SchoolDashboard /></RequireAuth>} />
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
