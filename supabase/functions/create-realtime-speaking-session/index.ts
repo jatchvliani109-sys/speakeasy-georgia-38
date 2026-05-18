@@ -14,8 +14,8 @@ const PRIMARY_MODEL = "gpt-realtime-mini";
 const FALLBACK_MODEL = "gpt-realtime-2";
 
 function instructionsFor(level: string, topic: string) {
-  // Very short prompt to keep input tokens low.
-  return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. Speak short simple English. One question at a time. If user speaks Georgian, do NOT speak Georgian; say "Try in English" and wait.`;
+  // Short prompt. Be lenient — don't ask user to repeat unless truly unintelligible.
+  return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
 }
 
 Deno.serve(async (req) => {

@@ -231,9 +231,7 @@ const STATUS_LABEL_KA: Record<RtStatus, string> = {
   error: "კავშირის შეცდომა",
 };
 
-function detectGeorgian(text: string) {
-  return /[\u10A0-\u10FF\u2D00-\u2D2F]/.test(text);
-}
+// Automatic Georgian detection removed — user manually requests Georgian help.
 
 function CallScreen({
   topic, level, onBack, onEnd,
@@ -247,8 +245,11 @@ function CallScreen({
   const [messages, setMessages] = useState<Msg[]>([]);
   const [partial, setPartial] = useState<{ user: string; ai: string }>({ user: "", ai: "" });
   const [showHelp, setShowHelp] = useState(false);
+  const [helpInput, setHelpInput] = useState("");
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [correctInput, setCorrectInput] = useState("");
   const [manualMode, setManualMode] = useState(true); // safety: push-to-talk by default
   const [pttActive, setPttActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -283,17 +284,13 @@ function CallScreen({
       if (e.final) {
         setMessages((prev) => [...prev, { role: "user", content: e.text }]);
         setPartial((p) => ({ ...p, user: "" }));
-        // Detect Georgian — show help card automatically.
-        if (detectGeorgian(e.text)) {
-          requestGeorgianHelpFromText(e.text);
-        }
       } else {
         setPartial((p) => ({ ...p, user: e.text }));
       }
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, model, micOn } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn } = useRealtimeCall({
     topic: topic.title_en,
     level,
     selectedLearningPath: learningPath,
@@ -347,12 +344,18 @@ function CallScreen({
     transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, partial]);
 
-  const requestGeorgianHelpFromText = async (georgianAsk?: string) => {
+  const openHelp = () => {
     setShowHelp(true);
+    setHelpInput("");
+    setHelpData(null);
+    setHelpLoading(false);
+  };
+
+  const submitHelp = async () => {
+    const georgianAsk = helpInput.trim();
+    if (!georgianAsk) return;
     setHelpLoading(true);
     setHelpData(null);
-    const last = messagesRef.current[messagesRef.current.length - 1];
-    const lastAi = last && last.role === "assistant" ? last.content : "";
     const r = await supabase.functions.invoke("ai-tutor", {
       body: {
         level,
@@ -360,27 +363,35 @@ function CallScreen({
           {
             role: "user",
             content:
-              `The student is practicing English speaking about "${topic.title_en}". ` +
-              (georgianAsk ? `The student just said in Georgian: "${georgianAsk}". ` : "") +
-              `The AI tutor's last line was: "${lastAi}". ` +
-              `Suggest ONE short, natural English reply (max 8 words) the student can say next, ` +
-              `and a short Georgian translation. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
+              `The student is practicing English (topic: "${topic.title_en}"). ` +
+              `They want to say this in English: "${georgianAsk}". ` +
+              `Give ONE short, natural English sentence they can say (max 10 words), ` +
+              `and the Georgian meaning. Reply in EXACTLY this format on two lines:\nEN: <english>\nKA: <georgian>`,
           },
         ],
       },
     });
     setHelpLoading(false);
     if (r.error || (r.data as any)?.error) {
-      setHelpData({ english: "I'm not sure. Can you repeat?", georgian: "არ ვარ დარწმუნებული. შეგიძლია გაიმეორო?" });
+      setHelpData({ english: "Sorry, I'm not sure.", georgian: "ბოდიში, ვერ მივხვდი." });
       return;
     }
     const reply = ((r.data as any).reply as string) ?? "";
     const en = (reply.match(/EN:\s*(.+)/i)?.[1] ?? "").trim().replace(/^["']|["']$/g, "");
     const ka = (reply.match(/KA:\s*(.+)/i)?.[1] ?? "").trim().replace(/^["']|["']$/g, "");
     setHelpData({
-      english: en || "Can you say that again, please?",
-      georgian: ka || "შეგიძლია გაიმეორო?",
+      english: en || "Can you help me, please?",
+      georgian: ka || georgianAsk,
     });
+  };
+
+  const submitCorrection = () => {
+    const text = correctInput.trim();
+    if (!text) return;
+    sendUserText(text);
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setCorrectInput("");
+    setShowCorrect(false);
   };
 
 
@@ -564,16 +575,24 @@ function CallScreen({
               : ""}
           </p>
 
-          {/* Help */}
+          {/* Help + Correction */}
           {isConnected && (
-            <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => requestGeorgianHelpFromText()}
+                onClick={openHelp}
                 className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-1.5 text-xs font-bold ka"
               >
                 <Lightbulb className="w-3.5 h-3.5" />
                 დახმარება ქართულად
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCorrectInput(""); setShowCorrect(true); }}
+                className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-bold ka border border-[hsl(220_22%_88%)]"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                AI-მ არასწორად გაიგო
               </button>
             </div>
           )}
@@ -601,11 +620,33 @@ function CallScreen({
                 </button>
               </div>
 
-              {helpLoading || !helpData ? (
+              {!helpData && !helpLoading && (
+                <>
+                  <label className="text-xs sp-text ka block mb-2">რისი თქმა გინდა ინგლისურად?</label>
+                  <textarea
+                    value={helpInput}
+                    onChange={(e) => setHelpInput(e.target.value)}
+                    rows={3}
+                    placeholder="მაგ: მინდა პიცის შეკვეთა"
+                    className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                  />
+                  <button
+                    onClick={submitHelp}
+                    disabled={!helpInput.trim()}
+                    className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+                  >
+                    მაჩვენე ინგლისურად
+                  </button>
+                </>
+              )}
+
+              {helpLoading && (
                 <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
                   <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
                 </div>
-              ) : (
+              )}
+
+              {helpData && !helpLoading && (
                 <>
                   <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
                   <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3 flex items-center justify-between gap-2">
@@ -625,6 +666,40 @@ function CallScreen({
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* "AI heard me wrong" correction overlay */}
+        {showCorrect && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowCorrect(false)}
+          >
+            <div
+              className="sp-card max-w-md w-full p-5 sp-pop-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <h3 className="font-bold sp-text ka">დაწერე რისი თქმაც გინდოდა</h3>
+                <button onClick={() => setShowCorrect(false)} className="sp-text-soft p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <textarea
+                value={correctInput}
+                onChange={(e) => setCorrectInput(e.target.value)}
+                rows={3}
+                placeholder="I would like to order pizza."
+                className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+              />
+              <button
+                onClick={submitCorrection}
+                disabled={!correctInput.trim()}
+                className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+              >
+                გაგზავნა
+              </button>
             </div>
           </div>
         )}
