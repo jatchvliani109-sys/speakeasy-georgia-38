@@ -554,7 +554,6 @@ function CallScreen({
             {messages.map((m, i) => (
               <TranscriptLine key={i} role={m.role} text={m.content} />
             ))}
-            {partial.user && <TranscriptLine role="user" text={partial.user} faded />}
             {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
           </div>
         </div>
