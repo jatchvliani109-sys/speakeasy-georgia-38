@@ -281,10 +281,6 @@ function CallScreen({
       if (e.final) {
         setMessages((prev) => [...prev, { role: "user", content: e.text }]);
         setPartial((p) => ({ ...p, user: "" }));
-        // Detect Georgian — show help card automatically.
-        if (detectGeorgian(e.text)) {
-          requestGeorgianHelpFromText(e.text);
-        }
       } else {
         setPartial((p) => ({ ...p, user: e.text }));
       }
