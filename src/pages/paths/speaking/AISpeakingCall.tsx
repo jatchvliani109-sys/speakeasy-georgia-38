@@ -56,7 +56,7 @@ const LEVEL_LABEL_KA: Record<Topic["level"], string> = {
 
 // --- Types --------------------------------------------------------------
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = { role: "user" | "assistant"; content: string; pending?: boolean };
 type Step = "setup" | "explain" | "call" | "summary";
 
 // --- Component ----------------------------------------------------------
