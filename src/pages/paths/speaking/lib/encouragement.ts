@@ -1,36 +1,23 @@
-// Friendly, casual Georgian-coach encouragement messages for the Speaking path.
-// Mix of casual slang and clean messages. One sentence max, at most one slang phrase per message.
+// Friendly, professional encouragement messages for the Speaking path.
+// Tone: friendly, light, encouraging — not formal, not childish, not slang.
 
 const KA_MESSAGES = [
-  // casual / slang
-  "საღოლ, ბრო! დღევანდელი პრაქტიკა შესრულებულია.",
-  "ვაა, კარგი გამოვიდა! დღეს საუბარში ივარჯიშე.",
-  "შეხე ამას — კიდევ ერთი გაკვეთილი შესრულებულია.",
-  "კარგია, ძმობილო! ნელ-ნელა ინგლისური მოდის.",
-  "საღოლ! დღეს კარგი speaking practice გამოვიდა.",
-  "ბრო, კარგი იყო — ხვალაც გააგრძელე და Streak არ დაკარგო.",
-  "სიმონ, ეგრე გააგრძელე — დღევანდელი გაკვეთილი შესრულებულია.",
-  "კარგი სამუშაოა, ტო. დღეს რეალურად ივარჯიშე.",
-  "ჰაჰა, მშვენიერია — ინგლისური უკვე მოძრაობაშია.",
-  "შესანიშნავია! დღეს ერთი ნაბიჯით წინ წახვედი.",
-  "ვაა, ეგრე! დღევანდელი მისია შესრულდა.",
-  "ბრატ, კარგად მიდიხარ — განაგრძე ასევე.",
-  // cleaner / balanced
-  "ყოჩაღ! დღევანდელი პრაქტიკა დასრულებულია.",
-  "კარგია! დღეს საუბარში ივარჯიშე.",
+  "კარგია! დღევანდელი საუბრის პრაქტიკა დასრულებულია.",
+  "ყოჩაღ! დღეს კარგი პროგრესი გაქვს.",
+  "კარგი მუშაობაა — ხვალ ისევ გააგრძელე.",
+  "დღევანდელი გაკვეთილი შესრულებულია. შეგიძლია კიდევ ივარჯიშო.",
+  "კარგი პრაქტიკა გამოვიდა. ნელ-ნელა საუბარი უფრო მარტივი გახდება.",
   "ძალიან კარგი — ასე გააგრძელე.",
-  "დღევანდელი გაკვეთილი შესრულებულია.",
   "კარგი რიტმია, შეინარჩუნე ის.",
   "ერთი ნაბიჯით წინ ხარ. ხვალაც მოდი.",
 ];
 
 const EN_MESSAGES = [
-  "Nice one — speaking practice done.",
-  "Good work today.",
-  "You showed up today. That counts.",
+  "Nice work! Today's speaking practice is complete.",
+  "Good job — you made progress today.",
+  "Great work. Come back tomorrow and keep practicing.",
+  "Today's lesson is complete. You can practice more if you want.",
   "Solid practice. Keep it going.",
-  "Done for today — see you tomorrow.",
-  "Nice progress today.",
 ];
 
 function pick<T>(arr: T[], seed?: number): T {
