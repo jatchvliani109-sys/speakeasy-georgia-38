@@ -122,6 +122,19 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       case "session.created":
       case "session.updated":
         if (!responseActiveRef.current) setStatus("ready");
+        // AI greets first — trigger one short opening response right after session is ready.
+        if (!greetedRef.current && dcRef.current?.readyState === "open") {
+          greetedRef.current = true;
+          try {
+            dcRef.current.send(JSON.stringify({
+              type: "response.create",
+              response: {
+                instructions: `Greet the learner warmly in ONE short English sentence, then ask ONE simple opening question about the topic "${topicRef.current}". Keep total under 18 words. Do not explain rules. Do not speak Georgian.`,
+              },
+            }));
+            dlog("greeting response.create sent");
+          } catch (e) { console.warn("[rt] greeting failed", e); }
+        }
         break;
       case "input_audio_buffer.speech_started":
         dlog("user speech started → pending transcript");
