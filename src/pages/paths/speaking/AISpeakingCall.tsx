@@ -250,7 +250,7 @@ function CallScreen({
   const [helpData, setHelpData] = useState<{ english: string; georgian: string } | null>(null);
   const [showCorrect, setShowCorrect] = useState(false);
   const [correctInput, setCorrectInput] = useState("");
-  const [manualMode, setManualMode] = useState(true); // safety: push-to-talk by default
+  const manualMode = true; // push-to-talk only (free/auto listening disabled)
   const [pttActive, setPttActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [showTimeWarn, setShowTimeWarn] = useState(false);
