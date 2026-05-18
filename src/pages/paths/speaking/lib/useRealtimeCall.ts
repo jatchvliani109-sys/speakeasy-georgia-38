@@ -293,5 +293,5 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     }
   }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
 
-  return { status, errorMsg, start, stop, setMicEnabled, model, micOn };
+  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn };
 }
