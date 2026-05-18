@@ -16,7 +16,9 @@ export type RtStatus =
   | "error";
 
 export type RtEvent =
+  | { kind: "user_turn_started" }
   | { kind: "user_text"; text: string; final: boolean }
+  | { kind: "user_text_failed" }
   | { kind: "ai_text"; text: string; final: boolean }
   | { kind: "georgian_help"; english: string; georgian: string };
 
