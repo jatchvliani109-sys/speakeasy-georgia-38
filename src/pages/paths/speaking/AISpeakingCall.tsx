@@ -601,7 +601,7 @@ function CallScreen({
 
           <p className="text-center text-[11px] sp-text-muted ka mt-2">
             {isConnected
-              ? "ილაპარაკე ინგლისურად — AI გისმენს. თუ გაგიჭირდა, დააჭირე „დახმარებას“."
+              ? "AI დაიწყებს საუბარს. შენ პასუხისთვის დააჭირე ღილაკს და ილაპარაკე."
               : ""}
           </p>
 
