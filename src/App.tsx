@@ -18,7 +18,12 @@ import SpeakingPronunciation from "./pages/paths/speaking/Pronunciation";
 import SpeakingRoleplayList from "./pages/paths/speaking/RoleplayList";
 import SpeakingRoleplaySession from "./pages/paths/speaking/RoleplaySession";
 import SpeakingProgress from "./pages/paths/speaking/SpeakingProgress";
-import BusinessDashboard from "./pages/paths/Business";
+import BusinessGate from "./pages/paths/business/BusinessGate";
+import BusinessSetup from "./pages/paths/business/BusinessSetup";
+import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest";
+import BusinessPlan from "./pages/paths/business/BusinessPlan";
+import BusinessHome from "./pages/paths/business/BusinessHome";
+import BusinessModule from "./pages/paths/business/BusinessModule";
 import NationalExamDashboard from "./pages/paths/NationalExam";
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
@@ -53,7 +58,12 @@ const App = () => (
             <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
             <Route path="/path/speaking/progress" element={<RequireAuth><SpeakingProgress /></RequireAuth>} />
             
-            <Route path="/path/business" element={<RequireAuth><BusinessDashboard /></RequireAuth>} />
+            <Route path="/path/business" element={<RequireAuth><BusinessGate /></RequireAuth>} />
+            <Route path="/path/business/setup" element={<RequireAuth><BusinessSetup /></RequireAuth>} />
+            <Route path="/path/business/test" element={<RequireAuth><BusinessPlacementTest /></RequireAuth>} />
+            <Route path="/path/business/plan" element={<RequireAuth><BusinessPlan /></RequireAuth>} />
+            <Route path="/path/business/home" element={<RequireAuth><BusinessHome /></RequireAuth>} />
+            <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
             
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
             <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
