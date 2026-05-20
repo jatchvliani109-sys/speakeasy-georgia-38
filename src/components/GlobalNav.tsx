@@ -29,10 +29,10 @@ const GROUPS: NavGroup[] = [
     title: "ბიზნეს ინგლისური",
     items: [
       { to: "/path/business/home", label: "Business Dashboard" },
+      { to: "/path/business/self-introduction", label: "First Step: Professional Introduction" },
       { to: "/path/business/setup", label: "Business Setup" },
       { to: "/path/business/test", label: "Placement Test" },
       { to: "/path/business/plan", label: "Personal Plan" },
-      { to: "/path/business/self-introduction", label: "Professional Self-Introduction" },
       { to: "/path/business/module/interview", label: "Job Interview" },
       { to: "/path/business/module/emails", label: "Work Emails" },
       { to: "/path/business/module/meetings", label: "Meetings" },

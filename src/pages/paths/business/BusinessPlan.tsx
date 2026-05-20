@@ -75,8 +75,8 @@ export default function BusinessPlan() {
         </ul>
       </BizCard>
 
-      <BizButton className="w-full" onClick={() => navigate("/path/business/home", { replace: true })}>
-        გეგმის დაწყება
+      <BizButton className="w-full" onClick={() => navigate("/path/business/self-introduction", { replace: true })}>
+        გეგმის დაწყება — პირველი ნაბიჯი
       </BizButton>
     </BusinessShell>
   );

@@ -56,6 +56,7 @@ export type BusinessState = {
   field: BusinessField | null;
   level: BusinessLevel | null;
   plan: BusinessPlan | null;
+  businessSelfIntroductionCompleted?: boolean;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -70,6 +71,7 @@ const empty = (): BusinessState => ({
   field: null,
   level: null,
   plan: null,
+  businessSelfIntroductionCompleted: false,
 });
 
 export function loadBusiness(uid: string): BusinessState {
@@ -164,13 +166,6 @@ export type BusinessModule = {
 
 export const BUSINESS_MODULES: BusinessModule[] = [
   {
-    slug: "introduction",
-    title: "პროფესიული წარდგენა",
-    description:
-      "ისწავლე როგორ წარადგინო შენი თავი უნივერსიტეტში, გასაუბრებაზე ან სამუშაო გარემოში.",
-    icon: "🪪",
-  },
-  {
     slug: "interview",
     title: "გასაუბრება",
     description: "ივარჯიშე გავრცელებულ კითხვებზე და გააუმჯობესე პასუხები.",
@@ -211,7 +206,7 @@ const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   emails_writing: "emails",
   presentations: "presentations",
   business_vocab: "vocabulary",
-  general_business: "introduction",
+  general_business: "interview",
 };
 
 const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {

@@ -10,7 +10,6 @@ import {
   LEVEL_LABELS,
   PRIORITY_LABELS,
   loadBusiness,
-  loadSelfIntros,
 } from "./lib/state";
 
 export default function BusinessHome() {
@@ -104,18 +103,40 @@ export default function BusinessHome() {
         </Link>
       </BizCard>
 
+      {/* Starter task: Professional Self-Introduction */}
+      {!s.businessSelfIntroductionCompleted ? (
+        <BizCard className="mb-4 border-l-4 border-l-[#1E2A44]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">პირველი ნაბიჯი</p>
+          <h3 className="ka text-lg font-bold text-[#1E2A44] mt-1">დაასრულე პირველი ნაბიჯი</h3>
+          <p className="ka text-sm text-[#374151] mt-2">
+            შექმენი შენი პროფესიული წარდგენა, სანამ ბიზნეს ინგლისურის მოდულებზე გადახვალ.
+          </p>
+          <div className="mt-3">
+            <BizButton onClick={() => navigate("/path/business/self-introduction")}>წარდგენის შექმნა</BizButton>
+          </div>
+        </BizCard>
+      ) : (
+        <BizCard className="mb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">პირველი ნაბიჯი</p>
+              <h3 className="ka text-base font-bold text-[#1E2A44] mt-0.5">პროფესიული წარდგენა მზადაა</h3>
+              <p className="ka text-xs text-[#5B6473] mt-1">შენახული წარდგენა შეგიძლია ნებისმიერ დროს შეცვალო.</p>
+            </div>
+            <Link to="/path/business/self-introduction" className="ka text-xs text-[#1E2A44] underline underline-offset-2 shrink-0">
+              ნახვა / რედაქტირება
+            </Link>
+          </div>
+        </BizCard>
+      )}
+
       {/* Modules */}
       <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
         მოდულები
       </p>
       <div className="grid grid-cols-2 gap-3 mb-6">
         {BUSINESS_MODULES.map((m) => {
-          const isIntro = m.slug === "introduction";
-          const introCount = user ? loadSelfIntros(user.id).length : 0;
-          const to = isIntro ? "/path/business/self-introduction" : `/path/business/module/${m.slug}`;
-          const status = isIntro
-            ? (introCount > 0 ? "შენახული წარდგენა მზადაა" : "Not started")
-            : null;
+          const to = `/path/business/module/${m.slug}`;
           return (
             <Link
               key={m.slug}
@@ -125,11 +146,6 @@ export default function BusinessHome() {
               <div className="text-xl mb-2">{m.icon}</div>
               <div className="ka font-semibold text-sm text-[#1E2A44]">{m.title}</div>
               <div className="ka text-[11px] text-[#5B6473] mt-1 line-clamp-2">{m.description}</div>
-              {status && (
-                <div className={`ka text-[10px] mt-2 font-semibold ${introCount > 0 ? "text-[#0F766E]" : "text-[#C9A227]"}`}>
-                  {status}
-                </div>
-              )}
             </Link>
           );
         })}
@@ -154,14 +170,13 @@ export default function BusinessHome() {
 
 type Rec = { to: string; tag: string; title: string; subtitle: string };
 function recommendedForLevel(level: string, _goal: string): Rec[] {
-  const intro = { to: "/path/business/self-introduction", tag: "მოდული", title: "პროფესიული წარდგენა", subtitle: "ისწავლე როგორ წარადგინო შენი თავი ნაბიჯ-ნაბიჯ." };
   const vocab = { to: "/path/business/module/vocabulary", tag: "ლექსიკა", title: "ბიზნეს ლექსიკა", subtitle: "სიტყვები მაგალითებითა და ქართული ახსნებით." };
   const emails = { to: "/path/business/module/emails", tag: "წერა", title: "მარტივი იმეილის ფრაზები", subtitle: "თავაზიანი გახსნა, მოთხოვნა, დასკვნა." };
   const interview = { to: "/path/business/module/interview", tag: "გასაუბრება", title: "გასაუბრების პასუხები", subtitle: "ივარჯიშე გავრცელებულ კითხვებზე." };
   const meetings = { to: "/path/business/module/meetings", tag: "შეხვედრები", title: "შეხვედრების ფრაზები", subtitle: "გამოთქვი აზრი და დასვი კითხვა პროფესიულად." };
   const presentations = { to: "/path/business/module/presentations", tag: "პრეზენტაცია", title: "პრეზენტაციის სტრუქტურა", subtitle: "გახსნა, მონაცემები, დასკვნა." };
-  if (level === "business_beginner") return [intro, vocab, emails];
-  if (level === "business_elementary") return [intro, emails, vocab];
+  if (level === "business_beginner") return [vocab, emails, interview];
+  if (level === "business_elementary") return [emails, vocab, interview];
   if (level === "business_intermediate") return [interview, emails, meetings];
   return [interview, presentations, meetings];
 }

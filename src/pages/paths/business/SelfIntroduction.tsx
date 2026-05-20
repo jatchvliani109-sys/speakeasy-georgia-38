@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
   BusinessLevel,
   loadBusiness,
+  saveBusiness,
   loadSelfIntros,
   saveSelfIntro,
   deleteSelfIntro,
@@ -110,7 +111,8 @@ const EXERCISES: Exercise[] = [
 // ---------- Main ----------
 export default function SelfIntroduction() {
   const { user } = useAuth();
-  const [step, setStep] = useState<number>(1);
+  const navigate = useNavigate();
+  const [step, setStep] = useState<number>(0);
   const [inputs, setInputs] = useState<SelfIntroInputs>(emptyInputs);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenResult | null>(null);
@@ -174,13 +176,44 @@ export default function SelfIntroduction() {
     };
     const list = saveSelfIntro(user.id, item);
     setSaved(list);
+    saveBusiness(user.id, { businessSelfIntroductionCompleted: true });
     toast.success("შენახულია");
     setStep(7);
   };
 
-  const speak = (text: string) => {
-    try { const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = 0.95;
-      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } catch {}
+  // OpenAI TTS read-aloud (cleans Georgian + emojis server-side). Cached per session.
+  const audioCache = useMemo(() => new Map<string, string>(), []);
+  const speak = async (text: string) => {
+    if (!text) return;
+    try {
+      let url = audioCache.get(text);
+      if (!url) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) {
+          if (res.status === 400) { toast.message("No English audio available"); return; }
+          throw new Error("tts");
+        }
+        const blob = await res.blob();
+        if (!blob.type.startsWith("audio/")) { toast.message("No English audio available"); return; }
+        url = URL.createObjectURL(blob);
+        audioCache.set(text, url);
+      }
+      const audio = new Audio(url);
+      audio.playbackRate = 0.95;
+      await audio.play();
+    } catch {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US"; u.rate = 0.95;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+      } catch {}
+    }
   };
   const copyText = async (t: string) => { try { await navigator.clipboard.writeText(t); toast.success("დაკოპირდა"); } catch {} };
   const markPracticed = (id: string) => {
@@ -201,22 +234,49 @@ export default function SelfIntroduction() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
       <div className="mb-4">
-        <h1 className="ka text-2xl font-bold text-[#1E2A44]">პროფესიული წარდგენა</h1>
+        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">პირველი ნაბიჯი</p>
+        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">შენი პროფესიული წარდგენა</h1>
         <p className="ka text-xs text-[#5B6473] mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
           {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-[#1E2A44]">{biz.level.replace("business_", "")}</span></span>}
         </p>
       </div>
 
-      {/* Progress */}
-      <div className="mb-5">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-            <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#1E2A44]" : "bg-[#E7E2D5]"}`} />
-          ))}
+      {/* Progress (hidden on intro step 0) */}
+      {step >= 1 && (
+        <div className="mb-5">
+          <div className="flex items-center gap-1">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#1E2A44]" : "bg-[#E7E2D5]"}`} />
+            ))}
+          </div>
+          <p className="ka text-[11px] text-[#5B6473] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
         </div>
-        <p className="ka text-[11px] text-[#5B6473] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
-      </div>
+      )}
+
+      {/* STEP 0: Friendly intro */}
+      {step === 0 && (
+        <BizCard className="mb-4">
+          <h2 className="ka text-xl font-bold text-[#1E2A44]">პირველი ნაბიჯი: პროფესიული წარდგენა</h2>
+          <p className="ka text-sm text-[#374151] mt-2">
+            სანამ ბიზნეს ინგლისურის გაკვეთილებზე გადავალთ, შევქმნათ შენი მოკლე და ძლიერი ინგლისური წარდგენა.
+          </p>
+          <div className="mt-4 space-y-2">
+            <p className="ka text-sm text-[#1E2A44]">
+              პროფესიული წარდგენა დაგჭირდება უნივერსიტეტში, გასაუბრებაზე, networking-ში, პრეზენტაციებზე და სამუშაო კომუნიკაციაში.
+            </p>
+            <p className="text-sm text-[#5B6473] italic">
+              A strong introduction helps you present yourself clearly in interviews, university, networking, and professional settings.
+            </p>
+          </div>
+          <div className="mt-5 flex gap-2 flex-wrap">
+            <BizButton onClick={() => setStep(1)}>წარდგენის შექმნა</BizButton>
+            {saved.length > 0 && (
+              <BizButton variant="outline" onClick={() => setStep(7)}>შენახული წარდგენა</BizButton>
+            )}
+          </div>
+        </BizCard>
+      )}
 
       {/* STEP 1: Structure */}
       {step === 1 && (
@@ -424,17 +484,37 @@ export default function SelfIntroduction() {
 
       {/* STEP 7: Complete */}
       {step === 7 && (
-        <BizCard className="mb-4 text-center">
-          <div className="text-3xl">✓</div>
-          <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2">მოდული დასრულდა</h2>
-          <p className="ka text-sm text-[#5B6473] mt-2">
-            შენი წარდგენა შენახულია. წაიკითხე ხმამაღლა მინიმუმ 3-ჯერ — ეს ყველაზე კარგი პრაქტიკაა.
-          </p>
+        <BizCard className="mb-4">
+          <div className="text-center">
+            <div className="text-3xl">✓</div>
+            <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2">წარდგენა მზადაა</h2>
+            <p className="ka text-sm text-[#5B6473] mt-2">
+              კარგია! ახლა უკვე გაქვს ინგლისური პროფესიული წარდგენა, რომელსაც გამოიყენებ გასაუბრებაზე, უნივერსიტეტში ან სამუშაო გარემოში.
+            </p>
+          </div>
+
+          {saved[0] && (
+            <div className="mt-5 p-4 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">შენახული წარდგენა</p>
+              <p className="text-sm text-[#1E2A44] leading-relaxed">{saved[0][saved[0].selected].en}</p>
+              {saved[0].phrases?.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-[#E7E2D5]">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold mb-2">ნასწავლი ფრაზები</p>
+                  <ul className="space-y-1">
+                    {saved[0].phrases.slice(0, 5).map((p, i) => (
+                      <li key={i} className="text-xs text-[#1E2A44]">• {p.en}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="mt-5 flex gap-2 justify-center flex-wrap">
+            <BizButton onClick={() => navigate("/path/business/home")}>ბიზნეს გაკვეთილებზე გადასვლა</BizButton>
             <BizButton variant="outline" onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}>
-              ხელახლა
+              ჩემი წარდგენის რედაქტირება
             </BizButton>
-            <Link to="/path/business/home"><BizButton>Dashboard-ზე დაბრუნება</BizButton></Link>
           </div>
         </BizCard>
       )}
