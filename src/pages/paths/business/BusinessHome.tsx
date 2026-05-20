@@ -10,7 +10,6 @@ import {
   LEVEL_LABELS,
   PRIORITY_LABELS,
   loadBusiness,
-  loadSelfIntros,
 } from "./lib/state";
 
 export default function BusinessHome() {
@@ -171,14 +170,13 @@ export default function BusinessHome() {
 
 type Rec = { to: string; tag: string; title: string; subtitle: string };
 function recommendedForLevel(level: string, _goal: string): Rec[] {
-  const intro = { to: "/path/business/self-introduction", tag: "მოდული", title: "პროფესიული წარდგენა", subtitle: "ისწავლე როგორ წარადგინო შენი თავი ნაბიჯ-ნაბიჯ." };
   const vocab = { to: "/path/business/module/vocabulary", tag: "ლექსიკა", title: "ბიზნეს ლექსიკა", subtitle: "სიტყვები მაგალითებითა და ქართული ახსნებით." };
   const emails = { to: "/path/business/module/emails", tag: "წერა", title: "მარტივი იმეილის ფრაზები", subtitle: "თავაზიანი გახსნა, მოთხოვნა, დასკვნა." };
   const interview = { to: "/path/business/module/interview", tag: "გასაუბრება", title: "გასაუბრების პასუხები", subtitle: "ივარჯიშე გავრცელებულ კითხვებზე." };
   const meetings = { to: "/path/business/module/meetings", tag: "შეხვედრები", title: "შეხვედრების ფრაზები", subtitle: "გამოთქვი აზრი და დასვი კითხვა პროფესიულად." };
   const presentations = { to: "/path/business/module/presentations", tag: "პრეზენტაცია", title: "პრეზენტაციის სტრუქტურა", subtitle: "გახსნა, მონაცემები, დასკვნა." };
-  if (level === "business_beginner") return [intro, vocab, emails];
-  if (level === "business_elementary") return [intro, emails, vocab];
+  if (level === "business_beginner") return [vocab, emails, interview];
+  if (level === "business_elementary") return [emails, vocab, interview];
   if (level === "business_intermediate") return [interview, emails, meetings];
   return [interview, presentations, meetings];
 }
