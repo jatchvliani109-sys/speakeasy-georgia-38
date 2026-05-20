@@ -51,23 +51,42 @@ export default function BusinessHome() {
 
       {plan && (<>
 
-
-      {/* Recommended */}
-      <BizCard className="mb-4 border-l-4 border-l-[#C9A227]">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
-          დღევანდელი გაკვეთილი
-        </p>
-        <h2 className="ka text-lg font-bold text-[#1E2A44] mt-1">{plan.recommendedModuleTitle}</h2>
-        <p className="ka text-xs text-[#5B6473] mt-1">
-          არჩეულია შენი მთავარი მიზნის მიხედვით: {PRIORITY_LABELS[plan.mainGoal]}.
-        </p>
-        <p className="ka text-xs text-[#5B6473] mt-1">დაახლოებითი დრო: 10–15 წუთი</p>
-        <div className="mt-4">
-          <BizButton onClick={() => navigate(`/path/business/module/${plan.recommendedModule}`)}>
-            გაკვეთილის დაწყება
-          </BizButton>
+      {/* Level badge */}
+      <BizCard className="mb-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">შენი დონე</p>
+            <p className="ka text-lg font-bold text-[#1E2A44] mt-0.5">{LEVEL_LABELS[plan.level]}</p>
+            <p className="ka text-xs text-[#5B6473] mt-0.5">მთავარი მიზანი: {PRIORITY_LABELS[plan.mainGoal]}</p>
+          </div>
+          <Link to="/path/business/test" className="ka text-[11px] text-[#1E2A44] underline underline-offset-2">
+            თავიდან ჩაბარება
+          </Link>
         </div>
       </BizCard>
+
+      {/* Recommended next lessons (level-aware) */}
+      <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+        რეკომენდებული გაკვეთილები შენი დონისთვის
+      </p>
+      <div className="space-y-2 mb-4">
+        {recommendedForLevel(plan.level, plan.mainGoal).map((r) => (
+          <Link
+            key={r.to}
+            to={r.to}
+            className="block bg-white border border-[#E7E2D5] rounded-2xl p-4 hover:border-[#1E2A44]/40 hover:shadow-sm transition-all"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">{r.tag}</p>
+                <p className="ka font-bold text-[#1E2A44] mt-0.5">{r.title}</p>
+                <p className="ka text-xs text-[#5B6473] mt-1">{r.subtitle}</p>
+              </div>
+              <span className="text-[#1E2A44] text-lg">→</span>
+            </div>
+          </Link>
+        ))}
+      </div>
 
       {/* Plan summary */}
       <BizCard className="mb-4">
@@ -131,6 +150,20 @@ export default function BusinessHome() {
       </>)}
     </BusinessShell>
   );
+}
+
+type Rec = { to: string; tag: string; title: string; subtitle: string };
+function recommendedForLevel(level: string, _goal: string): Rec[] {
+  const intro = { to: "/path/business/self-introduction", tag: "მოდული", title: "პროფესიული წარდგენა", subtitle: "ისწავლე როგორ წარადგინო შენი თავი ნაბიჯ-ნაბიჯ." };
+  const vocab = { to: "/path/business/module/vocabulary", tag: "ლექსიკა", title: "ბიზნეს ლექსიკა", subtitle: "სიტყვები მაგალითებითა და ქართული ახსნებით." };
+  const emails = { to: "/path/business/module/emails", tag: "წერა", title: "მარტივი იმეილის ფრაზები", subtitle: "თავაზიანი გახსნა, მოთხოვნა, დასკვნა." };
+  const interview = { to: "/path/business/module/interview", tag: "გასაუბრება", title: "გასაუბრების პასუხები", subtitle: "ივარჯიშე გავრცელებულ კითხვებზე." };
+  const meetings = { to: "/path/business/module/meetings", tag: "შეხვედრები", title: "შეხვედრების ფრაზები", subtitle: "გამოთქვი აზრი და დასვი კითხვა პროფესიულად." };
+  const presentations = { to: "/path/business/module/presentations", tag: "პრეზენტაცია", title: "პრეზენტაციის სტრუქტურა", subtitle: "გახსნა, მონაცემები, დასკვნა." };
+  if (level === "business_beginner") return [intro, vocab, emails];
+  if (level === "business_elementary") return [intro, emails, vocab];
+  if (level === "business_intermediate") return [interview, emails, meetings];
+  return [interview, presentations, meetings];
 }
 
 function Mini({ label, value }: { label: string; value: string }) {

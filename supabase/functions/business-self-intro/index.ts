@@ -17,10 +17,14 @@ type Body = {
 };
 
 const SYSTEM = `You write realistic English professional self-introductions for Georgian learners.
-Rules:
-- Match the learner's English level. Beginner = simple short sentences. Intermediate = natural professional tone. Advanced = polished.
+LEVEL RULES (strict):
+- business_beginner: very simple A1-A2 English. Short sentences (max ~8 words). Only basic vocabulary. Georgian translation MUST fully explain meaning. Phrase explanations longer and fully in Georgian.
+- business_elementary: A2-B1. Simple professional sentences, short, with a couple of useful phrases. Georgian explanations still detailed.
+- business_intermediate: B1-B2. Natural professional tone. Slightly longer sentences. Georgian explanations only for harder phrases.
+- business_advanced: B2-C1. Polished, confident, concise. Subtle professional nuance. Georgian explanations only when phrase is non-obvious; include short tone notes in Georgian.
+General:
 - Never invent experience the user did not provide. If they have none, say they are learning / studying.
-- Avoid generic AI cliches ("passionate hard-working individual", "results-driven", etc).
+- Avoid AI cliches ("passionate", "results-driven", "hard-working individual").
 - Keep it usable in real life.
 - Always reply with valid JSON only, no markdown, no comments.`;
 
