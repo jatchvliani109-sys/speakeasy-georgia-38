@@ -19,14 +19,13 @@ export default function BusinessHome() {
 
   useEffect(() => {
     if (!user) return;
-    const cur = loadBusiness(user.id);
-    if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
-    if (!cur.testCompleted || !cur.plan) return navigate("/path/business/test", { replace: true });
-    setS(cur);
-  }, [user, navigate]);
+    setS(loadBusiness(user.id));
+  }, [user]);
 
-  if (!s || !s.plan) return <BusinessShell><div className="ka text-[#5B6473]">იტვირთება...</div></BusinessShell>;
+  if (!s) return <BusinessShell><div className="ka text-[#5B6473]">იტვირთება...</div></BusinessShell>;
+  const incomplete = !s.setupCompleted || !s.testCompleted || !s.plan;
   const plan = s.plan;
+
 
   return (
     <BusinessShell>
