@@ -36,6 +36,21 @@ export default function BusinessHome() {
         </p>
       </div>
 
+      {incomplete && (
+        <BizCard className="mb-4 border-l-4 border-l-[#C9A227] bg-[#FFFBEA]">
+          <p className="ka text-sm text-[#1E2A44]">
+            სრული პერსონალიზაციისთვის გირჩევთ დაასრულოთ Business setup და ტესტი.
+          </p>
+          <div className="mt-3 flex gap-2 flex-wrap">
+            <BizButton onClick={() => navigate("/path/business/setup")}>Setup-ის დასრულება</BizButton>
+            <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>ტესტი</BizButton>
+          </div>
+        </BizCard>
+      )}
+
+      {plan && (<>
+
+
       {/* Recommended */}
       <BizCard className="mb-4 border-l-4 border-l-[#C9A227]">
         <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
