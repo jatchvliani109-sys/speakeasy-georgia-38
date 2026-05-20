@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LEARNING_PATHS, LearningPathId } from "@/lib/learningPaths";
 import { toast } from "sonner";
 import { Mic, Briefcase, GraduationCap, ArrowRight, LucideIcon } from "lucide-react";
+import { TestingShortcuts } from "@/components/GlobalNav";
 
 type Theme = {
   icon: LucideIcon;
@@ -190,6 +191,8 @@ export default function LearningPathSelection() {
         >
           მოგვიანებით შეგიძლია მიმართულების შეცვლა.
         </p>
+
+        <TestingShortcuts />
       </div>
     </Layout>
   );
