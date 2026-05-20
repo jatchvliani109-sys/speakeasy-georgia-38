@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import GlobalNav from "@/components/GlobalNav";
 
 // Shared shell for the Business English path.
 // Premium-education theme: warm white, cream, muted navy, slate, subtle gold accent.
@@ -19,9 +20,12 @@ export default function BusinessShell({
             <span className="w-7 h-7 rounded-md bg-[#1E2A44] text-[#F7F1E3] grid place-items-center text-xs font-bold">B</span>
             <span className="ka font-semibold text-sm">ბიზნეს ინგლისური</span>
           </Link>
-          <Link to="/learning-path" className="ka text-xs text-[#5B6473] hover:text-[#1E2A44]">
-            ↺ მიმართულების შეცვლა
-          </Link>
+          <div className="flex items-center gap-1">
+            <GlobalNav />
+            <Link to="/learning-path" className="ka text-xs text-[#5B6473] hover:text-[#1E2A44]">
+              ↺
+            </Link>
+          </div>
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
