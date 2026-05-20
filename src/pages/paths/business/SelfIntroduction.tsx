@@ -234,22 +234,49 @@ export default function SelfIntroduction() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
       <div className="mb-4">
-        <h1 className="ka text-2xl font-bold text-[#1E2A44]">პროფესიული წარდგენა</h1>
+        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">პირველი ნაბიჯი</p>
+        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">შენი პროფესიული წარდგენა</h1>
         <p className="ka text-xs text-[#5B6473] mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
           {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-[#1E2A44]">{biz.level.replace("business_", "")}</span></span>}
         </p>
       </div>
 
-      {/* Progress */}
-      <div className="mb-5">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-            <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#1E2A44]" : "bg-[#E7E2D5]"}`} />
-          ))}
+      {/* Progress (hidden on intro step 0) */}
+      {step >= 1 && (
+        <div className="mb-5">
+          <div className="flex items-center gap-1">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#1E2A44]" : "bg-[#E7E2D5]"}`} />
+            ))}
+          </div>
+          <p className="ka text-[11px] text-[#5B6473] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
         </div>
-        <p className="ka text-[11px] text-[#5B6473] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
-      </div>
+      )}
+
+      {/* STEP 0: Friendly intro */}
+      {step === 0 && (
+        <BizCard className="mb-4">
+          <h2 className="ka text-xl font-bold text-[#1E2A44]">პირველი ნაბიჯი: პროფესიული წარდგენა</h2>
+          <p className="ka text-sm text-[#374151] mt-2">
+            სანამ ბიზნეს ინგლისურის გაკვეთილებზე გადავალთ, შევქმნათ შენი მოკლე და ძლიერი ინგლისური წარდგენა.
+          </p>
+          <div className="mt-4 space-y-2">
+            <p className="ka text-sm text-[#1E2A44]">
+              პროფესიული წარდგენა დაგჭირდება უნივერსიტეტში, გასაუბრებაზე, networking-ში, პრეზენტაციებზე და სამუშაო კომუნიკაციაში.
+            </p>
+            <p className="text-sm text-[#5B6473] italic">
+              A strong introduction helps you present yourself clearly in interviews, university, networking, and professional settings.
+            </p>
+          </div>
+          <div className="mt-5 flex gap-2 flex-wrap">
+            <BizButton onClick={() => setStep(1)}>წარდგენის შექმნა</BizButton>
+            {saved.length > 0 && (
+              <BizButton variant="outline" onClick={() => setStep(7)}>შენახული წარდგენა</BizButton>
+            )}
+          </div>
+        </BizCard>
+      )}
 
       {/* STEP 1: Structure */}
       {step === 1 && (
