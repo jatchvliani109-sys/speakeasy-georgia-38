@@ -32,7 +32,7 @@ const GROUPS: NavGroup[] = [
       { to: "/path/business/setup", label: "Business Setup" },
       { to: "/path/business/test", label: "Placement Test" },
       { to: "/path/business/plan", label: "Personal Plan" },
-      { to: "/path/business/module/introduction", label: "Self-Introduction" },
+      { to: "/path/business/self-introduction", label: "Professional Self-Introduction" },
       { to: "/path/business/module/interview", label: "Job Interview" },
       { to: "/path/business/module/emails", label: "Work Emails" },
       { to: "/path/business/module/meetings", label: "Meetings" },
@@ -112,6 +112,7 @@ export const TESTING_SHORTCUTS: NavItem[] = [
   { to: "/path/business/setup", label: "Biz Setup" },
   { to: "/path/business/test", label: "Biz Test" },
   { to: "/path/business/plan", label: "Biz Plan" },
+  { to: "/path/business/self-introduction", label: "Self-Intro" },
   { to: "/path/speaking/call", label: "AI Session" },
 ];
 

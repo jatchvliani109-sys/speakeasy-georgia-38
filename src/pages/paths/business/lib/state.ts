@@ -288,3 +288,77 @@ export function buildPlan(s: BusinessState): BusinessPlan | null {
     weeklyFocus: WEEKLY_FOCUS[s.mainPriority],
   };
 }
+
+// --- Self-Introduction module storage ---
+
+export type SelfIntroVersion = { en: string; ka: string };
+export type SelfIntroPhrase = {
+  en: string;
+  ka: string;
+  explanationKa: string;
+  exampleEn: string;
+  exampleKa: string;
+};
+
+export type SelfIntroInputs = {
+  purpose: string;
+  name: string;
+  status: string;
+  field: string;
+  experience: string;
+  skills: string;
+  goal: string;
+};
+
+export type SavedSelfIntro = {
+  id: string;
+  createdAt: string;
+  inputs: SelfIntroInputs;
+  short: SelfIntroVersion;
+  standard: SelfIntroVersion;
+  polished: SelfIntroVersion;
+  phrases: SelfIntroPhrase[];
+  selected: "short" | "standard" | "polished";
+  practicedAt?: string | null;
+};
+
+const SI_KEY = (uid: string) => `business_self_intro_${uid}`;
+
+export function loadSelfIntros(uid: string): SavedSelfIntro[] {
+  try {
+    const raw = localStorage.getItem(SI_KEY(uid));
+    return raw ? (JSON.parse(raw) as SavedSelfIntro[]) : [];
+  } catch { return []; }
+}
+
+export function saveSelfIntro(uid: string, item: SavedSelfIntro) {
+  const list = loadSelfIntros(uid);
+  const idx = list.findIndex((i) => i.id === item.id);
+  if (idx >= 0) list[idx] = item; else list.unshift(item);
+  localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  return list;
+}
+
+export function deleteSelfIntro(uid: string, id: string) {
+  const list = loadSelfIntros(uid).filter((i) => i.id !== id);
+  localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  return list;
+}
+
+export const SELF_INTRO_PURPOSES: { id: string; label: string }[] = [
+  { id: "university", label: "უნივერსიტეტისთვის" },
+  { id: "interview", label: "გასაუბრებისთვის" },
+  { id: "networking", label: "Networking-ისთვის" },
+  { id: "freelance", label: "Freelance / client communication-ისთვის" },
+  { id: "presentation", label: "პრეზენტაციის დასაწყებად" },
+  { id: "general", label: "ზოგადი პროფესიული წარდგენისთვის" },
+];
+
+export const SELF_INTRO_STATUSES: { id: string; label: string }[] = [
+  { id: "student", label: "სტუდენტი" },
+  { id: "graduate", label: "კურსდამთავრებული" },
+  { id: "job_seeker", label: "სამსახურის მაძიებელი" },
+  { id: "employed", label: "დასაქმებული" },
+  { id: "freelancer", label: "ფრილანსერი" },
+  { id: "other", label: "სხვა" },
+];

@@ -24,6 +24,7 @@ import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest"
 import BusinessPlan from "./pages/paths/business/BusinessPlan";
 import BusinessHome from "./pages/paths/business/BusinessHome";
 import BusinessModule from "./pages/paths/business/BusinessModule";
+import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import NationalExamDashboard from "./pages/paths/NationalExam";
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/path/business/test" element={<RequireAuth><BusinessPlacementTest /></RequireAuth>} />
             <Route path="/path/business/plan" element={<RequireAuth><BusinessPlan /></RequireAuth>} />
             <Route path="/path/business/home" element={<RequireAuth><BusinessHome /></RequireAuth>} />
+            <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
             
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
