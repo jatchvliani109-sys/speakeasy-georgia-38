@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Sparkles, RotateCcw } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import GlobalNav from "@/components/GlobalNav";
 
 export default function Layout({ children, showLogout = true }: { children: ReactNode; showLogout?: boolean }) {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function Layout({ children, showLogout = true }: { children: Reac
           </Link>
           {user && showLogout && (
             <div className="flex items-center gap-1">
+              <GlobalNav />
               <Button
                 variant="ghost"
                 size="sm"

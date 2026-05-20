@@ -19,14 +19,13 @@ export default function BusinessHome() {
 
   useEffect(() => {
     if (!user) return;
-    const cur = loadBusiness(user.id);
-    if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
-    if (!cur.testCompleted || !cur.plan) return navigate("/path/business/test", { replace: true });
-    setS(cur);
-  }, [user, navigate]);
+    setS(loadBusiness(user.id));
+  }, [user]);
 
-  if (!s || !s.plan) return <BusinessShell><div className="ka text-[#5B6473]">იტვირთება...</div></BusinessShell>;
+  if (!s) return <BusinessShell><div className="ka text-[#5B6473]">იტვირთება...</div></BusinessShell>;
+  const incomplete = !s.setupCompleted || !s.testCompleted || !s.plan;
   const plan = s.plan;
+
 
   return (
     <BusinessShell>
@@ -36,6 +35,21 @@ export default function BusinessHome() {
           ინგლისური უნივერსიტეტისთვის, სამსახურისთვის და პროფესიული კომუნიკაციისთვის.
         </p>
       </div>
+
+      {incomplete && (
+        <BizCard className="mb-4 border-l-4 border-l-[#C9A227] bg-[#FFFBEA]">
+          <p className="ka text-sm text-[#1E2A44]">
+            სრული პერსონალიზაციისთვის გირჩევთ დაასრულოთ Business setup და ტესტი.
+          </p>
+          <div className="mt-3 flex gap-2 flex-wrap">
+            <BizButton onClick={() => navigate("/path/business/setup")}>Setup-ის დასრულება</BizButton>
+            <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>ტესტი</BizButton>
+          </div>
+        </BizCard>
+      )}
+
+      {plan && (<>
+
 
       {/* Recommended */}
       <BizCard className="mb-4 border-l-4 border-l-[#C9A227]">
@@ -100,6 +114,7 @@ export default function BusinessHome() {
           <Stat label="გასაუბრების პასუხები" value="0" />
         </div>
       </BizCard>
+      </>)}
     </BusinessShell>
   );
 }
