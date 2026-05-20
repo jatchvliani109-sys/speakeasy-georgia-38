@@ -10,6 +10,7 @@ import {
   LEVEL_LABELS,
   PRIORITY_LABELS,
   loadBusiness,
+  loadSelfIntros,
 } from "./lib/state";
 
 export default function BusinessHome() {
@@ -89,17 +90,30 @@ export default function BusinessHome() {
         მოდულები
       </p>
       <div className="grid grid-cols-2 gap-3 mb-6">
-        {BUSINESS_MODULES.map((m) => (
-          <Link
-            key={m.slug}
-            to={`/path/business/module/${m.slug}`}
-            className="bg-white border border-[#E7E2D5] rounded-2xl p-4 hover:border-[#1E2A44]/40 hover:shadow-sm transition-all"
-          >
-            <div className="text-xl mb-2">{m.icon}</div>
-            <div className="ka font-semibold text-sm text-[#1E2A44]">{m.title}</div>
-            <div className="ka text-[11px] text-[#5B6473] mt-1 line-clamp-2">{m.description}</div>
-          </Link>
-        ))}
+        {BUSINESS_MODULES.map((m) => {
+          const isIntro = m.slug === "introduction";
+          const introCount = user ? loadSelfIntros(user.id).length : 0;
+          const to = isIntro ? "/path/business/self-introduction" : `/path/business/module/${m.slug}`;
+          const status = isIntro
+            ? (introCount > 0 ? "შენახული წარდგენა მზადაა" : "Not started")
+            : null;
+          return (
+            <Link
+              key={m.slug}
+              to={to}
+              className="bg-white border border-[#E7E2D5] rounded-2xl p-4 hover:border-[#1E2A44]/40 hover:shadow-sm transition-all"
+            >
+              <div className="text-xl mb-2">{m.icon}</div>
+              <div className="ka font-semibold text-sm text-[#1E2A44]">{m.title}</div>
+              <div className="ka text-[11px] text-[#5B6473] mt-1 line-clamp-2">{m.description}</div>
+              {status && (
+                <div className={`ka text-[10px] mt-2 font-semibold ${introCount > 0 ? "text-[#0F766E]" : "text-[#C9A227]"}`}>
+                  {status}
+                </div>
+              )}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Progress preview */}
