@@ -484,17 +484,37 @@ export default function SelfIntroduction() {
 
       {/* STEP 7: Complete */}
       {step === 7 && (
-        <BizCard className="mb-4 text-center">
-          <div className="text-3xl">✓</div>
-          <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2">მოდული დასრულდა</h2>
-          <p className="ka text-sm text-[#5B6473] mt-2">
-            შენი წარდგენა შენახულია. წაიკითხე ხმამაღლა მინიმუმ 3-ჯერ — ეს ყველაზე კარგი პრაქტიკაა.
-          </p>
+        <BizCard className="mb-4">
+          <div className="text-center">
+            <div className="text-3xl">✓</div>
+            <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2">წარდგენა მზადაა</h2>
+            <p className="ka text-sm text-[#5B6473] mt-2">
+              კარგია! ახლა უკვე გაქვს ინგლისური პროფესიული წარდგენა, რომელსაც გამოიყენებ გასაუბრებაზე, უნივერსიტეტში ან სამუშაო გარემოში.
+            </p>
+          </div>
+
+          {saved[0] && (
+            <div className="mt-5 p-4 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">შენახული წარდგენა</p>
+              <p className="text-sm text-[#1E2A44] leading-relaxed">{saved[0][saved[0].selected].en}</p>
+              {saved[0].phrases?.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-[#E7E2D5]">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold mb-2">ნასწავლი ფრაზები</p>
+                  <ul className="space-y-1">
+                    {saved[0].phrases.slice(0, 5).map((p, i) => (
+                      <li key={i} className="text-xs text-[#1E2A44]">• {p.en}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="mt-5 flex gap-2 justify-center flex-wrap">
+            <BizButton onClick={() => navigate("/path/business/home")}>ბიზნეს გაკვეთილებზე გადასვლა</BizButton>
             <BizButton variant="outline" onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}>
-              ხელახლა
+              ჩემი წარდგენის რედაქტირება
             </BizButton>
-            <Link to="/path/business/home"><BizButton>Dashboard-ზე დაბრუნება</BizButton></Link>
           </div>
         </BizCard>
       )}
