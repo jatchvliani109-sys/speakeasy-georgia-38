@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
   BusinessLevel,
   loadBusiness,
+  saveBusiness,
   loadSelfIntros,
   saveSelfIntro,
   deleteSelfIntro,
@@ -110,7 +111,8 @@ const EXERCISES: Exercise[] = [
 // ---------- Main ----------
 export default function SelfIntroduction() {
   const { user } = useAuth();
-  const [step, setStep] = useState<number>(1);
+  const navigate = useNavigate();
+  const [step, setStep] = useState<number>(0);
   const [inputs, setInputs] = useState<SelfIntroInputs>(emptyInputs);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenResult | null>(null);
