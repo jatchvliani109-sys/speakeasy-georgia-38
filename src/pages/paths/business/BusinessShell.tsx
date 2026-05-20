@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GlobalNav from "@/components/GlobalNav";
 
 // Shared shell for the Business English path.
@@ -12,6 +12,7 @@ export default function BusinessShell({
   children: ReactNode;
   back?: { to: string; label: string };
 }) {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#FAF7F0]">
       <header className="border-b border-[#E7E2D5] bg-[#FAF7F0]/80 backdrop-blur sticky top-0 z-20">
@@ -29,10 +30,18 @@ export default function BusinessShell({
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
-        {back && (
-          <Link to={back.to} className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] inline-block mb-3">
+        {back ? (
+          <Link to={back.to} className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] inline-flex items-center gap-1 mb-3">
             ← {back.label}
           </Link>
+        ) : (
+          <button
+            onClick={() => navigate(-1)}
+            className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] inline-flex items-center gap-1 mb-3"
+            aria-label="უკან"
+          >
+            ← უკან
+          </button>
         )}
         {children}
       </main>
