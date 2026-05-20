@@ -114,6 +114,7 @@ export default function BusinessHome() {
           <Stat label="გასაუბრების პასუხები" value="0" />
         </div>
       </BizCard>
+      </>)}
     </BusinessShell>
   );
 }
