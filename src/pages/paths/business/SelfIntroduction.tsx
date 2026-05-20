@@ -176,13 +176,44 @@ export default function SelfIntroduction() {
     };
     const list = saveSelfIntro(user.id, item);
     setSaved(list);
+    saveBusiness(user.id, { businessSelfIntroductionCompleted: true });
     toast.success("შენახულია");
     setStep(7);
   };
 
-  const speak = (text: string) => {
-    try { const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = 0.95;
-      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } catch {}
+  // OpenAI TTS read-aloud (cleans Georgian + emojis server-side). Cached per session.
+  const audioCache = useMemo(() => new Map<string, string>(), []);
+  const speak = async (text: string) => {
+    if (!text) return;
+    try {
+      let url = audioCache.get(text);
+      if (!url) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) {
+          if (res.status === 400) { toast.message("No English audio available"); return; }
+          throw new Error("tts");
+        }
+        const blob = await res.blob();
+        if (!blob.type.startsWith("audio/")) { toast.message("No English audio available"); return; }
+        url = URL.createObjectURL(blob);
+        audioCache.set(text, url);
+      }
+      const audio = new Audio(url);
+      audio.playbackRate = 0.95;
+      await audio.play();
+    } catch {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US"; u.rate = 0.95;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+      } catch {}
+    }
   };
   const copyText = async (t: string) => { try { await navigator.clipboard.writeText(t); toast.success("დაკოპირდა"); } catch {} };
   const markPracticed = (id: string) => {
