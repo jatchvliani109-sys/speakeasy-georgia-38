@@ -160,7 +160,7 @@ export default function LearningPathSelection() {
             return (
               <article
                 key={p.id}
-                className={`lp-anim ${mounted ? "in" : ""} lp-card relative overflow-hidden rounded-2xl bg-[#FAFAF7] border border-[#E5E2D8] shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
+                className={`lp-anim ${mounted ? "in" : ""} lp-card relative overflow-hidden rounded-2xl ${theme.cardBg} border ${theme.cardBorder} shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
                 style={{ animationDelay: `${120 + idx * 90}ms` }}
               >
                 <div className={`absolute top-0 left-0 right-0 h-[3px] ${theme.accentLine}`} />
@@ -172,13 +172,13 @@ export default function LearningPathSelection() {
                       <Icon className="w-6 h-6" strokeWidth={1.75} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#6B7280] mb-1">
+                      <div className={`text-[10px] font-semibold tracking-[0.18em] uppercase ${theme.eyebrow} mb-1`}>
                         {theme.badge}
                       </div>
                       <h2 className="ka text-lg sm:text-xl font-extrabold text-[#071A2F] leading-snug">
                         {p.title}
                       </h2>
-                      <p className="ka text-sm text-[#6B7280] mt-2 leading-relaxed">
+                      <p className="ka text-sm text-[#4B5563] mt-2 leading-relaxed">
                         {p.description}
                       </p>
                     </div>
@@ -189,8 +189,8 @@ export default function LearningPathSelection() {
                     disabled={saving !== null}
                     className={`lp-btn group inline-flex items-center justify-center gap-2 w-full h-12 rounded-xl text-sm font-semibold tracking-wide ka
                       ${isCurrent
-                        ? "bg-[#FAFAF7] text-[#071A2F] border border-[#071A2F]/30 hover:bg-[#F7F1E3]"
-                        : "bg-[#071A2F] text-[#FAFAF7] hover:bg-[#0F2748]"}
+                        ? `bg-white ${theme.eyebrow} border ${theme.cardBorder} hover:bg-[#FAFAF7]`
+                        : `${theme.ctaBg} ${theme.ctaText} ${theme.ctaHover}`}
                       disabled:opacity-60 disabled:cursor-not-allowed`}
                   >
                     {isSaving ? (
@@ -204,6 +204,7 @@ export default function LearningPathSelection() {
                   </button>
                 </div>
               </article>
+
             );
           })}
         </div>
