@@ -36,14 +36,12 @@ type DashStats = {
 
 export default function SpeakingDashboard() {
   const { user } = useAuth();
-  const [streak, setStreak] = useState<SpeakingStats | null>(null);
   const [stats, setStats] = useState<DashStats | null>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [streakRes, lessonsRes, pronRes] = await Promise.all([
-        loadSpeakingStats(user.id),
+      const [lessonsRes, pronRes] = await Promise.all([
         supabase
           .from("lessons")
           .select("id, level, summary, completed, created_at")
@@ -55,7 +53,7 @@ export default function SpeakingDashboard() {
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
       ]);
-      setStreak(streakRes);
+
       const lessons = (lessonsRes.data ?? []).filter((l) => (l.level ?? "").startsWith("speaking"));
       const dailyLessons = lessons.filter((l) => !(l.level ?? "").includes("roleplay"));
       const completed = dailyLessons.filter((l) => l.completed);
