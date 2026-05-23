@@ -413,7 +413,7 @@ export default function SelfIntroduction() {
             <VersionCard key={v}
               label={v === "short" ? "Short — 20-30 წამი" : v === "standard" ? "Standard — 45-60 წამი" : "Polished — პროფესიული"}
               version={result[v]} isSelected={selected === v} onSelect={() => setSelected(v)}
-              onSpeak={() => speak(result[v].en)} onCopy={() => copyText(result[v].en)}
+              speakText={result[v].en} onCopy={() => copyText(result[v].en)}
               onRewrite={(mode) => rewrite(v, mode)} rewritingKey={rewriting} vKey={v}
               showKa={isBeginner || isElementary}/>
           ))}
