@@ -12,9 +12,7 @@ export default function Dashboard() {
     if (!user) return;
     (async () => {
       const { data: prof } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      if (!prof) return;
-      if (!prof.onboarding_completed) return navigate("/onboarding", { replace: true });
-      if (!prof.level_test_completed) return navigate("/level-test", { replace: true });
+      if (!prof) return navigate("/learning-path", { replace: true });
       const selected = (prof as any).selected_learning_path;
       const p = pathById(selected);
       if (!p) return navigate("/learning-path", { replace: true });
