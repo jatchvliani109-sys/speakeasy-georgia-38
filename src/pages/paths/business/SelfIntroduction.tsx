@@ -438,7 +438,7 @@ export default function SelfIntroduction() {
                   <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-[#1E2A44] text-sm">{p.en}</p>
-                      <button onClick={() => speak(p.en)} className="text-xs px-2 py-1 rounded border border-[#E7E2D5]">🔊</button>
+                      <ReadAloudButton text={p.en} />
                     </div>
                     <p className="ka text-xs text-[#5B6473] mt-1">{p.ka}</p>
                     <p className="ka text-xs text-[#374151] mt-2">{p.explanationKa}</p>
