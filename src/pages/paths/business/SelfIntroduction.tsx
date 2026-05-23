@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
   BusinessLevel,
   loadBusiness,
@@ -299,7 +300,7 @@ export default function SelfIntroduction() {
                     <p className="text-sm text-[#1E2A44] mt-1.5">{p.exEn}</p>
                     {(isBeginner || isElementary) && <p className="ka text-xs text-[#5B6473] mt-1">{p.exKa}</p>}
                   </div>
-                  <button onClick={() => speak(p.exEn)} className="text-xs px-2 py-1 rounded border border-[#E7E2D5]">🔊</button>
+                  <ReadAloudButton text={p.exEn} />
                 </div>
               </li>
             ))}
@@ -340,8 +341,10 @@ export default function SelfIntroduction() {
               {isAdvanced && EXAMPLES[inputs.purpose][tier].note && (
                 <p className="ka text-[11px] text-[#5B6473] mt-2 italic">{EXAMPLES[inputs.purpose][tier].note}</p>
               )}
-              <button onClick={() => speak(EXAMPLES[inputs.purpose][tier].en)}
-                className="mt-3 text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">🔊 მოსმენა</button>
+              <div className="mt-3">
+                <ReadAloudButton text={EXAMPLES[inputs.purpose][tier].en} label="მოსმენა" />
+              </div>
+
             </div>
           )}
 
@@ -410,7 +413,7 @@ export default function SelfIntroduction() {
             <VersionCard key={v}
               label={v === "short" ? "Short — 20-30 წამი" : v === "standard" ? "Standard — 45-60 წამი" : "Polished — პროფესიული"}
               version={result[v]} isSelected={selected === v} onSelect={() => setSelected(v)}
-              onSpeak={() => speak(result[v].en)} onCopy={() => copyText(result[v].en)}
+              speakText={result[v].en} onCopy={() => copyText(result[v].en)}
               onRewrite={(mode) => rewrite(v, mode)} rewritingKey={rewriting} vKey={v}
               showKa={isBeginner || isElementary}/>
           ))}
@@ -435,7 +438,7 @@ export default function SelfIntroduction() {
                   <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-[#1E2A44] text-sm">{p.en}</p>
-                      <button onClick={() => speak(p.en)} className="text-xs px-2 py-1 rounded border border-[#E7E2D5]">🔊</button>
+                      <ReadAloudButton text={p.en} />
                     </div>
                     <p className="ka text-xs text-[#5B6473] mt-1">{p.ka}</p>
                     <p className="ka text-xs text-[#374151] mt-2">{p.explanationKa}</p>
@@ -541,7 +544,7 @@ export default function SelfIntroduction() {
                   <p className="text-sm text-[#1E2A44] mt-3 leading-relaxed">{v.en}</p>
                   <p className="ka text-xs text-[#5B6473] mt-2">{v.ka}</p>
                   <div className="mt-3 flex gap-2 flex-wrap">
-                    <button onClick={() => speak(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">🔊 მოსმენა</button>
+                    <ReadAloudButton text={v.en} label="მოსმენა" />
                     <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">კოპირება</button>
                     <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">I practiced</button>
                   </div>
@@ -571,10 +574,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function VersionCard({
-  label, version, isSelected, onSelect, onSpeak, onCopy, onRewrite, rewritingKey, vKey, showKa,
+  label, version, isSelected, onSelect, speakText, onCopy, onRewrite, rewritingKey, vKey, showKa,
 }: {
   label: string; version: SelfIntroVersion; isSelected: boolean;
-  onSelect: () => void; onSpeak: () => void; onCopy: () => void;
+  onSelect: () => void; speakText: string; onCopy: () => void;
   onRewrite: (mode: "shorter" | "simpler" | "more_professional" | "improve") => void;
   rewritingKey: string | null; vKey: string; showKa: boolean;
 }) {
@@ -591,8 +594,8 @@ function VersionCard({
       </div>
       <p className="text-sm text-[#1E2A44] mt-3 leading-relaxed">{version.en}</p>
       {showKa && <p className="ka text-xs text-[#5B6473] mt-2">{version.ka}</p>}
-      <div className="mt-3 flex gap-1.5 flex-wrap">
-        <ChipBtn onClick={onSpeak}>🔊</ChipBtn>
+      <div className="mt-3 flex gap-1.5 flex-wrap items-center">
+        <ReadAloudButton text={speakText} />
         <ChipBtn onClick={onCopy}>კოპირება</ChipBtn>
         <ChipBtn onClick={() => onRewrite("improve")} loading={busy("improve")}>Improve</ChipBtn>
         <ChipBtn onClick={() => onRewrite("simpler")} loading={busy("simpler")}>Simpler</ChipBtn>

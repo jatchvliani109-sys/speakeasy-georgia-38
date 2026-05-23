@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { BUSINESS_MODULES } from "./lib/state";
 import { SAMPLE_BUSINESS_VOCAB } from "./lib/vocab";
 
@@ -62,16 +63,6 @@ function VocabCard({ v }: { v: typeof SAMPLE_BUSINESS_VOCAB[number] }) {
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<null | boolean>(null);
 
-  const speak = (text: string) => {
-    try {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "en-US";
-      u.rate = 0.95;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-    } catch {}
-  };
-
   return (
     <BizCard>
       <div className="flex items-start justify-between gap-3">
@@ -79,12 +70,7 @@ function VocabCard({ v }: { v: typeof SAMPLE_BUSINESS_VOCAB[number] }) {
           <h3 className="text-xl font-bold text-[#1E2A44]">{v.word}</h3>
           <p className="ka text-sm text-[#5B6473] mt-0.5">{v.georgian}</p>
         </div>
-        <button
-          onClick={() => speak(v.word)}
-          className="px-3 py-1.5 rounded-lg border border-[#E7E2D5] text-[#1E2A44] text-xs hover:bg-[#1E2A44]/5"
-        >
-          🔊
-        </button>
+        <ReadAloudButton text={v.word} size="md" />
       </div>
 
       <p className="ka text-sm text-[#374151] mt-3">{v.explanation}</p>
