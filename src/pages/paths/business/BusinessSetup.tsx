@@ -33,19 +33,23 @@ export default function BusinessSetup() {
 
   const [step, setStep] = useState<Step>(0);
   const [goals, setGoals] = useState<BusinessGoal[]>(initial?.goals ?? []);
-  const [priority, setPriority] = useState<BusinessPriority | null>(initial?.mainPriority ?? null);
+  const [priority, setPriority] = useState<BusinessPriority[]>(initial?.mainPriority ?? []);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(initial?.intensity ?? null);
   const [deadline, setDeadline] = useState<BusinessDeadline>(initial?.deadline ?? null);
-  const [field, setField] = useState<BusinessField | null>(initial?.field ?? null);
+  const [field, setField] = useState<BusinessField[]>(initial?.field ?? []);
 
   const toggleGoal = (g: BusinessGoal) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
+  const togglePriority = (p: BusinessPriority) =>
+    setPriority((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
+  const toggleField = (f: BusinessField) =>
+    setField((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
 
   const canNext =
     (step === 0 && goals.length > 0) ||
-    (step === 1 && !!priority) ||
+    (step === 1 && priority.length > 0) ||
     (step === 2 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
-    (step === 3 && !!field);
+    (step === 3 && field.length > 0);
 
   const next = () => {
     if (step < 3) setStep((s) => (s + 1) as Step);
