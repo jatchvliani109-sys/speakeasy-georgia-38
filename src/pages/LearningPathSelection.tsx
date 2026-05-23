@@ -10,26 +10,44 @@ import { TestingShortcuts } from "@/components/GlobalNav";
 
 type Theme = {
   icon: LucideIcon;
-  accentLine: string; // tailwind bg color for top accent
+  accentLine: string;
   iconBg: string;
   iconColor: string;
   badge: string;
+  cardBg: string;
+  cardBorder: string;
+  ctaBg: string;
+  ctaText: string;
+  ctaHover: string;
+  eyebrow: string;
 };
 
 const THEMES: Record<LearningPathId, Theme> = {
   speaking: {
     icon: Mic,
     accentLine: "bg-[#C9A227]",
-    iconBg: "bg-[#071A2F]",
-    iconColor: "text-[#C9A227]",
+    iconBg: "bg-[#0F2748]",
+    iconColor: "text-[#E8C461]",
     badge: "AI Speaking",
+    cardBg: "bg-[#FBF6EA]",
+    cardBorder: "border-[#E8D9A8]",
+    ctaBg: "bg-[#0F2748]",
+    ctaText: "text-[#F4E5B8]",
+    ctaHover: "hover:bg-[#16345E]",
+    eyebrow: "text-[#9A7A1E]",
   },
   business_english: {
     icon: Briefcase,
-    accentLine: "bg-[#0F766E]",
-    iconBg: "bg-[#111827]",
-    iconColor: "text-[#F7F1E3]",
+    accentLine: "bg-[#1E3A5F]",
+    iconBg: "bg-[#0F2748]",
+    iconColor: "text-[#E6ECF4]",
     badge: "Executive",
+    cardBg: "bg-[#F1F4F8]",
+    cardBorder: "border-[#CED8E5]",
+    ctaBg: "bg-[#0F2748]",
+    ctaText: "text-[#E6ECF4]",
+    ctaHover: "hover:bg-[#16345E]",
+    eyebrow: "text-[#1E3A5F]",
   },
   national_exam: {
     icon: GraduationCap,
@@ -37,6 +55,12 @@ const THEMES: Record<LearningPathId, Theme> = {
     iconBg: "bg-[#5C1A30]",
     iconColor: "text-[#F4D9DE]",
     badge: "Exam Prep",
+    cardBg: "bg-[#FAEFF2]",
+    cardBorder: "border-[#E8C8D2]",
+    ctaBg: "bg-[#5C1A30]",
+    ctaText: "text-[#F4D9DE]",
+    ctaHover: "hover:bg-[#7A2240]",
+    eyebrow: "text-[#7A2240]",
   },
 };
 
