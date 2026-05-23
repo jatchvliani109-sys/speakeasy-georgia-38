@@ -10,171 +10,211 @@ type MCQ = {
   promptKa?: string;
   options: string[];
   correct: number;
+  weight: 1 | 2 | 3;
 };
 type Open = {
   type: "open";
   prompt: string;
   promptKa?: string;
-  minWords: number;
 };
 type Question = MCQ | Open;
 
+// 10 MCQ + 1 optional open. Mix of easy(1), medium(2), hard(3).
 const QUESTIONS: Question[] = [
+  // EASY (1pt) — basic vocab in context
   {
     type: "mcq",
-    prompt: "What does deadline mean?",
-    promptKa: "რას ნიშნავს deadline?",
-    options: ["ბოლო ვადა", "შემოსავალი", "შეხვედრა", "თანამშრომელი"],
-    correct: 0,
-  },
-  {
-    type: "mcq",
-    prompt: "What does revenue mean?",
-    promptKa: "რას ნიშნავს revenue?",
-    options: ["ხარჯი", "შემოსავალი", "გადასახადი", "ბიუჯეტი"],
+    weight: 1,
+    prompt: "We need to ______ the meeting until next week because the client is unavailable.",
+    promptKa: "შეავსე ხარვეზი.",
+    options: ["cancel", "postpone", "delay back", "remove"],
     correct: 1,
   },
   {
     type: "mcq",
-    prompt: "Choose the more professional sentence.",
-    promptKa: "აირჩიე უფრო პროფესიული წინადადება.",
+    weight: 1,
+    prompt: "Which word best completes the sentence: 'Please find the report ______ to this email.'",
+    promptKa: "შეავსე ხარვეზი.",
+    options: ["included", "attached", "connected", "added"],
+    correct: 1,
+  },
+  {
+    type: "mcq",
+    weight: 1,
+    prompt: "A colleague writes: 'Could you send it ASAP?' This means they want it:",
+    promptKa: "რას ნიშნავს ASAP?",
     options: [
-      "Send me this today.",
-      "Could you please send this to me today?",
-      "Send today now.",
-      "U must send this.",
+      "whenever you have time",
+      "as soon as possible",
+      "after the next meeting",
+      "at a scheduled point",
+    ],
+    correct: 1,
+  },
+  // MEDIUM (2pt) — tone & register
+  {
+    type: "mcq",
+    weight: 2,
+    prompt: "You missed a deadline. Which message is the most professional?",
+    promptKa: "აირჩიე ყველაზე პროფესიული პასუხი.",
+    options: [
+      "Sorry, I forgot. Will send it later today.",
+      "Apologies for the delay — I'll have it on your desk by end of day.",
+      "My bad, things got crazy. Tomorrow ok?",
+      "I couldn't finish, sorry about that.",
     ],
     correct: 1,
   },
   {
     type: "mcq",
-    prompt: "Choose the most polite email opening.",
-    promptKa: "აირჩიე ყველაზე თავაზიანი იმეილის გახსნა.",
+    weight: 2,
+    prompt: "Which sentence is grammatically correct in a business context?",
+    promptKa: "აირჩიე გრამატიკულად სწორი წინადადება.",
     options: [
-      "Hey, what's up?",
-      "Yo team,",
-      "Dear Mr. Smith,",
-      "Hi dude,",
+      "I look forward to hear from you.",
+      "I am looking forward to hear from you soon.",
+      "I look forward to hearing from you.",
+      "I will look forward hearing from you.",
     ],
     correct: 2,
   },
   {
     type: "mcq",
-    prompt: "Choose the correct sentence.",
-    promptKa: "აირჩიე სწორი წინადადება.",
+    weight: 2,
+    prompt: "In a meeting, how do you politely disagree with a senior colleague?",
+    promptKa: "როგორ გამოხატავ თავაზიან უთანხმოებას?",
     options: [
-      "I am interesting in this position.",
-      "I am interested in this position.",
-      "I have interest on this position.",
-      "Me interested for this job.",
+      "You're wrong about that.",
+      "I don't think so.",
+      "I see your point, however, I'd like to suggest another angle.",
+      "That doesn't make sense to me.",
+    ],
+    correct: 2,
+  },
+  {
+    type: "mcq",
+    weight: 2,
+    prompt: "'We need to touch base before the client call.' What does 'touch base' mean here?",
+    promptKa: "რას ნიშნავს 'touch base'?",
+    options: [
+      "Sign a contract",
+      "Briefly connect or align",
+      "Reach a final decision",
+      "Physically meet in person",
+    ],
+    correct: 1,
+  },
+  // HARD (3pt) — nuance, idiom, complex register
+  {
+    type: "mcq",
+    weight: 3,
+    prompt: "Your manager says: 'Let's circle back on this once we have more bandwidth.' This means:",
+    promptKa: "რას ნიშნავს ეს ფრაზა?",
+    options: [
+      "We should restart the project from scratch.",
+      "We'll revisit this when we have more capacity.",
+      "We need to involve more team members now.",
+      "The decision has been finalized.",
     ],
     correct: 1,
   },
   {
     type: "mcq",
-    prompt: "Choose the correct sentence.",
-    promptKa: "აირჩიე სწორი წინადადება.",
+    weight: 3,
+    prompt: "A client email ends: 'I'd appreciate your thoughts at your earliest convenience.' The tone is:",
+    promptKa: "რა ტონია?",
     options: [
-      "We discussed about the project yesterday.",
-      "We discussed the project yesterday.",
-      "We did discuss to the project.",
-      "We are discuss the project.",
+      "Urgent and demanding",
+      "Polite but indicates the writer expects a timely reply",
+      "Casual and friendly with no time pressure",
+      "Passive-aggressive and unhappy",
     ],
     correct: 1,
   },
   {
     type: "mcq",
-    prompt: "Your manager asks for a status update. Choose the best response.",
-    promptKa: "მენეჯერი სტატუსს გეკითხება. აირჩიე საუკეთესო პასუხი.",
+    weight: 3,
+    prompt: "Choose the best rewrite of: 'We can't do this because we don't have enough money.'",
+    promptKa: "აირჩიე საუკეთესო პროფესიული გადაწერა.",
     options: [
-      "Nothing much, will see.",
-      "I'm on it, will share an update by EOD.",
-      "Idk, ask later.",
-      "Why you ask?",
+      "We are unable to proceed due to current budget constraints.",
+      "We can't proceed because of money problems right now.",
+      "Money is a problem so this isn't possible.",
+      "Due to the fact of money we cannot proceed with this.",
     ],
-    correct: 1,
+    correct: 0,
   },
-  {
-    type: "mcq",
-    prompt: "Choose the best follow-up email line.",
-    promptKa: "აირჩიე საუკეთესო follow-up ფრაზა იმეილში.",
-    options: [
-      "Why no answer?",
-      "Just checking in on my previous email — let me know if you need more info.",
-      "Reply now please.",
-      "I send again.",
-    ],
-    correct: 1,
-  },
-  {
-    type: "mcq",
-    prompt: "Pick the best presentation opener.",
-    promptKa: "აირჩიე საუკეთესო პრეზენტაციის გახსნა.",
-    options: [
-      "So yeah, let's start.",
-      "Today I'd like to walk you through our Q3 results.",
-      "Listen up everyone.",
-      "Okay so basically...",
-    ],
-    correct: 1,
-  },
-  {
-    type: "mcq",
-    prompt: "What does stakeholder mean?",
-    promptKa: "რას ნიშნავს stakeholder?",
-    options: [
-      "კონკურენტი",
-      "დაინტერესებული მხარე",
-      "კლიენტი მხოლოდ",
-      "მენეჯერი",
-    ],
-    correct: 1,
-  },
+  // OPTIONAL open
   {
     type: "open",
-    prompt: "Write 2–3 sentences: Tell me about yourself professionally.",
-    promptKa: "დაწერე 2–3 წინადადება: მოგვიყევი შენს თავზე პროფესიულად.",
-    minWords: 12,
+    prompt:
+      "(Optional) Write 2–3 sentences: a polite email to a client explaining a one-week delay on a deliverable.",
+    promptKa:
+      "(არასავალდებულო) დაწერე 2–3 წინადადება: თავაზიანი იმეილი კლიენტისთვის ერთკვირიანი დაგვიანების შესახებ.",
   },
 ];
 
-function computeLevel(correct: number, openWords: number): BusinessLevel {
-  // 10 MCQs + 1 open task
-  let score = correct; // 0..10
-  if (openWords >= 25) score += 2;
-  else if (openWords >= 12) score += 1;
-  if (score >= 11) return "business_advanced";
-  if (score >= 8) return "business_intermediate";
-  if (score >= 5) return "business_elementary";
+const MAX_MCQ_SCORE = QUESTIONS.reduce(
+  (s, q) => s + (q.type === "mcq" ? q.weight : 0),
+  0,
+);
+
+function levelFromPercent(pct: number): BusinessLevel {
+  if (pct >= 85) return "business_advanced";
+  if (pct >= 70) return "business_intermediate";
+  if (pct >= 50) return "business_elementary";
   return "business_beginner";
 }
+
+const LEVEL_BLURB: Record<BusinessLevel, string> = {
+  business_beginner:
+    "შენ ახლა იწყებ ბიზნეს ინგლისურს. შენი გეგმა ფოკუსირდება საბაზისო ლექსიკაზე, მარტივ იმეილებზე და ყოველდღიურ სამუშაო ფრაზებზე.",
+  business_elementary:
+    "შენ უკვე გესმის ბიზნეს ინგლისურის საფუძვლები. შენი გეგმა ფოკუსირდება უფრო თავაზიან ფორმულირებებზე, იმეილების სტრუქტურაზე და გავრცელებულ სამუშაო სიტუაციებზე.",
+  business_intermediate:
+    "შენ მაგრად მართავ ბიზნეს კომუნიკაციას. შენი გეგმა გააძლიერებს ნუანსს, ტონს, შეხვედრებსა და პრეზენტაციებში თავდაჯერებას.",
+  business_advanced:
+    "შენ მაღალ დონეზე ფლობ ბიზნეს ინგლისურს. შენი გეგმა გაასწავლის გამოცდილ ნიუანსებს, idiom-ებს, რთულ მოლაპარაკებებსა და დახვეწილ წერას.",
+};
 
 export default function BusinessPlacementTest() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const total = QUESTIONS.length;
   const [idx, setIdx] = useState(0);
-  const [answers, setAnswers] = useState<(number | string | null)[]>(() => Array(total).fill(null));
+  const [answers, setAnswers] = useState<(number | string | null)[]>(() =>
+    Array(total).fill(null),
+  );
   const [done, setDone] = useState(false);
   const [resultLevel, setResultLevel] = useState<BusinessLevel | null>(null);
+  const [resultPct, setResultPct] = useState<number>(0);
 
   const q = QUESTIONS[idx];
   const a = answers[idx];
 
-  const canNext = q.type === "mcq" ? typeof a === "number" : typeof a === "string" && a.trim().length > 0;
+  const isOpen = q.type === "open";
+  const canNext = isOpen ? true : typeof a === "number"; // open is optional
 
   const submit = () => {
-    let correct = 0;
-    let openWords = 0;
+    let raw = 0;
     answers.forEach((ans, i) => {
       const qq = QUESTIONS[i];
-      if (qq.type === "mcq" && ans === qq.correct) correct++;
-      if (qq.type === "open" && typeof ans === "string") {
-        openWords = ans.trim().split(/\s+/).filter(Boolean).length;
-      }
+      if (qq.type === "mcq" && ans === qq.correct) raw += qq.weight;
     });
-    const level = computeLevel(correct, openWords);
+    let pct = (raw / MAX_MCQ_SCORE) * 100;
+
+    // Optional open answer = small upward-only bonus
+    const openIdx = QUESTIONS.findIndex((x) => x.type === "open");
+    const openAns = answers[openIdx];
+    if (typeof openAns === "string") {
+      const words = openAns.trim().split(/\s+/).filter(Boolean).length;
+      if (words >= 25) pct = Math.min(100, pct + 6);
+      else if (words >= 12) pct = Math.min(100, pct + 3);
+    }
+
+    const level = levelFromPercent(pct);
     setResultLevel(level);
+    setResultPct(Math.round(pct));
     setDone(true);
     if (user) {
       const next = saveBusiness(user.id, { level, testCompleted: true });
@@ -196,12 +236,16 @@ export default function BusinessPlacementTest() {
             შედეგი
           </p>
           <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">
-            შენი ბიზნეს ინგლისურის დონე: <span className="text-[#0F766E]">{LEVEL_LABELS[resultLevel]}</span>
+            შენი დონე:{" "}
+            <span className="text-[#0F766E]">{LEVEL_LABELS[resultLevel]}</span>
           </h1>
-          <p className="ka text-sm text-[#5B6473] mt-2">
-            ამ დონის მიხედვით მოგიმზადებთ პერსონალურ გეგმას.
+          <p className="text-sm text-[#5B6473] mt-1">
+            Score: {resultPct}% (weighted)
           </p>
-          <div className="mt-5">
+          <p className="ka text-sm text-[#374151] mt-4 leading-relaxed">
+            {LEVEL_BLURB[resultLevel]}
+          </p>
+          <div className="mt-6">
             <BizButton onClick={() => navigate("/path/business/plan", { replace: true })}>
               გეგმის ნახვა
             </BizButton>
@@ -216,8 +260,15 @@ export default function BusinessPlacementTest() {
       <div className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
           კითხვა {idx + 1} / {total}
+          {q.type === "mcq" && (
+            <span className="ml-2 text-[#5B6473] normal-case tracking-normal">
+              · {q.weight} pt
+            </span>
+          )}
         </p>
-        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">ბიზნეს ინგლისურის მოკლე ტესტი</h1>
+        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">
+          ბიზნეს ინგლისურის მოკლე ტესტი
+        </h1>
         <p className="ka text-sm text-[#5B6473] mt-1">
           ტესტი დაგვეხმარება გავიგოთ რა დონიდან დავიწყოთ.
         </p>
@@ -234,7 +285,9 @@ export default function BusinessPlacementTest() {
               return (
                 <button
                   key={i}
-                  onClick={() => setAnswers((p) => p.map((v, j) => (j === idx ? i : v)))}
+                  onClick={() =>
+                    setAnswers((p) => p.map((v, j) => (j === idx ? i : v)))
+                  }
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
                       ? "border-[#1E2A44] bg-[#1E2A44]/5 text-[#1E2A44]"
@@ -247,27 +300,41 @@ export default function BusinessPlacementTest() {
             })}
           </div>
         ) : (
-          <textarea
-            value={typeof a === "string" ? a : ""}
-            onChange={(e) => setAnswers((p) => p.map((v, j) => (j === idx ? e.target.value : v)))}
-            rows={4}
-            placeholder="Write your answer in English..."
-            className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E7E2D5] focus:border-[#1E2A44] outline-none text-sm bg-white"
-          />
+          <>
+            <textarea
+              value={typeof a === "string" ? a : ""}
+              onChange={(e) =>
+                setAnswers((p) =>
+                  p.map((v, j) => (j === idx ? e.target.value : v)),
+                )
+              }
+              rows={5}
+              placeholder="Write your answer in English... (optional)"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E7E2D5] focus:border-[#1E2A44] outline-none text-sm bg-white"
+            />
+            <p className="ka text-xs text-[#5B6473] mt-2">
+              ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
+            </p>
+          </>
         )}
 
         <div className="flex items-center justify-between mt-6">
-          <BizButton variant="ghost" onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0}>
+          <BizButton
+            variant="ghost"
+            onClick={() => setIdx((i) => Math.max(0, i - 1))}
+            disabled={idx === 0}
+          >
             უკან
           </BizButton>
           {idx < total - 1 ? (
-            <BizButton onClick={() => setIdx((i) => Math.min(total - 1, i + 1))} disabled={!canNext}>
+            <BizButton
+              onClick={() => setIdx((i) => Math.min(total - 1, i + 1))}
+              disabled={!canNext}
+            >
               შემდეგი
             </BizButton>
           ) : (
-            <BizButton onClick={submit} disabled={!canNext}>
-              დასრულება
-            </BizButton>
+            <BizButton onClick={submit}>დასრულება</BizButton>
           )}
         </div>
       </BizCard>
