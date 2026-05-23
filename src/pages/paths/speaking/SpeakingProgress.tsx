@@ -31,7 +31,7 @@ export default function SpeakingProgress() {
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [mistakes, setMistakes] = useState<MistakeRow[]>([]);
   const [pron, setPron] = useState<PronRow[]>([]);
-  const [streak, setStreak] = useState<SpeakingStats | null>(null);
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
