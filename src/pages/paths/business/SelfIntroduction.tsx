@@ -140,7 +140,7 @@ export default function SelfIntroduction() {
     try {
       const { data, error } = await supabase.functions.invoke("business-self-intro", {
         body: { ...inputs, level: biz?.level || "business_intermediate",
-          businessPriority: biz?.mainPriority || "general_business", variant: "all" },
+          businessPriority: biz?.mainPriority?.[0] || "general_business", variant: "all" },
       });
       if (error) throw error;
       if (!data?.short || !data?.standard || !data?.polished) throw new Error("AI-მ ვერ დააბრუნა სრული პასუხი. სცადე ისევ.");
@@ -158,7 +158,7 @@ export default function SelfIntroduction() {
     setRewriting(`${which}:${variant}`);
     try {
       const { data, error } = await supabase.functions.invoke("business-self-intro", {
-        body: { ...inputs, level: biz?.level, businessPriority: biz?.mainPriority,
+        body: { ...inputs, level: biz?.level, businessPriority: biz?.mainPriority?.[0],
           variant, baseText: result[which].en },
       });
       if (error) throw error;
