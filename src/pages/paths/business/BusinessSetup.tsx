@@ -110,11 +110,12 @@ export default function BusinessSetup() {
         )}
 
         {step === 1 && (
-          <SingleSelect
+          <MultiSelect
             title="რომელია შენი მთავარი მიზანი ახლა?"
+            hint="შეგიძლია რამდენიმე პასუხი აირჩიო."
             options={PRIORITY_KEYS.map((k) => ({ value: k, label: PRIORITY_LABELS[k] }))}
-            value={priority}
-            onChange={(v) => setPriority(v as BusinessPriority)}
+            values={priority}
+            onToggle={(v) => togglePriority(v as BusinessPriority)}
           />
         )}
 
@@ -143,11 +144,12 @@ export default function BusinessSetup() {
         )}
 
         {step === 3 && (
-          <SingleSelect
-            title="რომელი სფერო გაინტერესებს?"
+          <MultiSelect
+            title="რომელი სფეროები გაინტერესებს?"
+            hint="შეგიძლია რამდენიმე სფერო აირჩიო."
             options={FIELD_KEYS.map((k) => ({ value: k, label: FIELD_LABELS[k] }))}
-            value={field}
-            onChange={(v) => setField(v as BusinessField)}
+            values={field}
+            onToggle={(v) => toggleField(v as BusinessField)}
           />
         )}
 
