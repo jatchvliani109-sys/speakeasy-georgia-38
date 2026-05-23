@@ -1,15 +1,29 @@
 import { Link, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { ArrowRight, MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
+import { ArrowRight, Mic, Briefcase, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
-  { icon: MessageCircle, title: "AI საუბრის ვარჯიში", desc: "ისაუბრე ნამდვილ AI მასწავლებელთან" },
-  { icon: Languages, title: "ქართული ახსნები", desc: "გაუგებრობის შემთხვევაში — ქართულად" },
-  { icon: CheckCircle2, title: "გრამატიკის შესწორება", desc: "ნაზად, შეცდომების გარეშე" },
-  { icon: BookOpen, title: "ახალი სიტყვები", desc: "ყოველი გაკვეთილის შემდეგ" },
-  { icon: TrendingUp, title: "პროგრესი", desc: "თვალი ადევნე საკუთარ ზრდას" },
+  {
+    icon: Mic,
+    eyebrow: "Speaking",
+    title: "საუბრის განვითარება",
+    desc: "ივარჯიშე ნამდვილ AI მასწავლებელთან — სტრუქტურირებული სესიები და რეალურ სიტუაციებზე დაფუძნებული დიალოგები, რომლებიც გაძლიერებს თავდაჯერებას, გამოთქმასა და ბუნებრივ მეტყველებას.",
+  },
+  {
+    icon: Briefcase,
+    eyebrow: "Business English",
+    title: "ბიზნეს ინგლისური",
+    desc: "პერსონალიზებული ბიზნეს ინგლისურის გზა შენი პროფესიისა და მიზნების მიხედვით — დონის ტესტი, სტრუქტურირებული მოდულები, იმეილები, გასაუბრებები, შეხვედრები და პრეზენტაციები.",
+  },
+  {
+    icon: GraduationCap,
+    eyebrow: "აბიტურიენტი",
+    title: "ეროვნული გამოცდებისთვის",
+    desc: "სტრუქტურირებული მომზადება მე-11 და მე-12 კლასელებისთვის — გრამატიკა, ლექსიკა, კითხვა და სავარჯიშო გამოცდები ეროვნული ფორმატით.",
+  },
 ];
+
 
 const Index = () => {
   const { user, loading } = useAuth();
