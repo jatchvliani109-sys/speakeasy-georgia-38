@@ -574,10 +574,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function VersionCard({
-  label, version, isSelected, onSelect, onSpeak, onCopy, onRewrite, rewritingKey, vKey, showKa,
+  label, version, isSelected, onSelect, speakText, onCopy, onRewrite, rewritingKey, vKey, showKa,
 }: {
   label: string; version: SelfIntroVersion; isSelected: boolean;
-  onSelect: () => void; onSpeak: () => void; onCopy: () => void;
+  onSelect: () => void; speakText: string; onCopy: () => void;
   onRewrite: (mode: "shorter" | "simpler" | "more_professional" | "improve") => void;
   rewritingKey: string | null; vKey: string; showKa: boolean;
 }) {
@@ -594,8 +594,8 @@ function VersionCard({
       </div>
       <p className="text-sm text-[#1E2A44] mt-3 leading-relaxed">{version.en}</p>
       {showKa && <p className="ka text-xs text-[#5B6473] mt-2">{version.ka}</p>}
-      <div className="mt-3 flex gap-1.5 flex-wrap">
-        <ChipBtn onClick={onSpeak}>🔊</ChipBtn>
+      <div className="mt-3 flex gap-1.5 flex-wrap items-center">
+        <ReadAloudButton text={speakText} />
         <ChipBtn onClick={onCopy}>კოპირება</ChipBtn>
         <ChipBtn onClick={() => onRewrite("improve")} loading={busy("improve")}>Improve</ChipBtn>
         <ChipBtn onClick={() => onRewrite("simpler")} loading={busy("simpler")}>Simpler</ChipBtn>
