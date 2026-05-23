@@ -152,12 +152,12 @@ export default function SpeakingDashboard() {
         </section>
 
         {/* Compact stats */}
-        <section className="grid grid-cols-4 gap-2">
-          <Stat label={<span className="inline-flex items-center gap-1"><Flame className="w-3 h-3" />Streak</span>} value={`${streak?.currentStreak ?? 0}`} />
+        <section className="grid grid-cols-3 gap-2">
           <Stat label="Lessons" value={stats?.lessonsCompleted ?? 0} />
           <Stat label="Phrases" value={stats?.phrasesPracticed ?? 0} />
           <Stat label="Attempts" value={stats?.pronAttempts ?? 0} />
         </section>
+
 
         {/* Other practice */}
         <section>
