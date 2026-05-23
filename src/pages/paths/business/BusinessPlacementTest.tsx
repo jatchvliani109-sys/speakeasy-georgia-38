@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessLevel, LEVEL_LABELS, buildPlan, loadBusiness, saveBusiness } from "./lib/state";
+import { BusinessLevel, LEVEL_LABELS, loadBusiness, saveBusiness } from "./lib/state";
 
 type MCQ = {
   type: "mcq";
@@ -217,16 +217,12 @@ export default function BusinessPlacementTest() {
     setResultPct(Math.round(pct));
     setDone(true);
     if (user) {
-      const next = saveBusiness(user.id, { level, testCompleted: true });
-      const plan = buildPlan(next);
-      if (plan) saveBusiness(user.id, { plan });
+      saveBusiness(user.id, { level, testCompleted: true });
     }
   };
 
   const initial = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
-  if (initial && !initial.setupCompleted) {
-    navigate("/path/business/setup", { replace: true });
-  }
+  void initial;
 
   if (done && resultLevel) {
     return (
@@ -246,8 +242,8 @@ export default function BusinessPlacementTest() {
             {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
-            <BizButton onClick={() => navigate("/path/business/plan", { replace: true })}>
-              გეგმის ნახვა
+            <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>
+              გაგრძელება
             </BizButton>
           </div>
         </BizCard>
