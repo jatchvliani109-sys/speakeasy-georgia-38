@@ -97,13 +97,13 @@
   .shadow-card { box-shadow: var(--shadow-card); }
   .transition-smooth { transition: var(--transition-smooth); }
 
-  /* ===== Speaking path theme — Modern Georgian English Speaking Coach =====
-     Palette: deep navy, warm cream, teal, light blue. Editorial, not "AI SaaS". */
+  /* ===== Speaking path theme — Warm Gold & Amber, premium editorial =====
+     Palette: warm cream, muted navy, gold, amber. Sharp, premium, not flashy. */
   body.sp-active {
     background:
-      radial-gradient(800px 500px at 90% -100px, hsl(175 60% 88% / 0.55), transparent 60%),
-      radial-gradient(700px 600px at -100px 200px, hsl(210 70% 92% / 0.6), transparent 60%),
-      linear-gradient(180deg, hsl(38 45% 97%) 0%, hsl(40 35% 95%) 100%) !important;
+      radial-gradient(800px 500px at 90% -100px, hsl(38 85% 80% / 0.45), transparent 60%),
+      radial-gradient(700px 600px at -100px 200px, hsl(30 70% 88% / 0.55), transparent 60%),
+      linear-gradient(180deg, hsl(40 50% 98%) 0%, hsl(38 45% 95%) 100%) !important;
     color: hsl(220 40% 16%);
   }
   body.sp-active::before {
@@ -116,8 +116,8 @@
   }
   body.sp-active #root { position: relative; z-index: 1; }
   body.sp-active header {
-    background: hsl(40 40% 97% / 0.85) !important;
-    border-color: hsl(220 25% 88%) !important;
+    background: hsl(40 50% 98% / 0.85) !important;
+    border-color: hsl(38 30% 86%) !important;
     color: hsl(220 40% 16%);
     backdrop-filter: blur(10px);
   }
@@ -128,18 +128,18 @@
   .sp-text-muted { color: hsl(220 15% 42%); }
   .sp-text-soft { color: hsl(220 20% 55%); }
 
-  /* Standard editorial card — clean, soft, no glow */
+  /* Standard editorial card — clean, soft, warm */
   .sp-card {
     background: hsl(0 0% 100%);
-    border: 1px solid hsl(220 22% 90%);
+    border: 1px solid hsl(38 28% 88%);
     border-radius: 1.125rem;
-    box-shadow: 0 1px 2px hsl(220 30% 20% / 0.04), 0 4px 18px -10px hsl(220 30% 20% / 0.08);
+    box-shadow: 0 1px 2px hsl(30 30% 20% / 0.04), 0 4px 18px -10px hsl(30 30% 20% / 0.08);
     color: hsl(220 45% 14%);
   }
-  /* Hero / featured card — deep navy block, the one premium accent */
+  /* Hero / featured card — deep navy with warm gold accent */
   .sp-card-hero {
     background:
-      radial-gradient(500px 240px at 100% 0%, hsl(175 75% 50% / 0.22), transparent 60%),
+      radial-gradient(500px 240px at 100% 0%, hsl(38 85% 55% / 0.22), transparent 60%),
       linear-gradient(160deg, hsl(220 50% 18%) 0%, hsl(218 55% 22%) 100%);
     color: hsl(40 30% 97%);
     border: 1px solid hsl(220 50% 22%);
@@ -148,8 +148,8 @@
   }
   .sp-card-hero .sp-text { color: hsl(40 30% 97%); }
   .sp-card-hero .sp-text-muted { color: hsl(40 25% 82%); }
-  /* Backwards-compat: any old usages of sp-card-glow get the editorial card */
   .sp-card-glow { @apply sp-card; }
+
 
   .sp-btn-primary {
     background: hsl(220 50% 18%);
