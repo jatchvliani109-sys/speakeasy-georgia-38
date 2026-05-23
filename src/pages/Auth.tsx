@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ArrowRight } from "lucide-react";
 
 const schema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
@@ -37,12 +37,12 @@ export default function Auth() {
           options: { emailRedirectTo: `${window.location.origin}/learning-path` },
         });
         if (error) throw error;
-        toast.success("მოგესალმებით! 🎉");
+        toast.success("მოგესალმებით");
         navigate("/learning-path");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("კეთილი იყოს თქვენი დაბრუნება!");
+        toast.success("კეთილი იყოს თქვენი დაბრუნება");
         navigate("/dashboard");
       }
     } catch (err: any) {
@@ -54,27 +54,71 @@ export default function Auth() {
 
   return (
     <Layout showLogout={false}>
-      <div className="max-w-sm mx-auto py-6">
-        <h1 className="text-3xl font-extrabold text-center mb-2 ka">
-          {mode === "signup" ? "შექმენი ანგარიში" : "შესვლა"}
-        </h1>
-        <p className="text-center text-muted-foreground mb-6 ka">
-          {mode === "signup" ? "სწრაფად — მხოლოდ ელ-ფოსტა და პაროლი" : "კეთილი იყოს თქვენი მობრძანება"}
-        </p>
-        <form onSubmit={submit} className="space-y-4 p-6 rounded-3xl gradient-card shadow-card border border-border">
+      <div className="max-w-sm mx-auto py-10">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
+            <span className="h-px w-6 bg-[#C9A227]" />
+            {mode === "signup" ? "Welcome" : "Sign in"}
+            <span className="h-px w-6 bg-[#C9A227]" />
+          </div>
+          <h1 className="text-3xl font-extrabold ka text-[#071A2F] mt-3 tracking-tight">
+            {mode === "signup" ? "შექმენი ანგარიში" : "შესვლა"}
+          </h1>
+          <p className="text-sm text-[#6B7280] mt-2 ka">
+            {mode === "signup" ? "ელ-ფოსტა და პაროლი — ეს არის ყველაფერი." : "კეთილი იყოს თქვენი მობრძანება."}
+          </p>
+        </div>
+
+        <form
+          onSubmit={submit}
+          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#FAFAF7] border border-[#E5E2D8] shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]"
+        >
           <div>
-            <Label htmlFor="email" className="ka">ელ-ფოსტა</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 mt-1.5 rounded-xl" />
+            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B7280]">
+              ელ-ფოსტა
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-11 mt-1.5 rounded-lg bg-white border-[#E5E2D8] focus-visible:ring-[#C9A227]"
+            />
           </div>
           <div>
-            <Label htmlFor="password" className="ka">პაროლი</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 mt-1.5 rounded-xl" />
+            <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B7280]">
+              პაროლი
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-11 mt-1.5 rounded-lg bg-white border-[#E5E2D8] focus-visible:ring-[#C9A227]"
+            />
           </div>
-          <Button type="submit" variant="hero" size="lg" className="w-full ka" disabled={loading}>
-            {loading ? "..." : mode === "signup" ? "რეგისტრაცია" : "შესვლა"}
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#071A2F] text-[#FAFAF7] text-sm font-semibold tracking-wide ka hover:bg-[#0F2748] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                {mode === "signup" ? "რეგისტრაცია" : "შესვლა"}
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </>
+            )}
+          </button>
         </form>
-        <button onClick={() => setMode(mode === "signup" ? "login" : "signup")} className="w-full text-center mt-6 text-sm text-primary hover:underline ka">
+
+        <button
+          onClick={() => setMode(mode === "signup" ? "login" : "signup")}
+          className="w-full text-center mt-6 text-sm text-[#6B7280] hover:text-[#071A2F] transition-colors ka"
+        >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
       </div>

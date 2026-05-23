@@ -19,26 +19,27 @@ type Theme = {
 const THEMES: Record<LearningPathId, Theme> = {
   speaking: {
     icon: Mic,
-    accentLine: "bg-[#0F766E]",
+    accentLine: "bg-[#C9A227]",
     iconBg: "bg-[#071A2F]",
     iconColor: "text-[#C9A227]",
     badge: "AI Speaking",
   },
   business_english: {
     icon: Briefcase,
-    accentLine: "bg-[#C9A227]",
+    accentLine: "bg-[#0F766E]",
     iconBg: "bg-[#111827]",
     iconColor: "text-[#F7F1E3]",
     badge: "Executive",
   },
   national_exam: {
     icon: GraduationCap,
-    accentLine: "bg-[#071A2F]",
-    iconBg: "bg-[#0F766E]",
-    iconColor: "text-[#F7F1E3]",
+    accentLine: "bg-[#7A2240]",
+    iconBg: "bg-[#5C1A30]",
+    iconColor: "text-[#F4D9DE]",
     badge: "Exam Prep",
   },
 };
+
 
 export default function LearningPathSelection() {
   const { user } = useAuth();
