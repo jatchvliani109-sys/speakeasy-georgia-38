@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import GlobalNav from "@/components/GlobalNav";
+import PathSwitcher from "@/components/PathSwitcher";
 
 // Shared shell for the Business English path.
 // Premium-education theme: warm white, cream, muted navy, slate, subtle gold accent.
