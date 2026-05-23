@@ -36,11 +36,11 @@ export type BusinessLevel =
   | "business_advanced";
 
 export type BusinessPlan = {
-  mainGoal: BusinessPriority;
+  mainGoals: BusinessPriority[];
   level: BusinessLevel;
   intensity: BusinessIntensity;
   deadline: BusinessDeadline;
-  field: BusinessField;
+  fields: BusinessField[];
   recommendedModule: string; // module slug
   recommendedModuleTitle: string;
   weeklyFocus: string[];
@@ -50,10 +50,10 @@ export type BusinessState = {
   setupCompleted: boolean;
   testCompleted: boolean;
   goals: BusinessGoal[];
-  mainPriority: BusinessPriority | null;
+  mainPriority: BusinessPriority[];
   intensity: BusinessIntensity | null;
   deadline: BusinessDeadline;
-  field: BusinessField | null;
+  field: BusinessField[];
   level: BusinessLevel | null;
   plan: BusinessPlan | null;
   businessSelfIntroductionCompleted?: boolean;
@@ -65,10 +65,10 @@ const empty = (): BusinessState => ({
   setupCompleted: false,
   testCompleted: false,
   goals: [],
-  mainPriority: null,
+  mainPriority: [],
   intensity: null,
   deadline: null,
-  field: null,
+  field: [],
   level: null,
   plan: null,
   businessSelfIntroductionCompleted: false,
