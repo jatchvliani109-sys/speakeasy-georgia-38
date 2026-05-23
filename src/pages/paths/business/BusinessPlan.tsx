@@ -47,10 +47,10 @@ export default function BusinessPlan() {
       </div>
 
       <BizCard className="mb-4">
-        <Row label="მთავარი მიზანი" value={PRIORITY_LABELS[plan.mainGoal]} />
+        <Row label="მთავარი მიზნები" value={plan.mainGoals.map((g) => PRIORITY_LABELS[g]).join(", ")} />
         <Row label="დონე" value={LEVEL_LABELS[plan.level]} />
         <Row label="ინტენსივობა" value={INTENSITY_LABELS[plan.intensity]} />
-        <Row label="სფერო" value={FIELD_LABELS[plan.field]} />
+        <Row label="სფეროები" value={plan.fields.map((f) => FIELD_LABELS[f]).join(", ")} />
       </BizCard>
 
       <BizCard className="mb-4">
