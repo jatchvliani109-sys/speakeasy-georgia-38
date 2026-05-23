@@ -230,11 +230,11 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
       body.tool_choice = { type: "function", function: { name: "lesson_summary" } };
     } else {
       // chat mode — stage-aware + optional coachMode (Speaking path)
-      let sys = baseTutor;
+      let sys = coachMode === "roleplay" ? "" : baseTutor;
       if (stage && STAGE_INSTRUCTIONS[stage]) sys += `\n\n${STAGE_INSTRUCTIONS[stage]}`;
       if (coachMode && COACH_MODES[coachMode]) sys += `\n\n${COACH_MODES[coachMode]}`;
-      if (lessonContext) sys += `\n\nLesson context:\n${JSON.stringify(lessonContext)}`;
-      body.messages = [{ role: "system", content: sys }, ...messages];
+      if (lessonContext) sys += `\n\nScene details:\n${JSON.stringify(lessonContext)}`;
+      body.messages = [{ role: "system", content: sys.trim() }, ...messages];
     }
 
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
