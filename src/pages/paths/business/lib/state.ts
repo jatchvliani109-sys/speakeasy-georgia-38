@@ -36,11 +36,11 @@ export type BusinessLevel =
   | "business_advanced";
 
 export type BusinessPlan = {
-  mainGoal: BusinessPriority;
+  mainGoals: BusinessPriority[];
   level: BusinessLevel;
   intensity: BusinessIntensity;
   deadline: BusinessDeadline;
-  field: BusinessField;
+  fields: BusinessField[];
   recommendedModule: string; // module slug
   recommendedModuleTitle: string;
   weeklyFocus: string[];
@@ -50,10 +50,10 @@ export type BusinessState = {
   setupCompleted: boolean;
   testCompleted: boolean;
   goals: BusinessGoal[];
-  mainPriority: BusinessPriority | null;
+  mainPriority: BusinessPriority[];
   intensity: BusinessIntensity | null;
   deadline: BusinessDeadline;
-  field: BusinessField | null;
+  field: BusinessField[];
   level: BusinessLevel | null;
   plan: BusinessPlan | null;
   businessSelfIntroductionCompleted?: boolean;
@@ -65,10 +65,10 @@ const empty = (): BusinessState => ({
   setupCompleted: false,
   testCompleted: false,
   goals: [],
-  mainPriority: null,
+  mainPriority: [],
   intensity: null,
   deadline: null,
-  field: null,
+  field: [],
   level: null,
   plan: null,
   businessSelfIntroductionCompleted: false,
@@ -269,18 +269,19 @@ const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
 };
 
 export function buildPlan(s: BusinessState): BusinessPlan | null {
-  if (!s.mainPriority || !s.intensity || !s.field || !s.level) return null;
-  const moduleSlug = PRIORITY_TO_MODULE[s.mainPriority];
+  const primaryGoal = s.mainPriority?.[0];
+  if (!primaryGoal || !s.intensity || !s.field?.length || !s.level) return null;
+  const moduleSlug = PRIORITY_TO_MODULE[primaryGoal];
   const mod = BUSINESS_MODULES.find((m) => m.slug === moduleSlug)!;
   return {
-    mainGoal: s.mainPriority,
+    mainGoals: s.mainPriority,
     level: s.level,
     intensity: s.intensity,
     deadline: s.deadline,
-    field: s.field,
+    fields: s.field,
     recommendedModule: mod.slug,
     recommendedModuleTitle: mod.title,
-    weeklyFocus: WEEKLY_FOCUS[s.mainPriority],
+    weeklyFocus: WEEKLY_FOCUS[primaryGoal],
   };
 }
 

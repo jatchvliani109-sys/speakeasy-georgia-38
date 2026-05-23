@@ -61,7 +61,7 @@ export default function BusinessHome() {
           <div>
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">შენი დონე</p>
             <p className="ka text-lg font-bold text-[#1E2A44] mt-0.5">{LEVEL_LABELS[plan.level]}</p>
-            <p className="ka text-xs text-[#5B6473] mt-0.5">მთავარი მიზანი: {PRIORITY_LABELS[plan.mainGoal]}</p>
+            <p className="ka text-xs text-[#5B6473] mt-0.5">მთავარი მიზნები: {plan.mainGoals.map((g) => PRIORITY_LABELS[g]).join(", ")}</p>
           </div>
           <Link to="/path/business/test" className="ka text-[11px] text-[#1E2A44] underline underline-offset-2">
             თავიდან ჩაბარება
@@ -74,7 +74,7 @@ export default function BusinessHome() {
         რეკომენდებული გაკვეთილები შენი დონისთვის
       </p>
       <div className="space-y-2 mb-4">
-        {recommendedForLevel(plan.level, plan.mainGoal).map((r) => (
+        {recommendedForLevel(plan.level, plan.mainGoals[0]).map((r) => (
           <Link
             key={r.to}
             to={r.to}
@@ -98,10 +98,10 @@ export default function BusinessHome() {
           შენი გეგმა
         </p>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Mini label="მთავარი მიზანი" value={PRIORITY_LABELS[plan.mainGoal]} />
+          <Mini label="მთავარი მიზნები" value={plan.mainGoals.map((g) => PRIORITY_LABELS[g]).join(", ")} />
           <Mini label="დონე" value={LEVEL_LABELS[plan.level]} />
           <Mini label="ინტენსივობა" value={INTENSITY_LABELS[plan.intensity]} />
-          <Mini label="სფერო" value={FIELD_LABELS[plan.field]} />
+          <Mini label="სფეროები" value={plan.fields.map((f) => FIELD_LABELS[f]).join(", ")} />
         </div>
         <Link to="/path/business/plan" className="ka text-[11px] text-[#1E2A44] underline underline-offset-2 mt-3 inline-block">
           სრული გეგმის ნახვა
