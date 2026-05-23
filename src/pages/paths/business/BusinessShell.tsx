@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import GlobalNav from "@/components/GlobalNav";
+import PathSwitcher from "@/components/PathSwitcher";
 
 // Shared shell for the Business English path.
 // Premium-education theme: warm white, cream, muted navy, slate, subtle gold accent.
@@ -23,9 +24,7 @@ export default function BusinessShell({
           </Link>
           <div className="flex items-center gap-1">
             <GlobalNav />
-            <Link to="/learning-path" className="ka text-xs text-[#5B6473] hover:text-[#1E2A44]">
-              ↺
-            </Link>
+            <PathSwitcher />
           </div>
         </div>
       </header>
