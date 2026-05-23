@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import PathSwitcher from "@/components/PathSwitcher";
 import {
   BUSINESS_MODULES,
   BusinessState,
@@ -29,12 +30,16 @@ export default function BusinessHome() {
 
   return (
     <BusinessShell>
-      <div className="mb-5">
-        <h1 className="ka text-2xl font-bold text-[#1E2A44]">ბიზნეს ინგლისური</h1>
-        <p className="ka text-sm text-[#5B6473] mt-1">
-          ინგლისური უნივერსიტეტისთვის, სამსახურისთვის და პროფესიული კომუნიკაციისთვის.
-        </p>
-      </div>
+      <header className="mb-5 flex items-end justify-between gap-3">
+        <div>
+          <h1 className="ka text-2xl font-bold text-[#1E2A44]">ბიზნეს ინგლისური</h1>
+          <p className="ka text-sm text-[#5B6473] mt-1">
+            ინგლისური უნივერსიტეტისთვის, სამსახურისთვის და პროფესიული კომუნიკაციისთვის.
+          </p>
+        </div>
+        <PathSwitcher />
+      </header>
+
 
       {incomplete && (
         <BizCard className="mb-4 border-l-4 border-l-[#C9A227] bg-[#FFFBEA]">
