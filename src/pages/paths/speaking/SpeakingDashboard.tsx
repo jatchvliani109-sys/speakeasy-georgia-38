@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2 } from "lucide-react";
+import { Headphones, Drama, LineChart, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
+
 
 const SIDE_PATHS = [
   { to: "/path/speaking/pronunciation", Icon: Headphones, title_ka: "მოსმენა და გამეორება", desc_ka: "მოკლე ფრაზები" },
@@ -36,14 +36,12 @@ type DashStats = {
 
 export default function SpeakingDashboard() {
   const { user } = useAuth();
-  const [streak, setStreak] = useState<SpeakingStats | null>(null);
   const [stats, setStats] = useState<DashStats | null>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [streakRes, lessonsRes, pronRes] = await Promise.all([
-        loadSpeakingStats(user.id),
+      const [lessonsRes, pronRes] = await Promise.all([
         supabase
           .from("lessons")
           .select("id, level, summary, completed, created_at")
@@ -55,7 +53,7 @@ export default function SpeakingDashboard() {
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
       ]);
-      setStreak(streakRes);
+
       const lessons = (lessonsRes.data ?? []).filter((l) => (l.level ?? "").startsWith("speaking"));
       const dailyLessons = lessons.filter((l) => !(l.level ?? "").includes("roleplay"));
       const completed = dailyLessons.filter((l) => l.completed);
@@ -154,12 +152,12 @@ export default function SpeakingDashboard() {
         </section>
 
         {/* Compact stats */}
-        <section className="grid grid-cols-4 gap-2">
-          <Stat label={<span className="inline-flex items-center gap-1"><Flame className="w-3 h-3" />Streak</span>} value={`${streak?.currentStreak ?? 0}`} />
+        <section className="grid grid-cols-3 gap-2">
           <Stat label="Lessons" value={stats?.lessonsCompleted ?? 0} />
           <Stat label="Phrases" value={stats?.phrasesPracticed ?? 0} />
           <Stat label="Attempts" value={stats?.pronAttempts ?? 0} />
         </section>
+
 
         {/* Other practice */}
         <section>

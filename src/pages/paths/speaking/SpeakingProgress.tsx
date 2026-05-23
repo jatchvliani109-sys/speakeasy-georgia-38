@@ -4,8 +4,8 @@ import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Repeat2, Volume2, Drama, Flame } from "lucide-react";
-import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
+import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
+
 
 type LessonRow = {
   id: string;
@@ -31,7 +31,7 @@ export default function SpeakingProgress() {
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [mistakes, setMistakes] = useState<MistakeRow[]>([]);
   const [pron, setPron] = useState<PronRow[]>([]);
-  const [streak, setStreak] = useState<SpeakingStats | null>(null);
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function SpeakingProgress() {
         .limit(100);
       setPron((pr ?? []) as PronRow[]);
 
-      setStreak(await loadSpeakingStats(user.id));
+      
       setLoading(false);
     })();
   }, [user]);
@@ -115,18 +115,8 @@ export default function SpeakingProgress() {
             </p>
           </div>
 
-          {/* Streak overview */}
-          <div className="sp-card p-5 flex items-center gap-3">
-            <Flame className="w-6 h-6 text-[hsl(20_85%_55%)] shrink-0" />
-            <div>
-              <div className="text-xl font-extrabold sp-text leading-none">
-                🔥 {streak?.currentStreak ?? 0} Day Speaking Streak
-              </div>
-              <div className="text-[11px] sp-text-soft mt-1">
-                Longest Streak: {streak?.longestStreak ?? 0}
-              </div>
-            </div>
-          </div>
+
+
 
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
