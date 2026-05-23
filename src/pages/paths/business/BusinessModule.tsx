@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { BUSINESS_MODULES } from "./lib/state";
 import { SAMPLE_BUSINESS_VOCAB } from "./lib/vocab";
 
