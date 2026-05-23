@@ -22,10 +22,8 @@ export default function BusinessShell({
             <span className="w-7 h-7 rounded-md bg-[#1E2A44] text-[#F7F1E3] grid place-items-center text-xs font-bold">B</span>
             <span className="ka font-semibold text-sm">ბიზნეს ინგლისური</span>
           </Link>
-          <div className="flex items-center gap-1">
-            <GlobalNav />
-            <PathSwitcher />
-          </div>
+          <GlobalNav />
+
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
