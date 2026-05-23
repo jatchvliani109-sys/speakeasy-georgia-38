@@ -24,9 +24,7 @@ export default function BusinessShell({
           </Link>
           <div className="flex items-center gap-1">
             <GlobalNav />
-            <Link to="/learning-path" className="ka text-xs text-[#5B6473] hover:text-[#1E2A44]">
-              ↺
-            </Link>
+            <PathSwitcher />
           </div>
         </div>
       </header>
