@@ -217,9 +217,7 @@ export default function BusinessPlacementTest() {
     setResultPct(Math.round(pct));
     setDone(true);
     if (user) {
-      const next = saveBusiness(user.id, { level, testCompleted: true });
-      const plan = buildPlan(next);
-      if (plan) saveBusiness(user.id, { plan });
+      saveBusiness(user.id, { level, testCompleted: true });
     }
   };
 
