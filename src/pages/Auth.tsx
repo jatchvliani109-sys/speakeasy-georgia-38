@@ -34,11 +34,11 @@ export default function Auth() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/onboarding` },
+          options: { emailRedirectTo: `${window.location.origin}/learning-path` },
         });
         if (error) throw error;
         toast.success("მოგესალმებით! 🎉");
-        navigate("/onboarding");
+        navigate("/learning-path");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
