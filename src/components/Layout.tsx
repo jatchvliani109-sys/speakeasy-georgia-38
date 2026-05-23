@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Sparkles, RotateCcw } from "lucide-react";
+import { LogOut, RotateCcw } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import GlobalNav from "@/components/GlobalNav";
+import Wordmark from "@/components/Wordmark";
 
 export default function Layout({ children, showLogout = true }: { children: ReactNode; showLogout?: boolean }) {
   const { user } = useAuth();
@@ -13,12 +14,10 @@ export default function Layout({ children, showLogout = true }: { children: Reac
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 font-bold text-lg">
-            <span className="w-9 h-9 rounded-2xl gradient-hero flex items-center justify-center text-primary-foreground shadow-soft">
-              <Sparkles className="w-5 h-5" />
-            </span>
-            <span>SpeakEasy</span>
+          <Link to={user ? "/dashboard" : "/"} className="flex items-center text-foreground hover:opacity-80 transition-opacity">
+            <Wordmark size="md" />
           </Link>
+
           {user && showLogout && (
             <div className="flex items-center gap-1">
               <GlobalNav />
