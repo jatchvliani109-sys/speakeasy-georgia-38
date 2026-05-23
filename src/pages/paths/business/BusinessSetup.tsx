@@ -49,7 +49,7 @@ export default function BusinessSetup() {
   const next = () => {
     if (step < 3) setStep((s) => (s + 1) as Step);
     else if (user) {
-      saveBusiness(user.id, {
+      const saved = saveBusiness(user.id, {
         goals,
         mainPriority: priority,
         intensity,
@@ -57,7 +57,9 @@ export default function BusinessSetup() {
         field,
         setupCompleted: true,
       });
-      navigate("/path/business/test", { replace: true });
+      const plan = buildPlan(saved);
+      if (plan) saveBusiness(user.id, { plan });
+      navigate("/path/business/plan", { replace: true });
     }
   };
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);
