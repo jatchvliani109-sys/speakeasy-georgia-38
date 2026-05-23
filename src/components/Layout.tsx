@@ -26,16 +26,13 @@ export default function Layout({ children, showLogout = true }: { children: Reac
                 variant="ghost"
                 size="sm"
                 className="text-xs text-muted-foreground h-8 px-2"
-                title="Reset Onboarding for Testing"
+                title="Reset path selection for testing"
                 onClick={async () => {
-                  if (!confirm("Are you sure you want to reset onboarding for testing?")) return;
+                  if (!confirm("Reset path selection for testing?")) return;
                   await supabase.from("profiles").update({
-                    onboarding_completed: false,
-                    level_test_completed: false,
                     selected_learning_path: null,
-                    english_level: null,
                   }).eq("id", user.id);
-                  navigate("/onboarding", { replace: true });
+                  navigate("/learning-path", { replace: true });
                 }}
               >
                 <RotateCcw className="w-3.5 h-3.5 mr-1" />
