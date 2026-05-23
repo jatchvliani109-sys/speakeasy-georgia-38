@@ -341,8 +341,10 @@ export default function SelfIntroduction() {
               {isAdvanced && EXAMPLES[inputs.purpose][tier].note && (
                 <p className="ka text-[11px] text-[#5B6473] mt-2 italic">{EXAMPLES[inputs.purpose][tier].note}</p>
               )}
-              <button onClick={() => speak(EXAMPLES[inputs.purpose][tier].en)}
-                className="mt-3 text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">🔊 მოსმენა</button>
+              <div className="mt-3">
+                <ReadAloudButton text={EXAMPLES[inputs.purpose][tier].en} label="მოსმენა" />
+              </div>
+
             </div>
           )}
 
