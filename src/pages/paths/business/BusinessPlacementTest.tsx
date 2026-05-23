@@ -242,8 +242,8 @@ export default function BusinessPlacementTest() {
             {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
-            <BizButton onClick={() => navigate("/path/business/plan", { replace: true })}>
-              გეგმის ნახვა
+            <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>
+              გაგრძელება
             </BizButton>
           </div>
         </BizCard>
