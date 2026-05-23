@@ -300,7 +300,7 @@ export default function SelfIntroduction() {
                     <p className="text-sm text-[#1E2A44] mt-1.5">{p.exEn}</p>
                     {(isBeginner || isElementary) && <p className="ka text-xs text-[#5B6473] mt-1">{p.exKa}</p>}
                   </div>
-                  <button onClick={() => speak(p.exEn)} className="text-xs px-2 py-1 rounded border border-[#E7E2D5]">🔊</button>
+                  <ReadAloudButton text={p.exEn} />
                 </div>
               </li>
             ))}
