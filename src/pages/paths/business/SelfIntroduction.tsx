@@ -544,7 +544,7 @@ export default function SelfIntroduction() {
                   <p className="text-sm text-[#1E2A44] mt-3 leading-relaxed">{v.en}</p>
                   <p className="ka text-xs text-[#5B6473] mt-2">{v.ka}</p>
                   <div className="mt-3 flex gap-2 flex-wrap">
-                    <button onClick={() => speak(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">🔊 მოსმენა</button>
+                    <ReadAloudButton text={v.en} label="მოსმენა" />
                     <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">კოპირება</button>
                     <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E7E2D5]">I practiced</button>
                   </div>
