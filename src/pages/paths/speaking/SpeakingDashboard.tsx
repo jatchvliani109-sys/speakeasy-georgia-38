@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Headphones, Drama, LineChart, ArrowRight, Flame, CheckCircle2 } from "lucide-react";
+import { Headphones, Drama, LineChart, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
+
 
 const SIDE_PATHS = [
   { to: "/path/speaking/pronunciation", Icon: Headphones, title_ka: "მოსმენა და გამეორება", desc_ka: "მოკლე ფრაზები" },
