@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import PathSwitcher from "@/components/PathSwitcher";
 import {
   BUSINESS_MODULES,
   BusinessState,
