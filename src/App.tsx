@@ -43,8 +43,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
-            <Route path="/level-test" element={<RequireAuth><LevelTest /></RequireAuth>} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
             
