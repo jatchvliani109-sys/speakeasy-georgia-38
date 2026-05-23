@@ -55,15 +55,6 @@ function pickTopic(level: string, recent: string[]): string {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function getLocalDateString(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-
-function getYesterdayLocalDateString() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return getLocalDateString(yesterday);
-}
 
 export default function Lesson() {
   const { user } = useAuth();
