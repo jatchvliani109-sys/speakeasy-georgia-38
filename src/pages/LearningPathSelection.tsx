@@ -10,26 +10,44 @@ import { TestingShortcuts } from "@/components/GlobalNav";
 
 type Theme = {
   icon: LucideIcon;
-  accentLine: string; // tailwind bg color for top accent
+  accentLine: string;
   iconBg: string;
   iconColor: string;
   badge: string;
+  cardBg: string;
+  cardBorder: string;
+  ctaBg: string;
+  ctaText: string;
+  ctaHover: string;
+  eyebrow: string;
 };
 
 const THEMES: Record<LearningPathId, Theme> = {
   speaking: {
     icon: Mic,
     accentLine: "bg-[#C9A227]",
-    iconBg: "bg-[#071A2F]",
-    iconColor: "text-[#C9A227]",
+    iconBg: "bg-[#0F2748]",
+    iconColor: "text-[#E8C461]",
     badge: "AI Speaking",
+    cardBg: "bg-[#FBF6EA]",
+    cardBorder: "border-[#E8D9A8]",
+    ctaBg: "bg-[#0F2748]",
+    ctaText: "text-[#F4E5B8]",
+    ctaHover: "hover:bg-[#16345E]",
+    eyebrow: "text-[#9A7A1E]",
   },
   business_english: {
     icon: Briefcase,
-    accentLine: "bg-[#0F766E]",
-    iconBg: "bg-[#111827]",
-    iconColor: "text-[#F7F1E3]",
+    accentLine: "bg-[#1E3A5F]",
+    iconBg: "bg-[#0F2748]",
+    iconColor: "text-[#E6ECF4]",
     badge: "Executive",
+    cardBg: "bg-[#F1F4F8]",
+    cardBorder: "border-[#CED8E5]",
+    ctaBg: "bg-[#0F2748]",
+    ctaText: "text-[#E6ECF4]",
+    ctaHover: "hover:bg-[#16345E]",
+    eyebrow: "text-[#1E3A5F]",
   },
   national_exam: {
     icon: GraduationCap,
@@ -37,6 +55,12 @@ const THEMES: Record<LearningPathId, Theme> = {
     iconBg: "bg-[#5C1A30]",
     iconColor: "text-[#F4D9DE]",
     badge: "Exam Prep",
+    cardBg: "bg-[#FAEFF2]",
+    cardBorder: "border-[#E8C8D2]",
+    ctaBg: "bg-[#5C1A30]",
+    ctaText: "text-[#F4D9DE]",
+    ctaHover: "hover:bg-[#7A2240]",
+    eyebrow: "text-[#7A2240]",
   },
 };
 
@@ -136,7 +160,7 @@ export default function LearningPathSelection() {
             return (
               <article
                 key={p.id}
-                className={`lp-anim ${mounted ? "in" : ""} lp-card relative overflow-hidden rounded-2xl bg-[#FAFAF7] border border-[#E5E2D8] shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
+                className={`lp-anim ${mounted ? "in" : ""} lp-card relative overflow-hidden rounded-2xl ${theme.cardBg} border ${theme.cardBorder} shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
                 style={{ animationDelay: `${120 + idx * 90}ms` }}
               >
                 <div className={`absolute top-0 left-0 right-0 h-[3px] ${theme.accentLine}`} />
@@ -148,13 +172,13 @@ export default function LearningPathSelection() {
                       <Icon className="w-6 h-6" strokeWidth={1.75} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#6B7280] mb-1">
+                      <div className={`text-[10px] font-semibold tracking-[0.18em] uppercase ${theme.eyebrow} mb-1`}>
                         {theme.badge}
                       </div>
                       <h2 className="ka text-lg sm:text-xl font-extrabold text-[#071A2F] leading-snug">
                         {p.title}
                       </h2>
-                      <p className="ka text-sm text-[#6B7280] mt-2 leading-relaxed">
+                      <p className="ka text-sm text-[#4B5563] mt-2 leading-relaxed">
                         {p.description}
                       </p>
                     </div>
@@ -165,8 +189,8 @@ export default function LearningPathSelection() {
                     disabled={saving !== null}
                     className={`lp-btn group inline-flex items-center justify-center gap-2 w-full h-12 rounded-xl text-sm font-semibold tracking-wide ka
                       ${isCurrent
-                        ? "bg-[#FAFAF7] text-[#071A2F] border border-[#071A2F]/30 hover:bg-[#F7F1E3]"
-                        : "bg-[#071A2F] text-[#FAFAF7] hover:bg-[#0F2748]"}
+                        ? `bg-white ${theme.eyebrow} border ${theme.cardBorder} hover:bg-[#FAFAF7]`
+                        : `${theme.ctaBg} ${theme.ctaText} ${theme.ctaHover}`}
                       disabled:opacity-60 disabled:cursor-not-allowed`}
                   >
                     {isSaving ? (
@@ -180,6 +204,7 @@ export default function LearningPathSelection() {
                   </button>
                 </div>
               </article>
+
             );
           })}
         </div>

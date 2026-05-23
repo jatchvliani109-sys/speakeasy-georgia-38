@@ -92,24 +92,22 @@ export default function SpeakingDashboard() {
         {/* Header */}
         <header className="flex items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold ka sp-text leading-tight">საუბრის პრაქტიკა</h1>
+            <div className="sp-eyebrow ka">საუბარი</div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold ka sp-text leading-tight mt-2">საუბრის პრაქტიკა</h1>
             <p className="text-sm sp-text-muted ka mt-1">ივარჯიშე ინგლისურად ყოველდღე.</p>
           </div>
           <PathSwitcher />
         </header>
 
         {/* Today / AI Speaking Session card */}
-        <section className="sp-card-hero p-5">
-          <div className="flex items-center gap-2 sp-text">
-            <span className="inline-flex w-9 h-9 rounded-xl items-center justify-center text-lg"
-              style={{ background: "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(175 70% 42%))", color: "white" }}>
-              🎙️
-            </span>
-            <div>
-              <div className="font-extrabold sp-text text-[16px]">AI Speaking Session</div>
-              <div className="text-[12px] sp-text-muted ka">ინგლისურად საუბრის პრაქტიკა რეალურ საუბარში.</div>
-            </div>
+        <section className="sp-card-hero p-6 sm:p-7">
+          <div className="text-[10px] font-semibold tracking-[0.22em] uppercase opacity-80">
+            AI Speaking Session
           </div>
+          <h2 className="ka text-xl sm:text-2xl font-extrabold mt-2 leading-snug">
+            ისაუბრე ინგლისურად რეალურ საუბარში
+          </h2>
+
 
           {todayDone ? (
             <>
