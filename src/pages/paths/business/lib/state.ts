@@ -269,18 +269,19 @@ const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
 };
 
 export function buildPlan(s: BusinessState): BusinessPlan | null {
-  if (!s.mainPriority || !s.intensity || !s.field || !s.level) return null;
-  const moduleSlug = PRIORITY_TO_MODULE[s.mainPriority];
+  const primaryGoal = s.mainPriority?.[0];
+  if (!primaryGoal || !s.intensity || !s.field?.length || !s.level) return null;
+  const moduleSlug = PRIORITY_TO_MODULE[primaryGoal];
   const mod = BUSINESS_MODULES.find((m) => m.slug === moduleSlug)!;
   return {
-    mainGoal: s.mainPriority,
+    mainGoals: s.mainPriority,
     level: s.level,
     intensity: s.intensity,
     deadline: s.deadline,
-    field: s.field,
+    fields: s.field,
     recommendedModule: mod.slug,
     recommendedModuleTitle: mod.title,
-    weeklyFocus: WEEKLY_FOCUS[s.mainPriority],
+    weeklyFocus: WEEKLY_FOCUS[primaryGoal],
   };
 }
 
