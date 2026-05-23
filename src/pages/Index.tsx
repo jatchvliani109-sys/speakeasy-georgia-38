@@ -1,15 +1,29 @@
 import { Link, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { ArrowRight, MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
+import { ArrowRight, Mic, Briefcase, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
-  { icon: MessageCircle, title: "AI საუბრის ვარჯიში", desc: "ისაუბრე ნამდვილ AI მასწავლებელთან" },
-  { icon: Languages, title: "ქართული ახსნები", desc: "გაუგებრობის შემთხვევაში — ქართულად" },
-  { icon: CheckCircle2, title: "გრამატიკის შესწორება", desc: "ნაზად, შეცდომების გარეშე" },
-  { icon: BookOpen, title: "ახალი სიტყვები", desc: "ყოველი გაკვეთილის შემდეგ" },
-  { icon: TrendingUp, title: "პროგრესი", desc: "თვალი ადევნე საკუთარ ზრდას" },
+  {
+    icon: Mic,
+    eyebrow: "Speaking",
+    title: "საუბრის განვითარება",
+    desc: "ივარჯიშე ნამდვილ AI მასწავლებელთან — სტრუქტურირებული სესიები და რეალურ სიტუაციებზე დაფუძნებული დიალოგები, რომლებიც გაძლიერებს თავდაჯერებას, გამოთქმასა და ბუნებრივ მეტყველებას.",
+  },
+  {
+    icon: Briefcase,
+    eyebrow: "Business English",
+    title: "ბიზნეს ინგლისური",
+    desc: "პერსონალიზებული ბიზნეს ინგლისურის გზა შენი პროფესიისა და მიზნების მიხედვით — დონის ტესტი, სტრუქტურირებული მოდულები, იმეილები, გასაუბრებები, შეხვედრები და პრეზენტაციები.",
+  },
+  {
+    icon: GraduationCap,
+    eyebrow: "აბიტურიენტი",
+    title: "ეროვნული გამოცდებისთვის",
+    desc: "სტრუქტურირებული მომზადება მე-11 და მე-12 კლასელებისთვის — გრამატიკა, ლექსიკა, კითხვა და სავარჯიშო გამოცდები ეროვნული ფორმატით.",
+  },
 ];
+
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -49,25 +63,40 @@ const Index = () => {
 
       <div className="h-px bg-[#E5E2D8] my-2" />
 
-      <section className="grid gap-3 mt-10 mb-8">
-        <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#6B7280] ka mb-1">
-          რას მიიღებ
+      <section className="mt-10 mb-10">
+        <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B7280] ka mb-5 text-center">
+          სამი მიმართულება — შენი მიზნისთვის
         </div>
-        {features.map((f) => (
-          <div
-            key={f.title}
-            className="flex items-center gap-4 p-4 rounded-xl bg-[#FAFAF7] border border-[#E5E2D8] ka transition-colors hover:border-[#C9A227]/40"
-          >
-            <div className="w-11 h-11 rounded-lg bg-[#071A2F] flex items-center justify-center text-[#C9A227] shrink-0">
-              <f.icon className="w-5 h-5" strokeWidth={1.75} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-[#071A2F] text-sm">{f.title}</div>
-              <div className="text-xs text-[#6B7280] mt-0.5">{f.desc}</div>
-            </div>
-          </div>
-        ))}
+        <div className="grid gap-4">
+          {features.map((f, i) => (
+            <article
+              key={f.title}
+              className="group relative flex gap-5 p-5 sm:p-6 rounded-2xl bg-[#FAFAF7] border border-[#E5E2D8] ka transition-all hover:border-[#C9A227]/50 hover:shadow-[0_8px_24px_-16px_rgba(7,26,47,0.18)]"
+            >
+              <div className="flex flex-col items-center shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-[#071A2F] flex items-center justify-center text-[#C9A227]">
+                  <f.icon className="w-5 h-5" strokeWidth={1.5} />
+                </div>
+                <div className="mt-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-[#9CA3AF] tabular-nums">
+                  0{i + 1}
+                </div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
+                  {f.eyebrow}
+                </div>
+                <h3 className="font-bold text-[#071A2F] text-base sm:text-lg mt-1.5 tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="text-[13px] sm:text-sm text-[#6B7280] leading-relaxed mt-2">
+                  {f.desc}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
+
     </Layout>
   );
 };
