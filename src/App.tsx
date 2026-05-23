@@ -7,8 +7,6 @@ import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Onboarding from "./pages/Onboarding";
-import LevelTest from "./pages/LevelTest";
 import Dashboard from "./pages/Dashboard";
 import LearningPathSelection from "./pages/LearningPathSelection";
 import SpeakingDashboard from "./pages/paths/speaking/SpeakingDashboard";
