@@ -205,3 +205,46 @@ function SingleSelect<T extends string>({
     </div>
   );
 }
+
+function MultiSelect<T extends string>({
+  title,
+  hint,
+  options,
+  values,
+  onToggle,
+}: {
+  title: string;
+  hint?: string;
+  options: { value: T; label: string }[];
+  values: T[];
+  onToggle: (v: T) => void;
+}) {
+  return (
+    <div>
+      <h2 className="ka font-semibold text-[#1E2A44]">{title}</h2>
+      {hint && <p className="ka text-xs text-[#5B6473] mt-1 mb-4">{hint}</p>}
+      <div className="space-y-2">
+        {options.map((o) => {
+          const on = values.includes(o.value);
+          return (
+            <button
+              key={o.value}
+              onClick={() => onToggle(o.value)}
+              className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
+                on
+                  ? "border-[#1E2A44] bg-[#1E2A44]/5 text-[#1E2A44]"
+                  : "border-[#E7E2D5] hover:border-[#1E2A44]/40 text-[#374151]"
+              }`}
+            >
+              <span
+                className="inline-block w-4 h-4 mr-2 rounded border align-middle"
+                style={{ background: on ? "#1E2A44" : "transparent", borderColor: on ? "#1E2A44" : "#CBD5E1" }}
+              />
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
