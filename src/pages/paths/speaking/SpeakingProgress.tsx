@@ -4,8 +4,8 @@ import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Repeat2, Volume2, Drama, Flame } from "lucide-react";
-import { loadSpeakingStats, type SpeakingStats } from "./lib/tracker";
+import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
+
 
 type LessonRow = {
   id: string;
