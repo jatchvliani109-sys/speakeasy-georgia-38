@@ -13,6 +13,7 @@ import {
   GOAL_LABELS,
   INTENSITY_LABELS,
   PRIORITY_LABELS,
+  buildPlan,
   loadBusiness,
   saveBusiness,
 } from "./lib/state";
