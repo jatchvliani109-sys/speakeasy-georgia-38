@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessLevel, LEVEL_LABELS, buildPlan, loadBusiness, saveBusiness } from "./lib/state";
+import { BusinessLevel, LEVEL_LABELS, loadBusiness, saveBusiness } from "./lib/state";
 
 type MCQ = {
   type: "mcq";
