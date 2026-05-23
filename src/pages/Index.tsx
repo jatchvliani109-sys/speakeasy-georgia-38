@@ -1,7 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import { MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
+import { ArrowRight, MessageCircle, Languages, CheckCircle2, BookOpen, TrendingUp } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
@@ -17,42 +16,59 @@ const Index = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">...</div>;
   if (user) return <Navigate to="/dashboard" replace />;
   return (
-  <Layout showLogout={false}>
-    <section className="py-8 text-center ka">
-      <div className="inline-block px-4 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-6">
-        🇬🇪 ქართველი მოსწავლეებისთვის
-      </div>
-      <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-5 ka">
-        ისწავლე ინგლისურად საუბარი{" "}
-        <span className="text-primary">AI მასწავლებელთან</span>
-      </h1>
-      <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto ka">
-        ივარჯიშე ყოველდღე, მიიღე შეცდომების გასწორება და ისაუბრე უფრო თავდაჯერებულად.
-      </p>
-      <div className="flex flex-col gap-3 max-w-xs mx-auto">
-        <Button asChild variant="hero" size="xl" className="ka">
-          <Link to="/auth">დაწყება</Link>
-        </Button>
-        <Button asChild variant="ghost" size="lg" className="ka">
-          <Link to="/auth?mode=login">უკვე მაქვს ანგარიში</Link>
-        </Button>
-      </div>
-    </section>
-
-    <section className="grid gap-3 mt-8">
-      {features.map((f) => (
-        <div key={f.title} className="flex items-center gap-4 p-4 rounded-2xl gradient-card shadow-card border border-border ka">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-            <f.icon className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="font-bold">{f.title}</div>
-            <div className="text-sm text-muted-foreground">{f.desc}</div>
-          </div>
+    <Layout showLogout={false}>
+      <section className="py-12 sm:py-16 text-center ka">
+        <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
+          <span className="h-px w-6 bg-[#C9A227]" />
+          SpeakEasy
+          <span className="h-px w-6 bg-[#C9A227]" />
         </div>
-      ))}
-    </section>
-  </Layout>
+        <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mt-5 mb-5 ka text-[#071A2F] tracking-tight">
+          ისწავლე ინგლისური{" "}
+          <span className="block sm:inline text-[#0F2748]">თავდაჯერებულად</span>
+        </h1>
+        <p className="text-base sm:text-lg text-[#6B7280] mb-9 max-w-md mx-auto ka leading-relaxed">
+          AI მასწავლებელი, რომელიც გესაუბრება ქართულად და ინგლისურად — შენი ტემპით.
+        </p>
+        <div className="flex flex-col gap-3 max-w-xs mx-auto">
+          <Link
+            to="/auth"
+            className="group inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[#071A2F] text-[#FAFAF7] text-sm font-semibold tracking-wide ka hover:bg-[#0F2748] transition-colors"
+          >
+            დაწყება
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <Link
+            to="/auth?mode=login"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-sm font-semibold ka text-[#071A2F] hover:bg-[#F7F1E3] transition-colors"
+          >
+            უკვე მაქვს ანგარიში
+          </Link>
+        </div>
+      </section>
+
+      <div className="h-px bg-[#E5E2D8] my-2" />
+
+      <section className="grid gap-3 mt-10 mb-8">
+        <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#6B7280] ka mb-1">
+          რას მიიღებ
+        </div>
+        {features.map((f) => (
+          <div
+            key={f.title}
+            className="flex items-center gap-4 p-4 rounded-xl bg-[#FAFAF7] border border-[#E5E2D8] ka transition-colors hover:border-[#C9A227]/40"
+          >
+            <div className="w-11 h-11 rounded-lg bg-[#071A2F] flex items-center justify-center text-[#C9A227] shrink-0">
+              <f.icon className="w-5 h-5" strokeWidth={1.75} />
+            </div>
+            <div className="min-w-0">
+              <div className="font-bold text-[#071A2F] text-sm">{f.title}</div>
+              <div className="text-xs text-[#6B7280] mt-0.5">{f.desc}</div>
+            </div>
+          </div>
+        ))}
+      </section>
+    </Layout>
   );
 };
 

@@ -97,13 +97,13 @@
   .shadow-card { box-shadow: var(--shadow-card); }
   .transition-smooth { transition: var(--transition-smooth); }
 
-  /* ===== Speaking path theme — Modern Georgian English Speaking Coach =====
-     Palette: deep navy, warm cream, teal, light blue. Editorial, not "AI SaaS". */
+  /* ===== Speaking path theme — Warm Gold & Amber, premium editorial =====
+     Palette: warm cream, muted navy, gold, amber. Sharp, premium, not flashy. */
   body.sp-active {
     background:
-      radial-gradient(800px 500px at 90% -100px, hsl(175 60% 88% / 0.55), transparent 60%),
-      radial-gradient(700px 600px at -100px 200px, hsl(210 70% 92% / 0.6), transparent 60%),
-      linear-gradient(180deg, hsl(38 45% 97%) 0%, hsl(40 35% 95%) 100%) !important;
+      radial-gradient(800px 500px at 90% -100px, hsl(38 85% 80% / 0.45), transparent 60%),
+      radial-gradient(700px 600px at -100px 200px, hsl(30 70% 88% / 0.55), transparent 60%),
+      linear-gradient(180deg, hsl(40 50% 98%) 0%, hsl(38 45% 95%) 100%) !important;
     color: hsl(220 40% 16%);
   }
   body.sp-active::before {
@@ -116,8 +116,8 @@
   }
   body.sp-active #root { position: relative; z-index: 1; }
   body.sp-active header {
-    background: hsl(40 40% 97% / 0.85) !important;
-    border-color: hsl(220 25% 88%) !important;
+    background: hsl(40 50% 98% / 0.85) !important;
+    border-color: hsl(38 30% 86%) !important;
     color: hsl(220 40% 16%);
     backdrop-filter: blur(10px);
   }
@@ -128,18 +128,18 @@
   .sp-text-muted { color: hsl(220 15% 42%); }
   .sp-text-soft { color: hsl(220 20% 55%); }
 
-  /* Standard editorial card — clean, soft, no glow */
+  /* Standard editorial card — clean, soft, warm */
   .sp-card {
     background: hsl(0 0% 100%);
-    border: 1px solid hsl(220 22% 90%);
+    border: 1px solid hsl(38 28% 88%);
     border-radius: 1.125rem;
-    box-shadow: 0 1px 2px hsl(220 30% 20% / 0.04), 0 4px 18px -10px hsl(220 30% 20% / 0.08);
+    box-shadow: 0 1px 2px hsl(30 30% 20% / 0.04), 0 4px 18px -10px hsl(30 30% 20% / 0.08);
     color: hsl(220 45% 14%);
   }
-  /* Hero / featured card — deep navy block, the one premium accent */
+  /* Hero / featured card — deep navy with warm gold accent */
   .sp-card-hero {
     background:
-      radial-gradient(500px 240px at 100% 0%, hsl(175 75% 50% / 0.22), transparent 60%),
+      radial-gradient(500px 240px at 100% 0%, hsl(38 85% 55% / 0.22), transparent 60%),
       linear-gradient(160deg, hsl(220 50% 18%) 0%, hsl(218 55% 22%) 100%);
     color: hsl(40 30% 97%);
     border: 1px solid hsl(220 50% 22%);
@@ -148,8 +148,8 @@
   }
   .sp-card-hero .sp-text { color: hsl(40 30% 97%); }
   .sp-card-hero .sp-text-muted { color: hsl(40 25% 82%); }
-  /* Backwards-compat: any old usages of sp-card-glow get the editorial card */
   .sp-card-glow { @apply sp-card; }
+
 
   .sp-btn-primary {
     background: hsl(220 50% 18%);
@@ -159,51 +159,51 @@
   }
   .sp-btn-primary:hover { background: hsl(220 55% 22%); }
   .sp-btn-teal {
-    background: hsl(175 70% 38%);
-    color: white;
-    box-shadow: 0 6px 16px -8px hsl(175 70% 30% / 0.4);
+    background: hsl(38 78% 48%);
+    color: hsl(30 50% 15%);
+    box-shadow: 0 6px 16px -8px hsl(30 70% 30% / 0.4);
     transition: background 0.2s ease;
   }
-  .sp-btn-teal:hover { background: hsl(175 75% 32%); }
+  .sp-btn-teal:hover { background: hsl(35 80% 44%); }
   .sp-btn-ghost {
-    background: hsl(40 35% 97%);
+    background: hsl(40 50% 97%);
     color: hsl(220 45% 14%);
-    border: 1px solid hsl(220 22% 88%);
+    border: 1px solid hsl(38 28% 86%);
   }
-  .sp-btn-ghost:hover { background: hsl(40 40% 94%); }
+  .sp-btn-ghost:hover { background: hsl(38 45% 94%); }
 
   .sp-chip {
-    background: hsl(40 40% 95%);
+    background: hsl(40 45% 95%);
     color: hsl(220 45% 18%);
-    border: 1px solid hsl(220 22% 88%);
+    border: 1px solid hsl(38 28% 86%);
   }
   .sp-chip-teal {
-    background: hsl(175 55% 92%);
-    color: hsl(175 70% 22%);
-    border: 1px solid hsl(175 50% 80%);
+    background: hsl(40 80% 92%);
+    color: hsl(30 70% 28%);
+    border: 1px solid hsl(38 60% 80%);
   }
   .sp-chip-blue {
-    background: hsl(210 70% 94%);
-    color: hsl(215 70% 28%);
-    border: 1px solid hsl(210 60% 82%);
+    background: hsl(38 65% 94%);
+    color: hsl(30 60% 30%);
+    border: 1px solid hsl(38 50% 82%);
   }
   .sp-chip-navy {
     background: hsl(220 35% 94%);
     color: hsl(220 50% 22%);
     border: 1px solid hsl(220 25% 84%);
   }
-  .sp-divider { border-color: hsl(220 22% 90%); }
-  .sp-rule { border-top: 1px solid hsl(220 22% 90%); }
+  .sp-divider { border-color: hsl(38 28% 88%); }
+  .sp-rule { border-top: 1px solid hsl(38 28% 88%); }
 
   /* Subtle accent bar for editorial section labels */
   .sp-eyebrow {
     display: inline-flex; align-items: center; gap: 0.5rem;
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    color: hsl(175 70% 28%);
+    color: hsl(30 75% 35%);
   }
   .sp-eyebrow::before {
     content: ""; display: inline-block; width: 18px; height: 2px; border-radius: 2px;
-    background: hsl(175 70% 38%);
+    background: hsl(38 78% 48%);
   }
 
   @keyframes sp-pulse {
@@ -212,9 +212,10 @@
   }
   .sp-bar {
     display: inline-block; width: 3px; border-radius: 9999px;
-    background: hsl(175 70% 38%);
+    background: hsl(38 78% 48%);
     animation: sp-pulse 1.1s ease-in-out infinite;
   }
+
 
   /* ===== Speaking section animations (scoped to body.sp-active) ===== */
   @keyframes sp-fade-in {
@@ -369,4 +370,72 @@
       animation: none !important;
     }
   }
+
+  /* ===== Exam path theme — Burgundy & Rose, serious academic =====
+     Palette: warm cream, deep burgundy, rose, ink. Premium, formal. */
+  body.ex-active {
+    background:
+      radial-gradient(800px 500px at 90% -100px, hsl(348 60% 88% / 0.5), transparent 60%),
+      radial-gradient(700px 600px at -100px 200px, hsl(20 50% 92% / 0.55), transparent 60%),
+      linear-gradient(180deg, hsl(35 40% 98%) 0%, hsl(30 30% 95%) 100%) !important;
+    color: hsl(348 30% 18%);
+  }
+  body.ex-active header {
+    background: hsl(35 40% 98% / 0.85) !important;
+    border-color: hsl(348 25% 88%) !important;
+    color: hsl(348 40% 18%);
+    backdrop-filter: blur(10px);
+  }
+  body.ex-active header a, body.ex-active header span { color: hsl(348 40% 18%); }
+  body.ex-active main { background: transparent; }
+
+  .ex-text { color: hsl(348 35% 16%); }
+  .ex-text-muted { color: hsl(348 12% 42%); }
+  .ex-text-soft { color: hsl(348 14% 55%); }
+
+  .ex-card {
+    background: hsl(0 0% 100%);
+    border: 1px solid hsl(348 22% 90%);
+    border-radius: 1.125rem;
+    box-shadow: 0 1px 2px hsl(348 30% 20% / 0.04), 0 4px 18px -10px hsl(348 30% 20% / 0.08);
+    color: hsl(348 35% 16%);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  }
+  .ex-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px hsl(348 30% 20% / 0.05), 0 14px 30px -14px hsl(348 30% 20% / 0.18);
+    border-color: hsl(348 40% 75%);
+  }
+  .ex-card-hero {
+    background:
+      radial-gradient(500px 240px at 100% 0%, hsl(348 65% 55% / 0.28), transparent 60%),
+      linear-gradient(160deg, hsl(348 55% 24%) 0%, hsl(348 50% 30%) 100%);
+    color: hsl(35 40% 97%);
+    border: 1px solid hsl(348 50% 30%);
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 30px -16px hsl(348 60% 16% / 0.5);
+  }
+  .ex-btn-primary {
+    background: hsl(348 55% 28%);
+    color: hsl(35 40% 97%);
+    box-shadow: 0 6px 16px -8px hsl(348 60% 16% / 0.4);
+    transition: background 0.2s ease, transform 0.12s ease;
+  }
+  .ex-btn-primary:hover { background: hsl(348 60% 32%); }
+  .ex-btn-primary:active { transform: scale(0.98); }
+  .ex-chip {
+    background: hsl(348 45% 95%);
+    color: hsl(348 55% 28%);
+    border: 1px solid hsl(348 35% 85%);
+  }
+  .ex-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: hsl(348 55% 32%);
+  }
+  .ex-eyebrow::before {
+    content: ""; display: inline-block; width: 18px; height: 2px; border-radius: 2px;
+    background: hsl(348 55% 38%);
+  }
 }
+
