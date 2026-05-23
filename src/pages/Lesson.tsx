@@ -183,41 +183,8 @@ export default function Lesson() {
           })));
         }
       }
-      // update saved streak immediately after lesson completion using LOCAL calendar dates only
-      const todayStr = getLocalDateString();
-      const yesterdayStr = getYesterdayLocalDateString();
-      const { data: prof, error: profileError } = await supabase
-        .from("profiles")
-        .select("streak, longest_streak, last_activity")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (profileError) throw profileError;
-
-      const lastLessonCompletedDate = prof?.last_activity ? String(prof.last_activity).slice(0, 10) : null;
-      const oldCurrentStreak = prof?.streak ?? 0;
-      const oldLongestStreak = prof?.longest_streak ?? 0;
-      let newCurrentStreak = 1;
-
-      if (lastLessonCompletedDate === todayStr) {
-        newCurrentStreak = oldCurrentStreak;
-      } else if (lastLessonCompletedDate === yesterdayStr) {
-        newCurrentStreak = oldCurrentStreak + 1;
-      }
-
-      const newLongestStreak = Math.max(oldLongestStreak, newCurrentStreak);
-      console.log("[streak update]", {
-        today: todayStr,
-        lastLessonCompletedDate,
-        oldCurrentStreak,
-        newCurrentStreak,
-      });
-
-      const { error: streakError } = await supabase
-        .from("profiles")
-        .update({ streak: newCurrentStreak, longest_streak: newLongestStreak, last_activity: todayStr } as any)
-        .eq("id", user.id);
-      if (streakError) throw streakError;
       navigate(`/summary/${lesson?.id}`);
+
     } catch (e: any) {
       toast.error(e.message);
       setEnding(false);
