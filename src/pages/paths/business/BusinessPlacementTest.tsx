@@ -222,9 +222,7 @@ export default function BusinessPlacementTest() {
   };
 
   const initial = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
-  if (initial && !initial.setupCompleted) {
-    navigate("/path/business/setup", { replace: true });
-  }
+  void initial;
 
   if (done && resultLevel) {
     return (
