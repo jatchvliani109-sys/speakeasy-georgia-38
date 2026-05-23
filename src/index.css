@@ -370,4 +370,73 @@
       animation: none !important;
     }
   }
+
+  /* ===== Exam path theme — Burgundy & Rose, serious academic =====
+     Palette: warm cream, deep burgundy, rose, ink. Premium, formal. */
+  body.ex-active {
+    background:
+      radial-gradient(800px 500px at 90% -100px, hsl(348 60% 88% / 0.5), transparent 60%),
+      radial-gradient(700px 600px at -100px 200px, hsl(20 50% 92% / 0.55), transparent 60%),
+      linear-gradient(180deg, hsl(35 40% 98%) 0%, hsl(30 30% 95%) 100%) !important;
+    color: hsl(348 30% 18%);
+  }
+  body.ex-active header {
+    background: hsl(35 40% 98% / 0.85) !important;
+    border-color: hsl(348 25% 88%) !important;
+    color: hsl(348 40% 18%);
+    backdrop-filter: blur(10px);
+  }
+  body.ex-active header a, body.ex-active header span { color: hsl(348 40% 18%); }
+  body.ex-active main { background: transparent; }
+
+  .ex-text { color: hsl(348 35% 16%); }
+  .ex-text-muted { color: hsl(348 12% 42%); }
+  .ex-text-soft { color: hsl(348 14% 55%); }
+
+  .ex-card {
+    background: hsl(0 0% 100%);
+    border: 1px solid hsl(348 22% 90%);
+    border-radius: 1.125rem;
+    box-shadow: 0 1px 2px hsl(348 30% 20% / 0.04), 0 4px 18px -10px hsl(348 30% 20% / 0.08);
+    color: hsl(348 35% 16%);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  }
+  .ex-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px hsl(348 30% 20% / 0.05), 0 14px 30px -14px hsl(348 30% 20% / 0.18);
+    border-color: hsl(348 40% 75%);
+  }
+  .ex-card-hero {
+    background:
+      radial-gradient(500px 240px at 100% 0%, hsl(348 65% 55% / 0.28), transparent 60%),
+      linear-gradient(160deg, hsl(348 55% 24%) 0%, hsl(348 50% 30%) 100%);
+    color: hsl(35 40% 97%);
+    border: 1px solid hsl(348 50% 30%);
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 30px -16px hsl(348 60% 16% / 0.5);
+  }
+  .ex-btn-primary {
+    background: hsl(348 55% 28%);
+    color: hsl(35 40% 97%);
+    box-shadow: 0 6px 16px -8px hsl(348 60% 16% / 0.4);
+    transition: background 0.2s ease, transform 0.12s ease;
+  }
+  .ex-btn-primary:hover { background: hsl(348 60% 32%); }
+  .ex-btn-primary:active { transform: scale(0.98); }
+  .ex-chip {
+    background: hsl(348 45% 95%);
+    color: hsl(348 55% 28%);
+    border: 1px solid hsl(348 35% 85%);
+  }
+  .ex-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: hsl(348 55% 32%);
+  }
+  .ex-eyebrow::before {
+    content: ""; display: inline-block; width: 18px; height: 2px; border-radius: 2px;
+    background: hsl(348 55% 38%);
+  }
+}
+
 }
