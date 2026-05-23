@@ -21,8 +21,8 @@ export default function BusinessPlan() {
   useEffect(() => {
     if (!user) return;
     const cur = loadBusiness(user.id);
-    if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
     if (!cur.testCompleted) return navigate("/path/business/test", { replace: true });
+    if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
     if (!cur.plan) {
       const plan = buildPlan(cur);
       if (plan) {
