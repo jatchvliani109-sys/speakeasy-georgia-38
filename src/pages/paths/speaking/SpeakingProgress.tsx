@@ -65,7 +65,7 @@ export default function SpeakingProgress() {
         .limit(100);
       setPron((pr ?? []) as PronRow[]);
 
-      setStreak(await loadSpeakingStats(user.id));
+      
       setLoading(false);
     })();
   }, [user]);
