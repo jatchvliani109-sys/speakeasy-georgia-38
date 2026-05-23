@@ -57,8 +57,6 @@ export default function LearningPathSelection() {
     (async () => {
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       if (!data) return;
-      if (!data.onboarding_completed) return navigate("/onboarding", { replace: true });
-      if (!data.level_test_completed) return navigate("/level-test", { replace: true });
       setCurrent((data as any)?.selected_learning_path ?? null);
     })();
   }, [user, navigate]);
