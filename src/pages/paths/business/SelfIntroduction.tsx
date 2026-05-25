@@ -12,6 +12,7 @@ import {
   loadSelfIntros,
   saveSelfIntro,
   deleteSelfIntro,
+  pullBusinessFromSupabase,
   SavedSelfIntro,
   SelfIntroInputs,
   SelfIntroVersion,
@@ -19,6 +20,7 @@ import {
   SELF_INTRO_PURPOSES,
   SELF_INTRO_STATUSES,
 } from "./lib/state";
+
 
 type GenResult = {
   short: SelfIntroVersion;
