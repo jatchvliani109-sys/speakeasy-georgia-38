@@ -803,11 +803,13 @@ function Header({
   session,
   isLight,
   hasBonus,
+  curriculum,
 }: {
   step: Step;
   session: SessionData;
   isLight: boolean;
   hasBonus: boolean;
+  curriculum: CurriculumStep | null;
 }) {
   const order: Step[] = ["focus"];
   if (!isLight && session.warmUp) order.push("warmup");
@@ -820,7 +822,9 @@ function Header({
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
         <h1 className="ka text-xl font-bold text-[#1E2A44]">📨 იმეილები</h1>
-        <span className="ka text-[11px] text-[#5B6473]">{labelFor(session.emailType)}</span>
+        <span className="ka text-[11px] text-[#5B6473]">
+          {curriculum ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}` : labelFor(session.emailType)}
+        </span>
       </div>
       <div className="h-1.5 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
         <div
