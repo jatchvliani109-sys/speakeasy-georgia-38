@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, pullBusinessFromSupabase } from "./lib/state";
+import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 
 type Briefing = {
   companyName: string;
