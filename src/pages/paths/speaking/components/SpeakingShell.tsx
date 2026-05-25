@@ -11,8 +11,7 @@ export default function SpeakingShell({ children }: { children: ReactNode }) {
   return (
     <Layout>
       <div className="relative">
-        {/* keyed wrapper -> retriggers sp-page fade-in on every speaking route change */}
-        <div key={pathname} className="sp-page">
+        <div key={pathname} className="sp-page-enter">
           {children}
         </div>
       </div>
