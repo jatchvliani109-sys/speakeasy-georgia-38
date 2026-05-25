@@ -12,6 +12,13 @@ type SessionBody = {
   goals?: string[];
   recentEmailTypes?: string[];
   recentScenarios?: string[];
+  curriculumTopicKey?: string;
+  curriculumTopicTitleKa?: string;
+  curriculumGuidance?: string;
+  curriculumStep?: number;
+  curriculumTotal?: number;
+  curriculumCycle?: number;
+  previouslyLearned?: { topicKa: string; phrases: { en: string; ka: string }[] } | null;
 };
 
 type FeedbackBody = {
