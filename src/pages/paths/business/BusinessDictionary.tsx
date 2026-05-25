@@ -49,16 +49,41 @@ export default function BusinessDictionary() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("business_email_sessions")
-        .select("id, email_type, scenario_key, completed_at, session_data")
-        .eq("user_id", user.id)
-        .eq("completed", true)
-        .order("completed_at", { ascending: false });
+      const [emails, interviews] = await Promise.all([
+        supabase
+          .from("business_email_sessions")
+          .select("id, email_type, scenario_key, completed_at, session_data")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .order("completed_at", { ascending: false }),
+        supabase
+          .from("business_interview_sessions")
+          .select("id, role_title, scenario_key, completed_at, session_data")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .order("completed_at", { ascending: false }),
+      ]);
       if (cancelled) return;
-      const list = (data || []) as SessionRow[];
+      const emailRows: SessionRow[] = (emails.data || []).map((r: any) => ({
+        id: r.id,
+        kind: "email",
+        email_type: r.email_type,
+        scenario_key: r.scenario_key,
+        completed_at: r.completed_at,
+        session_data: r.session_data,
+      }));
+      const interviewRows: SessionRow[] = (interviews.data || []).map((r: any) => ({
+        id: r.id,
+        kind: "interview",
+        email_type: r.role_title,
+        scenario_key: r.scenario_key,
+        completed_at: r.completed_at,
+        session_data: r.session_data,
+      }));
+      const list = [...emailRows, ...interviewRows].sort((a, b) =>
+        (b.completed_at || "").localeCompare(a.completed_at || ""),
+      );
       setRows(list);
-      // Expand most recent by default
       if (list.length) setOpen({ [list[0].id]: true });
       setLoading(false);
     })();
