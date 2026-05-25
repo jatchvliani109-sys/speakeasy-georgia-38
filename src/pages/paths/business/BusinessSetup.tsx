@@ -184,7 +184,7 @@ export default function BusinessSetup() {
             უკან
           </BizButton>
           <BizButton onClick={next} disabled={!canNext}>
-            {step < 3 ? "შემდეგი" : "ტესტზე გადასვლა"}
+            {step < 3 ? "შემდეგი" : "გეგმის ნახვა"}
           </BizButton>
         </div>
       </BizCard>
