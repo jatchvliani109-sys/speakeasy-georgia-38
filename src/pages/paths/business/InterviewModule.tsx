@@ -123,7 +123,7 @@ export default function InterviewModule() {
 
         const { data: recent } = await supabase
           .from("business_interview_sessions")
-          .select("role_title, completed")
+          .select("role_title, completed, session_data")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(20);
@@ -131,7 +131,13 @@ export default function InterviewModule() {
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
-        const recentRoles = (recent || []).slice(0, 6).map((r: any) => r.role_title);
+        const recentRoles = (recent || []).slice(0, 12).map((r: any) => r.role_title);
+
+        const curStep = interviewStep(completed.length);
+        setCurriculum(curStep);
+        const lastCompleted = completed[0] || null;
+        const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
+        setPreviouslyLearned(prev);
 
         const p = cur.plan;
         const { data, error } = await supabase.functions.invoke("business-interview", {
@@ -146,6 +152,13 @@ export default function InterviewModule() {
               (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
             ),
             recentRoles,
+            curriculumTopicKey: curStep.key,
+            curriculumTopicTitleKa: curStep.titleKa,
+            curriculumGuidance: curStep.guidanceEn,
+            curriculumStep: curStep.step,
+            curriculumTotal: curStep.total,
+            curriculumCycle: curStep.cycle,
+            previouslyLearned: prev,
           },
         });
         if (cancelled) return;
