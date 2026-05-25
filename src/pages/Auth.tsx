@@ -121,6 +121,43 @@ export default function Auth() {
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
+
+        <div className="mt-8 pt-6 border-t border-dashed border-[#E5E2D8]">
+          <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#9CA3AF] text-center mb-3">
+            Dev only
+          </div>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              const devEmail = "dev.preview@speakeasy.local";
+              const devPass = "DevPreview123!";
+              try {
+                let { error } = await supabase.auth.signInWithPassword({ email: devEmail, password: devPass });
+                if (error) {
+                  const { error: sErr } = await supabase.auth.signUp({
+                    email: devEmail,
+                    password: devPass,
+                    options: { emailRedirectTo: `${window.location.origin}/learning-path` },
+                  });
+                  if (sErr) throw sErr;
+                  const retry = await supabase.auth.signInWithPassword({ email: devEmail, password: devPass });
+                  if (retry.error) throw retry.error;
+                }
+                toast.success("Dev preview mode");
+                navigate("/learning-path");
+              } catch (err: any) {
+                toast.error(err.message ?? "Dev login failed");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="w-full h-11 rounded-xl bg-white border-2 border-dashed border-[#C9A227]/60 text-sm font-semibold text-[#071A2F] hover:bg-[#FFF8E1] transition-colors disabled:opacity-60 ka"
+          >
+            Continue as Guest (Dev Preview)
+          </button>
+        </div>
       </div>
     </Layout>
   );
