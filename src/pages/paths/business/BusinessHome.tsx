@@ -50,6 +50,7 @@ export default function BusinessHome() {
   const navigate = useNavigate();
   const [s, setS] = useState<BusinessState | null>(null);
   const [emailsCount, setEmailsCount] = useState<number>(0);
+  const [doneToday, setDoneToday] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user) return;
@@ -64,6 +65,17 @@ export default function BusinessHome() {
         .eq("user_id", user.id)
         .eq("completed", true);
       if (!cancelled) setEmailsCount(count ?? 0);
+
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const { data: todays } = await supabase
+        .from("business_email_sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("completed", true)
+        .gte("completed_at", startOfDay.toISOString())
+        .limit(1);
+      if (!cancelled) setDoneToday((todays?.length ?? 0) > 0);
     })();
     return () => {
       cancelled = true;
