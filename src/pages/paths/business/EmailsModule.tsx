@@ -9,6 +9,7 @@ import {
   PRIORITY_LABELS,
   pullBusinessFromSupabase,
 } from "./lib/state";
+import { emailStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 
 type Example = { en: string; ka: string; noteKa?: string };
 type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
@@ -90,6 +91,8 @@ export default function EmailsModule() {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ total: number; vocab: number }>({ total: 0, vocab: 0 });
+  const [curriculum, setCurriculum] = useState<CurriculumStep | null>(null);
+  const [previouslyLearned, setPreviouslyLearned] = useState<PreviouslyLearned | null>(null);
 
   // warmup
   const [warmupChoice, setWarmupChoice] = useState<number | null>(null);
@@ -134,7 +137,16 @@ export default function EmailsModule() {
         setStats({ total: completed.length, vocab: vocabCount });
 
         const recentEmailTypes = (recent || []).slice(0, 6).map((r: any) => r.email_type);
-        const recentScenarios = (recent || []).slice(0, 12).map((r: any) => r.scenario_key);
+        const recentScenarios = (recent || []).slice(0, 20).map((r: any) => r.scenario_key);
+
+        // Curriculum: fixed progressive sequence based on completed count
+        const curStep = emailStep(completed.length);
+        setCurriculum(curStep);
+
+        // Previously learned: from last completed session
+        const lastCompleted = completed[0] || null;
+        const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
+        setPreviouslyLearned(prev);
 
         const plan = cur.plan;
         const { data, error } = await supabase.functions.invoke("business-emails", {
@@ -148,6 +160,13 @@ export default function EmailsModule() {
             ),
             recentEmailTypes,
             recentScenarios,
+            curriculumTopicKey: curStep.key,
+            curriculumTopicTitleKa: curStep.titleKa,
+            curriculumGuidance: curStep.guidanceEn,
+            curriculumStep: curStep.step,
+            curriculumTotal: curStep.total,
+            curriculumCycle: curStep.cycle,
+            previouslyLearned: prev,
           },
         });
         if (cancelled) return;
@@ -300,23 +319,48 @@ export default function EmailsModule() {
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
-      <Header step={step} session={session} isLight={isLight} hasBonus={hasBonus} />
+      <Header step={step} session={session} isLight={isLight} hasBonus={hasBonus} curriculum={curriculum} />
 
       {step === "focus" && (
-        <BizCard className="border-l-4 border-l-[#C9A227]">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
-            დღევანდელი ფოკუსი · ~{minutes} წუთი
-          </p>
-          <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2 leading-snug">
-            {session.dailyFocusKa}
-          </h2>
-          <p className="ka text-sm text-[#5B6473] mt-3">
-            დღეს ერთად ვიმუშავებთ {labelFor(session.emailType)} ტიპის იმეილზე — შენი მიზნებისა და სფეროს გათვალისწინებით.
-          </p>
-          <div className="mt-5 flex justify-end">
-            <BizButton onClick={() => setStep(afterFocusStep)}>დაწყება →</BizButton>
-          </div>
-        </BizCard>
+        <>
+          {previouslyLearned && (
+            <BizCard className="mb-3 bg-[#FAF7F0] border-dashed">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                წინა გაკვეთილიდან
+              </p>
+              <p className="ka text-xs text-[#5B6473] mt-1">{previouslyLearned.topicKa}</p>
+              <div className="mt-2 space-y-1.5">
+                {previouslyLearned.phrases.map((p, i) => (
+                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E7E2D5]">
+                    <p className="text-sm text-[#1E2A44] font-medium">"{p.en}"</p>
+                    <p className="ka text-[11px] text-[#5B6473]">{p.ka}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="ka text-[11px] text-[#C9A227] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+            </BizCard>
+          )}
+          <BizCard className="border-l-4 border-l-[#C9A227]">
+            {curriculum && (
+              <p className="ka text-[10px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">
+                ეტაპი {curriculum.step} / {curriculum.total}
+                {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
+              </p>
+            )}
+            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+              დღევანდელი ფოკუსი · ~{minutes} წუთი
+            </p>
+            <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2 leading-snug">
+              {session.dailyFocusKa}
+            </h2>
+            <p className="ka text-sm text-[#5B6473] mt-3">
+              დღეს ერთად ვიმუშავებთ {labelFor(session.emailType)} ტიპის იმეილზე — შენი მიზნებისა და სფეროს გათვალისწინებით.
+            </p>
+            <div className="mt-5 flex justify-end">
+              <BizButton onClick={() => setStep(afterFocusStep)}>დაწყება →</BizButton>
+            </div>
+          </BizCard>
+        </>
       )}
 
       {step === "warmup" && session.warmUp && (
@@ -759,11 +803,13 @@ function Header({
   session,
   isLight,
   hasBonus,
+  curriculum,
 }: {
   step: Step;
   session: SessionData;
   isLight: boolean;
   hasBonus: boolean;
+  curriculum: CurriculumStep | null;
 }) {
   const order: Step[] = ["focus"];
   if (!isLight && session.warmUp) order.push("warmup");
@@ -776,7 +822,9 @@ function Header({
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
         <h1 className="ka text-xl font-bold text-[#1E2A44]">📨 იმეილები</h1>
-        <span className="ka text-[11px] text-[#5B6473]">{labelFor(session.emailType)}</span>
+        <span className="ka text-[11px] text-[#5B6473]">
+          {curriculum ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}` : labelFor(session.emailType)}
+        </span>
       </div>
       <div className="h-1.5 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
         <div

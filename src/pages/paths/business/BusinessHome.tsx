@@ -7,6 +7,7 @@ import PathSwitcher from "@/components/PathSwitcher";
 import {
   BUSINESS_MODULES,
   BusinessIntensity,
+  BusinessPriority,
   BusinessState,
   FIELD_LABELS,
   INTENSITY_LABELS,
@@ -14,6 +15,7 @@ import {
   PRIORITY_LABELS,
   pullBusinessFromSupabase,
 } from "./lib/state";
+import { emailStep, interviewStep } from "./lib/curriculum";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
@@ -22,35 +24,61 @@ const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   deadline: "30 წუთი",
 };
 
-const MODULE_FOCUS: Record<string, { title: string; subtitle: string }> = {
+const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle: string; doneSubtitle: string }> = {
   interview: {
     title: "გასაუბრების პასუხების ვარჯიში",
     subtitle: "ერთი კითხვა, მკაფიო პასუხი — დღევანდელი მცირე გამარჯვება.",
+    doneTitle: "ყოჩაღ — დღევანდელი გასაუბრება დასრულდა",
+    doneSubtitle: "სცადე ერთი ფრაზა გაიხსენო რომელიც დღეს გამოგივიდა.",
   },
   emails: {
     title: "დღევანდელი იმეილის გამოწვევა",
     subtitle: "დაწერე ერთი პროფესიული იმეილი და მიიღე AI უკუკავშირი.",
+    doneTitle: "ყოჩაღ — დღევანდელი იმეილი დასრულდა",
+    doneSubtitle: "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები.",
   },
   meetings: {
     title: "შეხვედრის ფრაზების სცენარი",
     subtitle: "ივარჯიშე როგორ ჩაერთო და გამოთქვა აზრი შეხვედრაზე.",
+    doneTitle: "შესრულდა",
+    doneSubtitle: "კარგი მუშაობა დღეს.",
   },
   presentations: {
     title: "პრეზენტაციის სტრუქტურის ვარჯიში",
     subtitle: "გახსნა, მთავარი იდეა, დასკვნა — სამივე ერთ მცირე სავარჯიშოში.",
+    doneTitle: "შესრულდა",
+    doneSubtitle: "კარგი მუშაობა დღეს.",
   },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
+    doneTitle: "შესრულდა",
+    doneSubtitle: "კარგი მუშაობა დღეს.",
   },
 };
+
+// Modules that are fully built today
+const ACTIVE_MODULES = new Set(["emails", "interview"]);
+
+// Map a learner priority to a module slug — used for goal-weighted rotation.
+const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
+  university: "presentations",
+  job_interview: "interview",
+  work_communication: "meetings",
+  remote_work: "emails",
+  emails_writing: "emails",
+  presentations: "presentations",
+  business_vocab: "vocabulary",
+  general_business: "interview",
+};
+
+type ModuleProgress = { slug: string; count: number; doneToday: boolean };
 
 export default function BusinessHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [s, setS] = useState<BusinessState | null>(null);
-  const [emailsCount, setEmailsCount] = useState<number>(0);
-  const [doneToday, setDoneToday] = useState<boolean>(false);
+  const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
 
   useEffect(() => {
     if (!user) return;
@@ -59,23 +87,43 @@ export default function BusinessHome() {
       const cur = await pullBusinessFromSupabase(user.id);
       if (cancelled) return;
       setS(cur);
-      const { count } = await supabase
-        .from("business_email_sessions")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("completed", true);
-      if (!cancelled) setEmailsCount(count ?? 0);
 
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
-      const { data: todays } = await supabase
-        .from("business_email_sessions")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("completed", true)
-        .gte("completed_at", startOfDay.toISOString())
-        .limit(1);
-      if (!cancelled) setDoneToday((todays?.length ?? 0) > 0);
+      const startIso = startOfDay.toISOString();
+
+      const [emailsAll, emailsToday, interviewAll, interviewToday] = await Promise.all([
+        supabase
+          .from("business_email_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true),
+        supabase
+          .from("business_email_sessions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .gte("completed_at", startIso)
+          .limit(1),
+        supabase
+          .from("business_interview_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true),
+        supabase
+          .from("business_interview_sessions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .gte("completed_at", startIso)
+          .limit(1),
+      ]);
+
+      if (cancelled) return;
+      setProgress({
+        emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
+        interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
+      });
     })();
     return () => {
       cancelled = true;
@@ -92,6 +140,39 @@ export default function BusinessHome() {
     );
   }, [user]);
 
+  // Build goal-weighted rotation queue across active modules.
+  const rotationQueue = useMemo<string[]>(() => {
+    const plan = s?.plan;
+    const goals = plan?.mainGoals || s?.mainPriority || [];
+    const weighted: string[] = [];
+    // Map goals to active modules with double weight on first goal
+    goals.forEach((g, idx) => {
+      const slug = PRIORITY_TO_MODULE[g];
+      if (slug && ACTIVE_MODULES.has(slug)) {
+        const reps = idx === 0 ? 2 : 1;
+        for (let i = 0; i < reps; i++) weighted.push(slug);
+      }
+    });
+    // Ensure both active modules appear at least once
+    Array.from(ACTIVE_MODULES).forEach((m) => {
+      if (!weighted.includes(m)) weighted.push(m);
+    });
+    return weighted;
+  }, [s]);
+
+  // Pick today's focus: first slot in rotation that hasn't been done today.
+  // If everything done, fall back to the first goal-priority module.
+  const focusModuleSlug = useMemo(() => {
+    if (!Object.keys(progress).length) return s?.plan?.recommendedModule || "emails";
+    const undone = rotationQueue.find((slug) => !progress[slug]?.doneToday);
+    return undone || rotationQueue[0] || s?.plan?.recommendedModule || "emails";
+  }, [progress, rotationQueue, s]);
+
+  // Suggestion: another active module not yet done today (after primary focus is done).
+  const suggestionSlug = useMemo(() => {
+    return rotationQueue.find((slug) => slug !== focusModuleSlug && !progress[slug]?.doneToday) || null;
+  }, [rotationQueue, focusModuleSlug, progress]);
+
   if (!s) {
     return (
       <BusinessShell>
@@ -102,15 +183,26 @@ export default function BusinessHome() {
 
   const incomplete = !s.setupCompleted || !s.testCompleted || !s.plan;
   const plan = s.plan;
-  const showIntroCard =
-    !!plan && !s.businessSelfIntroductionCompleted;
+  const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
-  const focusModuleSlug = plan?.recommendedModule || "emails";
   const focusMod = BUSINESS_MODULES.find((m) => m.slug === focusModuleSlug);
   const focusCopy = MODULE_FOCUS[focusModuleSlug] || MODULE_FOCUS.emails;
   const focusMinutes = plan ? INTENSITY_MINUTES[plan.intensity] : "15 წუთი";
+  const focusDoneToday = progress[focusModuleSlug]?.doneToday ?? false;
 
-  const moduleProgress: Record<string, number> = { emails: emailsCount };
+  // Curriculum preview for focus module
+  const focusCurriculum =
+    focusModuleSlug === "emails"
+      ? emailStep(progress.emails?.count ?? 0)
+      : focusModuleSlug === "interview"
+        ? interviewStep(progress.interview?.count ?? 0)
+        : null;
+
+  const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
+  const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
+
+  const emailsCount = progress.emails?.count ?? 0;
+  const interviewCount = progress.interview?.count ?? 0;
 
   return (
     <BusinessShell>
@@ -152,24 +244,32 @@ export default function BusinessHome() {
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/20 text-[#F2D680] px-2 py-1 rounded-md font-semibold">
-                    {doneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
+                    {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
-                  {doneToday ? (
+                  {focusDoneToday ? (
                     <span className="ka text-[10px] inline-flex items-center gap-1 bg-[#0F766E]/25 text-[#A7F3D0] px-2 py-1 rounded-md font-semibold">
                       ✓ დასრულდა
                     </span>
                   ) : (
                     <span className="ka text-[10px] text-[#F7F1E3]/70">⏱ ~{focusMinutes}</span>
                   )}
+                  {focusCurriculum && (
+                    <span className="ka text-[10px] bg-[#F7F1E3]/10 text-[#F7F1E3]/80 px-2 py-1 rounded-md font-semibold">
+                      ეტაპი {focusCurriculum.step}/{focusCurriculum.total}
+                    </span>
+                  )}
                 </div>
                 <h2 className="ka text-xl font-bold leading-snug">
-                  {doneToday ? "ყოჩაღ — დღევანდელი გაკვეთილი დასრულდა" : focusCopy.title}
+                  {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
                 <p className="ka text-sm text-[#F7F1E3]/80 mt-2 leading-relaxed">
-                  {doneToday
-                    ? "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები."
-                    : focusCopy.subtitle}
+                  {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
+                {focusCurriculum && !focusDoneToday && (
+                  <p className="ka text-[11px] text-[#F2D680] mt-2">
+                    დღევანდელი თემა: {focusCurriculum.titleKa}
+                  </p>
+                )}
                 {focusMod && (
                   <p className="ka text-[11px] text-[#F7F1E3]/60 mt-3">
                     მოდული: {focusMod.title}
@@ -179,11 +279,36 @@ export default function BusinessHome() {
                   onClick={() => navigate(`/path/business/module/${focusModuleSlug}`)}
                   className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full sm:w-auto"
                 >
-                  {doneToday ? "კიდევ ერთი სესია →" : "დაწყება →"}
+                  {focusDoneToday ? "კიდევ ერთი სესია →" : "დაწყება →"}
                 </button>
               </div>
             </div>
           </section>
+
+          {/* 2b. "Still have energy?" cross-module suggestion */}
+          {focusDoneToday && suggestionMod && suggestionCopy && (
+            <BizCard className="mb-5 bg-[#FFFBEA] border-[#F2E6B0]">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl shrink-0">{suggestionMod.icon}</div>
+                <div className="min-w-0 flex-1">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+                    კიდევ გრძნობ ენერგიას?
+                  </p>
+                  <p className="ka text-sm font-semibold text-[#1E2A44] mt-1">
+                    კარგად გააკეთე! თუ კიდევ გრძნობ ენერგიას შეგიძლია სცადო{" "}
+                    {suggestionMod.title.toLowerCase()}.
+                  </p>
+                  <p className="ka text-[11px] text-[#5B6473] mt-1">{suggestionCopy.subtitle}</p>
+                  <button
+                    onClick={() => navigate(`/path/business/module/${suggestionMod.slug}`)}
+                    className="ka mt-3 text-xs font-semibold text-[#1E2A44] underline underline-offset-2"
+                  >
+                    დაწყება →
+                  </button>
+                </div>
+              </div>
+            </BizCard>
+          )}
 
           {/* 3. Your Plan */}
           <section className="mb-4">
@@ -209,7 +334,6 @@ export default function BusinessHome() {
             </BizCard>
           </section>
 
-          {/* 3b. Optional self-introduction suggestion */}
           {showIntroCard && (
             <BizCard className="mb-5 bg-[#FAF7F0] border-dashed">
               <div className="flex items-start justify-between gap-3">
@@ -241,8 +365,14 @@ export default function BusinessHome() {
             </p>
             <div className="space-y-2">
               {BUSINESS_MODULES.map((m) => {
-                const count = moduleProgress[m.slug] ?? 0;
+                const count = progress[m.slug]?.count ?? 0;
                 const started = count > 0;
+                const cur =
+                  m.slug === "emails"
+                    ? emailStep(count)
+                    : m.slug === "interview"
+                      ? interviewStep(count)
+                      : null;
                 return (
                   <Link
                     key={m.slug}
@@ -269,6 +399,11 @@ export default function BusinessHome() {
                         <p className="ka text-[11px] text-[#5B6473] mt-1 line-clamp-2">
                           {m.description}
                         </p>
+                        {cur && (
+                          <p className="ka text-[10px] text-[#C9A227] mt-1.5 font-semibold">
+                            შემდეგი: ეტაპი {cur.step}/{cur.total} · {cur.titleKa}
+                          </p>
+                        )}
                         <div className="mt-2 h-1 rounded-full bg-[#F0EBDD] overflow-hidden">
                           <div
                             className="h-full bg-[#C9A227] transition-all"
@@ -291,9 +426,9 @@ export default function BusinessHome() {
             <BizCard>
               <div className="grid grid-cols-2 gap-3">
                 <Stat label="გაუმჯობესებული იმეილები" value={String(emailsCount)} />
+                <Stat label="გასაუბრებები" value={String(interviewCount)} />
                 <Stat label="ბიზნეს სიტყვები" value="0" />
-                <Stat label="გასაუბრების პასუხები" value="0" />
-                <Stat label="გაკვეთილები" value="0" />
+                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount)} />
               </div>
               <Link
                 to="/path/business/dictionary"

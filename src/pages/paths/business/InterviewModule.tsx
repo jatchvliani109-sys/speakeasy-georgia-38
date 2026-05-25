@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, pullBusinessFromSupabase } from "./lib/state";
+import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 
 type Briefing = {
   companyName: string;
@@ -79,6 +80,8 @@ export default function InterviewModule() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ total: number }>({ total: 0 });
+  const [curriculum, setCurriculum] = useState<CurriculumStep | null>(null);
+  const [previouslyLearned, setPreviouslyLearned] = useState<PreviouslyLearned | null>(null);
 
   // warmup
   const [warmupIdx, setWarmupIdx] = useState(0);
@@ -120,7 +123,7 @@ export default function InterviewModule() {
 
         const { data: recent } = await supabase
           .from("business_interview_sessions")
-          .select("role_title, completed")
+          .select("role_title, completed, session_data")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(20);
@@ -128,7 +131,13 @@ export default function InterviewModule() {
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
-        const recentRoles = (recent || []).slice(0, 6).map((r: any) => r.role_title);
+        const recentRoles = (recent || []).slice(0, 12).map((r: any) => r.role_title);
+
+        const curStep = interviewStep(completed.length);
+        setCurriculum(curStep);
+        const lastCompleted = completed[0] || null;
+        const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
+        setPreviouslyLearned(prev);
 
         const p = cur.plan;
         const { data, error } = await supabase.functions.invoke("business-interview", {
@@ -143,6 +152,13 @@ export default function InterviewModule() {
               (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
             ),
             recentRoles,
+            curriculumTopicKey: curStep.key,
+            curriculumTopicTitleKa: curStep.titleKa,
+            curriculumGuidance: curStep.guidanceEn,
+            curriculumStep: curStep.step,
+            curriculumTotal: curStep.total,
+            curriculumCycle: curStep.cycle,
+            previouslyLearned: prev,
           },
         });
         if (cancelled) return;
@@ -359,11 +375,34 @@ export default function InterviewModule() {
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
-      {step !== "done" && <Header step={step} session={session} stageIdx={stageIdx} />}
+      {step !== "done" && <Header step={step} session={session} stageIdx={stageIdx} curriculum={curriculum} />}
 
       {step === "briefing" && (
         <div className="space-y-3">
+          {previouslyLearned && (
+            <BizCard className="bg-[#FAF7F0] border-dashed">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                წინა გასაუბრებიდან
+              </p>
+              <p className="ka text-xs text-[#5B6473] mt-1">{previouslyLearned.topicKa}</p>
+              <div className="mt-2 space-y-1.5">
+                {previouslyLearned.phrases.map((p, i) => (
+                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E7E2D5]">
+                    <p className="text-sm text-[#1E2A44] font-medium">"{p.en}"</p>
+                    <p className="ka text-[11px] text-[#5B6473]">{p.ka}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="ka text-[11px] text-[#C9A227] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+            </BizCard>
+          )}
           <BizCard className="border-l-4 border-l-[#C9A227]">
+            {curriculum && (
+              <p className="ka text-[10px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">
+                ეტაპი {curriculum.step} / {curriculum.total}
+                {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
+              </p>
+            )}
             <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
               გასაუბრების ბრიფინგი · ~{session.estimatedMinutes} წუთი
             </p>
@@ -765,7 +804,7 @@ export default function InterviewModule() {
   );
 }
 
-function Header({ step, session, stageIdx }: { step: Step; session: SessionData; stageIdx: number }) {
+function Header({ step, session, stageIdx, curriculum }: { step: Step; session: SessionData; stageIdx: number; curriculum: CurriculumStep | null }) {
   const steps: Step[] = ["briefing", "warmup", "interview", "verdict", "debrief"];
   const overall = Math.max(0, steps.indexOf(step));
   const totalStages = session.stages.length;
@@ -779,15 +818,17 @@ function Header({ step, session, stageIdx }: { step: Step; session: SessionData;
       <div className="flex items-center justify-between mb-2">
         <h1 className="ka text-xl font-bold text-[#1E2A44]">🤝 გასაუბრება</h1>
         <span className="ka text-[11px] text-[#5B6473]">
-          {step === "interview" && session.stages[stageIdx]
-            ? session.stageLabelsKa[session.stages[stageIdx]]
-            : step === "briefing"
-              ? "ბრიფინგი"
-              : step === "warmup"
-                ? "გახურება"
-                : step === "verdict"
-                  ? "შედეგი"
-                  : "Debrief"}
+          {curriculum
+            ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}`
+            : step === "interview" && session.stages[stageIdx]
+              ? session.stageLabelsKa[session.stages[stageIdx]]
+              : step === "briefing"
+                ? "ბრიფინგი"
+                : step === "warmup"
+                  ? "გახურება"
+                  : step === "verdict"
+                    ? "შედეგი"
+                    : "Debrief"}
         </span>
       </div>
       <div className="h-1.5 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
