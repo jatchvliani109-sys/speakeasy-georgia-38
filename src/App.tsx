@@ -23,6 +23,7 @@ import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest"
 import BusinessPlan from "./pages/paths/business/BusinessPlan";
 import BusinessHome from "./pages/paths/business/BusinessHome";
 import BusinessModule from "./pages/paths/business/BusinessModule";
+import BusinessDictionary from "./pages/paths/business/BusinessDictionary";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import NationalExamDashboard from "./pages/paths/NationalExam";
 import Lesson from "./pages/Lesson";
