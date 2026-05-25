@@ -7,7 +7,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 type Vocab = { en: string; ka: string; exampleEn?: string; exampleKa?: string };
 type SessionRow = {
   id: string;
-  kind: "email" | "interview";
+  kind: "email" | "interview" | "meeting";
   email_type: string;
   scenario_key: string;
   completed_at: string | null;
@@ -49,7 +49,7 @@ export default function BusinessDictionary() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [emails, interviews] = await Promise.all([
+      const [emails, interviews, meetings] = await Promise.all([
         supabase
           .from("business_email_sessions")
           .select("id, email_type, scenario_key, completed_at, session_data")
@@ -59,6 +59,12 @@ export default function BusinessDictionary() {
         supabase
           .from("business_interview_sessions")
           .select("id, role_title, scenario_key, completed_at, session_data")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .order("completed_at", { ascending: false }),
+        supabase
+          .from("business_meeting_sessions")
+          .select("id, meeting_type, scenario_key, completed_at, session_data")
           .eq("user_id", user.id)
           .eq("completed", true)
           .order("completed_at", { ascending: false }),
@@ -80,7 +86,15 @@ export default function BusinessDictionary() {
         completed_at: r.completed_at,
         session_data: r.session_data,
       }));
-      const list = [...emailRows, ...interviewRows].sort((a, b) =>
+      const meetingRows: SessionRow[] = (meetings.data || []).map((r: any) => ({
+        id: r.id,
+        kind: "meeting",
+        email_type: r.meeting_type,
+        scenario_key: r.scenario_key,
+        completed_at: r.completed_at,
+        session_data: r.session_data,
+      }));
+      const list = [...emailRows, ...interviewRows, ...meetingRows].sort((a, b) =>
         (b.completed_at || "").localeCompare(a.completed_at || ""),
       );
       setRows(list);

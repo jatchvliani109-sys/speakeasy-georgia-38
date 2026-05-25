@@ -213,7 +213,9 @@ export default function BusinessHome() {
       ? emailStep(progress.emails?.count ?? 0)
       : focusModuleSlug === "interview"
         ? interviewStep(progress.interview?.count ?? 0)
-        : null;
+        : focusModuleSlug === "meetings"
+          ? meetingStep(progress.meetings?.count ?? 0)
+          : null;
 
   const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
   const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
@@ -389,7 +391,9 @@ export default function BusinessHome() {
                     ? emailStep(count)
                     : m.slug === "interview"
                       ? interviewStep(count)
-                      : null;
+                      : m.slug === "meetings"
+                        ? meetingStep(count)
+                        : null;
                 return (
                   <Link
                     key={m.slug}
