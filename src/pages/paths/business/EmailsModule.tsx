@@ -137,7 +137,16 @@ export default function EmailsModule() {
         setStats({ total: completed.length, vocab: vocabCount });
 
         const recentEmailTypes = (recent || []).slice(0, 6).map((r: any) => r.email_type);
-        const recentScenarios = (recent || []).slice(0, 12).map((r: any) => r.scenario_key);
+        const recentScenarios = (recent || []).slice(0, 20).map((r: any) => r.scenario_key);
+
+        // Curriculum: fixed progressive sequence based on completed count
+        const curStep = emailStep(completed.length);
+        setCurriculum(curStep);
+
+        // Previously learned: from last completed session
+        const lastCompleted = completed[0] || null;
+        const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
+        setPreviouslyLearned(prev);
 
         const plan = cur.plan;
         const { data, error } = await supabase.functions.invoke("business-emails", {
@@ -151,6 +160,13 @@ export default function EmailsModule() {
             ),
             recentEmailTypes,
             recentScenarios,
+            curriculumTopicKey: curStep.key,
+            curriculumTopicTitleKa: curStep.titleKa,
+            curriculumGuidance: curStep.guidanceEn,
+            curriculumStep: curStep.step,
+            curriculumTotal: curStep.total,
+            curriculumCycle: curStep.cycle,
+            previouslyLearned: prev,
           },
         });
         if (cancelled) return;
