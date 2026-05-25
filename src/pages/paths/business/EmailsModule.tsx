@@ -735,7 +735,7 @@ export default function EmailsModule() {
           </BizCard>
 
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <BizButton variant="outline" onClick={() => navigate("/vocabulary")}>
+            <BizButton variant="outline" onClick={() => navigate("/path/business/dictionary")}>
               ლექსიკონის ნახვა
             </BizButton>
             <BizButton onClick={() => navigate("/path/business/home")}>
