@@ -7,6 +7,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 type Vocab = { en: string; ka: string; exampleEn?: string; exampleKa?: string };
 type SessionRow = {
   id: string;
+  kind: "email" | "interview";
   email_type: string;
   scenario_key: string;
   completed_at: string | null;
