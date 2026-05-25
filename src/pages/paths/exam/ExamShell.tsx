@@ -11,7 +11,7 @@ export default function ExamShell({ children }: { children: ReactNode }) {
   return (
     <Layout>
       <div className="relative">
-        <div key={pathname} className="sp-page">
+        <div key={pathname} className="sp-page-enter">
           {children}
         </div>
       </div>

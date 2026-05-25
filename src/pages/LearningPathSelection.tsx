@@ -70,12 +70,6 @@ export default function LearningPathSelection() {
   const navigate = useNavigate();
   const [saving, setSaving] = useState<LearningPathId | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(t);
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -98,9 +92,7 @@ export default function LearningPathSelection() {
       toast.error(error.message);
       return;
     }
-    // Smooth fade-out before navigation
-    setMounted(false);
-    setTimeout(() => navigate(route), 220);
+    navigate(route);
   };
 
   return (
@@ -110,8 +102,7 @@ export default function LearningPathSelection() {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .lp-anim { opacity: 0; }
-        .lp-anim.in { animation: lp-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .lp-anim { animation: lp-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
         .lp-card {
           transition: transform 280ms cubic-bezier(0.22,1,0.36,1),
                       box-shadow 280ms ease,
@@ -128,14 +119,14 @@ export default function LearningPathSelection() {
         }
         .lp-btn:hover { letter-spacing: 0.04em; }
         @media (prefers-reduced-motion: reduce) {
-          .lp-anim, .lp-anim.in { animation: none !important; opacity: 1 !important; }
+          .lp-anim { animation: none !important; opacity: 1 !important; }
           .lp-card, .lp-btn { transition: none !important; }
         }
       `}</style>
 
       <div className="py-4 space-y-8">
         <header
-          className={`lp-anim ${mounted ? "in" : ""} text-center space-y-3`}
+          className="lp-anim text-center space-y-3"
           style={{ animationDelay: "0ms" }}
         >
           <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
@@ -160,7 +151,7 @@ export default function LearningPathSelection() {
             return (
               <article
                 key={p.id}
-                className={`lp-anim ${mounted ? "in" : ""} lp-card relative overflow-hidden rounded-2xl ${theme.cardBg} border ${theme.cardBorder} shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
+                className={`lp-anim lp-card relative overflow-hidden rounded-2xl ${theme.cardBg} border ${theme.cardBorder} shadow-[0_2px_10px_-4px_rgba(7,26,47,0.08)]`}
                 style={{ animationDelay: `${120 + idx * 90}ms` }}
               >
                 <div className={`absolute top-0 left-0 right-0 h-[3px] ${theme.accentLine}`} />
@@ -210,7 +201,7 @@ export default function LearningPathSelection() {
         </div>
 
         <p
-          className={`lp-anim ${mounted ? "in" : ""} text-center text-[11px] text-[#6B7280] ka`}
+          className="lp-anim text-center text-[11px] text-[#6B7280] ka"
           style={{ animationDelay: "480ms" }}
         >
           მოგვიანებით შეგიძლია მიმართულების შეცვლა.
