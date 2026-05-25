@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_email_sessions: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          email_type: string
+          feedback: Json | null
+          id: string
+          scenario_key: string
+          session_data: Json
+          updated_at: string
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          email_type: string
+          feedback?: Json | null
+          id?: string
+          scenario_key: string
+          session_data?: Json
+          updated_at?: string
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          email_type?: string
+          feedback?: Json | null
+          id?: string
+          scenario_key?: string
+          session_data?: Json
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_state: {
         Row: {
           created_at: string
