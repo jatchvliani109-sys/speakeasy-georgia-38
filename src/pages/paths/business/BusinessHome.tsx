@@ -10,7 +10,7 @@ import {
   INTENSITY_LABELS,
   LEVEL_LABELS,
   PRIORITY_LABELS,
-  loadBusiness,
+  pullBusinessFromSupabase,
 } from "./lib/state";
 
 export default function BusinessHome() {
@@ -20,8 +20,14 @@ export default function BusinessHome() {
 
   useEffect(() => {
     if (!user) return;
-    setS(loadBusiness(user.id));
+    let cancelled = false;
+    (async () => {
+      const cur = await pullBusinessFromSupabase(user.id);
+      if (!cancelled) setS(cur);
+    })();
+    return () => { cancelled = true; };
   }, [user]);
+
 
   if (!s) return <BusinessShell><div className="ka text-[#5B6473]">იტვირთება...</div></BusinessShell>;
   const incomplete = !s.setupCompleted || !s.testCompleted || !s.plan;
