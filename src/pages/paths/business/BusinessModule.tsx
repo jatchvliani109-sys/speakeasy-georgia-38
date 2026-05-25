@@ -5,12 +5,14 @@ import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { BUSINESS_MODULES } from "./lib/state";
 import { SAMPLE_BUSINESS_VOCAB } from "./lib/vocab";
 import EmailsModule from "./EmailsModule";
+import InterviewModule from "./InterviewModule";
 
 export default function BusinessModule() {
   const { slug } = useParams();
   const mod = BUSINESS_MODULES.find((m) => m.slug === slug);
 
   if (slug === "emails") return <EmailsModule />;
+  if (slug === "interview") return <InterviewModule />;
 
 
 
