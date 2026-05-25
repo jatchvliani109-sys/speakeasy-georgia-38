@@ -10,6 +10,10 @@ export default function BusinessModule() {
   const { slug } = useParams();
   const mod = BUSINESS_MODULES.find((m) => m.slug === slug);
 
+  if (slug === "emails") return <EmailsModule />;
+
+
+
   if (!mod) {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "უკან დაბრუნება" }}>
