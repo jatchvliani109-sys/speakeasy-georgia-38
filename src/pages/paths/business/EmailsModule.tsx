@@ -656,29 +656,99 @@ export default function EmailsModule() {
       )}
 
       {step === "done" && (
-        <BizCard className="text-center border-l-4 border-l-[#0F766E]">
-          <div className="mx-auto w-14 h-14 rounded-full bg-[#0F766E]/10 grid place-items-center text-[#0F766E] text-2xl animate-[pop_.5s_ease-out]">
-            ✓
+        <div className="relative">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] via-[#1A2540] to-[#15203A] text-[#F7F1E3] p-7 shadow-[0_20px_50px_-20px_rgba(30,42,68,0.6)]">
+            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#C9A227]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
+            <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#0F766E]/15 blur-3xl pointer-events-none" />
+            <div className="relative text-center">
+              <div className="mx-auto relative w-20 h-20">
+                <div className="absolute inset-0 rounded-full bg-[#C9A227]/15 animate-[ping_1.6s_ease-out_1]" />
+                <div className="absolute inset-0 rounded-full border border-[#C9A227]/40" />
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#C9A227] to-[#A8861E] grid place-items-center shadow-[0_8px_24px_-6px_rgba(201,162,39,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#1E2A44]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
+                  </svg>
+                </div>
+              </div>
+              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#F2D680] font-semibold mt-5">
+                შესრულებულია
+              </p>
+              <h2 className="ka text-2xl font-bold mt-1 leading-snug">
+                დღევანდელი გაკვეთილი დასრულებულია
+              </h2>
+              <p className="ka text-sm text-[#F7F1E3]/75 mt-2">
+                {labelFor(session.emailType)} · {session.dailyFocusKa}
+              </p>
+            </div>
           </div>
-          <h2 className="ka text-xl font-bold text-[#1E2A44] mt-3">სესია დასრულდა</h2>
-          <p className="ka text-sm text-[#5B6473] mt-2">
-            დღეს ივარჯიშე <b className="text-[#1E2A44]">{labelFor(session.emailType)}</b> იმეილზე
-            {bonusDone ? " + ბონუს სცენარი" : ""} და შენახულია {savedCount || session.vocabulary.length} ფრაზა.
-          </p>
-          <div className="grid grid-cols-2 gap-2 mt-4 text-left">
-            <Stat label="სულ სესია" value={String(stats.total + 1)} />
-            <Stat label="ნასწავლი ფრაზა" value={String(stats.vocab + (savedCount || session.vocabulary.length))} />
+
+          <BizCard className="mt-4">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+              დღევანდელი შედეგი
+            </p>
+            <ul className="mt-3 space-y-2">
+              <SumRow ok label={`სცენარი: ${session.practice.scenarioKa}`} />
+              <SumRow ok label={`შენახულია ${savedCount || session.vocabulary.length} ფრაზა ლექსიკაში`} />
+              <SumRow ok={!!improveAck} label={improveAck ? "გაუმჯობესების ნაბიჯი დასრულდა" : "გაუმჯობესების ნაბიჯი გამოტოვებული"} />
+              {bonusDone && <SumRow ok label="ბონუს სცენარი დასრულდა" />}
+            </ul>
+          </BizCard>
+
+          <BizCard className="mt-3">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                  საერთო პროგრესი
+                </p>
+                <p className="ka text-sm text-[#1E2A44] mt-1">
+                  <b className="text-lg">{stats.total + 1}</b> სესია დასრულებული
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-[#1E2A44]">
+                  {stats.vocab + (savedCount || session.vocabulary.length)}
+                </div>
+                <div className="ka text-[10px] text-[#5B6473]">სულ ფრაზა</div>
+              </div>
+            </div>
+            <div className="mt-3 h-2 rounded-full bg-[#F0EBDD] overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#C9A227] to-[#D8B547] transition-all duration-700"
+                style={{ width: `${Math.min(100, (stats.total + 1) * 5)}%` }}
+              />
+            </div>
+            <p className="ka text-[10px] text-[#5B6473] mt-2">20 სესია = 1 ეტაპის ნიშანი</p>
+          </BizCard>
+
+          <BizCard className="mt-3 bg-[#FFFBEA] border-[#F2E6B0]">
+            <div className="flex items-start gap-3">
+              <div className="text-xl">🌅</div>
+              <div className="min-w-0">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+                  ხვალინდელი სესია
+                </p>
+                <p className="ka text-sm text-[#1E2A44] mt-1 leading-relaxed">
+                  {session.tomorrowTeaseKa}
+                </p>
+              </div>
+            </div>
+          </BizCard>
+
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <BizButton variant="outline" onClick={() => navigate("/vocabulary")}>
+              ლექსიკონის ნახვა
+            </BizButton>
+            <BizButton onClick={() => navigate("/path/business/home")}>
+              დაშბორდზე დაბრუნება
+            </BizButton>
           </div>
-          <div className="mt-4 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0] text-left">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">ხვალ</p>
-            <p className="ka text-sm text-[#1E2A44] mt-1">{session.tomorrowTeaseKa}</p>
-          </div>
-          <div className="mt-5 flex gap-2 justify-center">
-            <BizButton variant="outline" onClick={() => navigate("/path/business/home")}>დაშბორდი</BizButton>
-            <BizButton onClick={() => window.location.reload()}>ახალი სესია</BizButton>
-          </div>
-          <style>{`@keyframes pop { 0%{transform:scale(.5);opacity:0} 100%{transform:scale(1);opacity:1} }`}</style>
-        </BizCard>
+
+          <style>{`
+            @keyframes pop { 0%{transform:scale(.5);opacity:0} 100%{transform:scale(1);opacity:1} }
+            @keyframes glow { 0%{opacity:.5} 100%{opacity:1} }
+            @keyframes draw { to { stroke-dashoffset: 0 } }
+          `}</style>
+        </div>
       )}
     </BusinessShell>
   );
