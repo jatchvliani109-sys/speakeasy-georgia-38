@@ -44,6 +44,15 @@ export default function BusinessSetup() {
     (async () => {
       const cur = await pullBusinessFromSupabase(user.id);
       if (cancelled) return;
+      // If setup already completed, do not show the questions again — route forward.
+      if (cur.setupCompleted) {
+        if (!cur.testCompleted) navigate("/path/business/test", { replace: true });
+        else if (!cur.plan) navigate("/path/business/plan", { replace: true });
+        else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped)
+          navigate("/path/business/self-introduction", { replace: true });
+        else navigate("/path/business/home", { replace: true });
+        return;
+      }
       setGoals(cur.goals ?? []);
       setPriority(cur.mainPriority ?? []);
       setIntensity(cur.intensity ?? null);
@@ -52,7 +61,7 @@ export default function BusinessSetup() {
     })();
 
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, navigate]);
 
   const toggleGoal = (g: BusinessGoal) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
