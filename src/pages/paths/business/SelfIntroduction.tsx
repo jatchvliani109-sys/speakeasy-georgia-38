@@ -286,7 +286,19 @@ export default function SelfIntroduction() {
             {saved.length > 0 && (
               <BizButton variant="outline" onClick={() => setStep(7)}>შენახული წარდგენა</BizButton>
             )}
+            <BizButton
+              variant="ghost"
+              onClick={() => {
+                if (user) saveBusiness(user.id, { businessSelfIntroductionSkipped: true });
+                navigate("/path/business/home", { replace: true });
+              }}
+            >
+              გამოტოვება
+            </BizButton>
           </div>
+          <p className="ka text-[11px] text-[#5B6473] mt-3">
+            შეგიძლია ახლა გამოტოვო და მოგვიანებით დაშბორდიდან შექმნა.
+          </p>
         </BizCard>
       )}
 

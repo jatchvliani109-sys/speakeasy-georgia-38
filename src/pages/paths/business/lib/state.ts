@@ -57,6 +57,7 @@ export type BusinessState = {
   level: BusinessLevel | null;
   plan: BusinessPlan | null;
   businessSelfIntroductionCompleted?: boolean;
+  businessSelfIntroductionSkipped?: boolean;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -72,6 +73,7 @@ const empty = (): BusinessState => ({
   level: null,
   plan: null,
   businessSelfIntroductionCompleted: false,
+  businessSelfIntroductionSkipped: false,
 });
 
 export function loadBusiness(uid: string): BusinessState {

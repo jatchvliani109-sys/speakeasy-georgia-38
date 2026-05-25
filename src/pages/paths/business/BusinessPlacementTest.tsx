@@ -233,7 +233,7 @@ export default function BusinessPlacementTest() {
       if (cur.testCompleted && cur.level) {
         if (!cur.setupCompleted) navigate("/path/business/setup", { replace: true });
         else if (!cur.plan) navigate("/path/business/plan", { replace: true });
-        else if (!cur.businessSelfIntroductionCompleted) navigate("/path/business/self-introduction", { replace: true });
+        else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped) navigate("/path/business/self-introduction", { replace: true });
         else navigate("/path/business/home", { replace: true });
       }
     })();
