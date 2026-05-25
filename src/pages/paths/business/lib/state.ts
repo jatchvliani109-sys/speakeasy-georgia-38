@@ -384,12 +384,14 @@ export function saveSelfIntro(uid: string, item: SavedSelfIntro) {
   const idx = list.findIndex((i) => i.id === item.id);
   if (idx >= 0) list[idx] = item; else list.unshift(item);
   localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  pushSelfIntrosRemote(uid, list).catch(() => {});
   return list;
 }
 
 export function deleteSelfIntro(uid: string, id: string) {
   const list = loadSelfIntros(uid).filter((i) => i.id !== id);
   localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  pushSelfIntrosRemote(uid, list).catch(() => {});
   return list;
 }
 
