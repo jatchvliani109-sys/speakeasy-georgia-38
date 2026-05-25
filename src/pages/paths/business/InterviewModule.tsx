@@ -80,6 +80,8 @@ export default function InterviewModule() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ total: number }>({ total: 0 });
+  const [curriculum, setCurriculum] = useState<CurriculumStep | null>(null);
+  const [previouslyLearned, setPreviouslyLearned] = useState<PreviouslyLearned | null>(null);
 
   // warmup
   const [warmupIdx, setWarmupIdx] = useState(0);
