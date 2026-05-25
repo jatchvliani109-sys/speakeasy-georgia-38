@@ -246,21 +246,9 @@
   }
 
   /* Page-level wrapper fade-in (used by SpeakingShell, keyed by pathname) */
-  body.sp-active .sp-page {
-    animation: sp-fade-in 320ms ease-out both;
+  body.sp-active .sp-page-enter {
+    animation: sp-fade-in 260ms ease-out both;
   }
-
-  /* Card entrance (auto-applied to .sp-card under sp-active). Delay by source order. */
-  body.sp-active .sp-card,
-  body.sp-active .sp-card-hero {
-    animation: sp-fade-in 360ms ease-out both;
-  }
-  body.sp-active .sp-card:nth-of-type(1) { animation-delay: 40ms; }
-  body.sp-active .sp-card:nth-of-type(2) { animation-delay: 90ms; }
-  body.sp-active .sp-card:nth-of-type(3) { animation-delay: 140ms; }
-  body.sp-active .sp-card:nth-of-type(4) { animation-delay: 190ms; }
-  body.sp-active .sp-card:nth-of-type(5) { animation-delay: 240ms; }
-  body.sp-active .sp-card:nth-of-type(6) { animation-delay: 280ms; }
 
   /* Generic stagger helper for grids/lists */
   body.sp-active .sp-stagger > * {
@@ -366,6 +354,7 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
     }
+    body.sp-active .sp-page-enter,
     .sp-rec-dot, .sp-recording, .sp-bar, .sp-spinner {
       animation: none !important;
     }
