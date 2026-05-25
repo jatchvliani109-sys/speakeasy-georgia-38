@@ -11,13 +11,28 @@ import {
 } from "./lib/state";
 
 type Example = { en: string; ka: string; noteKa?: string };
+type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
 type Vocab = { en: string; ka: string; exampleEn: string; exampleKa: string };
+type WarmUpOption = { label: string; text: string; isBetter: boolean; issuesKa: string[] };
+type WarmUp = {
+  kind: "spot_mistakes" | "compare";
+  promptKa: string;
+  options: WarmUpOption[];
+  explanationKa: string;
+};
+type BonusScenario = {
+  scenarioKa: string;
+  recipientRole: string;
+  promptKa: string;
+  hintsKa: string[];
+};
 type SessionData = {
   emailType: string;
   scenarioKey: string;
   dailyFocusKa: string;
   estimatedMinutes: number;
-  learn: { titleKa: string; explanationKa: string; examples: Example[] };
+  warmUp?: WarmUp | null;
+  learn: { titleKa: string; explanationKa: string; structure?: StructurePart[]; examples: Example[] };
   realExample: {
     contextKa: string;
     subject: string;
@@ -30,10 +45,12 @@ type SessionData = {
     promptKa: string;
     hintsKa: string[];
   };
+  bonusScenario?: BonusScenario | null;
   vocabulary: Vocab[];
   tomorrowTeaseKa: string;
 };
 
+type ImproveFocus = { instructionKa: string; originalSnippet: string; hintKa: string };
 type Feedback = {
   inCharacter: { subject: string; body: string };
   feedback: {
@@ -42,10 +59,24 @@ type Feedback = {
     improve: string[];
     suggestions: { before: string; after: string; whyKa: string }[];
     rewriteEn: string;
+    improveFocus?: ImproveFocus;
   };
 };
 
-type Step = "loading" | "focus" | "learn" | "example" | "practice" | "feedback" | "vocab" | "done";
+type ImproveAck = { praiseKa: string; polishedEn: string; tipKa: string };
+
+type Step =
+  | "loading"
+  | "focus"
+  | "warmup"
+  | "learn"
+  | "example"
+  | "practice"
+  | "feedback"
+  | "improve"
+  | "bonus"
+  | "vocab"
+  | "done";
 
 export default function EmailsModule() {
   const { user } = useAuth();
@@ -60,6 +91,22 @@ export default function EmailsModule() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ total: number; vocab: number }>({ total: 0, vocab: 0 });
 
+  // warmup
+  const [warmupChoice, setWarmupChoice] = useState<number | null>(null);
+  // improve step
+  const [improveText, setImproveText] = useState("");
+  const [improveAck, setImproveAck] = useState<ImproveAck | null>(null);
+  const [loadingImprove, setLoadingImprove] = useState(false);
+  // bonus
+  const [bonusText, setBonusText] = useState("");
+  const [bonusDone, setBonusDone] = useState(false);
+  // saved phrases
+  const [savedCount, setSavedCount] = useState(0);
+
+  const intensity = biz?.plan?.intensity || biz?.intensity || "standard";
+  const isLight = intensity === "light";
+  const hasBonus = !!session?.bonusScenario && (intensity === "intensive" || intensity === "deadline");
+
   // Load state + generate session
   useEffect(() => {
     if (!user) return;
@@ -70,7 +117,6 @@ export default function EmailsModule() {
         if (cancelled) return;
         setBiz(cur);
 
-        // Load recent sessions to avoid repeats + stats
         const { data: recent } = await supabase
           .from("business_email_sessions")
           .select("email_type, scenario_key, completed, session_data")
@@ -110,7 +156,6 @@ export default function EmailsModule() {
         if (!s?.emailType) throw new Error("Invalid session");
         setSession(s);
 
-        // Persist draft session row
         const { data: inserted, error: insErr } = await supabase
           .from("business_email_sessions")
           .insert({
@@ -157,6 +202,9 @@ export default function EmailsModule() {
       const fb = data as Feedback;
       if (!fb?.feedback) throw new Error("Invalid feedback");
       setFeedback(fb);
+      // seed improve text with the snippet they need to rewrite
+      const snip = fb.feedback.improveFocus?.originalSnippet || fb.feedback.suggestions?.[0]?.before || "";
+      setImproveText(snip);
       if (sessionId) {
         await supabase
           .from("business_email_sessions")
@@ -171,7 +219,56 @@ export default function EmailsModule() {
     }
   }
 
+  async function submitImprove() {
+    if (!session || !feedback || !improveText.trim()) return;
+    setLoadingImprove(true);
+    setError(null);
+    try {
+      const focus = feedback.feedback.improveFocus;
+      const fallback = feedback.feedback.suggestions?.[0];
+      const targetBefore = focus?.originalSnippet || fallback?.before || "";
+      const targetAfter = fallback?.after || "";
+      const whyKa = focus?.hintKa || fallback?.whyKa || "";
+      const { data, error } = await supabase.functions.invoke("business-emails", {
+        body: {
+          action: "improve",
+          level: biz?.plan?.level || biz?.level || "business_intermediate",
+          emailType: session.emailType,
+          originalEmail: userEmail,
+          targetBefore,
+          targetAfter,
+          whyKa,
+          userRewrite: improveText.trim(),
+        },
+      });
+      if (error) throw error;
+      setImproveAck(data as ImproveAck);
+    } catch (e: any) {
+      setError(e?.message || "ვერ მოვიდა პასუხი. სცადე ისევ.");
+    } finally {
+      setLoadingImprove(false);
+    }
+  }
+
+  async function savePhrasesToVocab() {
+    if (!user || !session) return 0;
+    const rows = session.vocabulary.map((v) => ({
+      user_id: user.id,
+      english_word: v.en,
+      georgian_meaning: v.ka,
+      example_sentence: v.exampleEn,
+      difficulty: "business",
+      status: "new" as const,
+    }));
+    if (!rows.length) return 0;
+    const { error } = await supabase.from("vocabulary").insert(rows);
+    if (error) return 0;
+    return rows.length;
+  }
+
   async function completeSession() {
+    const saved = await savePhrasesToVocab();
+    setSavedCount(saved);
     if (sessionId) {
       await supabase
         .from("business_email_sessions")
@@ -198,9 +295,12 @@ export default function EmailsModule() {
     );
   }
 
+  const showWarmup = !isLight && !!session.warmUp?.options?.length;
+  const afterFocusStep: Step = showWarmup ? "warmup" : "learn";
+
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
-      <Header step={step} session={session} />
+      <Header step={step} session={session} isLight={isLight} hasBonus={hasBonus} />
 
       {step === "focus" && (
         <BizCard className="border-l-4 border-l-[#C9A227]">
@@ -214,18 +314,91 @@ export default function EmailsModule() {
             დღეს ერთად ვიმუშავებთ {labelFor(session.emailType)} ტიპის იმეილზე — შენი მიზნებისა და სფეროს გათვალისწინებით.
           </p>
           <div className="mt-5 flex justify-end">
-            <BizButton onClick={() => setStep("learn")}>დაწყება →</BizButton>
+            <BizButton onClick={() => setStep(afterFocusStep)}>დაწყება →</BizButton>
           </div>
+        </BizCard>
+      )}
+
+      {step === "warmup" && session.warmUp && (
+        <BizCard>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+            გახურება · 1-2 წუთი
+          </p>
+          <p className="ka text-sm font-semibold text-[#1E2A44] mt-2">{session.warmUp.promptKa}</p>
+          <div className="mt-3 space-y-2">
+            {session.warmUp.options.map((o, i) => {
+              const isPicked = warmupChoice === i;
+              const reveal = warmupChoice !== null;
+              const correct = o.isBetter;
+              const ringClass = !reveal
+                ? "border-[#E7E2D5] hover:border-[#1E2A44]"
+                : correct
+                  ? "border-[#0F766E] bg-[#F0FDF9]"
+                  : isPicked
+                    ? "border-[#B45309] bg-[#FFFBEA]"
+                    : "border-[#E7E2D5] opacity-60";
+              return (
+                <button
+                  key={i}
+                  disabled={reveal}
+                  onClick={() => setWarmupChoice(i)}
+                  className={`w-full text-left p-3 rounded-lg border transition ${ringClass}`}
+                >
+                  <p className="text-xs font-semibold text-[#5B6473]">Option {o.label}</p>
+                  <p className="text-sm text-[#1E2A44] mt-1 whitespace-pre-wrap">{o.text}</p>
+                  {reveal && o.issuesKa?.length > 0 && (
+                    <ul className="ka mt-2 space-y-0.5">
+                      {o.issuesKa.map((it, j) => (
+                        <li key={j} className="text-[11px] text-[#5B6473]">• {it}</li>
+                      ))}
+                    </ul>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {warmupChoice !== null && (
+            <p className="ka text-xs text-[#1E2A44] mt-3 p-3 bg-[#FAF7F0] rounded-lg border border-[#E7E2D5]">
+              💡 {session.warmUp.explanationKa}
+            </p>
+          )}
+          <NavRow
+            onBack={() => setStep("focus")}
+            onNext={() => setStep("learn")}
+            nextLabel="სწავლა →"
+            nextDisabled={warmupChoice === null}
+          />
         </BizCard>
       )}
 
       {step === "learn" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
-            1 / 4 · სწავლა
-          </p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">სწავლა</p>
           <h3 className="ka text-lg font-bold text-[#1E2A44] mt-1">{session.learn.titleKa}</h3>
           <p className="ka text-sm text-[#374151] mt-2 leading-relaxed">{session.learn.explanationKa}</p>
+
+          {session.learn.structure && session.learn.structure.length > 0 && (
+            <div className="mt-4">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+                იმეილის სტრუქტურა
+              </p>
+              <div className="mt-2 space-y-2">
+                {session.learn.structure.map((p, i) => (
+                  <div key={i} className="flex gap-3 p-3 rounded-lg bg-white border border-[#E7E2D5]">
+                    <div className="shrink-0 w-7 h-7 rounded-full bg-[#1E2A44] text-white text-xs grid place-items-center font-bold">
+                      {i + 1}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="ka text-sm font-semibold text-[#1E2A44]">{p.partKa}</p>
+                      <p className="ka text-[11px] text-[#5B6473]">{p.purposeKa}</p>
+                      <p className="text-xs text-[#374151] mt-1 italic">"{p.exampleEn}"</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 space-y-2">
             {session.learn.examples.map((ex, i) => (
               <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
@@ -235,15 +408,17 @@ export default function EmailsModule() {
               </div>
             ))}
           </div>
-          <NavRow onNext={() => setStep("example")} nextLabel="რეალური მაგალითი →" />
+          <NavRow
+            onBack={() => setStep(showWarmup ? "warmup" : "focus")}
+            onNext={() => setStep("example")}
+            nextLabel="რეალური მაგალითი →"
+          />
         </BizCard>
       )}
 
       {step === "example" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
-            2 / 4 · რეალური მაგალითი
-          </p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">რეალური მაგალითი</p>
           <p className="ka text-xs text-[#5B6473] mt-2 italic">{session.realExample.contextKa}</p>
           <div className="mt-3 border border-[#E7E2D5] rounded-xl overflow-hidden">
             <div className="px-4 py-2 bg-[#1E2A44]/5 border-b border-[#E7E2D5]">
@@ -264,15 +439,13 @@ export default function EmailsModule() {
               ))}
             </ul>
           )}
-          <NavRow onBack={() => setStep("learn")} onNext={() => setStep("practice")} nextLabel="ვარჯიში →" />
+          <NavRow onBack={() => setStep("learn")} onNext={() => setStep("practice")} nextLabel="მთავარი დავალება →" />
         </BizCard>
       )}
 
       {step === "practice" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
-            3 / 4 · ვარჯიში
-          </p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">მთავარი დავალება</p>
           <div className="mt-2 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0]">
             <p className="ka text-sm text-[#1E2A44] leading-relaxed">{session.practice.scenarioKa}</p>
           </div>
@@ -304,7 +477,7 @@ export default function EmailsModule() {
         <div className="space-y-3">
           <BizCard className="border-l-4 border-l-[#1E2A44]">
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
-              4 / 4 · პასუხი {session.practice.recipientRole}-დან
+              პასუხი {session.practice.recipientRole}-დან
             </p>
             <div className="mt-3 border border-[#E7E2D5] rounded-xl overflow-hidden">
               <div className="px-4 py-2 bg-[#1E2A44]/5 border-b border-[#E7E2D5]">
@@ -317,9 +490,7 @@ export default function EmailsModule() {
           </BizCard>
 
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
-              AI feedback
-            </p>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">AI feedback</p>
             <p className="ka text-sm text-[#1E2A44] mt-2">{feedback.feedback.summaryKa}</p>
 
             {feedback.feedback.worked?.length > 0 && (
@@ -368,15 +539,107 @@ export default function EmailsModule() {
               </details>
             )}
 
-            <NavRow onNext={() => setStep("vocab")} nextLabel="ლექსიკა →" />
+            <NavRow onNext={() => setStep("improve")} nextLabel="გავაუმჯობესოთ →" />
           </BizCard>
         </div>
+      )}
+
+      {step === "improve" && feedback && (
+        <BizCard className="border-l-4 border-l-[#C9A227]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">გავაუმჯობესოთ ერთი ნაწილი</p>
+          <p className="ka text-sm font-semibold text-[#1E2A44] mt-2">
+            {feedback.feedback.improveFocus?.instructionKa || "გადაწერე ეს ნაწილი უკეთეს ვერსიად:"}
+          </p>
+          {(feedback.feedback.improveFocus?.originalSnippet || feedback.feedback.suggestions?.[0]?.before) && (
+            <div className="mt-2 p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
+              <p className="text-xs text-[#5B6473]">შენი ორიგინალი:</p>
+              <p className="text-sm text-[#1E2A44] mt-1 italic">
+                "{feedback.feedback.improveFocus?.originalSnippet || feedback.feedback.suggestions?.[0]?.before}"
+              </p>
+            </div>
+          )}
+          {feedback.feedback.improveFocus?.hintKa && (
+            <p className="ka text-xs text-[#5B6473] mt-2">💡 {feedback.feedback.improveFocus.hintKa}</p>
+          )}
+          <textarea
+            value={improveText}
+            onChange={(e) => setImproveText(e.target.value)}
+            placeholder="Rewrite just this part..."
+            className="mt-3 w-full min-h-[100px] p-3 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] resize-y"
+            disabled={!!improveAck}
+          />
+
+          {improveAck && (
+            <div className="mt-3 p-3 rounded-lg bg-[#F0FDF9] border border-[#A7F3D0]">
+              <p className="ka text-sm text-[#065F46]">✓ {improveAck.praiseKa}</p>
+              {improveAck.polishedEn && (
+                <p className="text-sm text-[#1E2A44] mt-2 italic">"{improveAck.polishedEn}"</p>
+              )}
+              {improveAck.tipKa && (
+                <p className="ka text-[11px] text-[#5B6473] mt-2">💡 {improveAck.tipKa}</p>
+              )}
+            </div>
+          )}
+          {error && <p className="ka text-xs text-[#B91C1C] mt-2">{error}</p>}
+
+          {!improveAck ? (
+            <NavRow
+              onBack={() => setStep("feedback")}
+              onNext={submitImprove}
+              nextLabel={loadingImprove ? "AI ფიქრობს..." : "გადახედვა →"}
+              nextDisabled={!improveText.trim() || loadingImprove}
+            />
+          ) : (
+            <NavRow
+              onNext={() => setStep(hasBonus ? "bonus" : "vocab")}
+              nextLabel={hasBonus ? "დამატებითი სცენარი →" : "დღევანდელი ფრაზები →"}
+            />
+          )}
+        </BizCard>
+      )}
+
+      {step === "bonus" && session.bonusScenario && (
+        <BizCard className="border-l-4 border-l-[#1E2A44]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+            დამატებითი ვარჯიში · ბონუს
+          </p>
+          <div className="mt-2 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0]">
+            <p className="ka text-sm text-[#1E2A44] leading-relaxed">{session.bonusScenario.scenarioKa}</p>
+          </div>
+          <p className="ka text-sm font-semibold text-[#1E2A44] mt-3">{session.bonusScenario.promptKa}</p>
+          {session.bonusScenario.hintsKa?.length > 0 && (
+            <ul className="mt-2 space-y-0.5">
+              {session.bonusScenario.hintsKa.map((h, i) => (
+                <li key={i} className="ka text-xs text-[#5B6473]">• {h}</li>
+              ))}
+            </ul>
+          )}
+          <textarea
+            value={bonusText}
+            onChange={(e) => setBonusText(e.target.value)}
+            placeholder="Write your email here in English..."
+            className="mt-3 w-full min-h-[140px] p-3 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] resize-y"
+            disabled={bonusDone}
+          />
+          {bonusDone && (
+            <p className="ka text-xs text-[#065F46] mt-2">✓ შენახულია — კარგი მუშაობა!</p>
+          )}
+          <NavRow
+            onBack={() => setStep("improve")}
+            onNext={() => {
+              if (!bonusDone) setBonusDone(true);
+              else setStep("vocab");
+            }}
+            nextLabel={bonusDone ? "დღევანდელი ფრაზები →" : "დასრულება →"}
+            nextDisabled={!bonusDone && !bonusText.trim()}
+          />
+        </BizCard>
       )}
 
       {step === "vocab" && (
         <BizCard>
           <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
-            ლექსიკა · დღევანდელი ფრაზები
+            დღევანდელი ფრაზები · ავტომატურად ინახება შენს ლექსიკაში
           </p>
           <div className="mt-3 space-y-2">
             {session.vocabulary.map((v, i) => (
@@ -399,11 +662,12 @@ export default function EmailsModule() {
           </div>
           <h2 className="ka text-xl font-bold text-[#1E2A44] mt-3">სესია დასრულდა</h2>
           <p className="ka text-sm text-[#5B6473] mt-2">
-            დღეს ივარჯიშე <b className="text-[#1E2A44]">{labelFor(session.emailType)}</b> იმეილზე და ისწავლე {session.vocabulary.length} ფრაზა.
+            დღეს ივარჯიშე <b className="text-[#1E2A44]">{labelFor(session.emailType)}</b> იმეილზე
+            {bonusDone ? " + ბონუს სცენარი" : ""} და შენახულია {savedCount || session.vocabulary.length} ფრაზა.
           </p>
           <div className="grid grid-cols-2 gap-2 mt-4 text-left">
-            <Stat label="სულ იმეილი" value={String(stats.total + 1)} />
-            <Stat label="ნასწავლი ფრაზა" value={String(stats.vocab + session.vocabulary.length)} />
+            <Stat label="სულ სესია" value={String(stats.total + 1)} />
+            <Stat label="ნასწავლი ფრაზა" value={String(stats.vocab + (savedCount || session.vocabulary.length))} />
           </div>
           <div className="mt-4 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0] text-left">
             <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">ხვალ</p>
@@ -420,8 +684,22 @@ export default function EmailsModule() {
   );
 }
 
-function Header({ step, session }: { step: Step; session: SessionData }) {
-  const order: Step[] = ["focus", "learn", "example", "practice", "feedback", "vocab", "done"];
+function Header({
+  step,
+  session,
+  isLight,
+  hasBonus,
+}: {
+  step: Step;
+  session: SessionData;
+  isLight: boolean;
+  hasBonus: boolean;
+}) {
+  const order: Step[] = ["focus"];
+  if (!isLight && session.warmUp) order.push("warmup");
+  order.push("learn", "example", "practice", "feedback", "improve");
+  if (hasBonus) order.push("bonus");
+  order.push("vocab", "done");
   const idx = Math.max(0, order.indexOf(step));
   const pct = ((idx + 1) / order.length) * 100;
   return (
