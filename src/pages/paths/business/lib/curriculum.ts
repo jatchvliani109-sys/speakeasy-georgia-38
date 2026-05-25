@@ -205,6 +205,12 @@ export function interviewStep(completedCount: number): CurriculumStep {
   return { ...INTERVIEW_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
 }
 
+export function meetingStep(completedCount: number): CurriculumStep {
+  const total = MEETING_CURRICULUM.length;
+  const idx = ((completedCount % total) + total) % total;
+  return { ...MEETING_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
+}
+
 export type PreviouslyLearned = {
   topicKa: string;
   phrases: { en: string; ka: string }[];
