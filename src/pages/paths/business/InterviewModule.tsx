@@ -375,11 +375,34 @@ export default function InterviewModule() {
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
-      {step !== "done" && <Header step={step} session={session} stageIdx={stageIdx} />}
+      {step !== "done" && <Header step={step} session={session} stageIdx={stageIdx} curriculum={curriculum} />}
 
       {step === "briefing" && (
         <div className="space-y-3">
+          {previouslyLearned && (
+            <BizCard className="bg-[#FAF7F0] border-dashed">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                წინა გასაუბრებიდან
+              </p>
+              <p className="ka text-xs text-[#5B6473] mt-1">{previouslyLearned.topicKa}</p>
+              <div className="mt-2 space-y-1.5">
+                {previouslyLearned.phrases.map((p, i) => (
+                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E7E2D5]">
+                    <p className="text-sm text-[#1E2A44] font-medium">"{p.en}"</p>
+                    <p className="ka text-[11px] text-[#5B6473]">{p.ka}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="ka text-[11px] text-[#C9A227] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+            </BizCard>
+          )}
           <BizCard className="border-l-4 border-l-[#C9A227]">
+            {curriculum && (
+              <p className="ka text-[10px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">
+                ეტაპი {curriculum.step} / {curriculum.total}
+                {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
+              </p>
+            )}
             <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
               გასაუბრების ბრიფინგი · ~{session.estimatedMinutes} წუთი
             </p>
