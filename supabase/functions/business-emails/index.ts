@@ -55,10 +55,6 @@ Rules:
 - Warm-up must be quick (1-2 min), engaging, and prime the learner for today's email type.
 - Georgian translations are required where specified.
 - Encouraging, warm, human tone in Georgian intro/explanations.`;
-- Real example must reflect chosen fields (e.g. management vs freelancing vs marketing).
-- Warm-up must be quick (1-2 min), engaging, and prime the learner for today's email type.
-- Georgian translations are required where specified.
-- Encouraging, warm, human tone in Georgian intro/explanations.`;
 
 const SYSTEM_FEEDBACK = `You give feedback on a Business English learner's email.
 Two-part response:
