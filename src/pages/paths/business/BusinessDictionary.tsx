@@ -7,6 +7,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 type Vocab = { en: string; ka: string; exampleEn?: string; exampleKa?: string };
 type SessionRow = {
   id: string;
+  kind: "email" | "interview";
   email_type: string;
   scenario_key: string;
   completed_at: string | null;
@@ -48,16 +49,41 @@ export default function BusinessDictionary() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("business_email_sessions")
-        .select("id, email_type, scenario_key, completed_at, session_data")
-        .eq("user_id", user.id)
-        .eq("completed", true)
-        .order("completed_at", { ascending: false });
+      const [emails, interviews] = await Promise.all([
+        supabase
+          .from("business_email_sessions")
+          .select("id, email_type, scenario_key, completed_at, session_data")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .order("completed_at", { ascending: false }),
+        supabase
+          .from("business_interview_sessions")
+          .select("id, role_title, scenario_key, completed_at, session_data")
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .order("completed_at", { ascending: false }),
+      ]);
       if (cancelled) return;
-      const list = (data || []) as SessionRow[];
+      const emailRows: SessionRow[] = (emails.data || []).map((r: any) => ({
+        id: r.id,
+        kind: "email",
+        email_type: r.email_type,
+        scenario_key: r.scenario_key,
+        completed_at: r.completed_at,
+        session_data: r.session_data,
+      }));
+      const interviewRows: SessionRow[] = (interviews.data || []).map((r: any) => ({
+        id: r.id,
+        kind: "interview",
+        email_type: r.role_title,
+        scenario_key: r.scenario_key,
+        completed_at: r.completed_at,
+        session_data: r.session_data,
+      }));
+      const list = [...emailRows, ...interviewRows].sort((a, b) =>
+        (b.completed_at || "").localeCompare(a.completed_at || ""),
+      );
       setRows(list);
-      // Expand most recent by default
       if (list.length) setOpen({ [list[0].id]: true });
       setLoading(false);
     })();
@@ -169,10 +195,12 @@ export default function BusinessDictionary() {
           {filtered.map((r) => {
             const vocab: Vocab[] = (r as any)._matched || r.session_data?.vocabulary || [];
             const isOpen = !!open[r.id];
-            const title =
-              TYPE_LABELS[r.email_type] ||
-              r.session_data?.dailyFocusKa ||
-              r.email_type;
+            const isInterview = r.kind === "interview";
+            const title = isInterview
+              ? (r.session_data?.briefing?.roleTitleKa || r.email_type)
+              : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
+            const sectionLabel = isInterview ? "გასაუბრება" : "იმეილები";
+            const icon = isInterview ? "🤝" : "📨";
             const date = formatKaDate(r.completed_at);
             return (
               <div
@@ -184,16 +212,17 @@ export default function BusinessDictionary() {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#FAF7F0] transition"
                 >
                   <div className="shrink-0 w-9 h-9 rounded-lg bg-[#1E2A44]/5 grid place-items-center text-base">
-                    📨
+                    {icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="ka text-sm font-semibold text-[#1E2A44] truncate">
-                      იმეილები — {title}
+                      {sectionLabel} — {title}
                     </p>
                     <p className="ka text-[11px] text-[#5B6473] mt-0.5">
                       {date} · {vocab.length} ფრაზა
                     </p>
                   </div>
+
                   <svg
                     className={`shrink-0 w-4 h-4 text-[#5B6473] transition-transform ${isOpen ? "rotate-180" : ""}`}
                     viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
