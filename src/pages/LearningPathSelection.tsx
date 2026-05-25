@@ -119,7 +119,7 @@ export default function LearningPathSelection() {
         }
         .lp-btn:hover { letter-spacing: 0.04em; }
         @media (prefers-reduced-motion: reduce) {
-          .lp-anim, .lp-anim.in { animation: none !important; opacity: 1 !important; }
+          .lp-anim { animation: none !important; opacity: 1 !important; }
           .lp-card, .lp-btn { transition: none !important; }
         }
       `}</style>
