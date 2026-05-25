@@ -818,6 +818,21 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function SumRow({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span
+        className={`shrink-0 mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[11px] font-bold ${
+          ok ? "bg-[#0F766E]/15 text-[#0F766E]" : "bg-[#E7E2D5] text-[#5B6473]"
+        }`}
+      >
+        {ok ? "✓" : "–"}
+      </span>
+      <span className="ka text-sm text-[#1E2A44] leading-snug">{label}</span>
+    </li>
+  );
+}
+
 const TYPE_LABELS: Record<string, string> = {
   follow_up: "Follow-up",
   request: "Request",
