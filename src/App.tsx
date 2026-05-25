@@ -72,6 +72,7 @@ const App = () => (
             <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <DevNav />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
