@@ -487,39 +487,124 @@ export default function SelfIntroduction() {
 
       {/* STEP 7: Complete */}
       {step === 7 && (
-        <BizCard className="mb-4">
-          <div className="text-center">
-            <div className="text-3xl">✓</div>
-            <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2">წარდგენა მზადაა</h2>
-            <p className="ka text-sm text-[#5B6473] mt-2">
-              კარგია! ახლა უკვე გაქვს ინგლისური პროფესიული წარდგენა, რომელსაც გამოიყენებ გასაუბრებაზე, უნივერსიტეტში ან სამუშაო გარემოში.
+        <div className="mb-4 animate-[bizFade_.5s_ease-out_both]">
+          <style>{`
+            @keyframes siCircleIn { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+            @keyframes siCheckDraw { from { stroke-dashoffset: 48; } to { stroke-dashoffset: 0; } }
+            @keyframes siRingPulse { 0% { transform: scale(0.6); opacity: 0.45; } 100% { transform: scale(1.7); opacity: 0; } }
+            @keyframes siGoldShimmer { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+            @keyframes siRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .si-rise-1 { animation: siRise .55s ease-out .25s both; }
+            .si-rise-2 { animation: siRise .55s ease-out .4s both; }
+            .si-rise-3 { animation: siRise .55s ease-out .55s both; }
+            .si-rise-4 { animation: siRise .55s ease-out .7s both; }
+          `}</style>
+
+          {/* Celebratory header */}
+          <div className="text-center mb-6">
+            <div className="relative inline-flex items-center justify-center mb-4">
+              <span
+                className="absolute inset-0 rounded-full bg-[#C9A227]/30"
+                style={{ animation: "siRingPulse 1.6s ease-out 0.3s infinite" }}
+              />
+              <span
+                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#1E2A44] to-[#15203A] shadow-[0_8px_24px_-8px_rgba(30,42,68,0.5)] ring-2 ring-[#C9A227]/40"
+                style={{ animation: "siCircleIn 0.5s cubic-bezier(.2,.8,.2,1) both" }}
+              >
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M5 12.5 L10 17.5 L19 7"
+                    stroke="#F5E6A8"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ strokeDasharray: 48, strokeDashoffset: 48, animation: "siCheckDraw 0.45s ease-out 0.35s forwards" }}
+                  />
+                </svg>
+              </span>
+            </div>
+            <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#C9A227] font-semibold si-rise-1">დასრულდა</p>
+            <h2 className="ka text-2xl font-bold text-[#1E2A44] mt-2 si-rise-1">წარდგენა მზადაა</h2>
+            <p className="ka text-sm text-[#5B6473] mt-3 max-w-md mx-auto si-rise-2">
+              ეს არის შენი პირადი პროფესიული წარდგენა — ინგლისურად, შენი ხმით.
+              გამოიყენე გასაუბრებაზე, ქსელშეკრებებზე ან ნებისმიერ პროფესიულ გარემოში.
             </p>
           </div>
 
           {saved[0] && (
-            <div className="mt-5 p-4 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">შენახული წარდგენა</p>
-              <p className="text-sm text-[#1E2A44] leading-relaxed">{saved[0][saved[0].selected].en}</p>
+            <>
+              {/* Premium document card */}
+              <div className="relative si-rise-3">
+                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#C9A227]/40 via-transparent to-[#1E2A44]/20 blur-[2px]" aria-hidden />
+                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#FAF7F0] border border-[#E7E2D5] shadow-[0_2px_4px_rgba(30,42,68,0.04),0_20px_50px_-20px_rgba(30,42,68,0.25)] overflow-hidden">
+                  <div className="h-[3px] bg-gradient-to-r from-[#C9A227] via-[#E8C547] to-[#C9A227]" />
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]" />
+                        <p className="ka text-[10px] uppercase tracking-[0.2em] text-[#5B6473] font-bold">შენი წარდგენა</p>
+                      </div>
+                      <span className="ka text-[10px] text-[#5B6473] italic">{saved[0].selected}</span>
+                    </div>
+                    <p className="text-[15px] text-[#1E2A44] leading-[1.7] font-medium" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                      "{saved[0][saved[0].selected].en}"
+                    </p>
+                    <div className="mt-4 pt-4 border-t border-dashed border-[#E7E2D5] flex items-center justify-between">
+                      <p className="ka text-[10px] text-[#8A8578] italic">— შენი ხელით აშენებული</p>
+                      <ReadAloudButton text={saved[0][saved[0].selected].en} label="მოსმენა" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Phrases bonus reward */}
               {saved[0].phrases?.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-[#E7E2D5]">
-                  <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold mb-2">ნასწავლი ფრაზები</p>
-                  <ul className="space-y-1">
-                    {saved[0].phrases.slice(0, 5).map((p, i) => (
-                      <li key={i} className="text-xs text-[#1E2A44]">• {p.en}</li>
-                    ))}
-                  </ul>
+                <div className="mt-5 si-rise-4">
+                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#FFF8E1] via-[#FDF3D0] to-[#FAF0C8] border border-[#E8C547]/50 shadow-[0_8px_24px_-12px_rgba(201,162,39,0.35)]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base" style={{ animation: "siGoldShimmer 2s ease-in-out infinite" }}>✦</span>
+                      <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#8A6A0F] font-bold">ბონუსი · ნასწავლი ფრაზები</p>
+                    </div>
+                    <ul className="space-y-2">
+                      {saved[0].phrases.slice(0, 5).map((p, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-[#1E2A44]">
+                          <span className="text-[#C9A227] font-bold mt-0.5">{i + 1}.</span>
+                          <span className="font-medium">{p.en}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
-            </div>
+            </>
           )}
 
-          <div className="mt-5 flex gap-2 justify-center flex-wrap">
-            <BizButton onClick={() => navigate("/path/business/home")}>ბიზნეს გაკვეთილებზე გადასვლა</BizButton>
-            <BizButton variant="outline" onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}>
-              ჩემი წარდგენის რედაქტირება
-            </BizButton>
+          {/* Next steps */}
+          <div className="mt-6 si-rise-4">
+            <p className="ka text-center text-[11px] uppercase tracking-[0.18em] text-[#5B6473] font-semibold mb-3">შემდეგი ნაბიჯი</p>
+            <div className="grid gap-2.5">
+              <button
+                onClick={() => navigate("/path/business/home")}
+                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(30,42,68,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(30,42,68,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+              >
+                <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#E8C547] to-[#C9A227]" />
+                <span className="flex items-center justify-between pl-2">
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span>ბიზნეს გაკვეთილებზე გადასვლა</span>
+                    <span className="text-[11px] font-normal text-[#F7F1E3]/70">გააგრძელე შენი მოგზაურობა</span>
+                  </span>
+                  <span className="text-lg transition-transform duration-200 group-hover:translate-x-1">→</span>
+                </span>
+              </button>
+              <button
+                onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}
+                className="ka w-full px-5 py-3 rounded-2xl border border-[#1E2A44]/15 bg-white/60 text-[#1E2A44] font-medium text-sm hover:bg-white hover:border-[#1E2A44]/30 transition-all duration-200"
+              >
+                ჩემი წარდგენის რედაქტირება
+              </button>
+            </div>
           </div>
-        </BizCard>
+        </div>
       )}
 
       {/* SAVED LIST */}
