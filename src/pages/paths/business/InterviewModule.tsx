@@ -804,7 +804,7 @@ export default function InterviewModule() {
   );
 }
 
-function Header({ step, session, stageIdx }: { step: Step; session: SessionData; stageIdx: number }) {
+function Header({ step, session, stageIdx, curriculum }: { step: Step; session: SessionData; stageIdx: number; curriculum: CurriculumStep | null }) {
   const steps: Step[] = ["briefing", "warmup", "interview", "verdict", "debrief"];
   const overall = Math.max(0, steps.indexOf(step));
   const totalStages = session.stages.length;
