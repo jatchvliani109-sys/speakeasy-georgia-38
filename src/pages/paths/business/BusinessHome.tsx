@@ -150,15 +150,25 @@ export default function BusinessHome() {
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] p-6 shadow-[0_12px_32px_-12px_rgba(30,42,68,0.45)]">
               <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/15 blur-2xl pointer-events-none" />
               <div className="relative">
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/20 text-[#F2D680] px-2 py-1 rounded-md font-semibold">
-                    შენი დღევანდელი მისია
+                    {doneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
-                  <span className="ka text-[10px] text-[#F7F1E3]/70">⏱ ~{focusMinutes}</span>
+                  {doneToday ? (
+                    <span className="ka text-[10px] inline-flex items-center gap-1 bg-[#0F766E]/25 text-[#A7F3D0] px-2 py-1 rounded-md font-semibold">
+                      ✓ დასრულდა
+                    </span>
+                  ) : (
+                    <span className="ka text-[10px] text-[#F7F1E3]/70">⏱ ~{focusMinutes}</span>
+                  )}
                 </div>
-                <h2 className="ka text-xl font-bold leading-snug">{focusCopy.title}</h2>
+                <h2 className="ka text-xl font-bold leading-snug">
+                  {doneToday ? "ყოჩაღ — დღევანდელი გაკვეთილი დასრულდა" : focusCopy.title}
+                </h2>
                 <p className="ka text-sm text-[#F7F1E3]/80 mt-2 leading-relaxed">
-                  {focusCopy.subtitle}
+                  {doneToday
+                    ? "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები."
+                    : focusCopy.subtitle}
                 </p>
                 {focusMod && (
                   <p className="ka text-[11px] text-[#F7F1E3]/60 mt-3">
@@ -169,7 +179,7 @@ export default function BusinessHome() {
                   onClick={() => navigate(`/path/business/module/${focusModuleSlug}`)}
                   className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full sm:w-auto"
                 >
-                  დაწყება →
+                  {doneToday ? "კიდევ ერთი სესია →" : "დაწყება →"}
                 </button>
               </div>
             </div>
