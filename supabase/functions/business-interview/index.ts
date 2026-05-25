@@ -50,6 +50,10 @@ const SYSTEM_SESSION = `You design realistic job-interview practice sessions for
 Output STRICT JSON only — no markdown.
 
 Rules:
+- Each session follows a FIXED PROGRESSIVE CURRICULUM. The caller passes curriculumTopicKey/Guidance — your interview must HEAVILY emphasize that focus area (e.g. "background" = lots of background-story questions; "pressure" = harsh pushback throughout; "salary" = include compensation discussion in closing).
+- Build on previouslyLearned phrases from the last session — incorporate one of them implicitly into the warmUp options or the openingLineEn context so it feels connected.
+- Scenarios MUST be unique. Never reuse role/company combos from recentRoles. Invent a fresh employer + role each time.
+- Complexity grows with curriculumCycle (1 = first pass, 2+ = more nuanced pushback and richer professional vocabulary).
 - Personalize company type, interviewer name & title, role to the learner's fields/profession/level.
 - management/finance/economics → corporate; marketing/sales → agency or B2C brand; project_management/hr → tech company; entrepreneurship/remote_work → startup or agency; freelancer goals → small startup or client.
 - Level scale: business_beginner (A1-A2 simple), business_elementary (A2-B1), business_intermediate (B1-B2), business_advanced (B2-C1 nuanced).
