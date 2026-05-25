@@ -210,11 +210,14 @@ export default function BusinessDictionary() {
             const vocab: Vocab[] = (r as any)._matched || r.session_data?.vocabulary || [];
             const isOpen = !!open[r.id];
             const isInterview = r.kind === "interview";
+            const isMeeting = r.kind === "meeting";
             const title = isInterview
               ? (r.session_data?.briefing?.roleTitleKa || r.email_type)
-              : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
-            const sectionLabel = isInterview ? "გასაუბრება" : "იმეილები";
-            const icon = isInterview ? "🤝" : "📨";
+              : isMeeting
+                ? (r.session_data?.briefing?.meetingTypeKa || r.email_type)
+                : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
+            const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : "იმეილები";
+            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : "📨";
             const date = formatKaDate(r.completed_at);
             return (
               <div
