@@ -123,7 +123,21 @@ Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include 4-
 
 function sessionPrompt(b: SessionBody) {
   const intensity = b.intensity || "standard";
+  const prevBlock = b.previouslyLearned
+    ? `Previously learned (last session, topic: ${b.previouslyLearned.topicKa}):\n${b.previouslyLearned.phrases
+        .map((p) => `- "${p.en}" (${p.ka})`)
+        .join("\n")}\n→ Reference one of these phrases naturally inside warmUp options or in the interviewer's openingLineEn context.`
+    : "(First interview session — set a welcoming tone.)";
+
   return `Generate a personalized interview session.
+
+CURRICULUM LOCK (drives interview focus):
+- topicKey: ${b.curriculumTopicKey || "background"}
+- topic (Georgian): ${b.curriculumTopicTitleKa || ""}
+- step ${b.curriculumStep || 1} / ${b.curriculumTotal || 7}, pass #${b.curriculumCycle || 1}
+- guidance: ${b.curriculumGuidance || ""}
+
+${prevBlock}
 
 Learner:
 - level: ${b.level || "business_intermediate"}
@@ -132,7 +146,7 @@ Learner:
 - fields: ${(b.fields || []).join(", ") || "general"}
 - goals: ${(b.goals || []).join(", ") || "job_interview"}
 
-Avoid reusing recent role titles: ${(b.recentRoles || []).join(", ") || "(none)"}
+Already used role titles (NEVER reuse, invent a fresh role + company): ${(b.recentRoles || []).join(", ") || "(none)"}
 
 Return JSON exactly in this shape:
 {
