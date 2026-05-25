@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
-type Action = "session" | "feedback";
+type Action = "session" | "feedback" | "improve";
 
 type SessionBody = {
   action: "session";
@@ -23,15 +23,27 @@ type FeedbackBody = {
   userEmail: string;
 };
 
+type ImproveBody = {
+  action: "improve";
+  level?: string;
+  emailType: string;
+  originalEmail: string;
+  targetBefore: string;
+  targetAfter: string;
+  whyKa: string;
+  userRewrite: string;
+};
+
 const SYSTEM_SESSION = `You design daily email-writing practice for Georgian learners of Business English.
 Output STRICT JSON only — no markdown, no comments.
 
 Rules:
 - Personalize to the learner's level, profession fields, goals.
 - Level scale: business_beginner (A1-A2, very short, simple), business_elementary (A2-B1), business_intermediate (B1-B2), business_advanced (B2-C1, nuanced).
-- Length adapts to intensity: "light" (10 min) => shorter example + 1 vocab focus, "standard" (20 min) => normal, "intensive" / "deadline" => longer/nuanced example.
+- Length adapts to intensity: "light" (10 min) => shorter example + 1 vocab focus, "standard" (20 min) => normal, "intensive" / "deadline" => longer/nuanced example AND include a bonusScenario for extra practice.
 - Never reuse a scenarioKey or emailType already in recentScenarios/recentEmailTypes.
 - Real example must reflect chosen fields (e.g. management vs freelancing vs marketing).
+- Warm-up must be quick (1-2 min), engaging, and prime the learner for today's email type.
 - Georgian translations are required where specified.
 - Encouraging, warm, human tone in Georgian intro/explanations.`;
 
@@ -44,13 +56,26 @@ Two-part response:
    - "improve": array of 2-3 short Georgian bullets on what to refine
    - "suggestions": array of 2-3 concrete English rewrite suggestions, each with { "before": "...", "after": "...", "whyKa": "..." }
    - "rewriteEn": full polished version of the user's email in English
+   - "improveFocus": ONE single targeted improvement the learner should rewrite next, with:
+       { "instructionKa": "1 short Georgian sentence telling them what to rewrite",
+         "originalSnippet": "the exact sentence/phrase from their email to rewrite",
+         "hintKa": "1-line Georgian hint" }
 Level guidance:
 - beginner/elementary: gentle, simple Georgian; rewrite uses simple words.
 - intermediate/advanced: more nuanced critique; rewrite uses polished professional tone.
 
 Output STRICT JSON only.`;
 
+const SYSTEM_IMPROVE = `You acknowledge a learner's targeted rewrite. Be warm, brief, specific.
+Output STRICT JSON only:
+{
+  "praiseKa": "1-2 sentence Georgian praise mentioning what improved",
+  "polishedEn": "your slightly polished version of their rewrite (1-2 sentences max)",
+  "tipKa": "1 short Georgian micro-tip for next time"
+}`;
+
 function sessionPrompt(b: SessionBody) {
+  const wantsBonus = b.intensity === "intensive" || b.intensity === "deadline";
   return `Generate today's email-writing session.
 
 Learner:
@@ -69,9 +94,21 @@ Return JSON exactly in this shape:
   "scenarioKey": "short kebab-case unique key for this scenario",
   "dailyFocusKa": "one short Georgian sentence stating today's goal",
   "estimatedMinutes": 10,
+  "warmUp": {
+    "kind": "spot_mistakes | compare",
+    "promptKa": "1 short Georgian instruction (e.g. 'შენი აზრით რომელია უფრო პროფესიული?' or 'რა არასწორია ამ იმეილში?')",
+    "options": [
+      { "label": "A", "text": "short email or sentence in English", "isBetter": true, "issuesKa": ["if spot_mistakes: 1-3 Georgian bullets explaining problems; if compare and this is worse, list weaknesses; if better, leave empty array"] },
+      { "label": "B", "text": "short email or sentence in English", "isBetter": false, "issuesKa": ["..."] }
+    ],
+    "explanationKa": "1-2 sentence Georgian explanation of WHY the better one is better — connects to today's focus"
+  },
   "learn": {
     "titleKa": "Georgian title of the concept",
     "explanationKa": "2-4 sentence Georgian explanation",
+    "structure": [
+      { "partKa": "Georgian label of email part (e.g. 'მისალმება')", "purposeKa": "1-line Georgian purpose", "exampleEn": "1 short English example for that part" }
+    ],
     "examples": [
       { "en": "short english example phrase/line", "ka": "Georgian translation", "noteKa": "optional 1-line tip" }
     ]
@@ -88,13 +125,20 @@ Return JSON exactly in this shape:
     "promptKa": "1-line instruction in Georgian telling them what to write",
     "hintsKa": ["2-3 short Georgian writing hints"]
   },
+  ${wantsBonus ? `"bonusScenario": {
+    "scenarioKa": "A second, SHORTER Georgian scenario (1-2 sentences) for extra practice — DIFFERENT angle/context from practice",
+    "recipientRole": "...",
+    "promptKa": "1-line Georgian instruction",
+    "hintsKa": ["1-2 short Georgian hints"]
+  },` : `"bonusScenario": null,`}
   "vocabulary": [
     { "en": "phrase or word", "ka": "Georgian translation", "exampleEn": "1-sentence usage", "exampleKa": "Georgian translation" }
   ],
   "tomorrowTeaseKa": "1 short Georgian sentence hinting at tomorrow's focus"
 }
 
-Include 3-5 vocabulary items. Include 2-3 examples in learn.`;
+Include 3-5 vocabulary items. Include 2-3 examples in learn. Include 3-4 structure parts in learn.structure.
+For "light" intensity: include only 2 structure parts and 2 vocab items.`;
 }
 
 function feedbackPrompt(b: FeedbackBody) {
@@ -114,9 +158,24 @@ Return JSON:
     "worked": ["..."],
     "improve": ["..."],
     "suggestions": [{ "before": "...", "after": "...", "whyKa": "..." }],
-    "rewriteEn": "..."
+    "rewriteEn": "...",
+    "improveFocus": { "instructionKa": "...", "originalSnippet": "...", "hintKa": "..." }
   }
 }`;
+}
+
+function improvePrompt(b: ImproveBody) {
+  return `Learner level: ${b.level || "business_intermediate"}
+Email type: ${b.emailType}
+They were asked to rewrite this part of their original email:
+Original snippet: """${b.targetBefore}"""
+Suggested direction: """${b.targetAfter}"""
+Why (Georgian): ${b.whyKa}
+
+Their rewrite:
+"""${b.userRewrite}"""
+
+Acknowledge warmly, polish minimally, give one micro-tip.`;
 }
 
 async function callAI(system: string, user: string) {
@@ -153,32 +212,26 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
+    let r;
     if (body.action === "session") {
-      const r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
-      if (!r.ok) {
-        return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
-          status: r.status,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify(r.parsed), {
+      r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
+    } else if (body.action === "feedback") {
+      r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody));
+    } else if (body.action === "improve") {
+      r = await callAI(SYSTEM_IMPROVE, improvePrompt(body as unknown as ImproveBody));
+    } else {
+      return new Response(JSON.stringify({ error: "unknown action" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (body.action === "feedback") {
-      const r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody));
-      if (!r.ok) {
-        return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
-          status: r.status,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify(r.parsed), {
+    if (!r.ok) {
+      return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
+        status: r.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    return new Response(JSON.stringify({ error: "unknown action" }), {
-      status: 400,
+    return new Response(JSON.stringify(r.parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
