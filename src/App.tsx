@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
+import DevNav from "@/components/DevNav";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <DevNav />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
