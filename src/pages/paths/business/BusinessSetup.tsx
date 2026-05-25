@@ -31,7 +31,7 @@ export default function BusinessSetup() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>(0);
-  const [hydrated, setHydrated] = useState(false);
+
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
   const [priority, setPriority] = useState<BusinessPriority[]>([]);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
