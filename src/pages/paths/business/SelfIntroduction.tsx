@@ -12,6 +12,7 @@ import {
   loadSelfIntros,
   saveSelfIntro,
   deleteSelfIntro,
+  pullBusinessFromSupabase,
   SavedSelfIntro,
   SelfIntroInputs,
   SelfIntroVersion,
@@ -19,6 +20,7 @@ import {
   SELF_INTRO_PURPOSES,
   SELF_INTRO_STATUSES,
 } from "./lib/state";
+
 
 type GenResult = {
   short: SelfIntroVersion;
@@ -121,7 +123,16 @@ export default function SelfIntroduction() {
   const [saved, setSaved] = useState<SavedSelfIntro[]>([]);
   const [rewriting, setRewriting] = useState<string | null>(null);
 
-  useEffect(() => { if (user) setSaved(loadSelfIntros(user.id)); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      await pullBusinessFromSupabase(user.id);
+      if (!cancelled) setSaved(loadSelfIntros(user.id));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
 
   const biz = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
   const tier = tierOf(biz?.level);

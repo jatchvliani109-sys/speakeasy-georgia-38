@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessLevel, LEVEL_LABELS, loadBusiness, saveBusiness } from "./lib/state";
+import { BusinessLevel, LEVEL_LABELS, pullBusinessFromSupabase, saveBusiness } from "./lib/state";
+
+
 
 type MCQ = {
   type: "mcq";
@@ -221,8 +223,23 @@ export default function BusinessPlacementTest() {
     }
   };
 
-  const initial = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
-  void initial;
+  // If the user already completed the placement test before, never make them redo it.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const cur = await pullBusinessFromSupabase(user.id);
+      if (cancelled || done) return;
+      if (cur.testCompleted && cur.level) {
+        if (!cur.setupCompleted) navigate("/path/business/setup", { replace: true });
+        else if (!cur.plan) navigate("/path/business/plan", { replace: true });
+        else if (!cur.businessSelfIntroductionCompleted) navigate("/path/business/self-introduction", { replace: true });
+        else navigate("/path/business/home", { replace: true });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, navigate, done]);
+
 
   if (done && resultLevel) {
     return (

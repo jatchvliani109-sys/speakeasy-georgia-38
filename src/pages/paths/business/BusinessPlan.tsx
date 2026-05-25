@@ -9,7 +9,7 @@ import {
   LEVEL_LABELS,
   PRIORITY_LABELS,
   buildPlan,
-  loadBusiness,
+  pullBusinessFromSupabase,
   saveBusiness,
 } from "./lib/state";
 
@@ -20,19 +20,25 @@ export default function BusinessPlan() {
 
   useEffect(() => {
     if (!user) return;
-    const cur = loadBusiness(user.id);
-    if (!cur.testCompleted) return navigate("/path/business/test", { replace: true });
-    if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
-    if (!cur.plan) {
-      const plan = buildPlan(cur);
-      if (plan) {
-        const next = saveBusiness(user.id, { plan });
-        setS(next);
-        return;
+    let cancelled = false;
+    (async () => {
+      const cur = await pullBusinessFromSupabase(user.id);
+      if (cancelled) return;
+      if (!cur.testCompleted) return navigate("/path/business/test", { replace: true });
+      if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
+      if (!cur.plan) {
+        const plan = buildPlan(cur);
+        if (plan) {
+          const next = saveBusiness(user.id, { plan });
+          setS(next);
+          return;
+        }
       }
-    }
-    setS(cur);
+      setS(cur);
+    })();
+    return () => { cancelled = true; };
   }, [user, navigate]);
+
 
   const plan = useMemo(() => s?.plan ?? null, [s]);
   if (!s || !plan) return <BusinessShell><div className="text-[#5B6473] ka">იტვირთება...</div></BusinessShell>;

@@ -88,11 +88,63 @@ export function saveBusiness(uid: string, patch: Partial<BusinessState>) {
   const cur = loadBusiness(uid);
   const next = { ...cur, ...patch };
   localStorage.setItem(KEY(uid), JSON.stringify(next));
+  pushBusinessRemote(uid, next).catch(() => {});
   return next;
 }
 
 export function resetBusiness(uid: string) {
   localStorage.removeItem(KEY(uid));
+  import("@/integrations/supabase/client").then(({ supabase }) => {
+    supabase
+      .from("business_state")
+      .upsert({ user_id: uid, state: {}, self_intros: [] } as any, { onConflict: "user_id" })
+      .then(() => {}, () => {});
+  });
+}
+
+// --- Supabase sync ---
+
+async function pushBusinessRemote(uid: string, state: BusinessState) {
+  const { supabase } = await import("@/integrations/supabase/client");
+  await supabase
+    .from("business_state")
+    .upsert({ user_id: uid, state: state as any }, { onConflict: "user_id" });
+}
+
+async function pushSelfIntrosRemote(uid: string, list: SavedSelfIntro[]) {
+  const { supabase } = await import("@/integrations/supabase/client");
+  await supabase
+    .from("business_state")
+    .upsert({ user_id: uid, self_intros: list as any }, { onConflict: "user_id" });
+}
+
+/**
+ * Pulls latest business state + self-intros from Supabase and mirrors into
+ * localStorage. Remote is the source of truth across devices; local is a cache.
+ */
+export async function pullBusinessFromSupabase(uid: string): Promise<BusinessState> {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("business_state")
+      .select("state, self_intros")
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (error) throw error;
+    if (data) {
+      const remoteState = ((data.state as any) || {}) as Partial<BusinessState>;
+      const merged: BusinessState = { ...empty(), ...remoteState };
+      localStorage.setItem(KEY(uid), JSON.stringify(merged));
+      const intros = Array.isArray(data.self_intros)
+        ? (data.self_intros as unknown as SavedSelfIntro[])
+        : [];
+      localStorage.setItem(SI_KEY(uid), JSON.stringify(intros));
+      return merged;
+    }
+  } catch {
+    // fall through to local cache
+  }
+  return loadBusiness(uid);
 }
 
 // --- Labels (Georgian) ---
@@ -332,12 +384,14 @@ export function saveSelfIntro(uid: string, item: SavedSelfIntro) {
   const idx = list.findIndex((i) => i.id === item.id);
   if (idx >= 0) list[idx] = item; else list.unshift(item);
   localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  pushSelfIntrosRemote(uid, list).catch(() => {});
   return list;
 }
 
 export function deleteSelfIntro(uid: string, id: string) {
   const list = loadSelfIntros(uid).filter((i) => i.id !== id);
   localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
+  pushSelfIntrosRemote(uid, list).catch(() => {});
   return list;
 }
 
