@@ -41,14 +41,20 @@ type ImproveBody = {
   userRewrite: string;
 };
 
-const SYSTEM_SESSION = `You design daily email-writing practice for Georgian learners of Business English.
+const SYSTEM_SESSION = `You design daily email-writing practice for Georgian learners of Business English following a FIXED PROGRESSIVE CURRICULUM.
 Output STRICT JSON only — no markdown, no comments.
 
 Rules:
-- Personalize to the learner's level, profession fields, goals.
+- The caller LOCKS today's emailType via curriculumTopicKey — you MUST use exactly that emailType. Do NOT pick a different one.
+- Each session explicitly builds on previous knowledge. If previouslyLearned is provided, naturally weave one of those phrases into either learn.examples or realExample.body, and reference it in dailyFocusKa as a callback.
+- Scenarios must be UNIQUE — never repeat anything in recentScenarios. Always invent a fresh real-world situation tied to the learner's fields/goals.
+- Complexity grows with curriculumCycle (1 = first pass, 2+ = repeat exposure with harder nuance and richer vocabulary). Cycle 2+ should NOT re-teach basics — assume previous topic mastery and push polish/nuance.
 - Level scale: business_beginner (A1-A2, very short, simple), business_elementary (A2-B1), business_intermediate (B1-B2), business_advanced (B2-C1, nuanced).
 - Length adapts to intensity: "light" (10 min) => shorter example + 1 vocab focus, "standard" (20 min) => normal, "intensive" / "deadline" => longer/nuanced example AND include a bonusScenario for extra practice.
-- Never reuse a scenarioKey or emailType already in recentScenarios/recentEmailTypes.
+- Real example must reflect chosen fields (e.g. management vs freelancing vs marketing).
+- Warm-up must be quick (1-2 min), engaging, and prime the learner for today's email type.
+- Georgian translations are required where specified.
+- Encouraging, warm, human tone in Georgian intro/explanations.`;
 - Real example must reflect chosen fields (e.g. management vs freelancing vs marketing).
 - Warm-up must be quick (1-2 min), engaging, and prime the learner for today's email type.
 - Georgian translations are required where specified.
