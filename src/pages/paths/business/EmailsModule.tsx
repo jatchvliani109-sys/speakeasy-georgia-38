@@ -9,6 +9,7 @@ import {
   PRIORITY_LABELS,
   pullBusinessFromSupabase,
 } from "./lib/state";
+import { emailStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 
 type Example = { en: string; ka: string; noteKa?: string };
 type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
