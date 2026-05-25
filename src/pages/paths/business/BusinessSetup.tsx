@@ -49,7 +49,7 @@ export default function BusinessSetup() {
       setIntensity(cur.intensity ?? null);
       setDeadline(cur.deadline ?? null);
       setField(cur.field ?? []);
-      setHydrated(true);
+      })();
     })();
     return () => { cancelled = true; };
   }, [user]);
