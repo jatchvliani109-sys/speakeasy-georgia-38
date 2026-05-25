@@ -224,7 +224,7 @@ export default function BusinessPlacementTest() {
   };
 
   // If the user already completed the placement test before, never make them redo it.
-  useEffectHydrate(() => {
+  useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
