@@ -89,7 +89,22 @@ Output STRICT JSON only:
 
 function sessionPrompt(b: SessionBody) {
   const wantsBonus = b.intensity === "intensive" || b.intensity === "deadline";
+  const lockedType = b.curriculumTopicKey || "";
+  const prevBlock = b.previouslyLearned
+    ? `Previously learned (last session, topic: ${b.previouslyLearned.topicKa}):\n${b.previouslyLearned.phrases
+        .map((p) => `- "${p.en}" (${p.ka})`)
+        .join("\n")}\n→ Weave ONE of these phrases naturally into either learn.examples or realExample.body, and briefly reference it in dailyFocusKa as a callback ("ვაგრძელებთ გუშინდელ...").`
+    : "(No previous session — this is their first lesson; keep tone introductory.)";
+
   return `Generate today's email-writing session.
+
+CURRICULUM LOCK:
+- topicKey (use as emailType): ${lockedType}
+- topic (Georgian): ${b.curriculumTopicTitleKa || ""}
+- step ${b.curriculumStep || 1} / ${b.curriculumTotal || 7}, pass #${b.curriculumCycle || 1}
+- guidance: ${b.curriculumGuidance || ""}
+
+${prevBlock}
 
 Learner:
 - level: ${b.level || "business_intermediate"}
@@ -97,15 +112,14 @@ Learner:
 - fields: ${(b.fields || []).join(", ") || "general"}
 - goals: ${(b.goals || []).join(", ") || "work_communication"}
 
-Avoid reusing:
-- recent emailTypes: ${(b.recentEmailTypes || []).join(", ") || "(none)"}
-- recent scenarioKeys: ${(b.recentScenarios || []).join(", ") || "(none)"}
+Already used scenarioKeys (NEVER reuse, generate a fresh scenario):
+${(b.recentScenarios || []).join(", ") || "(none)"}
 
 Return JSON exactly in this shape:
 {
-  "emailType": "one of: follow_up | request | introduction | complaint | update | thank_you | apology | meeting_invite | proposal | reminder",
+  "emailType": "${lockedType || "introduction"}",
   "scenarioKey": "short kebab-case unique key for this scenario",
-  "dailyFocusKa": "one short Georgian sentence stating today's goal",
+  "dailyFocusKa": "one short Georgian sentence stating today's goal (reference previous phrase if applicable)",
   "estimatedMinutes": 10,
   "warmUp": {
     "kind": "spot_mistakes | compare",
