@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -14,7 +14,7 @@ import {
   INTENSITY_LABELS,
   PRIORITY_LABELS,
   buildPlan,
-  loadBusiness,
+  pullBusinessFromSupabase,
   saveBusiness,
 } from "./lib/state";
 
@@ -29,14 +29,30 @@ const FIELD_KEYS = Object.keys(FIELD_LABELS) as BusinessField[];
 export default function BusinessSetup() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const initial = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
 
   const [step, setStep] = useState<Step>(0);
-  const [goals, setGoals] = useState<BusinessGoal[]>(initial?.goals ?? []);
-  const [priority, setPriority] = useState<BusinessPriority[]>(initial?.mainPriority ?? []);
-  const [intensity, setIntensity] = useState<BusinessIntensity | null>(initial?.intensity ?? null);
-  const [deadline, setDeadline] = useState<BusinessDeadline>(initial?.deadline ?? null);
-  const [field, setField] = useState<BusinessField[]>(initial?.field ?? []);
+  const [hydrated, setHydrated] = useState(false);
+  const [goals, setGoals] = useState<BusinessGoal[]>([]);
+  const [priority, setPriority] = useState<BusinessPriority[]>([]);
+  const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
+  const [deadline, setDeadline] = useState<BusinessDeadline>(null);
+  const [field, setField] = useState<BusinessField[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const cur = await pullBusinessFromSupabase(user.id);
+      if (cancelled) return;
+      setGoals(cur.goals ?? []);
+      setPriority(cur.mainPriority ?? []);
+      setIntensity(cur.intensity ?? null);
+      setDeadline(cur.deadline ?? null);
+      setField(cur.field ?? []);
+      setHydrated(true);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   const toggleGoal = (g: BusinessGoal) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
@@ -50,6 +66,7 @@ export default function BusinessSetup() {
     (step === 1 && priority.length > 0) ||
     (step === 2 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
     (step === 3 && field.length > 0);
+
 
   const next = () => {
     if (step < 3) setStep((s) => (s + 1) as Step);
