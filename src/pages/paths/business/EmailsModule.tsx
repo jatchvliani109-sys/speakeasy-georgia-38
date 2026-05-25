@@ -91,6 +91,8 @@ export default function EmailsModule() {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ total: number; vocab: number }>({ total: 0, vocab: 0 });
+  const [curriculum, setCurriculum] = useState<CurriculumStep | null>(null);
+  const [previouslyLearned, setPreviouslyLearned] = useState<PreviouslyLearned | null>(null);
 
   // warmup
   const [warmupChoice, setWarmupChoice] = useState<number | null>(null);
