@@ -128,6 +128,65 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   },
 ];
 
+export const MEETING_CURRICULUM: CurriculumTopic[] = [
+  {
+    key: "introduction",
+    titleKa: "შესავალი შეხვედრებში",
+    shortKa: "შესავალი",
+    focusKa: "ჩართვის საფუძვლები — თავაზიანი დათანხმება და უთანხმოება.",
+    guidanceEn:
+      "INTRODUCTION TO MEETINGS — basic participation, agreeing and disagreeing politely (I see your point, I'd add...). Foundation skill, friendly tone.",
+  },
+  {
+    key: "ideas",
+    titleKa: "იდეების გაზიარება",
+    shortKa: "იდეები",
+    focusKa: "თავდაჯერებული წვლილი, სხვისი იდეის ჩამოშენება.",
+    guidanceEn:
+      "SHARING IDEAS AND OPINIONS — contributing confidently, building on others' ideas (Building on what X said..., I'd like to add...). Push user to volunteer opinions.",
+  },
+  {
+    key: "disagreement",
+    titleKa: "უთანხმოების მართვა",
+    shortKa: "უთანხმოება",
+    focusKa: "პროფესიული pushback, საერთო ნიადაგის პოვნა.",
+    guidanceEn:
+      "HANDLING DISAGREEMENT — professional pushback, finding common ground. Colleagues actively challenge user this session.",
+  },
+  {
+    key: "leading",
+    titleKa: "შეხვედრის წარმართვა",
+    shortKa: "ლიდერობა",
+    focusKa: "დღის წესრიგი, საუბრის ფოკუსში დაკავება.",
+    guidanceEn:
+      "LEADING A MEETING — user IS the chair, sets agenda, keeps discussion on track, brings quiet colleagues in. AI plays attendees, not facilitator.",
+  },
+  {
+    key: "problem_solving",
+    titleKa: "პრობლემის გადაჭრა",
+    shortKa: "გადაჭრა",
+    focusKa: "გადაწყვეტების შემოთავაზება, ვარიანტების შეფასება წნეხის ქვეშ.",
+    guidanceEn:
+      "PROBLEM SOLVING IN MEETINGS — proposing solutions, evaluating options under time pressure. Throw a crisis to solve live.",
+  },
+  {
+    key: "updates",
+    titleKa: "სტატუსის წარდგენა",
+    shortKa: "Updates",
+    focusKa: "პროგრესის გაზიარება, კოლეგების კითხვებზე პასუხი.",
+    guidanceEn:
+      "PRESENTING UPDATES — sharing progress crisply, fielding tough questions from colleagues, owning blockers.",
+  },
+  {
+    key: "closing",
+    titleKa: "დახურვა და დავალებები",
+    shortKa: "Closing",
+    focusKa: "გადაწყვეტილებების შეჯამება, action item-ების გადანაწილება.",
+    guidanceEn:
+      "CLOSING AND ACTION ITEMS — summarizing decisions, assigning tasks professionally, confirming next steps.",
+  },
+];
+
 export type CurriculumStep = CurriculumTopic & {
   step: number; // 1-indexed
   total: number;
@@ -144,6 +203,12 @@ export function interviewStep(completedCount: number): CurriculumStep {
   const total = INTERVIEW_CURRICULUM.length;
   const idx = ((completedCount % total) + total) % total;
   return { ...INTERVIEW_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
+}
+
+export function meetingStep(completedCount: number): CurriculumStep {
+  const total = MEETING_CURRICULUM.length;
+  const idx = ((completedCount % total) + total) % total;
+  return { ...MEETING_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
 }
 
 export type PreviouslyLearned = {
