@@ -818,15 +818,17 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
       <div className="flex items-center justify-between mb-2">
         <h1 className="ka text-xl font-bold text-[#1E2A44]">🤝 გასაუბრება</h1>
         <span className="ka text-[11px] text-[#5B6473]">
-          {step === "interview" && session.stages[stageIdx]
-            ? session.stageLabelsKa[session.stages[stageIdx]]
-            : step === "briefing"
-              ? "ბრიფინგი"
-              : step === "warmup"
-                ? "გახურება"
-                : step === "verdict"
-                  ? "შედეგი"
-                  : "Debrief"}
+          {curriculum
+            ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}`
+            : step === "interview" && session.stages[stageIdx]
+              ? session.stageLabelsKa[session.stages[stageIdx]]
+              : step === "briefing"
+                ? "ბრიფინგი"
+                : step === "warmup"
+                  ? "გახურება"
+                  : step === "verdict"
+                    ? "შედეგი"
+                    : "Debrief"}
         </span>
       </div>
       <div className="h-1.5 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
