@@ -237,7 +237,29 @@ export default function BusinessHome() {
             {plan ? ` — ${LEVEL_LABELS[plan.level]}` : ""}
           </h1>
         </div>
-        <PathSwitcher />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            title="Dev: reset all business progress"
+            onClick={async () => {
+              if (!user) return;
+              if (!confirm("Reset ALL Business English progress for this account? (dev only)")) return;
+              try {
+                await Promise.all([
+                  supabase.from("business_email_sessions").delete().eq("user_id", user.id),
+                  supabase.from("business_interview_sessions").delete().eq("user_id", user.id),
+                  supabase.from("business_meeting_sessions").delete().eq("user_id", user.id),
+                ]);
+              } catch {}
+              resetBusiness(user.id);
+              window.location.reload();
+            }}
+            className="font-mono text-[10px] uppercase tracking-wider px-2 py-1 rounded-md border border-[#E7E2D5] text-[#5B6473] hover:bg-[#FAF7F0] hover:text-[#1E2A44] transition"
+          >
+            ↺ reset
+          </button>
+          <PathSwitcher />
+        </div>
       </header>
 
       {incomplete && (
