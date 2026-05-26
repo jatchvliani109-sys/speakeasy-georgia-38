@@ -245,10 +245,11 @@ export default function BusinessHome() {
               if (!user) return;
               if (!confirm("Reset ALL Business English progress for this account? (dev only)")) return;
               try {
+                const patch = { completed: false, completed_at: null } as any;
                 await Promise.all([
-                  supabase.from("business_email_sessions").delete().eq("user_id", user.id),
-                  supabase.from("business_interview_sessions").delete().eq("user_id", user.id),
-                  supabase.from("business_meeting_sessions").delete().eq("user_id", user.id),
+                  supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
+                  supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
+                  supabase.from("business_meeting_sessions").update(patch).eq("user_id", user.id),
                 ]);
               } catch {}
               resetBusiness(user.id);
