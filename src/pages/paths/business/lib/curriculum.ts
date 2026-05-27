@@ -187,6 +187,65 @@ export const MEETING_CURRICULUM: CurriculumTopic[] = [
   },
 ];
 
+export const PRESENTATION_CURRICULUM: CurriculumTopic[] = [
+  {
+    key: "self_introduction",
+    titleKa: "პროფესიული თვით-წარდგენა",
+    shortKa: "თვით-წარდგენა",
+    focusKa: "სახელი, როლი, გამოცდილება, მიზნები — სუფთა სტრუქტურა.",
+    guidanceEn:
+      "PROFESSIONAL SELF-INTRODUCTION — name, role, experience, goals. Foundation. Clean structure (hook → who → what → why). Slow pace.",
+  },
+  {
+    key: "data_numbers",
+    titleKa: "მონაცემებისა და რიცხვების წარდგენა",
+    shortKa: "Data",
+    focusKa: "გრაფიკები, სტატისტიკა, მკაფიო ახსნა.",
+    guidanceEn:
+      "PRESENTING DATA AND NUMBERS — charts, statistics, percent change, comparisons, clear explanation. Builds on self-intro opening.",
+  },
+  {
+    key: "pitch_idea",
+    titleKa: "იდეის წარდგენა (Pitch)",
+    shortKa: "Pitch",
+    focusKa: "სტრუქტურა, დარწმუნება, ნათელი call to action.",
+    guidanceEn:
+      "PITCHING AN IDEA — problem → solution → value → ask. Persuasive structure, clear call to action. Builds on data-presentation skills.",
+  },
+  {
+    key: "project_update",
+    titleKa: "პროექტის სტატუსის წარდგენა",
+    shortKa: "Project update",
+    focusKa: "პროგრესი, გამოწვევები, შემდეგი ნაბიჯები.",
+    guidanceEn:
+      "PRESENTING A PROJECT UPDATE — progress, blockers, next steps. Structured executive-style update. Builds on data + pitch framing.",
+  },
+  {
+    key: "qa_handling",
+    titleKa: "Q&A სესიის წარმართვა",
+    shortKa: "Q&A",
+    focusKa: "კითხვებზე თავდაჯერებული, პროფესიული პასუხი.",
+    guidanceEn:
+      "LEADING A Q&A SESSION — handling tough or vague questions confidently, bridging back, parking off-topic questions politely.",
+  },
+  {
+    key: "under_pressure",
+    titleKa: "პრეზენტაცია წნეხის ქვეშ",
+    shortKa: "Pressure",
+    focusKa: "მცირე დრო, უცაბედი კითხვები, სიმშვიდე.",
+    guidanceEn:
+      "PRESENTING UNDER PRESSURE — tight time limit, unexpected questions, staying composed. Push pace + curveballs.",
+  },
+  {
+    key: "full_presentation",
+    titleKa: "სრული ბიზნეს პრეზენტაცია",
+    shortKa: "Full deck",
+    focusKa: "ყველაფერი ერთად — გახსნა, მონაცემები, idea, Q&A.",
+    guidanceEn:
+      "FULL BUSINESS PRESENTATION — combines all skills: opening + data + pitch + update + Q&A. Most complex scenario, longest deck.",
+  },
+];
+
 export type CurriculumStep = CurriculumTopic & {
   step: number; // 1-indexed
   total: number;
@@ -209,6 +268,12 @@ export function meetingStep(completedCount: number): CurriculumStep {
   const total = MEETING_CURRICULUM.length;
   const idx = ((completedCount % total) + total) % total;
   return { ...MEETING_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
+}
+
+export function presentationStep(completedCount: number): CurriculumStep {
+  const total = PRESENTATION_CURRICULUM.length;
+  const idx = ((completedCount % total) + total) % total;
+  return { ...PRESENTATION_CURRICULUM[idx], step: idx + 1, total, cycle: Math.floor(completedCount / total) + 1 };
 }
 
 export type PreviouslyLearned = {

@@ -152,6 +152,51 @@ export type Database = {
         }
         Relationships: []
       }
+      business_presentation_sessions: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          debrief: Json | null
+          id: string
+          presentation_topic: string
+          result: string | null
+          scenario_key: string
+          session_data: Json
+          transcript: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          debrief?: Json | null
+          id?: string
+          presentation_topic: string
+          result?: string | null
+          scenario_key: string
+          session_data?: Json
+          transcript?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          debrief?: Json | null
+          id?: string
+          presentation_topic?: string
+          result?: string | null
+          scenario_key?: string
+          session_data?: Json
+          transcript?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_state: {
         Row: {
           created_at: string
