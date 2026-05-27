@@ -16,7 +16,7 @@ import {
   pullBusinessFromSupabase,
   resetBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
+import { emailStep, interviewStep, meetingStep, presentationStep } from "./lib/curriculum";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
@@ -46,9 +46,9 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
   },
   presentations: {
     title: "პრეზენტაციის სტრუქტურის ვარჯიში",
-    subtitle: "გახსნა, მთავარი იდეა, დასკვნა — სამივე ერთ მცირე სავარჯიშოში.",
-    doneTitle: "შესრულდა",
-    doneSubtitle: "კარგი მუშაობა დღეს.",
+    subtitle: "გახსნა, მთავარი იდეა, დასკვნა — სლაიდი-სლაიდი პრემიუმ ვარჯიში.",
+    doneTitle: "ყოჩაღ — დღევანდელი პრეზენტაცია დასრულდა",
+    doneSubtitle: "შენი წვლილი დაფიქსირდა. ხვალ ახალი თემა გელოდება.",
   },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
@@ -59,7 +59,7 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "meetings"]);
+const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "presentations"]);
 
 // Map a learner priority to a module slug — used for goal-weighted rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
