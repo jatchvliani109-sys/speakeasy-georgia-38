@@ -157,7 +157,7 @@ export const GOAL_LABELS: Record<BusinessGoal, string> = {
   work_communication: "სამსახურისთვის / სამუშაო კომუნიკაციისთვის",
   remote_work: "ფრილანსისთვის / remote work-ისთვის",
   emails_writing: "იმეილებისა და პროფესიული წერისთვის",
-  presentations: "პრეზენტაციებისთვის",
+  
   business_vocab: "ბიზნეს ლექსიკის გასაუმჯობესებლად",
   general_business: "ზოგადი ბიზნეს ინგლისურისთვის",
 };
