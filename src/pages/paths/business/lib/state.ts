@@ -6,9 +6,9 @@ export type BusinessGoal =
   | "work_communication"
   | "remote_work"
   | "emails_writing"
-  | "presentations"
   | "business_vocab"
   | "general_business";
+
 
 export type BusinessPriority = BusinessGoal;
 
@@ -157,7 +157,7 @@ export const GOAL_LABELS: Record<BusinessGoal, string> = {
   work_communication: "სამსახურისთვის / სამუშაო კომუნიკაციისთვის",
   remote_work: "ფრილანსისთვის / remote work-ისთვის",
   emails_writing: "იმეილებისა და პროფესიული წერისთვის",
-  presentations: "პრეზენტაციებისთვის",
+  
   business_vocab: "ბიზნეს ლექსიკის გასაუმჯობესებლად",
   general_business: "ზოგადი ბიზნეს ინგლისურისთვის",
 };
@@ -168,7 +168,7 @@ export const PRIORITY_LABELS: Record<BusinessPriority, string> = {
   work_communication: "სამუშაო კომუნიკაცია",
   remote_work: "ფრილანსი / remote work",
   emails_writing: "იმეილები და პროფესიული წერა",
-  presentations: "პრეზენტაციები",
+  
   business_vocab: "ბიზნეს ლექსიკა",
   general_business: "ზოგადი გაუმჯობესება",
 };
@@ -238,12 +238,6 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     icon: "🗓️",
   },
   {
-    slug: "presentations",
-    title: "პრეზენტაციები",
-    description: "ივარჯიშე იდეების, მონაცემების და ბიზნეს თემების ახსნაში.",
-    icon: "📊",
-  },
-  {
     slug: "vocabulary",
     title: "ბიზნეს ლექსიკა",
     description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
@@ -253,15 +247,15 @@ export const BUSINESS_MODULES: BusinessModule[] = [
 
 // Map main priority -> recommended module
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
-  university: "presentations",
+  university: "interview",
   job_interview: "interview",
   work_communication: "meetings",
   remote_work: "emails",
   emails_writing: "emails",
-  presentations: "presentations",
   business_vocab: "vocabulary",
   general_business: "interview",
 };
+
 
 const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
   university: [
@@ -298,13 +292,6 @@ const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
     "follow-up messages",
     "status updates",
     "tone improvement",
-  ],
-  presentations: [
-    "გახსნა და დასკვნა",
-    "მონაცემების ახსნა",
-    "ვიზუალის აღწერა",
-    "კითხვებზე პასუხი",
-    "Q&A ფრაზები",
   ],
   business_vocab: [
     "Finance & numbers",

@@ -7,12 +7,13 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 type Vocab = { en: string; ka: string; exampleEn?: string; exampleKa?: string };
 type SessionRow = {
   id: string;
-  kind: "email" | "interview" | "meeting" | "presentation";
+  kind: "email" | "interview" | "meeting";
   email_type: string;
   scenario_key: string;
   completed_at: string | null;
   session_data: any;
 };
+
 
 const TYPE_LABELS: Record<string, string> = {
   follow_up: "Follow-up",
@@ -49,7 +50,7 @@ export default function BusinessDictionary() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [emails, interviews, meetings, presentations] = await Promise.all([
+      const [emails, interviews, meetings] = await Promise.all([
         supabase
           .from("business_email_sessions")
           .select("id, email_type, scenario_key, completed_at, session_data")
@@ -68,12 +69,6 @@ export default function BusinessDictionary() {
           .eq("user_id", user.id)
           .eq("completed", true)
           .order("completed_at", { ascending: false }),
-        supabase
-          .from("business_presentation_sessions")
-          .select("id, presentation_topic, scenario_key, completed_at, session_data")
-          .eq("user_id", user.id)
-          .eq("completed", true)
-          .order("completed_at", { ascending: false }),
       ]);
       if (cancelled) return;
       const emailRows: SessionRow[] = (emails.data || []).map((r: any) => ({
@@ -85,12 +80,10 @@ export default function BusinessDictionary() {
       const meetingRows: SessionRow[] = (meetings.data || []).map((r: any) => ({
         id: r.id, kind: "meeting", email_type: r.meeting_type, scenario_key: r.scenario_key, completed_at: r.completed_at, session_data: r.session_data,
       }));
-      const presRows: SessionRow[] = (presentations.data || []).map((r: any) => ({
-        id: r.id, kind: "presentation", email_type: r.presentation_topic, scenario_key: r.scenario_key, completed_at: r.completed_at, session_data: r.session_data,
-      }));
-      const list = [...emailRows, ...interviewRows, ...meetingRows, ...presRows].sort((a, b) =>
+      const list = [...emailRows, ...interviewRows, ...meetingRows].sort((a, b) =>
         (b.completed_at || "").localeCompare(a.completed_at || ""),
       );
+
       setRows(list);
       if (list.length) setOpen({ [list[0].id]: true });
       setLoading(false);
@@ -205,16 +198,14 @@ export default function BusinessDictionary() {
             const isOpen = !!open[r.id];
             const isInterview = r.kind === "interview";
             const isMeeting = r.kind === "meeting";
-            const isPresentation = r.kind === "presentation";
             const title = isInterview
               ? (r.session_data?.briefing?.roleTitleKa || r.email_type)
               : isMeeting
                 ? (r.session_data?.briefing?.meetingTypeKa || r.email_type)
-                : isPresentation
-                  ? (r.session_data?.presentationTitleKa || r.email_type)
-                  : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
-            const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : isPresentation ? "პრეზენტაცია" : "იმეილები";
-            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : isPresentation ? "📊" : "📨";
+                : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
+            const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : "იმეილები";
+            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : "📨";
+
             const date = formatKaDate(r.completed_at);
             return (
               <div

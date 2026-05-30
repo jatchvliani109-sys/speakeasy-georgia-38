@@ -16,7 +16,7 @@ import {
   pullBusinessFromSupabase,
   resetBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep, meetingStep, presentationStep } from "./lib/curriculum";
+import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
@@ -44,12 +44,6 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
     doneTitle: "ყოჩაღ — დღევანდელი შეხვედრა დასრულდა",
     doneSubtitle: "შენი წვლილი დაფიქსირდა. ხვალ ახალი შეხვედრა გელოდება.",
   },
-  presentations: {
-    title: "პრეზენტაციის სტრუქტურის ვარჯიში",
-    subtitle: "გახსნა, მთავარი იდეა, დასკვნა — სლაიდი-სლაიდი პრემიუმ ვარჯიში.",
-    doneTitle: "ყოჩაღ — დღევანდელი პრეზენტაცია დასრულდა",
-    doneSubtitle: "შენი წვლილი დაფიქსირდა. ხვალ ახალი თემა გელოდება.",
-  },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
@@ -59,19 +53,19 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "presentations"]);
+const ACTIVE_MODULES = new Set(["emails", "interview", "meetings"]);
 
 // Map a learner priority to a module slug — used for goal-weighted rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
-  university: "presentations",
+  university: "interview",
   job_interview: "interview",
   work_communication: "meetings",
   remote_work: "emails",
   emails_writing: "emails",
-  presentations: "presentations",
   business_vocab: "vocabulary",
   general_business: "interview",
 };
+
 
 type ModuleProgress = { slug: string; count: number; doneToday: boolean };
 
@@ -97,15 +91,13 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday, presAll, presToday] = await Promise.all([
+      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday] = await Promise.all([
         supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_meeting_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
-        supabase.from("business_presentation_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-        supabase.from("business_presentation_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
       ]);
 
       if (cancelled) return;
@@ -113,8 +105,8 @@ export default function BusinessHome() {
         emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
-        presentations: { slug: "presentations", count: presAll.count ?? 0, doneToday: (presToday.data?.length ?? 0) > 0 },
       });
+
     })();
     return () => {
       cancelled = true;
@@ -189,9 +181,8 @@ export default function BusinessHome() {
         ? interviewStep(progress.interview?.count ?? 0)
         : focusModuleSlug === "meetings"
           ? meetingStep(progress.meetings?.count ?? 0)
-          : focusModuleSlug === "presentations"
-            ? presentationStep(progress.presentations?.count ?? 0)
-            : null;
+          : null;
+
 
   const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
   const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
@@ -225,7 +216,7 @@ export default function BusinessHome() {
                   supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_meeting_sessions").update(patch).eq("user_id", user.id),
-                  supabase.from("business_presentation_sessions").update(patch).eq("user_id", user.id),
+
                 ]);
               } catch {}
               resetBusiness(user.id);
@@ -393,9 +384,8 @@ export default function BusinessHome() {
                       ? interviewStep(count)
                       : m.slug === "meetings"
                         ? meetingStep(count)
-                        : m.slug === "presentations"
-                          ? presentationStep(count)
-                          : null;
+                        : null;
+
                 return (
                   <Link
                     key={m.slug}
