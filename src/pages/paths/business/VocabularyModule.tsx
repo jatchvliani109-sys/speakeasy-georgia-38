@@ -20,9 +20,10 @@ import {
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
 
-type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
+type Stage = "intro" | "cards" | "quiz" | "results" | "empty" | "reviewIntro";
 
 const PRACTICE_TARGET = 12;
+const REVIEW_FALLBACK_SIZE = 10;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
