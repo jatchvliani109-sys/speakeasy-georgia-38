@@ -235,7 +235,11 @@ export default function VocabularyModule() {
           ბიზნეს ლექსიკა
         </p>
         <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">
-          {stage === "results" ? "სესია დასრულდა" : "დღევანდელი სიტყვები"}
+          {stage === "results"
+            ? "სესია დასრულდა"
+            : stage === "reviewIntro"
+            ? "გამეორების დღე"
+            : "დღევანდელი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center gap-2 flex-wrap">
           <Link to="/path/business/vocabulary/notebook" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
@@ -250,6 +254,10 @@ export default function VocabularyModule() {
           reviewCount={reviewKeys.length}
           onStart={startSession}
         />
+      )}
+
+      {stage === "reviewIntro" && (
+        <ReviewIntroCard words={reviewWords} onStart={startSession} />
       )}
 
       {stage === "empty" && (
