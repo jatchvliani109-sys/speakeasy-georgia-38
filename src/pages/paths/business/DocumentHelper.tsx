@@ -235,6 +235,7 @@ function LibraryView({
   const grouped = useMemo(() => {
     const map: Record<DocType, BusinessDocument[]> = {
       email: [],
+      email_fix: [],
       cover_letter: [],
       resume_improve: [],
       bio: [],
