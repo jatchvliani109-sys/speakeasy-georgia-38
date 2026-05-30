@@ -478,8 +478,18 @@ export default function BusinessHome() {
                 <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount)} />
               </div>
               <Link
+                to="/path/business/documents"
+                className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white border border-[#E7E2D5] text-[#1E2A44] hover:border-[#1E2A44]/40 transition-colors text-sm font-semibold"
+              >
+                <span className="flex items-center gap-2">
+                  <span>🗂</span>
+                  <span>დოკუმენტების ასისტენტი</span>
+                </span>
+                <span>→</span>
+              </Link>
+              <Link
                 to="/path/business/dictionary"
-                className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#1E2A44] text-[#F7F1E3] hover:bg-[#15203A] transition-colors text-sm font-semibold"
+                className="ka mt-2 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#1E2A44] text-[#F7F1E3] hover:bg-[#15203A] transition-colors text-sm font-semibold"
               >
                 <span className="flex items-center gap-2">
                   <span>📖</span>
