@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_documents: {
+        Row: {
+          content: string
+          created_at: string
+          doc_type: string
+          highlights: Json
+          id: string
+          inputs: Json
+          meta: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          doc_type: string
+          highlights?: Json
+          id?: string
+          inputs?: Json
+          meta?: Json
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          doc_type?: string
+          highlights?: Json
+          id?: string
+          inputs?: Json
+          meta?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_email_sessions: {
         Row: {
           completed: boolean
