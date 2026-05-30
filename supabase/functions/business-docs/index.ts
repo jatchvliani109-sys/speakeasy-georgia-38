@@ -141,6 +141,43 @@ Return JSON:
 }`;
 }
 
+function emailFixPrompt(b: any, p: Profile) {
+  return `${profileBlock(p)}
+
+TASK: The user pasted an English email they wrote. Produce an improved, polished professional version AND explain each meaningful change so the user learns.
+
+Original email:
+"""${(b.original || "").slice(0, 4000)}"""
+
+Recipient context: ${b.recipient || "(not provided)"}
+Purpose / desired outcome: ${b.purpose || "(not provided)"}
+Tone preference: ${b.tone || "balanced professional"}
+
+Rules:
+- Keep the user's intent and core content. Do not invent facts.
+- Fix grammar, clarity, structure, tone, professionalism.
+- Improve subject line if there was one (or propose one).
+- Identify 3-8 SPECIFIC changes with concrete before/after snippets and a short Georgian explanation of WHY each change is better.
+
+Return JSON:
+{
+  "title": "short Georgian title for saving (e.g. 'გასწორებული იმეილი — კლიენტს')",
+  "subject": "improved English subject line (or empty string if not applicable)",
+  "content": "the improved English email (greeting, body paragraphs separated by \\n\\n, sign-off)",
+  "changes": [
+    {
+      "before": "exact snippet from the original (English)",
+      "after": "improved snippet (English)",
+      "whyKa": "1-line Georgian explanation of why this is better"
+    }
+  ],
+  "summaryKa": "2-3 sentence Georgian summary of what was improved overall",
+  "highlights": [
+    { "phrase": "exact phrase from improved email", "whyKa": "1-line Georgian explanation" }
+  ]
+}`;
+}
+
 function adjustPrompt(b: any) {
   return `Rewrite the following English document with the requested adjustment. Keep the same purpose and core content. Output JSON only.
 
