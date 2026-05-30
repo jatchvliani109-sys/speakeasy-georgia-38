@@ -24,7 +24,7 @@ If a field is missing, return an empty string (or empty array for skills). Do no
 
 async function parseDocxToText(base64: string): Promise<string> {
   const bin = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const result = await mammoth.extractRawText({ buffer: bin });
+  const result = await mammoth.extractRawText({ arrayBuffer: bin.buffer });
   return (result?.value || "").trim();
 }
 
