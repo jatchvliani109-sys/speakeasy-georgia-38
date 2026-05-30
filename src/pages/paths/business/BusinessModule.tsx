@@ -7,7 +7,7 @@ import { SAMPLE_BUSINESS_VOCAB } from "./lib/vocab";
 import EmailsModule from "./EmailsModule";
 import InterviewModule from "./InterviewModule";
 import MeetingsModule from "./MeetingsModule";
-import PresentationsModule from "./PresentationsModule";
+
 
 export default function BusinessModule() {
   const { slug } = useParams();
