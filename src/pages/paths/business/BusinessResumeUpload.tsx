@@ -130,21 +130,42 @@ export default function BusinessResumeUpload() {
         return { name: p, level: "" };
       });
 
+  const [storagePath, setStoragePath] = useState<string | null>(null);
+
   const handleFile = async (f: File) => {
     const err = validate(f);
     if (err) {
       toast.error(err);
       return;
     }
+    if (!user) {
+      toast.error("გთხოვ შეხვიდე ანგარიშში");
+      return;
+    }
     setFile(f);
     setParsing(true);
     setExtracted(null);
+    setStoragePath(null);
     try {
       const base64 = await fileToBase64(f);
+
+      // Upload raw file to private storage (best-effort, don't block extraction).
+      const safeName = f.name.replace(/[^\w.\-]+/g, "_");
+      const path = `${user.id}/${Date.now()}_${safeName}`;
+      const { error: upErr } = await supabase.storage
+        .from("resumes")
+        .upload(path, f, { upsert: true, contentType: f.type || undefined });
+      if (upErr) {
+        console.warn("resume storage upload failed", upErr);
+      } else {
+        setStoragePath(path);
+      }
+
       const { data, error } = await supabase.functions.invoke("business-resume-parse", {
         body: { fileBase64: base64, mimeType: f.type, fileName: f.name },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       if (!data?.extracted) throw new Error("ვერ მოხერხდა მონაცემების ამოღება");
       const ex: Extracted = { ...empty, ...data.extracted };
       setExtracted(ex);
@@ -154,7 +175,12 @@ export default function BusinessResumeUpload() {
       setLanguagesInput(formatLanguages(ex.languages || []));
     } catch (e: any) {
       console.error(e);
-      toast.error("ვერ მოხერხდა რეზიუმეს გაანალიზება. სცადე ხელახლა.");
+      const msg = String(e?.message || "");
+      if (msg.includes("Unsupported")) {
+        toast.error("მხოლოდ PDF ან Word (.docx) ფაილებია ნებადართული");
+      } else {
+        toast.error("ვერ მოხერხდა რეზიუმეს გაანალიზება. სცადე ხელახლა.");
+      }
       setFile(null);
     } finally {
       setParsing(false);
@@ -181,6 +207,7 @@ export default function BusinessResumeUpload() {
         user_id: user.id,
         file_name: file.name,
         mime_type: file.type,
+        storage_path: storagePath,
         full_name: extracted.full_name || null,
         job_title: extracted.job_title || null,
         industry: extracted.industry || null,
