@@ -232,6 +232,8 @@ Deno.serve(async (req) => {
     let r;
     if (body.action === "email_write") {
       r = await callAI(SYSTEM_BASE, emailPrompt(body, profile));
+    } else if (body.action === "email_fix") {
+      r = await callAI(SYSTEM_BASE, emailFixPrompt(body, profile));
     } else if (body.action === "cover_letter") {
       r = await callAI(SYSTEM_BASE, coverLetterPrompt(body, profile));
     } else if (body.action === "resume_improve") {
