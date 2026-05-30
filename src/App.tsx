@@ -26,6 +26,7 @@ import BusinessModule from "./pages/paths/business/BusinessModule";
 import BusinessDictionary from "./pages/paths/business/BusinessDictionary";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
+import DocumentHelper from "./pages/paths/business/DocumentHelper";
 import NationalExamDashboard from "./pages/paths/NationalExam";
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
             <Route path="/path/business/dictionary" element={<RequireAuth><BusinessDictionary /></RequireAuth>} />
+            <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
             
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
             <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
