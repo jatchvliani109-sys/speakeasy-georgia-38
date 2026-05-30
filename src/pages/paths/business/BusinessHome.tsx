@@ -53,19 +53,19 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "presentations"]);
+const ACTIVE_MODULES = new Set(["emails", "interview", "meetings"]);
 
 // Map a learner priority to a module slug — used for goal-weighted rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
-  university: "presentations",
+  university: "interview",
   job_interview: "interview",
   work_communication: "meetings",
   remote_work: "emails",
   emails_writing: "emails",
-  presentations: "presentations",
   business_vocab: "vocabulary",
   general_business: "interview",
 };
+
 
 type ModuleProgress = { slug: string; count: number; doneToday: boolean };
 
