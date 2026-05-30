@@ -145,12 +145,12 @@ export default function VocabularyModule() {
         (() => {
           const isNew = newWords.find((w) => w.key === wordKey);
           if (isNew) return emptyProgressFor(isNew);
+          const fallback = reviewWords.find((w) => w.key === wordKey);
+          if (fallback) return emptyProgressFor(fallback);
           return null;
         })();
       if (!row) continue;
-      results.forEach((c) => {
-        row = applyAnswer(row!, c);
-      });
+      row = applySessionResults(row, results);
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
