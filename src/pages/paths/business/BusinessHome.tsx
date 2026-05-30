@@ -80,6 +80,7 @@ export default function BusinessHome() {
   const navigate = useNavigate();
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
+  const [hasResume, setHasResume] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user) return;
@@ -106,6 +107,15 @@ export default function BusinessHome() {
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
       });
+
+      const { data: resumeRow } = await supabase
+        .from("business_resumes")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setHasResume(!!resumeRow?.id);
+
 
     })();
     return () => {
