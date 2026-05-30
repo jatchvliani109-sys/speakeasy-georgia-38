@@ -486,3 +486,56 @@ export function sourceLabelKa(source: string): string {
     default: return source;
   }
 }
+
+// ---------------- Review fallback (no new words today) ----------------
+
+/**
+ * When the user has no new words queued for today, build a session from the
+ * 10 lowest-confidence words across their entire progress (excluding mastered).
+ */
+export function pickLowestConfidenceWords(progress: ProgressRow[], n = 10): VocabWord[] {
+  const candidates = progress
+    .filter((p) => !checkMastery(p))
+    .sort((a, b) => {
+      if (a.confidence !== b.confidence) return a.confidence - b.confidence;
+      // tie-break: more wrong answers first
+      return b.wrong_count - a.wrong_count;
+    })
+    .slice(0, n);
+  return candidates.map(progressToWord).filter(Boolean) as VocabWord[];
+}
+
+/**
+ * Build a 15-20 question quiz using only the supplied review words. Generates
+ * roughly 2 varied questions per word so even a 10-word pool reaches ~20 Qs.
+ */
+export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
+  if (!words.length) return [];
+  const pool = ALL_WORDS;
+  const generators = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa, makeTrueFalse];
+  const questions: QuizQuestion[] = [];
+
+  // Pass 1: one varied question per word
+  words.forEach((w, i) => {
+    const gen = generators[i % generators.length];
+    const q = gen(w, pool);
+    questions.push(q || makeMcMeaning(w, pool));
+  });
+  // Pass 2: a second different question per word until we hit ~20
+  words.forEach((w, i) => {
+    if (questions.length >= 20) return;
+    const gen = generators[(i + 2) % generators.length];
+    const q = gen(w, pool);
+    questions.push(q || makeTrKaToEn(w, pool));
+  });
+
+  // Avoid back-to-back same type
+  let merged = shuffle(questions);
+  for (let i = 1; i < merged.length; i++) {
+    if (merged[i].type === merged[i - 1].type) {
+      const swap = merged.findIndex((q, idx) => idx > i && q.type !== merged[i - 1].type);
+      if (swap > -1) [merged[i], merged[swap]] = [merged[swap], merged[i]];
+    }
+  }
+  return merged.slice(0, 20);
+}
