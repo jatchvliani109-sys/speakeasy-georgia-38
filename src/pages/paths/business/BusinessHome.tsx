@@ -311,6 +311,33 @@ export default function BusinessHome() {
             </div>
           </section>
 
+          {/* 2a. Document Helper — prominent practical tool */}
+          <section className="mb-5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+              დოკუმენტების ასისტენტი
+            </p>
+            <button
+              onClick={() => navigate("/path/business/documents")}
+              className="w-full text-left bg-white border-2 border-[#E7E2D5] hover:border-[#1E2A44]/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="flex items-start gap-4">
+                <div className="text-3xl shrink-0">🗂</div>
+                <div className="flex-1 min-w-0">
+                  <p className="ka font-bold text-[#1E2A44] text-base">
+                    შექმენი ან გაასწორე რეალური დოკუმენტი
+                  </p>
+                  <p className="ka text-xs text-[#5B6473] mt-1 leading-relaxed">
+                    იმეილი, სამოტივაციო წერილი, რეზიუმე, ბიო — შენი მონაცემებით, წამიერად. ან ჩასვი იმეილი და მიიღე გაუმჯობესებული ვერსია.
+                  </p>
+                  <span className="ka inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#1E2A44]">
+                    გახსნა →
+                  </span>
+                </div>
+              </div>
+            </button>
+          </section>
+
+
           {/* 2b. "Still have energy?" cross-module suggestion */}
           {focusDoneToday && suggestionMod && suggestionCopy && (
             <BizCard className="mb-5 bg-[#FFFBEA] border-[#F2E6B0]">
