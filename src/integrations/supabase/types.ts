@@ -326,6 +326,99 @@ export type Database = {
         }
         Relationships: []
       }
+      business_vocab_progress: {
+        Row: {
+          confidence: number
+          correct_count: number
+          created_at: string
+          due_at: string
+          field: string | null
+          id: string
+          last_seen_at: string | null
+          manual_label: string | null
+          meta: Json
+          source: string
+          updated_at: string
+          user_id: string
+          word_key: string
+          wrong_count: number
+        }
+        Insert: {
+          confidence?: number
+          correct_count?: number
+          created_at?: string
+          due_at?: string
+          field?: string | null
+          id?: string
+          last_seen_at?: string | null
+          manual_label?: string | null
+          meta?: Json
+          source?: string
+          updated_at?: string
+          user_id: string
+          word_key: string
+          wrong_count?: number
+        }
+        Update: {
+          confidence?: number
+          correct_count?: number
+          created_at?: string
+          due_at?: string
+          field?: string | null
+          id?: string
+          last_seen_at?: string | null
+          manual_label?: string | null
+          meta?: Json
+          source?: string
+          updated_at?: string
+          user_id?: string
+          word_key?: string
+          wrong_count?: number
+        }
+        Relationships: []
+      }
+      business_vocab_sessions: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          new_words: number
+          review_words: number
+          score: number
+          session_data: Json
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          new_words?: number
+          review_words?: number
+          score?: number
+          session_data?: Json
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          new_words?: number
+          review_words?: number
+          score?: number
+          session_data?: Json
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           completed: boolean
