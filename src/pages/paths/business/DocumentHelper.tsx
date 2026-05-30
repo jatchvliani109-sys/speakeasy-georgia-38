@@ -251,7 +251,7 @@ function LibraryView({
       </button>
       <h2 className="ka text-xl font-bold text-[#1E2A44] mb-3">ჩემი დოკუმენტები</h2>
       <div className="flex flex-wrap gap-2 mb-4">
-        {(["all", "email", "cover_letter", "resume_improve", "bio"] as const).map((f) => (
+        {(["all", "email", "email_fix", "cover_letter", "resume_improve", "bio"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
