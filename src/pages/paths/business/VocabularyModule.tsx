@@ -20,7 +20,8 @@ import type { VocabWord } from "./lib/vocabBank";
 
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
 
-const PRACTICE_TARGET = 6;
+const PRACTICE_TARGET = 12;
+const AUTO_ADVANCE_MS = 1400;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
@@ -82,31 +83,40 @@ export default function VocabularyModule() {
     else setStage("quiz");
   };
 
-  // QUIZ
+  // QUIZ — single click flow
   const currentQ = quiz[qIdx];
-  const submitAnswer = () => {
-    if (selected === null || revealed) return;
-    const correct = checkAnswer(currentQ, selected);
+
+  const handleSelect = (val: string | number) => {
+    if (revealed || !currentQ) return;
+    setSelected(val);
+    const correct = checkAnswer(currentQ, val);
+    const nextAnswers =
+      "wordKey" in currentQ
+        ? [...answers, { wordKey: currentQ.wordKey, correct }]
+        : answers;
+    setAnswers(nextAnswers);
     setRevealed(true);
-    if ("wordKey" in currentQ) {
-      setAnswers((a) => [...a, { wordKey: currentQ.wordKey, correct }]);
-    }
+    // Auto-advance after a short pause so user sees green/red feedback
+    window.setTimeout(() => {
+      goNext(nextAnswers);
+    }, AUTO_ADVANCE_MS);
   };
-  const nextQ = () => {
+
+  const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
       setSelected(null);
       setRevealed(false);
     } else {
-      finishSession();
+      finishSession(ans);
     }
   };
 
-  const finishSession = async () => {
+  const finishSession = async (finalAnswers: { wordKey: string; correct: boolean }[]) => {
     if (!user) return;
     // Aggregate per word
     const perWord = new Map<string, boolean[]>();
-    answers.forEach((a) => {
+    finalAnswers.forEach((a) => {
       const arr = perWord.get(a.wordKey) || [];
       arr.push(a.correct);
       perWord.set(a.wordKey, arr);
@@ -140,25 +150,26 @@ export default function VocabularyModule() {
     setTotalVocab(newProgress.length);
 
     // Save session
-    const score = answers.filter((a) => a.correct).length;
+    const score = finalAnswers.filter((a) => a.correct).length;
     const { supabase } = await import("@/integrations/supabase/client");
     await supabase.from("business_vocab_sessions").insert({
       user_id: user.id,
       score,
-      total: answers.length,
+      total: finalAnswers.length,
       new_words: newWords.length,
       review_words: reviewKeys.length,
       completed: true,
       completed_at: new Date().toISOString(),
       session_data: {
         wordKeys: newWords.map((w) => w.key),
-        answers,
+        answers: finalAnswers,
       },
     });
 
-    setLastResults({ answers, newWords });
+    setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };
+
 
   const startPracticeMore = () => {
     const src = lastResults || { answers, newWords };
@@ -260,21 +271,18 @@ export default function VocabularyModule() {
             q={currentQ}
             selected={selected}
             revealed={revealed}
-            setSelected={setSelected}
+            setSelected={handleSelect}
           />
-          <div className="mt-4 flex justify-end">
-            {!revealed ? (
-              <BizButton onClick={submitAnswer} disabled={selected === null}>
-                შემოწმება
-              </BizButton>
-            ) : (
-              <BizButton onClick={nextQ}>
+          {revealed && (
+            <div className="mt-4 flex justify-end">
+              <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
               </BizButton>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
+
 
       {stage === "results" && lastResults && (
         <Results
