@@ -384,9 +384,8 @@ export default function BusinessHome() {
                       ? interviewStep(count)
                       : m.slug === "meetings"
                         ? meetingStep(count)
-                        : m.slug === "presentations"
-                          ? presentationStep(count)
-                          : null;
+                        : null;
+
                 return (
                   <Link
                     key={m.slug}
