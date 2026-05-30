@@ -54,6 +54,7 @@ export default function VocabularyModule() {
       if (cancelled) return;
       const plan = planSession(p, s.field || [], s.mainPriority || []);
       setProgress(p);
+      setTotalVocab(p.length);
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
