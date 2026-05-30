@@ -92,13 +92,16 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday] = await Promise.all([
+      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
         supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_meeting_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
+        supabase.from("business_vocab_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+        supabase.from("business_vocab_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
+        supabase.from("business_vocab_progress").select("id", { count: "exact", head: true }).eq("user_id", user.id),
       ]);
 
       if (cancelled) return;
@@ -106,7 +109,9 @@ export default function BusinessHome() {
         emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
+        vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
+      setVocabWordCount(vocabWords.count ?? 0);
 
       const { data: resumeRow } = await supabase
         .from("business_resumes")
