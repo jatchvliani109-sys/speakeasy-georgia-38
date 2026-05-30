@@ -198,16 +198,14 @@ export default function BusinessDictionary() {
             const isOpen = !!open[r.id];
             const isInterview = r.kind === "interview";
             const isMeeting = r.kind === "meeting";
-            const isPresentation = r.kind === "presentation";
             const title = isInterview
               ? (r.session_data?.briefing?.roleTitleKa || r.email_type)
               : isMeeting
                 ? (r.session_data?.briefing?.meetingTypeKa || r.email_type)
-                : isPresentation
-                  ? (r.session_data?.presentationTitleKa || r.email_type)
-                  : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
-            const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : isPresentation ? "პრეზენტაცია" : "იმეილები";
-            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : isPresentation ? "📊" : "📨";
+                : (TYPE_LABELS[r.email_type] || r.session_data?.dailyFocusKa || r.email_type);
+            const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : "იმეილები";
+            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : "📨";
+
             const date = formatKaDate(r.completed_at);
             return (
               <div
