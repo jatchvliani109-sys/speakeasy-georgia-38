@@ -271,21 +271,18 @@ export default function VocabularyModule() {
             q={currentQ}
             selected={selected}
             revealed={revealed}
-            setSelected={setSelected}
+            setSelected={handleSelect}
           />
-          <div className="mt-4 flex justify-end">
-            {!revealed ? (
-              <BizButton onClick={submitAnswer} disabled={selected === null}>
-                შემოწმება
-              </BizButton>
-            ) : (
-              <BizButton onClick={nextQ}>
+          {revealed && (
+            <div className="mt-4 flex justify-end">
+              <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
               </BizButton>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
+
 
       {stage === "results" && lastResults && (
         <Results
