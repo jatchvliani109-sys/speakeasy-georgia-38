@@ -168,7 +168,7 @@ export const PRIORITY_LABELS: Record<BusinessPriority, string> = {
   work_communication: "სამუშაო კომუნიკაცია",
   remote_work: "ფრილანსი / remote work",
   emails_writing: "იმეილები და პროფესიული წერა",
-  presentations: "პრეზენტაციები",
+  
   business_vocab: "ბიზნეს ლექსიკა",
   general_business: "ზოგადი გაუმჯობესება",
 };
