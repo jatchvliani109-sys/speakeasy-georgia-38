@@ -148,6 +148,7 @@ function HomeView({
 }) {
   const tools: { id: DocType; title: string; subtitle: string; icon: string }[] = [
     { id: "email", title: "პროფესიული იმეილი", subtitle: "აღწერე რა გინდა გადასცე — მიიღე გაპრიალებული იმეილი.", icon: "✉️" },
+    { id: "email_fix", title: "გაასწორე ჩემი ელ-ფოსტა", subtitle: "ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია + ახსნა.", icon: "🛠" },
     { id: "cover_letter", title: "სამოტივაციო წერილი", subtitle: "შენი რეზიუმე + სამუშაო პოზიცია → მორგებული წერილი.", icon: "📝" },
     { id: "resume_improve", title: "რეზიუმეს გაუმჯობესება", subtitle: "კონკრეტული რჩევები — სუსტი ფრაზები, keywords, ტონი.", icon: "📄" },
     { id: "bio", title: "პროფესიული ბიო", subtitle: "მოკლე, საშუალო, სრული — LinkedIn-ისთვის და სხვა.", icon: "👤" },
