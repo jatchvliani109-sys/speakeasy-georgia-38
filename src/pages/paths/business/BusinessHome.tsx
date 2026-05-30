@@ -81,6 +81,7 @@ export default function BusinessHome() {
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
+  const [vocabWordCount, setVocabWordCount] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
@@ -92,13 +93,16 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday] = await Promise.all([
+      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
         supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_meeting_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
+        supabase.from("business_vocab_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+        supabase.from("business_vocab_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
+        supabase.from("business_vocab_progress").select("id", { count: "exact", head: true }).eq("user_id", user.id),
       ]);
 
       if (cancelled) return;
@@ -106,7 +110,9 @@ export default function BusinessHome() {
         emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
+        vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
+      setVocabWordCount(vocabWords.count ?? 0);
 
       const { data: resumeRow } = await supabase
         .from("business_resumes")
@@ -226,7 +232,7 @@ export default function BusinessHome() {
                   supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_meeting_sessions").update(patch).eq("user_id", user.id),
-
+                  supabase.from("business_vocab_sessions").update(patch).eq("user_id", user.id),
                 ]);
               } catch {}
               resetBusiness(user.id);
@@ -474,8 +480,8 @@ export default function BusinessHome() {
               <div className="grid grid-cols-2 gap-3">
                 <Stat label="გაუმჯობესებული იმეილები" value={String(emailsCount)} />
                 <Stat label="გასაუბრებები" value={String(interviewCount)} />
-                <Stat label="ბიზნეს სიტყვები" value="0" />
-                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount)} />
+                <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
+                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.meetings?.count ?? 0) + (progress.vocabulary?.count ?? 0))} />
               </div>
               <Link
                 to="/path/business/documents"

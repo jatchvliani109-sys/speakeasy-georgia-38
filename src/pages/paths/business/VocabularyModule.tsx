@@ -20,6 +20,8 @@ import type { VocabWord } from "./lib/vocabBank";
 
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
 
+const PRACTICE_TARGET = 6;
+
 export default function VocabularyModule() {
   const { user } = useAuth();
   const [stage, setStage] = useState<Stage>("intro");
@@ -34,6 +36,11 @@ export default function VocabularyModule() {
   const [answers, setAnswers] = useState<{ wordKey: string; correct: boolean }[]>([]);
   const [selected, setSelected] = useState<string | number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [totalVocab, setTotalVocab] = useState(0);
+  const [lastResults, setLastResults] = useState<{
+    answers: { wordKey: string; correct: boolean }[];
+    newWords: VocabWord[];
+  } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -47,6 +54,7 @@ export default function VocabularyModule() {
       if (cancelled) return;
       const plan = planSession(p, s.field || [], s.mainPriority || []);
       setProgress(p);
+      setTotalVocab(p.length);
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
@@ -121,6 +129,15 @@ export default function VocabularyModule() {
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
+    // Update local progress + total vocab counter
+    const newProgress = [...progress];
+    updated.forEach((row) => {
+      const idx = newProgress.findIndex((p) => p.word_key === row.word_key);
+      if (idx >= 0) newProgress[idx] = row;
+      else newProgress.push(row);
+    });
+    setProgress(newProgress);
+    setTotalVocab(newProgress.length);
 
     // Save session
     const score = answers.filter((a) => a.correct).length;
@@ -139,7 +156,40 @@ export default function VocabularyModule() {
       },
     });
 
+    setLastResults({ answers, newWords });
     setStage("results");
+  };
+
+  const startPracticeMore = () => {
+    const src = lastResults || { answers, newWords };
+    // Build a quick review pool: words user got wrong + lowest-confidence words
+    const wrongKeys = Array.from(
+      new Set(src.answers.filter((a) => !a.correct).map((a) => a.wordKey)),
+    );
+    const wrongWords = wrongKeys
+      .map((k) => src.newWords.find((w) => w.key === k) || progressToWord(progress.find((p) => p.word_key === k) as ProgressRow))
+      .filter(Boolean) as VocabWord[];
+
+    let pool: VocabWord[] = [...wrongWords];
+    if (pool.length < PRACTICE_TARGET) {
+      const lowConf = [...progress]
+        .filter((p) => !pool.find((w) => w.key === p.word_key))
+        .sort((a, b) => a.confidence - b.confidence)
+        .map((p) => progressToWord(p))
+        .filter(Boolean) as VocabWord[];
+      pool = [...pool, ...lowConf].slice(0, PRACTICE_TARGET);
+    }
+    if (!pool.length) return;
+
+    const reviewKeysNew = pool.map((w) => w.key);
+    setNewWords([]);
+    setReviewKeys(reviewKeysNew);
+    setQuiz(buildQuiz([], reviewKeysNew));
+    setQIdx(0);
+    setAnswers([]);
+    setSelected(null);
+    setRevealed(false);
+    setStage("quiz");
   };
 
   if (loading) {
@@ -226,11 +276,14 @@ export default function VocabularyModule() {
         </>
       )}
 
-      {stage === "results" && (
+      {stage === "results" && lastResults && (
         <Results
-          answers={answers}
-          newWords={newWords}
-          onAgain={() => window.location.reload()}
+          answers={lastResults.answers}
+          newWords={lastResults.newWords}
+          reviewCount={reviewKeys.length}
+          totalVocab={totalVocab}
+          canPracticeMore={lastResults.answers.some((a) => !a.correct) || progress.length > 0}
+          onPracticeMore={startPracticeMore}
         />
       )}
     </BusinessShell>
@@ -471,17 +524,22 @@ function QuestionCard({
 function Results({
   answers,
   newWords,
-  onAgain,
+  reviewCount,
+  totalVocab,
+  canPracticeMore,
+  onPracticeMore,
 }: {
   answers: { wordKey: string; correct: boolean }[];
   newWords: VocabWord[];
-  onAgain: () => void;
+  reviewCount: number;
+  totalVocab: number;
+  canPracticeMore: boolean;
+  onPracticeMore: () => void;
 }) {
   const total = answers.length;
   const correct = answers.filter((a) => a.correct).length;
   const pct = total ? Math.round((correct / total) * 100) : 0;
 
-  // Aggregate per word
   const perWord = new Map<string, { c: number; w: number }>();
   answers.forEach((a) => {
     const cur = perWord.get(a.wordKey) || { c: 0, w: 0 };
@@ -499,6 +557,9 @@ function Results({
     return s && s.w >= s.c;
   });
 
+  const learnedToday = mastered.length;
+  const addedToReview = needsReview.length + reviewCount;
+
   const message =
     pct >= 90 ? "შესანიშნავია — ძალიან კარგად!" :
     pct >= 70 ? "კარგი მუშაობაა. გააგრძელე ასე!" :
@@ -515,6 +576,12 @@ function Results({
           <p className="ka text-sm text-[#F7F1E3]/80 mt-2">{correct} / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-[#F2D680] mt-3 font-semibold">{message}</p>
         </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <SummaryStat label="ნასწავლი" value={learnedToday} />
+        <SummaryStat label="გასამეორებელი" value={addedToReview} />
+        <SummaryStat label="სულ ლექსიკაში" value={totalVocab} />
       </div>
 
       {mastered.length > 0 && (
@@ -549,14 +616,32 @@ function Results({
         </BizCard>
       )}
 
-      <div className="flex gap-2">
-        <Link to="/path/business/home" className="flex-1">
-          <BizButton variant="outline" className="w-full">დაბრუნება</BizButton>
+      <div className="space-y-2 pt-2">
+        {canPracticeMore && (
+          <BizButton className="w-full" onClick={onPracticeMore}>
+            დღეს კიდევ ვივარჯიშოთ →
+          </BizButton>
+        )}
+        <Link to="/path/business/home" className="block">
+          <BizButton variant="outline" className="w-full">
+            დაშბორდზე დაბრუნება
+          </BizButton>
         </Link>
-        <Link to="/path/business/vocabulary/notebook" className="flex-1">
-          <BizButton className="w-full">რვეული →</BizButton>
+        <Link to="/path/business/vocabulary/notebook" className="block">
+          <p className="ka text-center text-xs text-[#1E2A44] underline underline-offset-2 mt-2">
+            📔 ჩემი რვეულის ნახვა
+          </p>
         </Link>
       </div>
+    </div>
+  );
+}
+
+function SummaryStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-white border border-[#E7E2D5] rounded-xl p-3 text-center">
+      <p className="text-xl font-bold text-[#1E2A44]">{value}</p>
+      <p className="ka text-[10px] text-[#5B6473] uppercase tracking-wider mt-0.5">{label}</p>
     </div>
   );
 }
