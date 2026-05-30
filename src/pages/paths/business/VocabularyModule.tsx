@@ -78,6 +78,15 @@ export default function VocabularyModule() {
   }, [user]);
 
   const startSession = () => {
+    if (reviewMode) {
+      setQuiz(buildReviewQuiz(reviewWords));
+      setQIdx(0);
+      setAnswers([]);
+      setSelected(null);
+      setRevealed(false);
+      setStage("quiz");
+      return;
+    }
     const q = buildQuiz(newWords, reviewKeys);
     setQuiz(q);
     setCardIdx(0);
