@@ -36,6 +36,11 @@ export default function VocabularyModule() {
   const [answers, setAnswers] = useState<{ wordKey: string; correct: boolean }[]>([]);
   const [selected, setSelected] = useState<string | number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [totalVocab, setTotalVocab] = useState(0);
+  const [lastResults, setLastResults] = useState<{
+    answers: { wordKey: string; correct: boolean }[];
+    newWords: VocabWord[];
+  } | null>(null);
 
   useEffect(() => {
     if (!user) return;
