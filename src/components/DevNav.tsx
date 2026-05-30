@@ -92,7 +92,7 @@ const GROUPS: Group[] = [
       { to: "/path/business/module/interview", label: "Job interview" },
       { to: "/path/business/module/emails", label: "Work emails" },
       { to: "/path/business/module/meetings", label: "Meetings" },
-      { to: "/path/business/module/presentations", label: "Presentations" },
+      
       { to: "/path/business/module/vocabulary", label: "Business vocabulary" },
     ],
   },
