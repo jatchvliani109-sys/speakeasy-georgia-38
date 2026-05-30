@@ -480,8 +480,8 @@ export default function BusinessHome() {
               <div className="grid grid-cols-2 gap-3">
                 <Stat label="გაუმჯობესებული იმეილები" value={String(emailsCount)} />
                 <Stat label="გასაუბრებები" value={String(interviewCount)} />
-                <Stat label="ბიზნეს სიტყვები" value="0" />
-                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount)} />
+                <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
+                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.meetings?.count ?? 0) + (progress.vocabulary?.count ?? 0))} />
               </div>
               <Link
                 to="/path/business/documents"
