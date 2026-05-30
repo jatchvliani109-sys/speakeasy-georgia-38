@@ -519,18 +519,6 @@ export default function BusinessHome() {
                   <span>ჩემი ლექსიკონი</span>
                 </span>
                 <span>→</span>
-              </Link>
-
-              <Link
-                to="/path/business/dictionary"
-                className="ka mt-2 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#1E2A44] text-[#F7F1E3] hover:bg-[#15203A] transition-colors text-sm font-semibold"
-              >
-                <span className="flex items-center gap-2">
-                  <span>📖</span>
-                  <span>ჩემი ლექსიკონი</span>
-                </span>
-                <span>→</span>
-              </Link>
             </BizCard>
           </section>
         </>
