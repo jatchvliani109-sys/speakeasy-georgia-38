@@ -21,7 +21,6 @@ import type { VocabWord } from "./lib/vocabBank";
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
 
 const PRACTICE_TARGET = 12;
-const AUTO_ADVANCE_MS = 1400;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
@@ -90,16 +89,11 @@ export default function VocabularyModule() {
     if (revealed || !currentQ) return;
     setSelected(val);
     const correct = checkAnswer(currentQ, val);
-    const nextAnswers =
-      "wordKey" in currentQ
-        ? [...answers, { wordKey: currentQ.wordKey, correct }]
-        : answers;
+    const key = "wordKey" in currentQ ? currentQ.wordKey : `mistake:${currentQ.key}`;
+    const nextAnswers = [...answers, { wordKey: key, correct }];
     setAnswers(nextAnswers);
     setRevealed(true);
-    // Auto-advance after a short pause so user sees green/red feedback
-    window.setTimeout(() => {
-      goNext(nextAnswers);
-    }, AUTO_ADVANCE_MS);
+    // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
   const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
@@ -192,10 +186,12 @@ export default function VocabularyModule() {
     }
     if (!pool.length) return;
 
-    const reviewKeysNew = pool.map((w) => w.key);
+    // Pass pool as newWords so buildQuiz uses real VocabWord objects directly
+    // (review-key lookup via findWord would miss ingested phrases). We still
+    // skip the cards stage and go straight to quiz.
     setNewWords([]);
-    setReviewKeys(reviewKeysNew);
-    setQuiz(buildQuiz([], reviewKeysNew));
+    setReviewKeys(pool.map((w) => w.key));
+    setQuiz(buildQuiz(pool, []));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
