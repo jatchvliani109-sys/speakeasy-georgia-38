@@ -6,26 +6,36 @@ import { toast } from "sonner";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { pullBusinessFromSupabase, saveBusiness } from "./lib/state";
 
+type LanguageEntry = { name: string; level: string };
+
 type Extracted = {
   full_name: string;
   job_title: string;
   industry: string;
-  skills: string[];
+  technical_skills: string[];
+  soft_skills: string[];
   years_of_experience: string;
   education: string;
+  graduation_year: string;
+  languages: LanguageEntry[];
+  achievements: string[];
 };
 
 const empty: Extracted = {
   full_name: "",
   job_title: "",
   industry: "",
-  skills: [],
+  technical_skills: [],
+  soft_skills: [],
   years_of_experience: "",
   education: "",
+  graduation_year: "",
+  languages: [],
+  achievements: [],
 };
 
 const ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-const MAX_BYTES = 8 * 1024 * 1024; // 8MB
+const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -40,6 +50,23 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString("ka-GE", { day: "numeric", month: "long", year: "numeric" });
+  } catch {
+    return iso;
+  }
+}
+
+type ExistingResume = {
+  id: string;
+  file_name: string | null;
+  created_at: string;
+  full_name: string | null;
+  job_title: string | null;
+};
+
 export default function BusinessResumeUpload() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -49,23 +76,31 @@ export default function BusinessResumeUpload() {
   const [saving, setSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [extracted, setExtracted] = useState<Extracted | null>(null);
-  const [skillsInput, setSkillsInput] = useState("");
+  const [existing, setExisting] = useState<ExistingResume | null>(null);
+  const [showReplace, setShowReplace] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Text inputs (comma-separated)
+  const [techInput, setTechInput] = useState("");
+  const [softInput, setSoftInput] = useState("");
+  const [achievementsInput, setAchievementsInput] = useState("");
+  const [languagesInput, setLanguagesInput] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    // Pre-check: if a resume was already uploaded, skip ahead
     (async () => {
       const { data } = await supabase
         .from("business_resumes")
-        .select("id")
+        .select("id, file_name, created_at, full_name, job_title")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (data?.id) {
-        // Mark step complete so flow advances
+        setExisting(data as ExistingResume);
         saveBusiness(user.id, { businessResumeUploaded: true } as any);
       }
+      setLoaded(true);
     })();
   }, [user]);
 
@@ -76,9 +111,24 @@ export default function BusinessResumeUpload() {
       f.name.toLowerCase().endsWith(".pdf") ||
       f.name.toLowerCase().endsWith(".docx");
     if (!ok) return "მხოლოდ PDF ან Word (.docx) ფაილებია ნებადართული";
-    if (f.size > MAX_BYTES) return "ფაილი ძალიან დიდია (მაქს. 8MB)";
+    if (f.size > MAX_BYTES) return "ფაილი ძალიან დიდია — მაქსიმუმ 10MB";
+    if (f.size === 0) return "ფაილი ცარიელია — სცადე სხვა";
     return null;
   };
+
+  const formatLanguages = (langs: LanguageEntry[]) =>
+    langs.map((l) => (l.level ? `${l.name} (${l.level})` : l.name)).join(", ");
+
+  const parseLanguages = (s: string): LanguageEntry[] =>
+    s
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => {
+        const m = p.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+        if (m) return { name: m[1].trim(), level: m[2].trim() };
+        return { name: p, level: "" };
+      });
 
   const handleFile = async (f: File) => {
     const err = validate(f);
@@ -98,7 +148,10 @@ export default function BusinessResumeUpload() {
       if (!data?.extracted) throw new Error("ვერ მოხერხდა მონაცემების ამოღება");
       const ex: Extracted = { ...empty, ...data.extracted };
       setExtracted(ex);
-      setSkillsInput((ex.skills || []).join(", "));
+      setTechInput((ex.technical_skills || []).join(", "));
+      setSoftInput((ex.soft_skills || []).join(", "));
+      setAchievementsInput((ex.achievements || []).join("\n"));
+      setLanguagesInput(formatLanguages(ex.languages || []));
     } catch (e: any) {
       console.error(e);
       toast.error("ვერ მოხერხდა რეზიუმეს გაანალიზება. სცადე ხელახლა.");
@@ -119,10 +172,11 @@ export default function BusinessResumeUpload() {
     if (!user || !extracted || !file) return;
     setSaving(true);
     try {
-      const skills = skillsInput
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const technical = techInput.split(",").map((s) => s.trim()).filter(Boolean);
+      const soft = softInput.split(",").map((s) => s.trim()).filter(Boolean);
+      const achievements = achievementsInput.split("\n").map((s) => s.trim()).filter(Boolean);
+      const languages = parseLanguages(languagesInput);
+
       const row = {
         user_id: user.id,
         file_name: file.name,
@@ -130,15 +184,19 @@ export default function BusinessResumeUpload() {
         full_name: extracted.full_name || null,
         job_title: extracted.job_title || null,
         industry: extracted.industry || null,
-        skills,
+        skills: [...technical, ...soft],
+        technical_skills: technical,
+        soft_skills: soft,
         years_of_experience: extracted.years_of_experience || null,
         education: extracted.education || null,
+        graduation_year: extracted.graduation_year || null,
+        languages,
+        achievements,
       };
       const { error } = await supabase.from("business_resumes").insert(row as any);
       if (error) throw error;
       saveBusiness(user.id, { businessResumeUploaded: true } as any);
       toast.success("რეზიუმე შენახულია");
-      // Continue the flow
       const s = await pullBusinessFromSupabase(user.id);
       if (!s.businessSelfIntroductionCompleted && !s.businessSelfIntroductionSkipped) {
         navigate("/path/business/self-introduction", { replace: true });
@@ -159,6 +217,10 @@ export default function BusinessResumeUpload() {
     navigate("/path/business/self-introduction", { replace: true });
   };
 
+  const keepExisting = () => {
+    navigate("/path/business/home", { replace: true });
+  };
+
   return (
     <BusinessShell>
       <div className="mb-6">
@@ -172,8 +234,58 @@ export default function BusinessResumeUpload() {
         </p>
       </div>
 
-      {!extracted && (
+      {/* Existing resume view */}
+      {loaded && existing && !showReplace && !extracted && (
         <BizCard className="mb-4">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+            შენი ამჟამინდელი რეზიუმე
+          </p>
+          <div className="mt-3 p-4 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#1E2A44] text-white grid place-items-center text-sm font-bold shrink-0">
+                PDF
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#1E2A44] truncate">
+                  {existing.file_name || "resume"}
+                </p>
+                {(existing.full_name || existing.job_title) && (
+                  <p className="text-xs text-[#374151] mt-0.5 truncate">
+                    {[existing.full_name, existing.job_title].filter(Boolean).join(" — ")}
+                  </p>
+                )}
+                <p className="ka text-[11px] text-[#5B6473] mt-1">
+                  ატვირთულია: {formatDate(existing.created_at)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 flex items-center justify-between gap-3 flex-wrap">
+            <BizButton variant="outline" onClick={() => setShowReplace(true)}>
+              ახალი ფაილის ატვირთვა
+            </BizButton>
+            <BizButton onClick={keepExisting}>დატოვება და გაგრძელება</BizButton>
+          </div>
+        </BizCard>
+      )}
+
+      {/* Upload zone */}
+      {loaded && !extracted && (!existing || showReplace) && (
+        <BizCard className="mb-4">
+          {showReplace && (
+            <div className="mb-3 flex items-center justify-between">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                ახალი რეზიუმე ჩაანაცვლებს ძველს
+              </p>
+              <button
+                onClick={() => setShowReplace(false)}
+                className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+              >
+                გაუქმება
+              </button>
+            </div>
+          )}
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -194,7 +306,7 @@ export default function BusinessResumeUpload() {
             <p className="ka text-sm font-semibold text-[#1E2A44]">
               {parsing ? "ვამუშავებ..." : "გადმოაგდე ფაილი ან აირჩიე"}
             </p>
-            <p className="ka text-xs text-[#5B6473] mt-1">PDF ან Word (.docx) — მაქს. 8MB</p>
+            <p className="ka text-xs text-[#5B6473] mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
             <input
               ref={inputRef}
               type="file"
@@ -214,14 +326,16 @@ export default function BusinessResumeUpload() {
             </p>
           )}
 
-          <div className="mt-5 flex items-center justify-center">
-            <button
-              onClick={skip}
-              className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
-            >
-              გამოტოვება — შემდეგ ვცადო
-            </button>
-          </div>
+          {!existing && (
+            <div className="mt-5 flex items-center justify-center">
+              <button
+                onClick={skip}
+                className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+              >
+                გამოტოვება — შემდეგ ვცადო
+              </button>
+            </div>
+          )}
         </BizCard>
       )}
 
@@ -268,26 +382,50 @@ export default function BusinessResumeUpload() {
             onChange={(v) => setExtracted({ ...extracted, years_of_experience: v })}
           />
           <Field
-            label="ძირითადი უნარები (გამოყავი მძიმეებით)"
-            value={skillsInput}
-            onChange={setSkillsInput}
+            label="ტექნიკური უნარები (გამოყავი მძიმეებით)"
+            value={techInput}
+            onChange={setTechInput}
           />
           <Field
-            label="განათლება"
+            label="Soft skills (გამოყავი მძიმეებით)"
+            value={softInput}
+            onChange={setSoftInput}
+          />
+          <Field
+            label="ენები (მაგ. English (B2), German (A2))"
+            value={languagesInput}
+            onChange={setLanguagesInput}
+          />
+          <Field
+            label="განათლება — ხარისხი და უნივერსიტეტი"
             value={extracted.education}
             onChange={(v) => setExtracted({ ...extracted, education: v })}
+            textarea
+          />
+          <Field
+            label="დასრულების წელი"
+            value={extracted.graduation_year}
+            onChange={(v) => setExtracted({ ...extracted, graduation_year: v })}
+          />
+          <Field
+            label="მიღწევები და სერტიფიკატები (თითო ხაზზე ცალკე)"
+            value={achievementsInput}
+            onChange={setAchievementsInput}
             textarea
           />
 
           <div className="flex items-center justify-between mt-6 gap-3">
             <button
-              onClick={skip}
+              onClick={() => {
+                setFile(null);
+                setExtracted(null);
+              }}
               className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
             >
-              გამოტოვება
+              სხვა ფაილის ატვირთვა
             </button>
             <BizButton onClick={save} disabled={saving}>
-              {saving ? "ვინახავ..." : "შენახვა და გაგრძელება"}
+              {saving ? "ვინახავ..." : "დადასტურება და გაგრძელება"}
             </BizButton>
           </div>
         </BizCard>
@@ -316,7 +454,7 @@ function Field({
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          rows={2}
+          rows={3}
           className="w-full px-3 py-2 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] bg-white resize-none"
         />
       ) : (
