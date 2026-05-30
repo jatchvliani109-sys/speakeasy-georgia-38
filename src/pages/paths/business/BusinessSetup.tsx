@@ -48,6 +48,8 @@ export default function BusinessSetup() {
       if (cur.setupCompleted) {
         if (!cur.testCompleted) navigate("/path/business/test", { replace: true });
         else if (!cur.plan) navigate("/path/business/plan", { replace: true });
+        else if (!cur.businessResumeUploaded && !cur.businessResumeSkipped)
+          navigate("/path/business/resume", { replace: true });
         else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped)
           navigate("/path/business/self-introduction", { replace: true });
         else navigate("/path/business/home", { replace: true });
