@@ -128,6 +128,15 @@ export default function VocabularyModule() {
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
+    // Update local progress + total vocab counter
+    const newProgress = [...progress];
+    updated.forEach((row) => {
+      const idx = newProgress.findIndex((p) => p.word_key === row.word_key);
+      if (idx >= 0) newProgress[idx] = row;
+      else newProgress.push(row);
+    });
+    setProgress(newProgress);
+    setTotalVocab(newProgress.length);
 
     // Save session
     const score = answers.filter((a) => a.correct).length;
@@ -146,7 +155,40 @@ export default function VocabularyModule() {
       },
     });
 
+    setLastResults({ answers, newWords });
     setStage("results");
+  };
+
+  const startPracticeMore = () => {
+    const src = lastResults || { answers, newWords };
+    // Build a quick review pool: words user got wrong + lowest-confidence words
+    const wrongKeys = Array.from(
+      new Set(src.answers.filter((a) => !a.correct).map((a) => a.wordKey)),
+    );
+    const wrongWords = wrongKeys
+      .map((k) => src.newWords.find((w) => w.key === k) || progressToWord(progress.find((p) => p.word_key === k) as ProgressRow))
+      .filter(Boolean) as VocabWord[];
+
+    let pool: VocabWord[] = [...wrongWords];
+    if (pool.length < PRACTICE_TARGET) {
+      const lowConf = [...progress]
+        .filter((p) => !pool.find((w) => w.key === p.word_key))
+        .sort((a, b) => a.confidence - b.confidence)
+        .map((p) => progressToWord(p))
+        .filter(Boolean) as VocabWord[];
+      pool = [...pool, ...lowConf].slice(0, PRACTICE_TARGET);
+    }
+    if (!pool.length) return;
+
+    const reviewKeysNew = pool.map((w) => w.key);
+    setNewWords([]);
+    setReviewKeys(reviewKeysNew);
+    setQuiz(buildQuiz([], reviewKeysNew));
+    setQIdx(0);
+    setAnswers([]);
+    setSelected(null);
+    setRevealed(false);
+    setStage("quiz");
   };
 
   if (loading) {
