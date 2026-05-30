@@ -16,7 +16,7 @@ export default function BusinessModule() {
   if (slug === "emails") return <EmailsModule />;
   if (slug === "interview") return <InterviewModule />;
   if (slug === "meetings") return <MeetingsModule />;
-  if (slug === "presentations") return <PresentationsModule />;
+  
 
 
 
