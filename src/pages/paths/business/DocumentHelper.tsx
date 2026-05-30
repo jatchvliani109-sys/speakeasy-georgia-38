@@ -148,6 +148,7 @@ function HomeView({
 }) {
   const tools: { id: DocType; title: string; subtitle: string; icon: string }[] = [
     { id: "email", title: "პროფესიული იმეილი", subtitle: "აღწერე რა გინდა გადასცე — მიიღე გაპრიალებული იმეილი.", icon: "✉️" },
+    { id: "email_fix", title: "გაასწორე ჩემი ელ-ფოსტა", subtitle: "ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია + ახსნა.", icon: "🛠" },
     { id: "cover_letter", title: "სამოტივაციო წერილი", subtitle: "შენი რეზიუმე + სამუშაო პოზიცია → მორგებული წერილი.", icon: "📝" },
     { id: "resume_improve", title: "რეზიუმეს გაუმჯობესება", subtitle: "კონკრეტული რჩევები — სუსტი ფრაზები, keywords, ტონი.", icon: "📄" },
     { id: "bio", title: "პროფესიული ბიო", subtitle: "მოკლე, საშუალო, სრული — LinkedIn-ისთვის და სხვა.", icon: "👤" },
@@ -234,6 +235,7 @@ function LibraryView({
   const grouped = useMemo(() => {
     const map: Record<DocType, BusinessDocument[]> = {
       email: [],
+      email_fix: [],
       cover_letter: [],
       resume_improve: [],
       bio: [],
@@ -249,7 +251,7 @@ function LibraryView({
       </button>
       <h2 className="ka text-xl font-bold text-[#1E2A44] mb-3">ჩემი დოკუმენტები</h2>
       <div className="flex flex-wrap gap-2 mb-4">
-        {(["all", "email", "cover_letter", "resume_improve", "bio"] as const).map((f) => (
+        {(["all", "email", "email_fix", "cover_letter", "resume_improve", "bio"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -346,6 +348,13 @@ function ToolView({
       <>
         {Common}
         <EmailFlow profile={profile} onSaved={onSaved} />
+      </>
+    );
+  if (tool === "email_fix")
+    return (
+      <>
+        {Common}
+        <EmailFixFlow profile={profile} onSaved={onSaved} />
       </>
     );
   if (tool === "cover_letter")
@@ -447,10 +456,14 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
           <Label className="mt-4">ურთიერთობა</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {[
-              { id: "colleague", label: "კოლეგა" },
-              { id: "manager", label: "მენეჯერი" },
+              { id: "manager", label: "მენეჯერი / უფროსი" },
+              { id: "colleague", label: "თანამშრომელი" },
               { id: "client", label: "კლიენტი" },
-              { id: "stranger", label: "უცნობი / პირველად" },
+              { id: "prospect", label: "პოტენციური კლიენტი" },
+              { id: "supplier", label: "მომწოდებელი" },
+              { id: "hr", label: "HR / დამსაქმებელი" },
+              { id: "professor", label: "უნივერსიტეტი / პროფესორი" },
+              { id: "stranger", label: "უცნობი პროფესიონალი" },
             ].map((o) => (
               <Chip key={o.id} active={relationship === o.id} onClick={() => setRelationship(o.id)}>
                 {o.label}
@@ -504,6 +517,101 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
           </div>
         </BizCard>
       )}
+    </div>
+  );
+}
+
+/* ---------- Email Fix ---------- */
+function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: BusinessDocument) => void }) {
+  const { user } = useAuth();
+  const [original, setOriginal] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [tone, setTone] = useState("balanced professional");
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const r = await callDocs({
+        action: "email_fix",
+        profile,
+        original,
+        recipient,
+        purpose,
+        tone,
+      });
+      const doc = await saveDocument(user.id, {
+        doc_type: "email_fix",
+        title: r.title || "გასწორებული იმეილი",
+        content: r.content || "",
+        meta: {
+          subject: r.subject || "",
+          original,
+          changes: r.changes || [],
+          summaryKa: r.summaryKa || "",
+        },
+        inputs: { recipient, purpose, tone },
+        highlights: r.highlights || [],
+      });
+      onSaved(doc);
+    } catch (e: any) {
+      toast({ title: "შეცდომა", description: String(e?.message || e), variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="ka text-xl font-bold text-[#1E2A44] mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
+      <p className="ka text-xs text-[#5B6473] mb-4">
+        ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
+      </p>
+      <BizCard>
+        <Label>შენი იმეილი *</Label>
+        <textarea
+          value={original}
+          onChange={(e) => setOriginal(e.target.value)}
+          rows={10}
+          placeholder="ჩასვი აქ შენი არსებული იმეილი..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">ვის ეგზავნება? (არასავალდებულო)</Label>
+        <input
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+          placeholder="მაგ. მენეჯერი, კლიენტი, HR..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">რა არის მიზანი? (არასავალდებულო)</Label>
+        <textarea
+          value={purpose}
+          onChange={(e) => setPurpose(e.target.value)}
+          rows={2}
+          placeholder="რის გადაცემა გინდა ან რა შედეგი გინდა მიიღო..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">ტონი</Label>
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          {[
+            { id: "balanced professional", label: "დაბალანსებული პროფესიული" },
+            { id: "formal", label: "ფორმალური" },
+            { id: "friendly", label: "მეგობრული" },
+            { id: "direct", label: "პირდაპირი" },
+          ].map((o) => (
+            <Chip key={o.id} active={tone === o.id} onClick={() => setTone(o.id)}>
+              {o.label}
+            </Chip>
+          ))}
+        </div>
+        <div className="flex justify-end mt-4">
+          <BizButton onClick={generate} disabled={loading || !original.trim()}>
+            {loading ? "ვამუშავებ..." : "გასწორება ✨"}
+          </BizButton>
+        </div>
+      </BizCard>
     </div>
   );
 }
@@ -876,6 +984,65 @@ function DocView({
           />
         )}
       </article>
+
+      {/* Email Fix: before/after + changes */}
+      {doc.doc_type === "email_fix" && !editing && (() => {
+        const meta = (doc.meta as any) || {};
+        const original: string = meta.original || "";
+        const changes: { before: string; after: string; whyKa: string }[] = Array.isArray(meta.changes) ? meta.changes : [];
+        return (
+          <>
+            {meta.summaryKa && (
+              <BizCard className="mt-4 bg-[#F0F7F4] border-[#CDE3D8]">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#0F766E] font-semibold mb-1">შეჯამება</p>
+                <p className="ka text-xs text-[#1E2A44] leading-relaxed">{meta.summaryKa}</p>
+              </BizCard>
+            )}
+            <section className="mt-4">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+                შედარება — ორიგინალი / გაუმჯობესებული
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-white border border-[#E7E2D5] rounded-2xl p-4">
+                  <p className="ka text-[10px] uppercase tracking-wider text-[#B45309] font-semibold mb-2">ორიგინალი</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#1E2A44] leading-relaxed">{original}</p>
+                </div>
+                <div className="bg-white border border-[#CDE3D8] rounded-2xl p-4">
+                  <p className="ka text-[10px] uppercase tracking-wider text-[#0F766E] font-semibold mb-2">გაუმჯობესებული</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#1E2A44] leading-relaxed">{doc.content}</p>
+                </div>
+              </div>
+            </section>
+            {changes.length > 0 && (
+              <section className="mt-4">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+                  რა გასწორდა და რატომ
+                </p>
+                <ul className="space-y-2">
+                  {changes.map((c, i) => (
+                    <li key={i} className="bg-white border border-[#E7E2D5] rounded-xl p-3">
+                      <div className="text-[11px] grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="bg-[#FEF3E2] rounded-md px-2 py-1.5">
+                          <span className="ka font-semibold text-[#B45309]">Before: </span>
+                          <span className="text-[#1E2A44]">{c.before}</span>
+                        </div>
+                        <div className="bg-[#ECFDF5] rounded-md px-2 py-1.5">
+                          <span className="ka font-semibold text-[#0F766E]">After: </span>
+                          <span className="text-[#1E2A44]">{c.after}</span>
+                        </div>
+                      </div>
+                      {c.whyKa && (
+                        <p className="ka text-[11px] text-[#5B6473] mt-2">↳ {c.whyKa}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        );
+      })()}
+
 
       {/* Bio versions quick pick */}
       {doc.doc_type === "bio" && !editing && (

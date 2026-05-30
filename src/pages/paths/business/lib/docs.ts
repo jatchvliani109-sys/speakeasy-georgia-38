@@ -2,13 +2,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { BusinessState } from "./state";
 
-export type DocType = "email" | "cover_letter" | "resume_improve" | "bio";
+export type DocType = "email" | "cover_letter" | "resume_improve" | "bio" | "email_fix";
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
   email: "პროფესიული იმეილი",
   cover_letter: "სამოტივაციო წერილი",
   resume_improve: "რეზიუმეს გაუმჯობესება",
   bio: "პროფესიული ბიო",
+  email_fix: "გასწორებული იმეილი",
 };
 
 export const DOC_TYPE_ICONS: Record<DocType, string> = {
@@ -16,6 +17,7 @@ export const DOC_TYPE_ICONS: Record<DocType, string> = {
   cover_letter: "📝",
   resume_improve: "📄",
   bio: "👤",
+  email_fix: "🛠",
 };
 
 export type Highlight = { phrase: string; whyKa: string };
