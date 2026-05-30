@@ -985,6 +985,65 @@ function DocView({
         )}
       </article>
 
+      {/* Email Fix: before/after + changes */}
+      {doc.doc_type === "email_fix" && !editing && (() => {
+        const meta = (doc.meta as any) || {};
+        const original: string = meta.original || "";
+        const changes: { before: string; after: string; whyKa: string }[] = Array.isArray(meta.changes) ? meta.changes : [];
+        return (
+          <>
+            {meta.summaryKa && (
+              <BizCard className="mt-4 bg-[#F0F7F4] border-[#CDE3D8]">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#0F766E] font-semibold mb-1">შეჯამება</p>
+                <p className="ka text-xs text-[#1E2A44] leading-relaxed">{meta.summaryKa}</p>
+              </BizCard>
+            )}
+            <section className="mt-4">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+                შედარება — ორიგინალი / გაუმჯობესებული
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-white border border-[#E7E2D5] rounded-2xl p-4">
+                  <p className="ka text-[10px] uppercase tracking-wider text-[#B45309] font-semibold mb-2">ორიგინალი</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#1E2A44] leading-relaxed">{original}</p>
+                </div>
+                <div className="bg-white border border-[#CDE3D8] rounded-2xl p-4">
+                  <p className="ka text-[10px] uppercase tracking-wider text-[#0F766E] font-semibold mb-2">გაუმჯობესებული</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#1E2A44] leading-relaxed">{doc.content}</p>
+                </div>
+              </div>
+            </section>
+            {changes.length > 0 && (
+              <section className="mt-4">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+                  რა გასწორდა და რატომ
+                </p>
+                <ul className="space-y-2">
+                  {changes.map((c, i) => (
+                    <li key={i} className="bg-white border border-[#E7E2D5] rounded-xl p-3">
+                      <div className="text-[11px] grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="bg-[#FEF3E2] rounded-md px-2 py-1.5">
+                          <span className="ka font-semibold text-[#B45309]">Before: </span>
+                          <span className="text-[#1E2A44]">{c.before}</span>
+                        </div>
+                        <div className="bg-[#ECFDF5] rounded-md px-2 py-1.5">
+                          <span className="ka font-semibold text-[#0F766E]">After: </span>
+                          <span className="text-[#1E2A44]">{c.after}</span>
+                        </div>
+                      </div>
+                      {c.whyKa && (
+                        <p className="ka text-[11px] text-[#5B6473] mt-2">↳ {c.whyKa}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        );
+      })()}
+
+
       {/* Bio versions quick pick */}
       {doc.doc_type === "bio" && !editing && (
         <div className="flex gap-2 mt-3 flex-wrap">
