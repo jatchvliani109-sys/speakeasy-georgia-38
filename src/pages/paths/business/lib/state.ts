@@ -247,15 +247,15 @@ export const BUSINESS_MODULES: BusinessModule[] = [
 
 // Map main priority -> recommended module
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
-  university: "presentations",
+  university: "interview",
   job_interview: "interview",
   work_communication: "meetings",
   remote_work: "emails",
   emails_writing: "emails",
-  presentations: "presentations",
   business_vocab: "vocabulary",
   general_business: "interview",
 };
+
 
 const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
   university: [
