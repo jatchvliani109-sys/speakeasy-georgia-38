@@ -238,12 +238,6 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     icon: "🗓️",
   },
   {
-    slug: "presentations",
-    title: "პრეზენტაციები",
-    description: "ივარჯიშე იდეების, მონაცემების და ბიზნეს თემების ახსნაში.",
-    icon: "📊",
-  },
-  {
     slug: "vocabulary",
     title: "ბიზნეს ლექსიკა",
     description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
