@@ -207,6 +207,7 @@ export default function BusinessResumeUpload() {
         user_id: user.id,
         file_name: file.name,
         mime_type: file.type,
+        storage_path: storagePath,
         full_name: extracted.full_name || null,
         job_title: extracted.job_title || null,
         industry: extracted.industry || null,
