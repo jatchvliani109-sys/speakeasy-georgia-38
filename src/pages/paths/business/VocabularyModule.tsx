@@ -20,7 +20,8 @@ import type { VocabWord } from "./lib/vocabBank";
 
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
 
-const PRACTICE_TARGET = 6;
+const PRACTICE_TARGET = 12;
+const AUTO_ADVANCE_MS = 1400;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
