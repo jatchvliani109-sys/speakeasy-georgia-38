@@ -4,6 +4,7 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 type Action =
   | "email_write"
+  | "email_fix"
   | "cover_letter"
   | "resume_improve"
   | "bio_write"
