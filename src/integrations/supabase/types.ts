@@ -252,6 +252,7 @@ export type Database = {
           raw_text: string | null
           skills: Json
           soft_skills: Json
+          storage_path: string | null
           technical_skills: Json
           updated_at: string
           user_id: string
@@ -272,6 +273,7 @@ export type Database = {
           raw_text?: string | null
           skills?: Json
           soft_skills?: Json
+          storage_path?: string | null
           technical_skills?: Json
           updated_at?: string
           user_id: string
@@ -292,6 +294,7 @@ export type Database = {
           raw_text?: string | null
           skills?: Json
           soft_skills?: Json
+          storage_path?: string | null
           technical_skills?: Json
           updated_at?: string
           user_id?: string
