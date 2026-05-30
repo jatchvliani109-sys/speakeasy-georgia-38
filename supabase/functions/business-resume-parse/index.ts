@@ -1,7 +1,8 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-// @ts-ignore - mammoth ships CJS, deno can load via npm specifier
-import mammoth from "npm:mammoth@1.8.0";
+// @ts-ignore - jszip via npm
+import JSZip from "npm:jszip@3.10.1";
 
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 type LanguageEntry = { name: string; level: string };
@@ -21,48 +22,82 @@ type ExtractedResume = {
 };
 
 const SYSTEM_PROMPT = `You are a precise multilingual resume parser. The resume may contain Georgian (ქართული), English, or both.
-Read carefully and return a STRICT JSON object with these keys:
-- full_name (string) — preserve the original script exactly. If the name is written in Georgian (e.g. "ნინო ბერიძე"), return it in Georgian — do NOT transliterate or translate.
-- job_title (string: current or most recent role, in the original language used)
+Return a STRICT JSON object with these keys:
+- full_name (string) — preserve original script exactly. If Georgian (e.g. "ნინო ბერიძე"), keep Georgian — do NOT transliterate.
+- job_title (string: current or most recent role)
 - industry (string: short field/industry label in English)
-- technical_skills (array of 3-10 short technical/hard skills in English where reasonable)
-- soft_skills (array of 2-6 short soft skills in English)
+- technical_skills (array of 3-12 short hard skills in English where reasonable)
+- soft_skills (array of 2-8 short soft skills in English)
 - years_of_experience (string like "5 years", "Entry-level", or "3+ years")
 - education (string: highest degree + institution, one line, original language preserved)
-- graduation_year (string like "2021" or "" if not stated)
-- languages (array of { "name": "English", "level": "B2" } — include proficiency if mentioned, else empty string for level)
-- achievements (array of 0-6 short strings: notable achievements, certifications, awards, publications)
+- graduation_year (string like "2021" or "")
+- languages (array of { "name": "English", "level": "B2" } — include proficiency if mentioned, else empty string)
+- achievements (array of 0-8 short strings: notable achievements, certifications, awards, publications)
 
 Rules:
 - Preserve Georgian characters exactly (UTF-8). Do NOT romanize Georgian names.
 - If a field is missing, return an empty string (or empty array).
 - Do not invent information.
-- Respond ONLY with raw JSON, no markdown.`;
+- Respond ONLY with raw JSON.`;
 
-async function parseDocxToText(base64: string): Promise<string> {
-  const bin = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const result = await mammoth.extractRawText({ arrayBuffer: bin.buffer });
-  return (result?.value || "").trim();
+function base64ToBytes(b64: string): Uint8Array {
+  const clean = b64.replace(/\s/g, "");
+  const bin = atob(clean);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
 }
 
-async function extractWithAI(payload: {
-  textContent?: string;
-  pdfBase64?: string;
-}): Promise<ExtractedResume> {
-  const userParts: any[] = [];
-  if (payload.pdfBase64) {
-    userParts.push({
-      type: "file",
-      file: { filename: "resume.pdf", file_data: `data:application/pdf;base64,${payload.pdfBase64}` },
-    });
-    userParts.push({ type: "text", text: "Extract the resume fields as instructed. Preserve Georgian names exactly." });
-  } else {
-    userParts.push({
-      type: "text",
-      text: `Resume text:\n\n${payload.textContent}\n\nExtract the fields as instructed. Preserve Georgian names exactly.`,
-    });
-  }
+// Extract plain text from a .docx by reading word/document.xml inside the zip.
+async function extractDocxText(bytes: Uint8Array): Promise<string> {
+  const zip = await JSZip.loadAsync(bytes);
+  const doc = zip.file("word/document.xml");
+  if (!doc) throw new Error("Invalid .docx (missing word/document.xml)");
+  const xml: string = await doc.async("string");
+  // Replace paragraph/break tags with newlines, then strip remaining tags.
+  const withBreaks = xml
+    .replace(/<w:p[\s>][^>]*\/?>/g, "\n")
+    .replace(/<\/w:p>/g, "\n")
+    .replace(/<w:br[^>]*\/?>/g, "\n")
+    .replace(/<w:tab[^>]*\/?>/g, "\t");
+  const stripped = withBreaks.replace(/<[^>]+>/g, "");
+  // Decode common XML entities
+  const decoded = stripped
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_m, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_m, d) => String.fromCodePoint(parseInt(d, 10)));
+  return decoded.replace(/\n{3,}/g, "\n\n").trim();
+}
 
+async function callOpenAI(userParts: any[]): Promise<string> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userParts },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`OpenAI error ${res.status}: ${t}`);
+  }
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content || "{}";
+}
+
+async function callLovableFallback(userParts: any[]): Promise<string> {
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -78,28 +113,28 @@ async function extractWithAI(payload: {
       response_format: { type: "json_object" },
     }),
   });
-
   if (!res.ok) {
     const t = await res.text();
     throw new Error(`AI gateway error ${res.status}: ${t}`);
   }
   const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content || "{}";
+  return data?.choices?.[0]?.message?.content || "{}";
+}
+
+function normalise(raw: string): ExtractedResume {
   let parsed: any = {};
   try {
-    parsed = JSON.parse(content);
+    parsed = JSON.parse(raw);
   } catch {
-    const match = content.match(/\{[\s\S]*\}/);
-    parsed = match ? JSON.parse(match[0]) : {};
+    const m = raw.match(/\{[\s\S]*\}/);
+    parsed = m ? JSON.parse(m[0]) : {};
   }
-
   const tech: string[] = Array.isArray(parsed.technical_skills)
-    ? parsed.technical_skills.map((s: any) => String(s)).slice(0, 12)
+    ? parsed.technical_skills.map((s: any) => String(s)).slice(0, 14)
     : [];
   const soft: string[] = Array.isArray(parsed.soft_skills)
-    ? parsed.soft_skills.map((s: any) => String(s)).slice(0, 8)
+    ? parsed.soft_skills.map((s: any) => String(s)).slice(0, 10)
     : [];
-
   const languages: LanguageEntry[] = Array.isArray(parsed.languages)
     ? parsed.languages
         .map((l: any) => {
@@ -107,9 +142,8 @@ async function extractWithAI(payload: {
           return { name: String(l?.name || ""), level: String(l?.level || "") };
         })
         .filter((l: LanguageEntry) => l.name)
-        .slice(0, 8)
+        .slice(0, 10)
     : [];
-
   return {
     full_name: String(parsed.full_name || ""),
     job_title: String(parsed.job_title || ""),
@@ -122,7 +156,7 @@ async function extractWithAI(payload: {
     graduation_year: String(parsed.graduation_year || ""),
     languages,
     achievements: Array.isArray(parsed.achievements)
-      ? parsed.achievements.map((s: any) => String(s)).slice(0, 8)
+      ? parsed.achievements.map((s: any) => String(s)).slice(0, 10)
       : [],
   };
 }
@@ -131,7 +165,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
+      throw new Error("No AI provider configured");
+    }
 
     const body = await req.json();
     const fileBase64: string = body?.fileBase64;
@@ -145,10 +181,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const isPdf = mimeType.includes("pdf") || fileName.toLowerCase().endsWith(".pdf");
+    const lower = fileName.toLowerCase();
+    const isPdf = mimeType.includes("pdf") || lower.endsWith(".pdf");
     const isDocx =
-      mimeType.includes("officedocument.wordprocessingml") ||
-      fileName.toLowerCase().endsWith(".docx");
+      mimeType.includes("officedocument.wordprocessingml") || lower.endsWith(".docx");
 
     if (!isPdf && !isDocx) {
       return new Response(JSON.stringify({ error: "Unsupported file type" }), {
@@ -158,20 +194,51 @@ Deno.serve(async (req) => {
     }
 
     let rawText = "";
-    let extracted: ExtractedResume;
+    let aiContent = "";
 
     if (isDocx) {
-      rawText = await parseDocxToText(fileBase64);
+      const bytes = base64ToBytes(fileBase64);
+      rawText = await extractDocxText(bytes);
       if (!rawText) throw new Error("Could not read text from DOCX");
-      extracted = await extractWithAI({ textContent: rawText });
+      const parts = [
+        {
+          type: "text",
+          text: `Resume text:\n\n${rawText}\n\nExtract the fields as instructed. Preserve Georgian names exactly.`,
+        },
+      ];
+      try {
+        if (OPENAI_API_KEY) aiContent = await callOpenAI(parts);
+        else aiContent = await callLovableFallback(parts);
+      } catch (e) {
+        console.error("primary AI failed, trying fallback", e);
+        if (LOVABLE_API_KEY) aiContent = await callLovableFallback(parts);
+        else throw e;
+      }
     } else {
-      extracted = await extractWithAI({ pdfBase64: fileBase64 });
+      // PDF
+      const dataUrl = `data:application/pdf;base64,${fileBase64}`;
+      const openAiParts = [
+        {
+          type: "file",
+          file: { filename: fileName || "resume.pdf", file_data: dataUrl },
+        },
+        { type: "text", text: "Extract the resume fields as instructed. Preserve Georgian names exactly." },
+      ];
+      try {
+        if (OPENAI_API_KEY) aiContent = await callOpenAI(openAiParts);
+        else throw new Error("openai not configured");
+      } catch (e) {
+        console.error("OpenAI PDF parse failed, falling back to Lovable Gemini", e);
+        if (!LOVABLE_API_KEY) throw e;
+        aiContent = await callLovableFallback(openAiParts);
+      }
     }
 
-    return new Response(
-      JSON.stringify({ extracted, rawText }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    const extracted = normalise(aiContent);
+
+    return new Response(JSON.stringify({ extracted, rawText }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("business-resume-parse error", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
