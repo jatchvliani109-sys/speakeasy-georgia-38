@@ -129,7 +129,7 @@ export function planSession(
   // Surface difficult words first: lower confidence wins.
   dueRows.sort((a, b) => a.confidence - b.confidence);
 
-  const reviewKeys = dueRows.slice(0, 8).map((r) => r.word_key);
+  const reviewKeys = dueRows.slice(0, 10).map((r) => r.word_key);
 
   // Determine current core week by total mastered count
   const masteredCore = progress.filter(
@@ -143,22 +143,23 @@ export function planSession(
   const fieldCandidates = fieldWordsFor(fields, goals).filter((w) => !seen.has(w.key));
 
   const newWords: VocabWord[] = [];
-  // Start with up to 4 core, fill with 2 field
+  // Up to 6 core, fill with up to 4 field words → 10 total
   for (const w of coreCandidates) {
-    if (newWords.length >= 4) break;
-    newWords.push(w);
-  }
-  for (const w of fieldCandidates) {
     if (newWords.length >= 6) break;
     newWords.push(w);
   }
+  for (const w of fieldCandidates) {
+    if (newWords.length >= 10) break;
+    newWords.push(w);
+  }
   // If still short, top up with any unseen core regardless of week
-  if (newWords.length < 5) {
+  if (newWords.length < 8) {
     for (const w of CORE_WORDS) {
-      if (newWords.length >= 6) break;
+      if (newWords.length >= 10) break;
       if (!seen.has(w.key) && !newWords.includes(w)) newWords.push(w);
     }
   }
+
   return { newWords, reviewKeys };
 }
 
