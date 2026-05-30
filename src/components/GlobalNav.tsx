@@ -36,7 +36,7 @@ const GROUPS: NavGroup[] = [
       { to: "/path/business/module/interview", label: "Job Interview" },
       { to: "/path/business/module/emails", label: "Work Emails" },
       { to: "/path/business/module/meetings", label: "Meetings" },
-      { to: "/path/business/module/presentations", label: "Presentations" },
+      
       { to: "/path/business/module/vocabulary", label: "Business Vocabulary" },
     ],
   },
