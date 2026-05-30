@@ -63,7 +63,14 @@ export default function VocabularyModule() {
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
-        setStage("empty");
+        const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
+        if (fallback.length) {
+          setReviewWords(fallback);
+          setReviewMode(true);
+          setStage("reviewIntro");
+        } else {
+          setStage("empty");
+        }
       }
       setLoading(false);
     })();
