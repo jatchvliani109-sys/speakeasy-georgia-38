@@ -50,7 +50,7 @@ export default function BusinessDictionary() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [emails, interviews, meetings, presentations] = await Promise.all([
+      const [emails, interviews, meetings] = await Promise.all([
         supabase
           .from("business_email_sessions")
           .select("id, email_type, scenario_key, completed_at, session_data")
@@ -69,12 +69,6 @@ export default function BusinessDictionary() {
           .eq("user_id", user.id)
           .eq("completed", true)
           .order("completed_at", { ascending: false }),
-        supabase
-          .from("business_presentation_sessions")
-          .select("id, presentation_topic, scenario_key, completed_at, session_data")
-          .eq("user_id", user.id)
-          .eq("completed", true)
-          .order("completed_at", { ascending: false }),
       ]);
       if (cancelled) return;
       const emailRows: SessionRow[] = (emails.data || []).map((r: any) => ({
@@ -86,12 +80,10 @@ export default function BusinessDictionary() {
       const meetingRows: SessionRow[] = (meetings.data || []).map((r: any) => ({
         id: r.id, kind: "meeting", email_type: r.meeting_type, scenario_key: r.scenario_key, completed_at: r.completed_at, session_data: r.session_data,
       }));
-      const presRows: SessionRow[] = (presentations.data || []).map((r: any) => ({
-        id: r.id, kind: "presentation", email_type: r.presentation_topic, scenario_key: r.scenario_key, completed_at: r.completed_at, session_data: r.session_data,
-      }));
-      const list = [...emailRows, ...interviewRows, ...meetingRows, ...presRows].sort((a, b) =>
+      const list = [...emailRows, ...interviewRows, ...meetingRows].sort((a, b) =>
         (b.completed_at || "").localeCompare(a.completed_at || ""),
       );
+
       setRows(list);
       if (list.length) setOpen({ [list[0].id]: true });
       setLoading(false);
