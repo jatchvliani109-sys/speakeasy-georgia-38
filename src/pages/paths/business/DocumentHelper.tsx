@@ -449,10 +449,14 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
           <Label className="mt-4">ურთიერთობა</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {[
-              { id: "colleague", label: "კოლეგა" },
-              { id: "manager", label: "მენეჯერი" },
+              { id: "manager", label: "მენეჯერი / უფროსი" },
+              { id: "colleague", label: "თანამშრომელი" },
               { id: "client", label: "კლიენტი" },
-              { id: "stranger", label: "უცნობი / პირველად" },
+              { id: "prospect", label: "პოტენციური კლიენტი" },
+              { id: "supplier", label: "მომწოდებელი" },
+              { id: "hr", label: "HR / დამსაქმებელი" },
+              { id: "professor", label: "უნივერსიტეტი / პროფესორი" },
+              { id: "stranger", label: "უცნობი პროფესიონალი" },
             ].map((o) => (
               <Chip key={o.id} active={relationship === o.id} onClick={() => setRelationship(o.id)}>
                 {o.label}
