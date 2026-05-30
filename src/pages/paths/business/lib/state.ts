@@ -6,9 +6,9 @@ export type BusinessGoal =
   | "work_communication"
   | "remote_work"
   | "emails_writing"
-  | "presentations"
   | "business_vocab"
   | "general_business";
+
 
 export type BusinessPriority = BusinessGoal;
 
