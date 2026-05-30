@@ -357,6 +357,36 @@ function IntroCard({
   );
 }
 
+function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () => void }) {
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] p-6 shadow-[0_12px_32px_-12px_rgba(30,42,68,0.45)]">
+      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/15 blur-2xl pointer-events-none" />
+      <div className="relative">
+        <p className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/20 text-[#F2D680] px-2 py-1 rounded-md font-semibold inline-block">
+          გამეორების დღე
+        </p>
+        <h2 className="ka text-xl font-bold mt-3 leading-snug">
+          {words.length} სიტყვის გამეორება
+        </h2>
+        <p className="ka text-sm text-[#F7F1E3]/80 mt-2 leading-relaxed">
+          ახალი სიტყვები ხვალ გემატება. დღეს გაიმეორე ის სიტყვები, რომლებიც ყველაზე მეტ გამეორებას საჭიროებს.
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <Mini label="სიტყვები" value={`${words.length}`} />
+          <Mini label="კითხვები" value="~20" />
+          <Mini label="დრო" value="~7 წთ" />
+        </div>
+        <button
+          onClick={onStart}
+          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+        >
+          გამეორების დაწყება →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-[#F7F1E3]/10 rounded-lg px-3 py-2">
