@@ -16,7 +16,7 @@ import {
   pullBusinessFromSupabase,
   resetBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep, meetingStep, presentationStep } from "./lib/curriculum";
+import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
