@@ -7,12 +7,13 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 type Vocab = { en: string; ka: string; exampleEn?: string; exampleKa?: string };
 type SessionRow = {
   id: string;
-  kind: "email" | "interview" | "meeting" | "presentation";
+  kind: "email" | "interview" | "meeting";
   email_type: string;
   scenario_key: string;
   completed_at: string | null;
   session_data: any;
 };
+
 
 const TYPE_LABELS: Record<string, string> = {
   follow_up: "Follow-up",
