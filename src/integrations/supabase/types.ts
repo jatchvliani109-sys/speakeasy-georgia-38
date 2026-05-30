@@ -238,46 +238,61 @@ export type Database = {
       }
       business_resumes: {
         Row: {
+          achievements: Json
           created_at: string
           education: string | null
           file_name: string | null
           full_name: string | null
+          graduation_year: string | null
           id: string
           industry: string | null
           job_title: string | null
+          languages: Json
           mime_type: string | null
           raw_text: string | null
           skills: Json
+          soft_skills: Json
+          technical_skills: Json
           updated_at: string
           user_id: string
           years_of_experience: string | null
         }
         Insert: {
+          achievements?: Json
           created_at?: string
           education?: string | null
           file_name?: string | null
           full_name?: string | null
+          graduation_year?: string | null
           id?: string
           industry?: string | null
           job_title?: string | null
+          languages?: Json
           mime_type?: string | null
           raw_text?: string | null
           skills?: Json
+          soft_skills?: Json
+          technical_skills?: Json
           updated_at?: string
           user_id: string
           years_of_experience?: string | null
         }
         Update: {
+          achievements?: Json
           created_at?: string
           education?: string | null
           file_name?: string | null
           full_name?: string | null
+          graduation_year?: string | null
           id?: string
           industry?: string | null
           job_title?: string | null
+          languages?: Json
           mime_type?: string | null
           raw_text?: string | null
           skills?: Json
+          soft_skills?: Json
+          technical_skills?: Json
           updated_at?: string
           user_id?: string
           years_of_experience?: string | null
