@@ -197,6 +197,54 @@ export type Database = {
         }
         Relationships: []
       }
+      business_resumes: {
+        Row: {
+          created_at: string
+          education: string | null
+          file_name: string | null
+          full_name: string | null
+          id: string
+          industry: string | null
+          job_title: string | null
+          mime_type: string | null
+          raw_text: string | null
+          skills: Json
+          updated_at: string
+          user_id: string
+          years_of_experience: string | null
+        }
+        Insert: {
+          created_at?: string
+          education?: string | null
+          file_name?: string | null
+          full_name?: string | null
+          id?: string
+          industry?: string | null
+          job_title?: string | null
+          mime_type?: string | null
+          raw_text?: string | null
+          skills?: Json
+          updated_at?: string
+          user_id: string
+          years_of_experience?: string | null
+        }
+        Update: {
+          created_at?: string
+          education?: string | null
+          file_name?: string | null
+          full_name?: string | null
+          id?: string
+          industry?: string | null
+          job_title?: string | null
+          mime_type?: string | null
+          raw_text?: string | null
+          skills?: Json
+          updated_at?: string
+          user_id?: string
+          years_of_experience?: string | null
+        }
+        Relationships: []
+      }
       business_state: {
         Row: {
           created_at: string

@@ -129,6 +129,26 @@ export default function SelfIntroduction() {
     (async () => {
       await pullBusinessFromSupabase(user.id);
       if (!cancelled) setSaved(loadSelfIntros(user.id));
+      // Pre-fill from latest resume if user hasn't started typing yet
+      const { data: resume } = await supabase
+        .from("business_resumes")
+        .select("full_name, job_title, industry, skills, years_of_experience")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled || !resume) return;
+      setInputs((prev) => {
+        if (prev.name || prev.field || prev.skills || prev.experience) return prev;
+        const skillsArr = Array.isArray(resume.skills) ? resume.skills : [];
+        return {
+          ...prev,
+          name: prev.name || resume.full_name || "",
+          field: prev.field || resume.industry || resume.job_title || "",
+          experience: prev.experience || resume.years_of_experience || "",
+          skills: prev.skills || skillsArr.join(", "),
+        };
+      });
     })();
     return () => { cancelled = true; };
   }, [user]);

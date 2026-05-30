@@ -80,6 +80,7 @@ export default function BusinessHome() {
   const navigate = useNavigate();
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
+  const [hasResume, setHasResume] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user) return;
@@ -106,6 +107,15 @@ export default function BusinessHome() {
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
       });
+
+      const { data: resumeRow } = await supabase
+        .from("business_resumes")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setHasResume(!!resumeRow?.id);
+
 
     })();
     return () => {
@@ -363,6 +373,30 @@ export default function BusinessHome() {
                   className="ka text-xs text-[#1E2A44] underline underline-offset-2 shrink-0 mt-1"
                 >
                   დაწყება →
+                </Link>
+              </div>
+            </BizCard>
+          )}
+
+          {!hasResume && (
+            <BizCard className="mb-5 bg-[#FAF7F0] border-dashed">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                    პერსონალიზაცია
+                  </p>
+                  <p className="ka text-sm font-semibold text-[#1E2A44] mt-1">
+                    ატვირთე რეზიუმე
+                  </p>
+                  <p className="ka text-xs text-[#5B6473] mt-1">
+                    გაკვეთილები მოერგება შენს პროფესიულ გამოცდილებას.
+                  </p>
+                </div>
+                <Link
+                  to="/path/business/resume"
+                  className="ka text-xs text-[#1E2A44] underline underline-offset-2 shrink-0 mt-1"
+                >
+                  ატვირთვა →
                 </Link>
               </div>
             </BizCard>

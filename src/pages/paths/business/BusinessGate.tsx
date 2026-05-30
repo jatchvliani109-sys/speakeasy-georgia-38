@@ -16,6 +16,7 @@ export default function BusinessGate() {
       if (!s.testCompleted || !s.level) navigate("/path/business/test", { replace: true });
       else if (!s.setupCompleted) navigate("/path/business/setup", { replace: true });
       else if (!s.plan) navigate("/path/business/plan", { replace: true });
+      else if (!s.businessResumeUploaded && !s.businessResumeSkipped) navigate("/path/business/resume", { replace: true });
       else if (!s.businessSelfIntroductionCompleted && !s.businessSelfIntroductionSkipped) navigate("/path/business/self-introduction", { replace: true });
       else navigate("/path/business/home", { replace: true });
     })();
