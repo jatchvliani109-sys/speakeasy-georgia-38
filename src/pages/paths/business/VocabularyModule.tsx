@@ -276,11 +276,14 @@ export default function VocabularyModule() {
         </>
       )}
 
-      {stage === "results" && (
+      {stage === "results" && lastResults && (
         <Results
-          answers={answers}
-          newWords={newWords}
-          onAgain={() => window.location.reload()}
+          answers={lastResults.answers}
+          newWords={lastResults.newWords}
+          reviewCount={reviewKeys.length}
+          totalVocab={totalVocab}
+          canPracticeMore={lastResults.answers.some((a) => !a.correct) || progress.length > 0}
+          onPracticeMore={startPracticeMore}
         />
       )}
     </BusinessShell>
