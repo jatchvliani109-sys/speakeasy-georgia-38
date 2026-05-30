@@ -6,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import {
   ALL_WORDS,
+  ALL_CORE_WORDS,
   CORE_WORDS,
   fieldWordsFor,
   findWord,
