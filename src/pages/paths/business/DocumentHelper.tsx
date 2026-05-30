@@ -521,6 +521,101 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
   );
 }
 
+/* ---------- Email Fix ---------- */
+function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: BusinessDocument) => void }) {
+  const { user } = useAuth();
+  const [original, setOriginal] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [tone, setTone] = useState("balanced professional");
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const r = await callDocs({
+        action: "email_fix",
+        profile,
+        original,
+        recipient,
+        purpose,
+        tone,
+      });
+      const doc = await saveDocument(user.id, {
+        doc_type: "email_fix",
+        title: r.title || "გასწორებული იმეილი",
+        content: r.content || "",
+        meta: {
+          subject: r.subject || "",
+          original,
+          changes: r.changes || [],
+          summaryKa: r.summaryKa || "",
+        },
+        inputs: { recipient, purpose, tone },
+        highlights: r.highlights || [],
+      });
+      onSaved(doc);
+    } catch (e: any) {
+      toast({ title: "შეცდომა", description: String(e?.message || e), variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="ka text-xl font-bold text-[#1E2A44] mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
+      <p className="ka text-xs text-[#5B6473] mb-4">
+        ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
+      </p>
+      <BizCard>
+        <Label>შენი იმეილი *</Label>
+        <textarea
+          value={original}
+          onChange={(e) => setOriginal(e.target.value)}
+          rows={10}
+          placeholder="ჩასვი აქ შენი არსებული იმეილი..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">ვის ეგზავნება? (არასავალდებულო)</Label>
+        <input
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+          placeholder="მაგ. მენეჯერი, კლიენტი, HR..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">რა არის მიზანი? (არასავალდებულო)</Label>
+        <textarea
+          value={purpose}
+          onChange={(e) => setPurpose(e.target.value)}
+          rows={2}
+          placeholder="რის გადაცემა გინდა ან რა შედეგი გინდა მიიღო..."
+          className="w-full mt-2 rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#1E2A44]"
+        />
+        <Label className="mt-4">ტონი</Label>
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          {[
+            { id: "balanced professional", label: "დაბალანსებული პროფესიული" },
+            { id: "formal", label: "ფორმალური" },
+            { id: "friendly", label: "მეგობრული" },
+            { id: "direct", label: "პირდაპირი" },
+          ].map((o) => (
+            <Chip key={o.id} active={tone === o.id} onClick={() => setTone(o.id)}>
+              {o.label}
+            </Chip>
+          ))}
+        </div>
+        <div className="flex justify-end mt-4">
+          <BizButton onClick={generate} disabled={loading || !original.trim()}>
+            {loading ? "ვამუშავებ..." : "გასწორება ✨"}
+          </BizButton>
+        </div>
+      </BizCard>
+    </div>
+  );
+}
+
 /* ---------- Cover Letter ---------- */
 function CoverLetterFlow({
   profile,
