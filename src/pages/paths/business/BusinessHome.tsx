@@ -519,6 +519,7 @@ export default function BusinessHome() {
                   <span>ჩემი ლექსიკონი</span>
                 </span>
                 <span>→</span>
+              </Link>
             </BizCard>
           </section>
         </>
