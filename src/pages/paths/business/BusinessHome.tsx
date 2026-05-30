@@ -181,9 +181,8 @@ export default function BusinessHome() {
         ? interviewStep(progress.interview?.count ?? 0)
         : focusModuleSlug === "meetings"
           ? meetingStep(progress.meetings?.count ?? 0)
-          : focusModuleSlug === "presentations"
-            ? presentationStep(progress.presentations?.count ?? 0)
-            : null;
+          : null;
+
 
   const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
   const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
