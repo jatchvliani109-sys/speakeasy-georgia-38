@@ -44,6 +44,8 @@ export default function VocabularyModule() {
     answers: { wordKey: string; correct: boolean }[];
     newWords: VocabWord[];
   } | null>(null);
+  const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
+  const [reviewMode, setReviewMode] = useState(false);
 
   useEffect(() => {
     if (!user) return;
