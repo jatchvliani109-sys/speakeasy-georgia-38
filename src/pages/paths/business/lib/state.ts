@@ -293,13 +293,6 @@ const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
     "status updates",
     "tone improvement",
   ],
-  presentations: [
-    "გახსნა და დასკვნა",
-    "მონაცემების ახსნა",
-    "ვიზუალის აღწერა",
-    "კითხვებზე პასუხი",
-    "Q&A ფრაზები",
-  ],
   business_vocab: [
     "Finance & numbers",
     "Marketing & sales",
