@@ -186,10 +186,12 @@ export default function VocabularyModule() {
     }
     if (!pool.length) return;
 
-    const reviewKeysNew = pool.map((w) => w.key);
+    // Pass pool as newWords so buildQuiz uses real VocabWord objects directly
+    // (review-key lookup via findWord would miss ingested phrases). We still
+    // skip the cards stage and go straight to quiz.
     setNewWords([]);
-    setReviewKeys(reviewKeysNew);
-    setQuiz(buildQuiz([], reviewKeysNew));
+    setReviewKeys(pool.map((w) => w.key));
+    setQuiz(buildQuiz(pool, []));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
