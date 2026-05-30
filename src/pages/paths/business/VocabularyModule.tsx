@@ -330,8 +330,9 @@ function WordCard({ word }: { word: VocabWord }) {
 function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
   switch (q.type) {
     case "mc_meaning":
+      return selected === q.correctKa;
     case "tr_en_to_ka":
-      return selected === q.correctKa || selected === (q as any).correct;
+      return selected === q.correct;
     case "tr_ka_to_en":
       return selected === q.correct;
     case "fill_blank":
