@@ -316,7 +316,7 @@ export function buildQuiz(newWords: VocabWord[], reviewKeys: string[]): QuizQues
       }
     }
   }
-  return merged.slice(0, 14);
+  return merged.slice(0, 20);
 }
 
 // ---------------- Phrase ingestion from other modules ----------------
