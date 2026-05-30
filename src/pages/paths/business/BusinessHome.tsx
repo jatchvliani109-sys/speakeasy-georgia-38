@@ -232,7 +232,7 @@ export default function BusinessHome() {
                   supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_meeting_sessions").update(patch).eq("user_id", user.id),
-
+                  supabase.from("business_vocab_sessions").update(patch).eq("user_id", user.id),
                 ]);
               } catch {}
               resetBusiness(user.id);
