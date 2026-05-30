@@ -378,6 +378,30 @@ export default function BusinessHome() {
             </BizCard>
           )}
 
+          {!hasResume && (
+            <BizCard className="mb-5 bg-[#FAF7F0] border-dashed">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                    პერსონალიზაცია
+                  </p>
+                  <p className="ka text-sm font-semibold text-[#1E2A44] mt-1">
+                    ატვირთე რეზიუმე
+                  </p>
+                  <p className="ka text-xs text-[#5B6473] mt-1">
+                    გაკვეთილები მოერგება შენს პროფესიულ გამოცდილებას.
+                  </p>
+                </div>
+                <Link
+                  to="/path/business/resume"
+                  className="ka text-xs text-[#1E2A44] underline underline-offset-2 shrink-0 mt-1"
+                >
+                  ატვირთვა →
+                </Link>
+              </div>
+            </BizCard>
+          )}
+
           {/* 4. Modules */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
