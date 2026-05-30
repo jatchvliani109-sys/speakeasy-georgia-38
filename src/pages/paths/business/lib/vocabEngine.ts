@@ -184,6 +184,7 @@ export function planSession(
   const seen = new Set(progress.map((p) => p.word_key));
 
   const dueRows = progress
+    .filter((p) => !checkMastery(p))
     .filter((p) => new Date(p.due_at).getTime() <= now)
     .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
 
@@ -192,9 +193,9 @@ export function planSession(
 
   const reviewKeys = dueRows.slice(0, 10).map((r) => r.word_key);
 
-  // Determine current core week by total mastered count
+  // Determine current core week by total mastered count (strict mastery).
   const masteredCore = progress.filter(
-    (p) => p.source === "core" && p.confidence >= 3,
+    (p) => p.source === "core" && checkMastery(p),
   ).length;
   const currentWeek = Math.min(4, Math.floor(masteredCore / 6) + 1);
 
