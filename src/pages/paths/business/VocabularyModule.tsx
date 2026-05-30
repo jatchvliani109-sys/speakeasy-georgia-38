@@ -89,16 +89,11 @@ export default function VocabularyModule() {
     if (revealed || !currentQ) return;
     setSelected(val);
     const correct = checkAnswer(currentQ, val);
-    const nextAnswers =
-      "wordKey" in currentQ
-        ? [...answers, { wordKey: currentQ.wordKey, correct }]
-        : answers;
+    const key = "wordKey" in currentQ ? currentQ.wordKey : `mistake:${currentQ.key}`;
+    const nextAnswers = [...answers, { wordKey: key, correct }];
     setAnswers(nextAnswers);
     setRevealed(true);
-    // Auto-advance after a short pause so user sees green/red feedback
-    window.setTimeout(() => {
-      goNext(nextAnswers);
-    }, AUTO_ADVANCE_MS);
+    // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
   const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
