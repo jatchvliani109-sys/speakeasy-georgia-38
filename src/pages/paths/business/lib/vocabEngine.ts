@@ -59,6 +59,66 @@ export function applyAnswer(p: ProgressRow, correct: boolean): ProgressRow {
   };
 }
 
+// Aggregate one full session's results for a single word. This drives
+// mastery: confidence + history are bumped once per session, not per answer.
+export function applySessionResults(p: ProgressRow, results: boolean[]): ProgressRow {
+  if (!results.length) return p;
+  const correctCount = results.filter(Boolean).length;
+  const wrongCount = results.length - correctCount;
+  const sessionCorrect = wrongCount === 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const prevHistory: { date: string; correct: boolean }[] = Array.isArray(p.meta?.history)
+    ? p.meta.history
+    : [];
+  const history = [...prevHistory, { date: today, correct: sessionCorrect }].slice(-30);
+  const confidence = Math.max(
+    0,
+    Math.min(5, sessionCorrect ? p.confidence + 1 : p.confidence - 1),
+  );
+  const newCorrectTotal = p.correct_count + correctCount;
+  const meta = { ...(p.meta || {}), history };
+  const mastered = checkMastery({
+    ...p,
+    confidence,
+    correct_count: newCorrectTotal,
+    meta,
+  });
+  const days = mastered
+    ? 14
+    : sessionCorrect
+    ? confidence <= 1
+      ? 1
+      : confidence === 2
+      ? 3
+      : confidence === 3
+      ? 7
+      : 14
+    : 1;
+  return {
+    ...p,
+    confidence,
+    correct_count: newCorrectTotal,
+    wrong_count: p.wrong_count + wrongCount,
+    last_seen_at: new Date().toISOString(),
+    due_at: new Date(Date.now() + days * DAY_MS).toISOString(),
+    meta,
+  };
+}
+
+// Mastery requires: ≥4 correct answers total, correct sessions across ≥3
+// different days, and no wrong sessions in the last 2 appearances.
+export function checkMastery(p: ProgressRow): boolean {
+  if (p.correct_count < 4) return false;
+  const history: { date: string; correct: boolean }[] = Array.isArray(p.meta?.history)
+    ? p.meta.history
+    : [];
+  const correctDays = new Set(history.filter((h) => h.correct).map((h) => h.date));
+  if (correctDays.size < 3) return false;
+  const last2 = history.slice(-2);
+  if (last2.length < 2 || last2.some((h) => !h.correct)) return false;
+  return true;
+}
+
 // ---------------- DB helpers ----------------
 
 export async function loadProgress(userId: string): Promise<ProgressRow[]> {
@@ -124,6 +184,7 @@ export function planSession(
   const seen = new Set(progress.map((p) => p.word_key));
 
   const dueRows = progress
+    .filter((p) => !checkMastery(p))
     .filter((p) => new Date(p.due_at).getTime() <= now)
     .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
 
@@ -132,9 +193,9 @@ export function planSession(
 
   const reviewKeys = dueRows.slice(0, 10).map((r) => r.word_key);
 
-  // Determine current core week by total mastered count
+  // Determine current core week by total mastered count (strict mastery).
   const masteredCore = progress.filter(
-    (p) => p.source === "core" && p.confidence >= 3,
+    (p) => p.source === "core" && checkMastery(p),
   ).length;
   const currentWeek = Math.min(4, Math.floor(masteredCore / 6) + 1);
 
@@ -424,4 +485,57 @@ export function sourceLabelKa(source: string): string {
     case "meeting": return "შეხვედრების მოდული";
     default: return source;
   }
+}
+
+// ---------------- Review fallback (no new words today) ----------------
+
+/**
+ * When the user has no new words queued for today, build a session from the
+ * 10 lowest-confidence words across their entire progress (excluding mastered).
+ */
+export function pickLowestConfidenceWords(progress: ProgressRow[], n = 10): VocabWord[] {
+  const candidates = progress
+    .filter((p) => !checkMastery(p))
+    .sort((a, b) => {
+      if (a.confidence !== b.confidence) return a.confidence - b.confidence;
+      // tie-break: more wrong answers first
+      return b.wrong_count - a.wrong_count;
+    })
+    .slice(0, n);
+  return candidates.map(progressToWord).filter(Boolean) as VocabWord[];
+}
+
+/**
+ * Build a 15-20 question quiz using only the supplied review words. Generates
+ * roughly 2 varied questions per word so even a 10-word pool reaches ~20 Qs.
+ */
+export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
+  if (!words.length) return [];
+  const pool = ALL_WORDS;
+  const generators = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa, makeTrueFalse];
+  const questions: QuizQuestion[] = [];
+
+  // Pass 1: one varied question per word
+  words.forEach((w, i) => {
+    const gen = generators[i % generators.length];
+    const q = gen(w, pool);
+    questions.push(q || makeMcMeaning(w, pool));
+  });
+  // Pass 2: a second different question per word until we hit ~20
+  words.forEach((w, i) => {
+    if (questions.length >= 20) return;
+    const gen = generators[(i + 2) % generators.length];
+    const q = gen(w, pool);
+    questions.push(q || makeTrKaToEn(w, pool));
+  });
+
+  // Avoid back-to-back same type
+  let merged = shuffle(questions);
+  for (let i = 1; i < merged.length; i++) {
+    if (merged[i].type === merged[i - 1].type) {
+      const swap = merged.findIndex((q, idx) => idx > i && q.type !== merged[i - 1].type);
+      if (swap > -1) [merged[i], merged[swap]] = [merged[swap], merged[i]];
+    }
+  }
+  return merged.slice(0, 20);
 }

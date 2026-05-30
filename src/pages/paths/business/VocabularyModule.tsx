@@ -4,11 +4,13 @@ import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
-  applyAnswer,
+  applySessionResults,
   buildQuiz,
+  buildReviewQuiz,
   emptyProgressFor,
   ingestExternalPhrases,
   loadProgress,
+  pickLowestConfidenceWords,
   planSession,
   progressToWord,
   type ProgressRow,
@@ -18,9 +20,10 @@ import {
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
 
-type Stage = "intro" | "cards" | "quiz" | "results" | "empty";
+type Stage = "intro" | "cards" | "quiz" | "results" | "empty" | "reviewIntro";
 
 const PRACTICE_TARGET = 12;
+const REVIEW_FALLBACK_SIZE = 10;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
@@ -41,6 +44,8 @@ export default function VocabularyModule() {
     answers: { wordKey: string; correct: boolean }[];
     newWords: VocabWord[];
   } | null>(null);
+  const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
+  const [reviewMode, setReviewMode] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -58,7 +63,14 @@ export default function VocabularyModule() {
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
-        setStage("empty");
+        const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
+        if (fallback.length) {
+          setReviewWords(fallback);
+          setReviewMode(true);
+          setStage("reviewIntro");
+        } else {
+          setStage("empty");
+        }
       }
       setLoading(false);
     })();
@@ -66,6 +78,15 @@ export default function VocabularyModule() {
   }, [user]);
 
   const startSession = () => {
+    if (reviewMode) {
+      setQuiz(buildReviewQuiz(reviewWords));
+      setQIdx(0);
+      setAnswers([]);
+      setSelected(null);
+      setRevealed(false);
+      setStage("quiz");
+      return;
+    }
     const q = buildQuiz(newWords, reviewKeys);
     setQuiz(q);
     setCardIdx(0);
@@ -124,12 +145,12 @@ export default function VocabularyModule() {
         (() => {
           const isNew = newWords.find((w) => w.key === wordKey);
           if (isNew) return emptyProgressFor(isNew);
+          const fallback = reviewWords.find((w) => w.key === wordKey);
+          if (fallback) return emptyProgressFor(fallback);
           return null;
         })();
       if (!row) continue;
-      results.forEach((c) => {
-        row = applyAnswer(row!, c);
-      });
+      row = applySessionResults(row, results);
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
@@ -214,7 +235,11 @@ export default function VocabularyModule() {
           ბიზნეს ლექსიკა
         </p>
         <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">
-          {stage === "results" ? "სესია დასრულდა" : "დღევანდელი სიტყვები"}
+          {stage === "results"
+            ? "სესია დასრულდა"
+            : stage === "reviewIntro"
+            ? "გამეორების დღე"
+            : "დღევანდელი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center gap-2 flex-wrap">
           <Link to="/path/business/vocabulary/notebook" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
@@ -229,6 +254,10 @@ export default function VocabularyModule() {
           reviewCount={reviewKeys.length}
           onStart={startSession}
         />
+      )}
+
+      {stage === "reviewIntro" && (
+        <ReviewIntroCard words={reviewWords} onStart={startSession} />
       )}
 
       {stage === "empty" && (
@@ -322,6 +351,36 @@ function IntroCard({
           className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
         >
           დაწყება →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () => void }) {
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] p-6 shadow-[0_12px_32px_-12px_rgba(30,42,68,0.45)]">
+      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/15 blur-2xl pointer-events-none" />
+      <div className="relative">
+        <p className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/20 text-[#F2D680] px-2 py-1 rounded-md font-semibold inline-block">
+          გამეორების დღე
+        </p>
+        <h2 className="ka text-xl font-bold mt-3 leading-snug">
+          {words.length} სიტყვის გამეორება
+        </h2>
+        <p className="ka text-sm text-[#F7F1E3]/80 mt-2 leading-relaxed">
+          ახალი სიტყვები ხვალ გემატება. დღეს გაიმეორე ის სიტყვები, რომლებიც ყველაზე მეტ გამეორებას საჭიროებს.
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <Mini label="სიტყვები" value={`${words.length}`} />
+          <Mini label="კითხვები" value="~20" />
+          <Mini label="დრო" value="~7 წთ" />
+        </div>
+        <button
+          onClick={onStart}
+          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+        >
+          გამეორების დაწყება →
         </button>
       </div>
     </div>
