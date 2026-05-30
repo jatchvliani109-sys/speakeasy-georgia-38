@@ -350,6 +350,13 @@ function ToolView({
         <EmailFlow profile={profile} onSaved={onSaved} />
       </>
     );
+  if (tool === "email_fix")
+    return (
+      <>
+        {Common}
+        <EmailFixFlow profile={profile} onSaved={onSaved} />
+      </>
+    );
   if (tool === "cover_letter")
     return (
       <>
