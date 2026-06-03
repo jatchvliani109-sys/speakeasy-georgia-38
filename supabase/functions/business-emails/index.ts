@@ -207,15 +207,22 @@ Return JSON:
 function improvePrompt(b: ImproveBody) {
   return `Learner level: ${b.level || "business_intermediate"}
 Email type: ${b.emailType}
-They were asked to rewrite this part of their original email:
-Original snippet: """${b.targetBefore}"""
-Suggested direction: """${b.targetAfter}"""
-Why (Georgian): ${b.whyKa}
 
-Their rewrite:
+ORIGINAL SNIPPET (what they were asked to improve):
+"""${b.targetBefore}"""
+
+SUGGESTED DIRECTION (reference only, not required):
+"""${b.targetAfter}"""
+
+WHY THE ORIGINAL NEEDED IMPROVING (Georgian):
+${b.whyKa}
+
+LEARNER'S REWRITE:
 """${b.userRewrite}"""
 
-Acknowledge warmly, polish minimally, give one micro-tip.`;
+Honestly judge whether the rewrite is genuinely better than the ORIGINAL SNIPPET.
+Do NOT default to praise. If it is similar or worse, say so kindly and explain specifically why, then give a concrete hint.
+Return the JSON schema exactly.`;
 }
 
 async function callAI(system: string, user: string) {
