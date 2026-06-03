@@ -64,7 +64,15 @@ type Feedback = {
   };
 };
 
-type ImproveAck = { praiseKa: string; polishedEn: string; tipKa: string };
+type ImproveVerdict = "better" | "similar" | "worse" | "empty";
+type ImproveAck = {
+  verdict: ImproveVerdict;
+  headlineKa: string;
+  detailsKa: string;
+  tipKa: string;
+  polishedEn: string;
+  canRetry: boolean;
+};
 
 type Step =
   | "loading"
@@ -239,7 +247,11 @@ export default function EmailsModule() {
   }
 
   async function submitImprove() {
-    if (!session || !feedback || !improveText.trim()) return;
+    if (!session || !feedback) return;
+    if (!improveText.trim()) {
+      setError("გთხოვ ჩაწერო შენი ვერსია — ცარიელი პასუხი ვერ შევაფასებთ 🙂");
+      return;
+    }
     setLoadingImprove(true);
     setError(null);
     try {
@@ -268,6 +280,12 @@ export default function EmailsModule() {
       setLoadingImprove(false);
     }
   }
+
+  function retryImprove() {
+    setImproveAck(null);
+    setError(null);
+  }
+
 
   async function savePhrasesToVocab() {
     if (!user || !session) return 0;
@@ -605,40 +623,74 @@ export default function EmailsModule() {
           {feedback.feedback.improveFocus?.hintKa && (
             <p className="ka text-xs text-[#5B6473] mt-2">💡 {feedback.feedback.improveFocus.hintKa}</p>
           )}
-          <textarea
-            value={improveText}
-            onChange={(e) => setImproveText(e.target.value)}
-            placeholder="Rewrite just this part..."
-            className="mt-3 w-full min-h-[100px] p-3 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] resize-y"
-            disabled={!!improveAck}
-          />
+          {(() => {
+            const v = improveAck?.verdict;
+            const locked = !!improveAck && v === "better";
+            const tone =
+              v === "better"
+                ? { bg: "bg-[#F0FDF9]", border: "border-[#A7F3D0]", text: "text-[#065F46]", icon: "✓" }
+                : v === "similar"
+                ? { bg: "bg-[#FFFBEA]", border: "border-[#F2E6B0]", text: "text-[#92400E]", icon: "≈" }
+                : v === "worse"
+                ? { bg: "bg-[#FEF2F2]", border: "border-[#FECACA]", text: "text-[#991B1B]", icon: "↻" }
+                : { bg: "bg-[#FFFBEA]", border: "border-[#F2E6B0]", text: "text-[#92400E]", icon: "✎" };
+            return (
+              <>
+                <div className="mt-4 p-4 rounded-xl bg-[#FFFBEA] border-2 border-[#C9A227]/40 shadow-sm">
+                  <label htmlFor="improve-input" className="ka block text-sm font-bold text-[#1E2A44]">
+                    ✍️ შეასწორე ეს ნაწილი და დაწერე გაუმჯობესებული ვერსია
+                  </label>
+                  <p className="ka text-xs text-[#5B6473] mt-1">
+                    გადაწერე ზემოთ მოცემული ფრაზა შენი სიტყვებით — გავხადოთ უფრო ნათელი და პროფესიული.
+                  </p>
+                  <textarea
+                    id="improve-input"
+                    value={improveText}
+                    onChange={(e) => setImproveText(e.target.value)}
+                    placeholder="Write your improved version here..."
+                    className="mt-3 w-full min-h-[180px] p-4 rounded-lg border-2 border-[#C9A227]/50 bg-white text-base text-[#1E2A44] outline-none focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/20 resize-y"
+                    disabled={locked}
+                  />
+                  {!locked && (
+                    <div className="mt-3 flex justify-end">
+                      <BizButton onClick={submitImprove} disabled={loadingImprove}>
+                        {loadingImprove ? "AI ფიქრობს..." : improveAck ? "ხელახლა შეფასება" : "შეფასება →"}
+                      </BizButton>
+                    </div>
+                  )}
+                </div>
 
-          {improveAck && (
-            <div className="mt-3 p-3 rounded-lg bg-[#F0FDF9] border border-[#A7F3D0]">
-              <p className="ka text-sm text-[#065F46]">✓ {improveAck.praiseKa}</p>
-              {improveAck.polishedEn && (
-                <p className="text-sm text-[#1E2A44] mt-2 italic">"{improveAck.polishedEn}"</p>
-              )}
-              {improveAck.tipKa && (
-                <p className="ka text-[11px] text-[#5B6473] mt-2">💡 {improveAck.tipKa}</p>
-              )}
-            </div>
-          )}
-          {error && <p className="ka text-xs text-[#B91C1C] mt-2">{error}</p>}
+                {improveAck && (
+                  <div className={`mt-3 p-3 rounded-lg ${tone.bg} border ${tone.border}`}>
+                    <p className={`ka text-sm font-semibold ${tone.text}`}>
+                      {tone.icon} {improveAck.headlineKa}
+                    </p>
+                    {improveAck.detailsKa && (
+                      <p className={`ka text-sm ${tone.text} mt-1 opacity-90`}>{improveAck.detailsKa}</p>
+                    )}
+                    {improveAck.polishedEn && v === "better" && (
+                      <p className="text-sm text-[#1E2A44] mt-2 italic">"{improveAck.polishedEn}"</p>
+                    )}
+                    {improveAck.tipKa && (
+                      <p className="ka text-[11px] text-[#5B6473] mt-2">💡 {improveAck.tipKa}</p>
+                    )}
+                  </div>
+                )}
+                {error && <p className="ka text-xs text-[#B91C1C] mt-2">{error}</p>}
 
-          {!improveAck ? (
-            <NavRow
-              onBack={() => setStep("feedback")}
-              onNext={submitImprove}
-              nextLabel={loadingImprove ? "AI ფიქრობს..." : "გადახედვა →"}
-              nextDisabled={!improveText.trim() || loadingImprove}
-            />
-          ) : (
-            <NavRow
-              onNext={() => setStep(hasBonus ? "bonus" : "vocab")}
-              nextLabel={hasBonus ? "დამატებითი სცენარი →" : "დღევანდელი ფრაზები →"}
-            />
-          )}
+                {locked ? (
+                  <NavRow
+                    onNext={() => setStep(hasBonus ? "bonus" : "vocab")}
+                    nextLabel={hasBonus ? "დამატებითი სცენარი →" : "დღევანდელი ფრაზები →"}
+                  />
+                ) : (
+                  <div className="mt-5">
+                    <BizButton variant="ghost" onClick={() => setStep("feedback")}>← უკან</BizButton>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </BizCard>
       )}
 

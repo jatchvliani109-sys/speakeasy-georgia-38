@@ -75,13 +75,30 @@ Level guidance:
 
 Output STRICT JSON only.`;
 
-const SYSTEM_IMPROVE = `You acknowledge a learner's targeted rewrite. Be warm, brief, specific.
+const SYSTEM_IMPROVE = `You honestly assess whether a learner's targeted rewrite is actually better than the original snippet.
+Be warm and encouraging, but ALWAYS honest. Never falsely praise weak or unchanged attempts.
+
+Compare userRewrite against:
+- originalSnippet (what they were asked to improve)
+- targetAfter (the suggested direction — for reference only, not a required answer)
+- whyKa (the reason the original needed improvement)
+
+Choose ONE verdict:
+- "better": genuinely improved — clearer, more professional, better tone, addresses the issue in whyKa.
+- "similar": only superficially changed (synonyms, reordering) without real improvement, OR essentially the same as original.
+- "worse": grammatically broken, less clear, wrong tone, or further from the suggested direction.
+- "empty": userRewrite is empty, whitespace only, or one or two random characters.
+
 Output STRICT JSON only:
 {
-  "praiseKa": "1-2 sentence Georgian praise mentioning what improved",
-  "polishedEn": "your slightly polished version of their rewrite (1-2 sentences max)",
-  "tipKa": "1 short Georgian micro-tip for next time"
-}`;
+  "verdict": "better" | "similar" | "worse" | "empty",
+  "headlineKa": "1 short warm Georgian sentence reflecting the verdict (e.g. 'მართლა გაუმჯობესდა!' or 'ეს ვერსია ცოტა უფრო სუსტია — ვცადოთ ისევ.')",
+  "detailsKa": "1-2 specific Georgian sentences — for 'better' name exactly what improved and why it works; for 'similar' point out what stayed the same; for 'worse' honestly say what made it weaker (grammar, tone, clarity); never harsh.",
+  "tipKa": "1 short Georgian hint focusing on what to try next (concrete, actionable)",
+  "polishedEn": "for 'better' only: a slightly polished version of their rewrite (1-2 sentences). For other verdicts return empty string.",
+  "canRetry": true | false
+}
+canRetry: true when verdict is 'similar' or 'worse' (encourage another try), false when 'better' (move on).`;
 
 function sessionPrompt(b: SessionBody) {
   const wantsBonus = b.intensity === "intensive" || b.intensity === "deadline";
@@ -190,15 +207,22 @@ Return JSON:
 function improvePrompt(b: ImproveBody) {
   return `Learner level: ${b.level || "business_intermediate"}
 Email type: ${b.emailType}
-They were asked to rewrite this part of their original email:
-Original snippet: """${b.targetBefore}"""
-Suggested direction: """${b.targetAfter}"""
-Why (Georgian): ${b.whyKa}
 
-Their rewrite:
+ORIGINAL SNIPPET (what they were asked to improve):
+"""${b.targetBefore}"""
+
+SUGGESTED DIRECTION (reference only, not required):
+"""${b.targetAfter}"""
+
+WHY THE ORIGINAL NEEDED IMPROVING (Georgian):
+${b.whyKa}
+
+LEARNER'S REWRITE:
 """${b.userRewrite}"""
 
-Acknowledge warmly, polish minimally, give one micro-tip.`;
+Honestly judge whether the rewrite is genuinely better than the ORIGINAL SNIPPET.
+Do NOT default to praise. If it is similar or worse, say so kindly and explain specifically why, then give a concrete hint.
+Return the JSON schema exactly.`;
 }
 
 async function callAI(system: string, user: string) {
