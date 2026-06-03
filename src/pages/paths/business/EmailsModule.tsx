@@ -64,7 +64,15 @@ type Feedback = {
   };
 };
 
-type ImproveAck = { praiseKa: string; polishedEn: string; tipKa: string };
+type ImproveVerdict = "better" | "similar" | "worse" | "empty";
+type ImproveAck = {
+  verdict: ImproveVerdict;
+  headlineKa: string;
+  detailsKa: string;
+  tipKa: string;
+  polishedEn: string;
+  canRetry: boolean;
+};
 
 type Step =
   | "loading"
