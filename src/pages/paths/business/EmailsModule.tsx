@@ -688,7 +688,9 @@ export default function EmailsModule() {
                     nextLabel={hasBonus ? "დამატებითი სცენარი →" : "დღევანდელი ფრაზები →"}
                   />
                 ) : (
-                  <NavRow onBack={() => setStep("feedback")} />
+                  <div className="mt-5">
+                    <BizButton variant="ghost" onClick={() => setStep("feedback")}>← უკან</BizButton>
+                  </div>
                 )}
               </>
             );
