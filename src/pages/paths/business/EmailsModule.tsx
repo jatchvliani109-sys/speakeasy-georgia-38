@@ -247,7 +247,11 @@ export default function EmailsModule() {
   }
 
   async function submitImprove() {
-    if (!session || !feedback || !improveText.trim()) return;
+    if (!session || !feedback) return;
+    if (!improveText.trim()) {
+      setError("გთხოვ ჩაწერო შენი ვერსია — ცარიელი პასუხი ვერ შევაფასებთ 🙂");
+      return;
+    }
     setLoadingImprove(true);
     setError(null);
     try {
@@ -276,6 +280,12 @@ export default function EmailsModule() {
       setLoadingImprove(false);
     }
   }
+
+  function retryImprove() {
+    setImproveAck(null);
+    setError(null);
+  }
+
 
   async function savePhrasesToVocab() {
     if (!user || !session) return 0;
