@@ -653,13 +653,9 @@ export default function EmailsModule() {
                   />
                   {!locked && (
                     <div className="mt-3 flex justify-end">
-                      <Button
-                        onClick={submitImprove}
-                        disabled={loadingImprove}
-                        className="bg-[#1E2A44] hover:bg-[#1E2A44]/90 text-white"
-                      >
+                      <BizButton onClick={submitImprove} disabled={loadingImprove}>
                         {loadingImprove ? "AI ფიქრობს..." : improveAck ? "ხელახლა შეფასება" : "შეფასება →"}
-                      </Button>
+                      </BizButton>
                     </div>
                   )}
                 </div>
