@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -19,6 +19,16 @@ import {
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
+import { GiorgiCharacter, type GiorgiState } from "./components/GiorgiCharacter";
+import {
+  isSoundEnabled,
+  playCombo,
+  playComplete,
+  playCorrect,
+  playFlip,
+  playWrong,
+  setSoundEnabled,
+} from "./lib/vocabSounds";
 
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty" | "reviewIntro";
 
@@ -46,6 +56,23 @@ export default function VocabularyModule() {
   } | null>(null);
   const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
   const [reviewMode, setReviewMode] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [bestCombo, setBestCombo] = useState(0);
+  const [giorgi, setGiorgi] = useState<GiorgiState>("idle");
+  const [giorgiSalt, setGiorgiSalt] = useState(0);
+  const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
+  const [confettiKey, setConfettiKey] = useState(0);
+  const masteredBaselineRef = useRef<number>(0);
+
+  const setGiorgiState = (s: GiorgiState) => {
+    setGiorgi(s);
+    setGiorgiSalt((x) => x + 1);
+  };
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOnState(next);
+    setSoundEnabled(next);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -78,12 +105,18 @@ export default function VocabularyModule() {
   }, [user]);
 
   const startSession = () => {
+    // Resume audio on user gesture (browsers require it).
+    try { (window as any).AudioContext && new (window as any).AudioContext().resume?.(); } catch {}
+    masteredBaselineRef.current = progress.filter((p) => p.confidence >= 4).length;
+    setCombo(0);
+    setBestCombo(0);
     if (reviewMode) {
       setQuiz(buildReviewQuiz(reviewWords));
       setQIdx(0);
       setAnswers([]);
       setSelected(null);
       setRevealed(false);
+      setGiorgiState("idle");
       setStage("quiz");
       return;
     }
@@ -94,13 +127,21 @@ export default function VocabularyModule() {
     setAnswers([]);
     setSelected(null);
     setRevealed(false);
+    setGiorgiState(newWords.length ? "newWord" : "idle");
+    if (newWords.length) playFlip();
     setStage(newWords.length ? "cards" : "quiz");
   };
 
   // CARDS
   const onNextCard = () => {
-    if (cardIdx + 1 < newWords.length) setCardIdx((i) => i + 1);
-    else setStage("quiz");
+    if (cardIdx + 1 < newWords.length) {
+      setCardIdx((i) => i + 1);
+      setGiorgiState("newWord");
+      playFlip();
+    } else {
+      setStage("quiz");
+      setGiorgiState("idle");
+    }
   };
 
   // QUIZ — single click flow
@@ -114,6 +155,23 @@ export default function VocabularyModule() {
     const nextAnswers = [...answers, { wordKey: key, correct }];
     setAnswers(nextAnswers);
     setRevealed(true);
+
+    if (correct) {
+      const nextCombo = combo + 1;
+      setCombo(nextCombo);
+      setBestCombo((b) => Math.max(b, nextCombo));
+      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) {
+        setGiorgiState("combo");
+        playCombo();
+      } else {
+        setGiorgiState("correct");
+        playCorrect();
+      }
+    } else {
+      setCombo(0);
+      setGiorgiState("wrong");
+      playWrong();
+    }
     // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
@@ -122,6 +180,7 @@ export default function VocabularyModule() {
       setQIdx((i) => i + 1);
       setSelected(null);
       setRevealed(false);
+      setGiorgiState("idle");
     } else {
       finishSession(ans);
     }
@@ -181,6 +240,16 @@ export default function VocabularyModule() {
       },
     });
 
+    // Mastered milestone (every 10 mastered → confetti)
+    const newMastered = newProgress.filter((p) => p.confidence >= 4).length;
+    const baseline = masteredBaselineRef.current;
+    if (Math.floor(newMastered / 10) > Math.floor(baseline / 10)) {
+      setConfettiKey((k) => k + 1);
+    }
+    masteredBaselineRef.current = newMastered;
+
+    setGiorgiState("complete");
+    playComplete();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };
@@ -241,12 +310,35 @@ export default function VocabularyModule() {
             ? "გამეორების დღე"
             : "დღევანდელი სიტყვები"}
         </h1>
-        <div className="mt-2 flex items-center gap-2 flex-wrap">
+        <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
           <Link to="/path/business/vocabulary/notebook" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
             📔 ჩემი რვეული
           </Link>
+          <button
+            type="button"
+            onClick={toggleSound}
+            title={soundOn ? "ხმის გამორთვა" : "ხმის ჩართვა"}
+            className="ka text-[11px] inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E7E2D5] text-[#5B6473] hover:text-[#1E2A44] hover:bg-[#FAF7F0] transition"
+          >
+            <span>{soundOn ? "🔊" : "🔇"}</span>
+            <span>{soundOn ? "ხმა ჩართულია" : "ხმა გამორთულია"}</span>
+          </button>
         </div>
       </header>
+
+      {(stage === "cards" || stage === "quiz" || stage === "results") && (
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <GiorgiCharacter state={giorgi} salt={giorgiSalt} size={120} />
+          {stage === "quiz" && combo >= 2 && (
+            <div className="ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm self-start mt-2">
+              <span className="biz-flame">🔥</span>
+              {combo} სწორი ზედიზედ
+            </div>
+          )}
+        </div>
+      )}
+
+      {confettiKey > 0 && <Confetti seed={confettiKey} />}
 
       {stage === "intro" && (
         <IntroCard
@@ -280,7 +372,7 @@ export default function VocabularyModule() {
       {stage === "cards" && newWords[cardIdx] && (
         <>
           <ProgressBar value={cardIdx + 1} total={newWords.length} label={`ახალი სიტყვა ${cardIdx + 1}/${newWords.length}`} />
-          <WordCard word={newWords[cardIdx]} />
+          <WordCard key={newWords[cardIdx].key} word={newWords[cardIdx]} />
           <div className="mt-4 flex justify-end">
             <BizButton onClick={onNextCard}>
               {cardIdx + 1 < newWords.length ? "შემდეგი →" : "ქვიზის დაწყება →"}
@@ -413,7 +505,7 @@ function ProgressBar({ value, total, label }: { value: number; total: number; la
 
 function WordCard({ word }: { word: VocabWord }) {
   return (
-    <div className="bg-white border border-[#E7E2D5] rounded-3xl p-6 shadow-[0_2px_4px_rgba(30,42,68,0.04),0_12px_32px_-12px_rgba(30,42,68,0.15)] animate-[bizFade_.35s_ease-out_both]">
+    <div key={word.key} className="biz-card-flip bg-white border border-[#E7E2D5] rounded-3xl p-6 shadow-[0_2px_4px_rgba(30,42,68,0.04),0_12px_32px_-12px_rgba(30,42,68,0.15)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-3xl font-bold text-[#1E2A44] tracking-tight">{word.en}</h2>
@@ -489,8 +581,8 @@ function QuestionCard({
             disabled={revealed}
             onClick={() => setSelected(value)}
             className={`text-left px-4 py-3 rounded-xl border text-sm transition-all
-              ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900" : ""}
-              ${isWrongPick ? "border-red-400 bg-red-50 text-red-900" : ""}
+              ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
+              ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
               ${!revealed && isSelected ? "border-[#1E2A44] bg-[#FAF7F0] text-[#1E2A44]" : ""}
               ${!revealed && !isSelected ? "border-[#E7E2D5] bg-white text-[#1E2A44] hover:bg-[#FAF7F0]" : ""}
               ${revealed && !isCorrect && !isWrongPick ? "border-[#E7E2D5] bg-white text-[#5B6473] opacity-60" : ""}
@@ -705,6 +797,39 @@ function SummaryStat({ label, value }: { label: string; value: number }) {
     <div className="bg-white border border-[#E7E2D5] rounded-xl p-3 text-center">
       <p className="text-xl font-bold text-[#1E2A44]">{value}</p>
       <p className="ka text-[10px] text-[#5B6473] uppercase tracking-wider mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+function Confetti({ seed }: { seed: number }): JSX.Element {
+  const pieces = useMemo(() => {
+    const colors = ["#C9A227", "#1E2A44", "#E0B844", "#10B981", "#EF4444", "#F2D680"];
+    return Array.from({ length: 36 }).map((_, i) => ({
+      id: `${seed}-${i}`,
+      left: Math.random() * 100,
+      delay: Math.random() * 250,
+      duration: 1400 + Math.random() * 900,
+      color: colors[i % colors.length],
+      size: 6 + Math.round(Math.random() * 6),
+      rot: Math.round(Math.random() * 360),
+    }));
+  }, [seed]);
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="absolute top-0 rounded-sm"
+          style={{
+            left: `${p.left}%`,
+            width: p.size,
+            height: p.size * 0.4,
+            background: p.color,
+            transform: `rotate(${p.rot}deg)`,
+            animation: `bizConfettiFall ${p.duration}ms ease-in ${p.delay}ms forwards`,
+          }}
+        />
+      ))}
     </div>
   );
 }

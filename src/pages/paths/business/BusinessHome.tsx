@@ -17,6 +17,8 @@ import {
   resetBusiness,
 } from "./lib/state";
 import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
+import { loadProgress, planSession } from "./lib/vocabEngine";
+import type { VocabWord } from "./lib/vocabBank";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
@@ -82,6 +84,9 @@ export default function BusinessHome() {
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
+  const [vocabPreview, setVocabPreview] = useState<VocabWord | null>(null);
+  const [vocabNewToday, setVocabNewToday] = useState<number>(0);
+  const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
@@ -113,6 +118,17 @@ export default function BusinessHome() {
         vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
       setVocabWordCount(vocabWords.count ?? 0);
+
+      // Plan a preview of today's vocab session for the dashboard card.
+      try {
+        const vp = await loadProgress(user.id);
+        if (!cancelled) {
+          const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
+          setVocabNewToday(plan.newWords.length);
+          setVocabReviewToday(plan.reviewKeys.length);
+          setVocabPreview(plan.newWords[0] || null);
+        }
+      } catch {}
 
       const { data: resumeRow } = await supabase
         .from("business_resumes")
@@ -310,6 +326,65 @@ export default function BusinessHome() {
               </div>
             </div>
           </section>
+
+          {/* 2a-pre. Vocabulary — prominent fun card with Giorgi */}
+          <section className="mb-5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+              ბიზნეს ლექსიკა
+            </p>
+            <button
+              onClick={() => navigate("/path/business/module/vocabulary")}
+              className="group relative w-full text-left overflow-hidden rounded-3xl p-5 transition-all hover:shadow-lg"
+              style={{
+                background:
+                  "radial-gradient(420px 180px at 100% 0%, rgba(201,162,39,0.30), transparent 60%), linear-gradient(135deg, #1E2A44 0%, #15203A 100%)",
+                color: "#F7F1E3",
+                boxShadow: "0 12px 32px -14px rgba(30,42,68,0.45)",
+              }}
+            >
+              <div className="flex items-stretch gap-3">
+                <div className="shrink-0 w-[88px] -mb-2 self-end">
+                  <MiniGiorgi />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/25 text-[#F2D680] px-2 py-1 rounded-md font-bold">
+                      🔥 დღევანდელი ვარჯიში
+                    </span>
+                    <span className="ka text-[10px] text-[#F7F1E3]/70">
+                      დღეს {vocabWordCount} სიტყვა იცი
+                    </span>
+                  </div>
+                  <p className="ka text-base font-bold mt-2 leading-snug">
+                    გიორგი ბიზნესიანი გელოდება!
+                  </p>
+                  <p className="ka text-[11px] text-[#F7F1E3]/75 mt-1 leading-relaxed">
+                    {vocabNewToday > 0
+                      ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
+                      : vocabReviewToday > 0
+                      ? `${vocabReviewToday} გასამეორებელი სიტყვა`
+                      : "გამეორების დღე — ყველაზე რთული სიტყვები"}
+                  </p>
+
+                  {vocabPreview && (
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F1E3]/10 border border-[#F7F1E3]/15">
+                      <span className="ka text-[9px] uppercase tracking-wider text-[#F2D680] font-semibold">
+                        პირველი სიტყვა
+                      </span>
+                      <span className="text-sm font-bold text-[#F7F1E3]">{vocabPreview.en}</span>
+                      <span className="ka text-[11px] text-[#F7F1E3]/70">· {vocabPreview.ka}</span>
+                    </div>
+                  )}
+
+                  <span className="ka mt-3 inline-flex items-center justify-center gap-1 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] px-4 py-2 rounded-xl font-bold text-xs">
+                    დაწყება →
+                  </span>
+                </div>
+              </div>
+            </button>
+          </section>
+
+
 
           {/* 2a. Document Helper — prominent practical tool */}
           <section className="mb-5">
@@ -543,5 +618,30 @@ function Stat({ label, value }: { label: string; value: string }) {
       <div className="text-xl font-bold text-[#1E2A44]">{value}</div>
       <div className="ka text-[11px] text-[#5B6473] mt-0.5">{label}</div>
     </div>
+  );
+}
+
+function MiniGiorgi(): JSX.Element {
+  return (
+    <svg viewBox="0 0 120 140" width="100%" height="100%" aria-hidden style={{ animation: "giorgiBreathe 3.5s ease-in-out infinite" }}>
+      <ellipse cx="60" cy="134" rx="26" ry="3" fill="#000" opacity="0.18" />
+      <path d="M30 132 L34 86 Q60 78 86 86 L90 132 Z" fill="#0F1B2E" />
+      <path d="M60 86 L46 132 L52 132 L60 102 Z" fill="#0A1424" />
+      <path d="M60 86 L74 132 L68 132 L60 102 Z" fill="#0A1424" />
+      <path d="M60 86 L54 96 L60 102 L66 96 Z" fill="#F7F1E3" />
+      <path d="M58 96 L62 96 L64 100 L60 104 L56 100 Z" fill="#C9A227" />
+      <path d="M56 100 L64 100 L66 122 L60 128 L54 122 Z" fill="#C9A227" />
+      <path d="M32 90 L30 122 L40 122 L42 92 Z" fill="#0F1B2E" />
+      <path d="M88 90 L90 122 L80 122 L78 92 Z" fill="#0F1B2E" />
+      <rect x="55" y="72" width="10" height="10" fill="#E8C9A0" />
+      <ellipse cx="60" cy="56" rx="22" ry="24" fill="#F0D2A8" />
+      <path d="M38 50 Q40 30 60 30 Q80 30 82 50 Q78 40 60 40 Q42 40 38 50 Z" fill="#2A2118" />
+      <g stroke="#1E2A44" strokeWidth="1.5" fill="none">
+        <circle cx="51" cy="56" r="5" />
+        <circle cx="69" cy="56" r="5" />
+        <line x1="56" y1="56" x2="64" y2="56" />
+      </g>
+      <line x1="54" y1="68" x2="66" y2="68" stroke="#1E2A44" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
