@@ -581,8 +581,8 @@ function QuestionCard({
             disabled={revealed}
             onClick={() => setSelected(value)}
             className={`text-left px-4 py-3 rounded-xl border text-sm transition-all
-              ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900" : ""}
-              ${isWrongPick ? "border-red-400 bg-red-50 text-red-900" : ""}
+              ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
+              ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
               ${!revealed && isSelected ? "border-[#1E2A44] bg-[#FAF7F0] text-[#1E2A44]" : ""}
               ${!revealed && !isSelected ? "border-[#E7E2D5] bg-white text-[#1E2A44] hover:bg-[#FAF7F0]" : ""}
               ${revealed && !isCorrect && !isWrongPick ? "border-[#E7E2D5] bg-white text-[#5B6473] opacity-60" : ""}
