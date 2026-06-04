@@ -327,7 +327,7 @@ export default function BusinessHome() {
             </div>
           </section>
 
-          {/* 2a-pre. Vocabulary — prominent fun card with Giorgi */}
+          {/* 2a-pre. Vocabulary — prominent card */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
               ბიზნეს ლექსიკა
@@ -342,45 +342,38 @@ export default function BusinessHome() {
                 boxShadow: "0 12px 32px -14px rgba(30,42,68,0.45)",
               }}
             >
-              <div className="flex items-stretch gap-3">
-                <div className="shrink-0 w-[88px] -mb-2 self-end">
-                  <MiniGiorgi />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/25 text-[#F2D680] px-2 py-1 rounded-md font-bold">
-                      🔥 დღევანდელი ვარჯიში
-                    </span>
-                    <span className="ka text-[10px] text-[#F7F1E3]/70">
-                      დღეს {vocabWordCount} სიტყვა იცი
-                    </span>
-                  </div>
-                  <p className="ka text-base font-bold mt-2 leading-snug">
-                    გიორგი ბიზნესიანი გელოდება!
-                  </p>
-                  <p className="ka text-[11px] text-[#F7F1E3]/75 mt-1 leading-relaxed">
-                    {vocabNewToday > 0
-                      ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
-                      : vocabReviewToday > 0
-                      ? `${vocabReviewToday} გასამეორებელი სიტყვა`
-                      : "გამეორების დღე — ყველაზე რთული სიტყვები"}
-                  </p>
-
-                  {vocabPreview && (
-                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F1E3]/10 border border-[#F7F1E3]/15">
-                      <span className="ka text-[9px] uppercase tracking-wider text-[#F2D680] font-semibold">
-                        პირველი სიტყვა
-                      </span>
-                      <span className="text-sm font-bold text-[#F7F1E3]">{vocabPreview.en}</span>
-                      <span className="ka text-[11px] text-[#F7F1E3]/70">· {vocabPreview.ka}</span>
-                    </div>
-                  )}
-
-                  <span className="ka mt-3 inline-flex items-center justify-center gap-1 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] px-4 py-2 rounded-xl font-bold text-xs">
-                    დაწყება →
-                  </span>
-                </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/25 text-[#F2D680] px-2 py-1 rounded-md font-bold">
+                  🔥 დღევანდელი ვარჯიში
+                </span>
+                <span className="ka text-[10px] text-[#F7F1E3]/70">
+                  დღეს {vocabWordCount} სიტყვა იცი
+                </span>
               </div>
+              <p className="ka text-base font-bold mt-2 leading-snug">
+                დღევანდელი ბიზნეს სიტყვები
+              </p>
+              <p className="ka text-[11px] text-[#F7F1E3]/75 mt-1 leading-relaxed">
+                {vocabNewToday > 0
+                  ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
+                  : vocabReviewToday > 0
+                  ? `${vocabReviewToday} გასამეორებელი სიტყვა`
+                  : "გამეორების დღე — ყველაზე რთული სიტყვები"}
+              </p>
+
+              {vocabPreview && (
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F1E3]/10 border border-[#F7F1E3]/15">
+                  <span className="ka text-[9px] uppercase tracking-wider text-[#F2D680] font-semibold">
+                    პირველი სიტყვა
+                  </span>
+                  <span className="text-sm font-bold text-[#F7F1E3]">{vocabPreview.en}</span>
+                  <span className="ka text-[11px] text-[#F7F1E3]/70">· {vocabPreview.ka}</span>
+                </div>
+              )}
+
+              <span className="ka mt-3 inline-flex items-center justify-center gap-1 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] px-4 py-2 rounded-xl font-bold text-xs">
+                დაწყება →
+              </span>
             </button>
           </section>
 
