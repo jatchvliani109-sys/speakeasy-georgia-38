@@ -517,19 +517,15 @@ function WordCard({ word }: { word: VocabWord }) {
         <ReadAloudButton text={word.en} size="md" />
       </div>
 
-      <p className="ka text-sm text-[#374151] mt-4 leading-relaxed">{word.explanationKa}</p>
+      {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
+        <p className="ka text-sm text-[#374151] mt-4 leading-relaxed">{word.explanationKa}</p>
+      )}
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4">
         <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
           <p className="text-sm text-[#1E2A44]">"{word.exampleEn}"</p>
           <p className="ka text-xs text-[#5B6473] mt-1">{word.exampleKa}</p>
         </div>
-        {word.example2En && (
-          <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
-            <p className="text-sm text-[#1E2A44]">"{word.example2En}"</p>
-            <p className="ka text-xs text-[#5B6473] mt-1">{word.example2Ka}</p>
-          </div>
-        )}
       </div>
     </div>
   );
