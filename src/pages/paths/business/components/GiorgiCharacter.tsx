@@ -10,7 +10,7 @@ export type GiorgiState =
   | "blank";
 
 const MESSAGES: Record<GiorgiState, string[]> = {
-  idle: ["მზად ვარ ვარჯიშისთვის.", "დავიწყოთ!"],
+  idle: ["მზად ვარ ვარჯიშისთვის.", "ყურადღება!"],
   correct: [
     "ბრავო! ვიცოდი რომ შეგეძლო!",
     "სწორია! გიორგი ბიზნესიანი კმაყოფილია.",
