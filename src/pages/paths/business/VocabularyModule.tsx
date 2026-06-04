@@ -505,7 +505,7 @@ function ProgressBar({ value, total, label }: { value: number; total: number; la
 
 function WordCard({ word }: { word: VocabWord }) {
   return (
-    <div className="bg-white border border-[#E7E2D5] rounded-3xl p-6 shadow-[0_2px_4px_rgba(30,42,68,0.04),0_12px_32px_-12px_rgba(30,42,68,0.15)] animate-[bizFade_.35s_ease-out_both]">
+    <div key={word.key} className="biz-card-flip bg-white border border-[#E7E2D5] rounded-3xl p-6 shadow-[0_2px_4px_rgba(30,42,68,0.04),0_12px_32px_-12px_rgba(30,42,68,0.15)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-3xl font-bold text-[#1E2A44] tracking-tight">{word.en}</h2>
