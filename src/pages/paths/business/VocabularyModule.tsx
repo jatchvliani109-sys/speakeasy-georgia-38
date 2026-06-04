@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -19,6 +19,16 @@ import {
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
+import { GiorgiCharacter, type GiorgiState } from "./components/GiorgiCharacter";
+import {
+  isSoundEnabled,
+  playCombo,
+  playComplete,
+  playCorrect,
+  playFlip,
+  playWrong,
+  setSoundEnabled,
+} from "./lib/vocabSounds";
 
 type Stage = "intro" | "cards" | "quiz" | "results" | "empty" | "reviewIntro";
 
