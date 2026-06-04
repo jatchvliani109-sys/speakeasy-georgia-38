@@ -56,6 +56,23 @@ export default function VocabularyModule() {
   } | null>(null);
   const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
   const [reviewMode, setReviewMode] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [bestCombo, setBestCombo] = useState(0);
+  const [giorgi, setGiorgi] = useState<GiorgiState>("idle");
+  const [giorgiSalt, setGiorgiSalt] = useState(0);
+  const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
+  const [confettiKey, setConfettiKey] = useState(0);
+  const masteredBaselineRef = useRef<number>(0);
+
+  const setGiorgiState = (s: GiorgiState) => {
+    setGiorgi(s);
+    setGiorgiSalt((x) => x + 1);
+  };
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOnState(next);
+    setSoundEnabled(next);
+  };
 
   useEffect(() => {
     if (!user) return;
