@@ -1005,7 +1005,7 @@ const FIELD_EXTRA: VocabWord[] = [
   ] as Mini[]).map((m) => mkField(m, "management")),
   // marketing
   ...([
-    ["ctr","CTR","CTR","CTR is up 5%.","CTR 5%-ით გაიზარდა."],
+    ["ctr","CTR","დაწკაპუნების კოეფიციენტი","Our CTR is up 5% this week.","ჩვენი CTR 5%-ით გაიზარდა ამ კვირაში."],
     ["cpc","CPC","CPC","Lower CPC is the goal.","CPC-ის შემცირება მიზანია."],
     ["cpm","CPM","CPM","Negotiate CPM down.","CPM ჩამოშალე."],
     ["sem","SEM","SEM","SEM budget approved.","SEM ბიუჯეტი დამტკიცდა."],
