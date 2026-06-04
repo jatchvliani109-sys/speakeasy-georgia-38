@@ -255,17 +255,28 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function distractorsKa(word: VocabWord, pool: VocabWord[], n: number): string[] {
-  return pick(
-    pool.filter((w) => w.key !== word.key).map((w) => w.ka),
-    n,
-  );
+  const seen = new Set<string>([word.ka]);
+  const unique: string[] = [];
+  for (const w of pool) {
+    if (w.key === word.key) continue;
+    if (seen.has(w.ka)) continue;
+    seen.add(w.ka);
+    unique.push(w.ka);
+  }
+  return pick(unique, n);
 }
 
 function distractorsEn(word: VocabWord, pool: VocabWord[], n: number): string[] {
-  return pick(
-    pool.filter((w) => w.key !== word.key).map((w) => w.en),
-    n,
-  );
+  const seen = new Set<string>([word.en.toLowerCase()]);
+  const unique: string[] = [];
+  for (const w of pool) {
+    if (w.key === word.key) continue;
+    const k = w.en.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    unique.push(w.en);
+  }
+  return pick(unique, n);
 }
 
 function makeMcMeaning(word: VocabWord, pool: VocabWord[]): QuizQuestion {
