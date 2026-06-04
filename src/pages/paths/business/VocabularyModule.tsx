@@ -105,12 +105,18 @@ export default function VocabularyModule() {
   }, [user]);
 
   const startSession = () => {
+    // Resume audio on user gesture (browsers require it).
+    try { (window as any).AudioContext && new (window as any).AudioContext().resume?.(); } catch {}
+    masteredBaselineRef.current = progress.filter((p) => p.confidence >= 4).length;
+    setCombo(0);
+    setBestCombo(0);
     if (reviewMode) {
       setQuiz(buildReviewQuiz(reviewWords));
       setQIdx(0);
       setAnswers([]);
       setSelected(null);
       setRevealed(false);
+      setGiorgiState("idle");
       setStage("quiz");
       return;
     }
@@ -121,13 +127,21 @@ export default function VocabularyModule() {
     setAnswers([]);
     setSelected(null);
     setRevealed(false);
+    setGiorgiState(newWords.length ? "newWord" : "idle");
+    if (newWords.length) playFlip();
     setStage(newWords.length ? "cards" : "quiz");
   };
 
   // CARDS
   const onNextCard = () => {
-    if (cardIdx + 1 < newWords.length) setCardIdx((i) => i + 1);
-    else setStage("quiz");
+    if (cardIdx + 1 < newWords.length) {
+      setCardIdx((i) => i + 1);
+      setGiorgiState("newWord");
+      playFlip();
+    } else {
+      setStage("quiz");
+      setGiorgiState("idle");
+    }
   };
 
   // QUIZ — single click flow
@@ -141,6 +155,23 @@ export default function VocabularyModule() {
     const nextAnswers = [...answers, { wordKey: key, correct }];
     setAnswers(nextAnswers);
     setRevealed(true);
+
+    if (correct) {
+      const nextCombo = combo + 1;
+      setCombo(nextCombo);
+      setBestCombo((b) => Math.max(b, nextCombo));
+      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) {
+        setGiorgiState("combo");
+        playCombo();
+      } else {
+        setGiorgiState("correct");
+        playCorrect();
+      }
+    } else {
+      setCombo(0);
+      setGiorgiState("wrong");
+      playWrong();
+    }
     // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
@@ -149,6 +180,7 @@ export default function VocabularyModule() {
       setQIdx((i) => i + 1);
       setSelected(null);
       setRevealed(false);
+      setGiorgiState("idle");
     } else {
       finishSession(ans);
     }
