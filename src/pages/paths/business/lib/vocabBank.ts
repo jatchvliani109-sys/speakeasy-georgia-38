@@ -510,19 +510,19 @@ export const FIELD_WORDS: VocabWord[] = [
 type Mini = [string, string, string, string, string]; // key, en, ka, exampleEn, exampleKa
 const mk = (m: Mini, week: number): VocabWord => ({
   key: m[0], en: m[1], ka: m[2],
-  explanationKa: m[2],
+  explanationKa: "",
   pronunciation: "",
   exampleEn: m[3], exampleKa: m[4],
-  example2En: m[3], example2Ka: m[4],
+  example2En: "", example2Ka: "",
   source: "core",
   week,
 });
 const mkField = (m: Mini, field: string): VocabWord => ({
   key: m[0], en: m[1], ka: m[2],
-  explanationKa: m[2],
+  explanationKa: "",
   pronunciation: "",
   exampleEn: m[3], exampleKa: m[4],
-  example2En: m[3], example2Ka: m[4],
+  example2En: "", example2Ka: "",
   source: "field",
   field,
 });
