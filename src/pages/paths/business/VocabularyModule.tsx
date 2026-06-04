@@ -240,6 +240,16 @@ export default function VocabularyModule() {
       },
     });
 
+    // Mastered milestone (every 10 mastered → confetti)
+    const newMastered = newProgress.filter((p) => p.confidence >= 4).length;
+    const baseline = masteredBaselineRef.current;
+    if (Math.floor(newMastered / 10) > Math.floor(baseline / 10)) {
+      setConfettiKey((k) => k + 1);
+    }
+    masteredBaselineRef.current = newMastered;
+
+    setGiorgiState("complete");
+    playComplete();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };
