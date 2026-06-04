@@ -800,3 +800,36 @@ function SummaryStat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+function Confetti({ seed }: { seed: number }): JSX.Element {
+  const pieces = useMemo(() => {
+    const colors = ["#C9A227", "#1E2A44", "#E0B844", "#10B981", "#EF4444", "#F2D680"];
+    return Array.from({ length: 36 }).map((_, i) => ({
+      id: `${seed}-${i}`,
+      left: Math.random() * 100,
+      delay: Math.random() * 250,
+      duration: 1400 + Math.random() * 900,
+      color: colors[i % colors.length],
+      size: 6 + Math.round(Math.random() * 6),
+      rot: Math.round(Math.random() * 360),
+    }));
+  }, [seed]);
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="absolute top-0 rounded-sm"
+          style={{
+            left: `${p.left}%`,
+            width: p.size,
+            height: p.size * 0.4,
+            background: p.color,
+            transform: `rotate(${p.rot}deg)`,
+            animation: `bizConfettiFall ${p.duration}ms ease-in ${p.delay}ms forwards`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
