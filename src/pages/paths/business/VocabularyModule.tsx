@@ -372,7 +372,7 @@ export default function VocabularyModule() {
       {stage === "cards" && newWords[cardIdx] && (
         <>
           <ProgressBar value={cardIdx + 1} total={newWords.length} label={`ახალი სიტყვა ${cardIdx + 1}/${newWords.length}`} />
-          <WordCard word={newWords[cardIdx]} />
+          <WordCard key={newWords[cardIdx].key} word={newWords[cardIdx]} />
           <div className="mt-4 flex justify-end">
             <BizButton onClick={onNextCard}>
               {cardIdx + 1 < newWords.length ? "შემდეგი →" : "ქვიზის დაწყება →"}
