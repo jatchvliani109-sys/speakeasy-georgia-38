@@ -346,8 +346,8 @@ function makeGeorgianMistake(m: GeorgianMistake): QuizQuestion {
   };
 }
 
-const NEW_GENERATORS = [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeTrueFalse, makeSentenceCorrect];
-const REVIEW_GENERATORS = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrueFalse, makeTrEnToKa];
+const NEW_GENERATORS = [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeSentenceCorrect];
+const REVIEW_GENERATORS = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa];
 
 /**
  * Build a mixed quiz of ~12 questions for the session.
