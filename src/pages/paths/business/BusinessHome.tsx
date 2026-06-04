@@ -614,27 +614,3 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MiniGiorgi(): JSX.Element {
-  return (
-    <svg viewBox="0 0 120 140" width="100%" height="100%" aria-hidden style={{ animation: "giorgiBreathe 3.5s ease-in-out infinite" }}>
-      <ellipse cx="60" cy="134" rx="26" ry="3" fill="#000" opacity="0.18" />
-      <path d="M30 132 L34 86 Q60 78 86 86 L90 132 Z" fill="#0F1B2E" />
-      <path d="M60 86 L46 132 L52 132 L60 102 Z" fill="#0A1424" />
-      <path d="M60 86 L74 132 L68 132 L60 102 Z" fill="#0A1424" />
-      <path d="M60 86 L54 96 L60 102 L66 96 Z" fill="#F7F1E3" />
-      <path d="M58 96 L62 96 L64 100 L60 104 L56 100 Z" fill="#C9A227" />
-      <path d="M56 100 L64 100 L66 122 L60 128 L54 122 Z" fill="#C9A227" />
-      <path d="M32 90 L30 122 L40 122 L42 92 Z" fill="#0F1B2E" />
-      <path d="M88 90 L90 122 L80 122 L78 92 Z" fill="#0F1B2E" />
-      <rect x="55" y="72" width="10" height="10" fill="#E8C9A0" />
-      <ellipse cx="60" cy="56" rx="22" ry="24" fill="#F0D2A8" />
-      <path d="M38 50 Q40 30 60 30 Q80 30 82 50 Q78 40 60 40 Q42 40 38 50 Z" fill="#2A2118" />
-      <g stroke="#1E2A44" strokeWidth="1.5" fill="none">
-        <circle cx="51" cy="56" r="5" />
-        <circle cx="69" cy="56" r="5" />
-        <line x1="56" y1="56" x2="64" y2="56" />
-      </g>
-      <line x1="54" y1="68" x2="66" y2="68" stroke="#1E2A44" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
