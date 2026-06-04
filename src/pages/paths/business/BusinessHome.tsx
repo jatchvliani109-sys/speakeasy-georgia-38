@@ -312,6 +312,29 @@ export default function BusinessHome() {
                     დღევანდელი თემა: {focusCurriculum.titleKa}
                   </p>
                 )}
+                {focusModuleSlug === "vocabulary" && !focusDoneToday && (
+                  <div className="mt-3 space-y-2">
+                    <p className="ka text-[11px] text-[#F2D680]">
+                      დღეს {vocabWordCount} სიტყვა იცი
+                    </p>
+                    <p className="ka text-[11px] text-[#F7F1E3]/75">
+                      {vocabNewToday > 0
+                        ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
+                        : vocabReviewToday > 0
+                        ? `${vocabReviewToday} გასამეორებელი სიტყვა`
+                        : "გამეორების დღე — ყველაზე რთული სიტყვები"}
+                    </p>
+                    {vocabPreview && (
+                      <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F1E3]/10 border border-[#F7F1E3]/15">
+                        <span className="ka text-[9px] uppercase tracking-wider text-[#F2D680] font-semibold">
+                          პირველი სიტყვა
+                        </span>
+                        <span className="text-sm font-bold text-[#F7F1E3]">{vocabPreview.en}</span>
+                        <span className="ka text-[11px] text-[#F7F1E3]/70">· {vocabPreview.ka}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {focusMod && (
                   <p className="ka text-[11px] text-[#F7F1E3]/60 mt-3">
                     მოდული: {focusMod.title}
@@ -327,55 +350,7 @@ export default function BusinessHome() {
             </div>
           </section>
 
-          {/* 2a-pre. Vocabulary — prominent card */}
-          <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
-              ბიზნეს ლექსიკა
-            </p>
-            <button
-              onClick={() => navigate("/path/business/module/vocabulary")}
-              className="group relative w-full text-left overflow-hidden rounded-3xl p-5 transition-all hover:shadow-lg"
-              style={{
-                background:
-                  "radial-gradient(420px 180px at 100% 0%, rgba(201,162,39,0.30), transparent 60%), linear-gradient(135deg, #1E2A44 0%, #15203A 100%)",
-                color: "#F7F1E3",
-                boxShadow: "0 12px 32px -14px rgba(30,42,68,0.45)",
-              }}
-            >
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/25 text-[#F2D680] px-2 py-1 rounded-md font-bold">
-                  🔥 დღევანდელი ვარჯიში
-                </span>
-                <span className="ka text-[10px] text-[#F7F1E3]/70">
-                  დღეს {vocabWordCount} სიტყვა იცი
-                </span>
-              </div>
-              <p className="ka text-base font-bold mt-2 leading-snug">
-                დღევანდელი ბიზნეს სიტყვები
-              </p>
-              <p className="ka text-[11px] text-[#F7F1E3]/75 mt-1 leading-relaxed">
-                {vocabNewToday > 0
-                  ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
-                  : vocabReviewToday > 0
-                  ? `${vocabReviewToday} გასამეორებელი სიტყვა`
-                  : "გამეორების დღე — ყველაზე რთული სიტყვები"}
-              </p>
 
-              {vocabPreview && (
-                <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F1E3]/10 border border-[#F7F1E3]/15">
-                  <span className="ka text-[9px] uppercase tracking-wider text-[#F2D680] font-semibold">
-                    პირველი სიტყვა
-                  </span>
-                  <span className="text-sm font-bold text-[#F7F1E3]">{vocabPreview.en}</span>
-                  <span className="ka text-[11px] text-[#F7F1E3]/70">· {vocabPreview.ka}</span>
-                </div>
-              )}
-
-              <span className="ka mt-3 inline-flex items-center justify-center gap-1 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] px-4 py-2 rounded-xl font-bold text-xs">
-                დაწყება →
-              </span>
-            </button>
-          </section>
 
 
 
