@@ -17,6 +17,8 @@ import {
   resetBusiness,
 } from "./lib/state";
 import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
+import { loadProgress, planSession } from "./lib/vocabEngine";
+import type { VocabWord } from "./lib/vocabBank";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
   light: "10 წუთი",
