@@ -310,12 +310,35 @@ export default function VocabularyModule() {
             ? "გამეორების დღე"
             : "დღევანდელი სიტყვები"}
         </h1>
-        <div className="mt-2 flex items-center gap-2 flex-wrap">
+        <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
           <Link to="/path/business/vocabulary/notebook" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
             📔 ჩემი რვეული
           </Link>
+          <button
+            type="button"
+            onClick={toggleSound}
+            title={soundOn ? "ხმის გამორთვა" : "ხმის ჩართვა"}
+            className="ka text-[11px] inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E7E2D5] text-[#5B6473] hover:text-[#1E2A44] hover:bg-[#FAF7F0] transition"
+          >
+            <span>{soundOn ? "🔊" : "🔇"}</span>
+            <span>{soundOn ? "ხმა ჩართულია" : "ხმა გამორთულია"}</span>
+          </button>
         </div>
       </header>
+
+      {(stage === "cards" || stage === "quiz" || stage === "results") && (
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <GiorgiCharacter state={giorgi} salt={giorgiSalt} size={120} />
+          {stage === "quiz" && combo >= 2 && (
+            <div className="ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm self-start mt-2">
+              <span className="biz-flame">🔥</span>
+              {combo} სწორი ზედიზედ
+            </div>
+          )}
+        </div>
+      )}
+
+      {confettiKey > 0 && <Confetti seed={confettiKey} />}
 
       {stage === "intro" && (
         <IntroCard
