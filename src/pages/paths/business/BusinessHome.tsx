@@ -84,6 +84,9 @@ export default function BusinessHome() {
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
+  const [vocabPreview, setVocabPreview] = useState<VocabWord | null>(null);
+  const [vocabNewToday, setVocabNewToday] = useState<number>(0);
+  const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
