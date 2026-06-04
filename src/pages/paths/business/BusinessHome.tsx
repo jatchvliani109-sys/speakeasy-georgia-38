@@ -119,6 +119,17 @@ export default function BusinessHome() {
       });
       setVocabWordCount(vocabWords.count ?? 0);
 
+      // Plan a preview of today's vocab session for the dashboard card.
+      try {
+        const vp = await loadProgress(user.id);
+        if (!cancelled) {
+          const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
+          setVocabNewToday(plan.newWords.length);
+          setVocabReviewToday(plan.reviewKeys.length);
+          setVocabPreview(plan.newWords[0] || null);
+        }
+      } catch {}
+
       const { data: resumeRow } = await supabase
         .from("business_resumes")
         .select("id")
