@@ -523,7 +523,7 @@ export function pickLowestConfidenceWords(progress: ProgressRow[], n = 10): Voca
 export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
   if (!words.length) return [];
   const pool = ALL_WORDS;
-  const generators = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa, makeTrueFalse];
+  const generators = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa];
   const questions: QuizQuestion[] = [];
 
   // Pass 1: one varied question per word
