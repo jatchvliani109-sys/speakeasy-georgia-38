@@ -119,7 +119,7 @@ export default function VocabularyModule() {
       setStage("quiz");
       return;
     }
-    const q = buildQuiz(newWords, reviewKeys);
+    const q = buildQuiz(newWords, reviewKeys, tierLevel);
     setQuiz(q);
     setCardIdx(0);
     setQIdx(0);
