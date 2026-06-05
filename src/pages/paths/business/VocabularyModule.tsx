@@ -43,6 +43,7 @@ export default function VocabularyModule() {
   const [state, setState] = useState<BusinessState | null>(null);
   const [newWords, setNewWords] = useState<VocabWord[]>([]);
   const [reviewKeys, setReviewKeys] = useState<string[]>([]);
+  const [tierLevel, setTierLevel] = useState<1 | 2 | 3>(1);
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
@@ -87,6 +88,7 @@ export default function VocabularyModule() {
       setTotalVocab(p.length);
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
+      setTierLevel(plan.tierLevel);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
@@ -117,7 +119,7 @@ export default function VocabularyModule() {
       setStage("quiz");
       return;
     }
-    const q = buildQuiz(newWords, reviewKeys);
+    const q = buildQuiz(newWords, reviewKeys, tierLevel);
     setQuiz(q);
     setCardIdx(0);
     setQIdx(0);
@@ -294,7 +296,7 @@ export default function VocabularyModule() {
     // skip the cards stage and go straight to quiz.
     setNewWords([]);
     setReviewKeys(pool.map((w) => w.key));
-    setQuiz(buildQuiz(pool, []));
+    setQuiz(buildQuiz(pool, [], tierLevel));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
