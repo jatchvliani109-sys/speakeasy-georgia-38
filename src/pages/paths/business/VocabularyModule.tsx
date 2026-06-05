@@ -19,13 +19,13 @@ import {
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
-import { GiorgiCharacter, type GiorgiState } from "./components/GiorgiCharacter";
 import {
   isSoundEnabled,
   playCombo,
   playComplete,
   playCorrect,
   playFlip,
+  playMegaCombo,
   playWrong,
   setSoundEnabled,
 } from "./lib/vocabSounds";
@@ -58,16 +58,14 @@ export default function VocabularyModule() {
   const [reviewMode, setReviewMode] = useState(false);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
-  const [giorgi, setGiorgi] = useState<GiorgiState>("idle");
-  const [giorgiSalt, setGiorgiSalt] = useState(0);
   const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
   const [confettiKey, setConfettiKey] = useState(0);
+  const [streakOverlay, setStreakOverlay] = useState<null | "mid" | "mega">(null);
+  const [progressPulse, setProgressPulse] = useState(0);
+  const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
+  const autoAdvanceRef = useRef<number | null>(null);
 
-  const setGiorgiState = (s: GiorgiState) => {
-    setGiorgi(s);
-    setGiorgiSalt((x) => x + 1);
-  };
   const toggleSound = () => {
     const next = !soundOn;
     setSoundOnState(next);
@@ -116,7 +114,6 @@ export default function VocabularyModule() {
       setAnswers([]);
       setSelected(null);
       setRevealed(false);
-      setGiorgiState("idle");
       setStage("quiz");
       return;
     }
@@ -127,7 +124,6 @@ export default function VocabularyModule() {
     setAnswers([]);
     setSelected(null);
     setRevealed(false);
-    setGiorgiState(newWords.length ? "newWord" : "idle");
     if (newWords.length) playFlip();
     setStage(newWords.length ? "cards" : "quiz");
   };
@@ -136,16 +132,32 @@ export default function VocabularyModule() {
   const onNextCard = () => {
     if (cardIdx + 1 < newWords.length) {
       setCardIdx((i) => i + 1);
-      setGiorgiState("newWord");
       playFlip();
     } else {
       setStage("quiz");
-      setGiorgiState("idle");
     }
   };
 
   // QUIZ — single click flow
   const currentQ = quiz[qIdx];
+
+  const triggerStreak = (n: number) => {
+    if (n === 10 || (n > 10 && n % 10 === 0)) {
+      setStreakOverlay("mega");
+      setScreenFlash("mega");
+      setConfettiKey((k) => k + 1);
+      playMegaCombo();
+      window.setTimeout(() => setStreakOverlay(null), 2500);
+      window.setTimeout(() => setScreenFlash(null), 2500);
+    } else if (n === 5 || (n > 5 && n % 5 === 0)) {
+      setStreakOverlay("mid");
+      setScreenFlash("gold");
+      setProgressPulse((p) => p + 1);
+      playCombo();
+      window.setTimeout(() => setStreakOverlay(null), 1500);
+      window.setTimeout(() => setScreenFlash(null), 1500);
+    }
+  };
 
   const handleSelect = (val: string | number) => {
     if (revealed || !currentQ) return;
@@ -160,31 +172,33 @@ export default function VocabularyModule() {
       const nextCombo = combo + 1;
       setCombo(nextCombo);
       setBestCombo((b) => Math.max(b, nextCombo));
-      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) {
-        setGiorgiState("combo");
-        playCombo();
+      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0) || nextCombo === 10 || (nextCombo > 10 && nextCombo % 10 === 0)) {
+        triggerStreak(nextCombo);
       } else {
-        setGiorgiState("correct");
         playCorrect();
       }
+      // Auto-advance on correct after 1.5s (longer if streak overlay is showing)
+      const delay = (nextCombo === 10 || (nextCombo > 10 && nextCombo % 10 === 0)) ? 2700 : (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) ? 1700 : 1500;
+      if (autoAdvanceRef.current) window.clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = window.setTimeout(() => goNext(nextAnswers), delay);
     } else {
       setCombo(0);
-      setGiorgiState("wrong");
       playWrong();
+      // Wrong: do not auto-advance — let user review and click next.
     }
-    // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
   const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
+    if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
       setSelected(null);
       setRevealed(false);
-      setGiorgiState("idle");
     } else {
       finishSession(ans);
     }
   };
+
 
   const finishSession = async (finalAnswers: { wordKey: string; correct: boolean }[]) => {
     if (!user) return;
@@ -248,7 +262,6 @@ export default function VocabularyModule() {
     }
     masteredBaselineRef.current = newMastered;
 
-    setGiorgiState("complete");
     playComplete();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
@@ -326,15 +339,41 @@ export default function VocabularyModule() {
         </div>
       </header>
 
-      {(stage === "cards" || stage === "quiz" || stage === "results") && (
-        <div className="mb-3 flex items-end justify-between gap-3">
-          <GiorgiCharacter state={giorgi} salt={giorgiSalt} size={120} />
-          {stage === "quiz" && combo >= 2 && (
-            <div className="ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm self-start mt-2">
-              <span className="biz-flame">🔥</span>
-              {combo} სწორი ზედიზედ
+      {stage === "quiz" && combo >= 2 && (
+        <div className="mb-3 flex items-center justify-end">
+          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
+            <span className="biz-flame">🔥</span>
+            {combo} სწორი ზედიზედ
+          </div>
+        </div>
+      )}
+
+      {/* Screen flash overlay for streaks */}
+      {screenFlash && (
+        <div
+          key={`flash-${screenFlash}-${streakOverlay}`}
+          className={`pointer-events-none fixed inset-0 z-40 ${screenFlash === "mega" ? "biz-mega-flash" : "biz-gold-flash"}`}
+        />
+      )}
+
+      {/* Streak message overlay */}
+      {streakOverlay === "mid" && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex">
+          <div className="absolute left-1/2 top-1/2 biz-streak-pop">
+            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
+              🔥 5 სწორი პასუხი!
             </div>
-          )}
+          </div>
+        </div>
+      )}
+      {streakOverlay === "mega" && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex">
+          <div className="absolute left-1/2 top-1/2 biz-mega-pop">
+            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#C9A227] via-[#E0B844] to-[#F2D680] text-[#1E2A44] text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
+              <div className="text-4xl">⚡ 10 სწორი პასუხი!</div>
+              <div className="text-xl mt-1 text-[#1E2A44]/85">გაუჩერებელი ხარ!</div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -383,15 +422,17 @@ export default function VocabularyModule() {
 
       {stage === "quiz" && currentQ && (
         <>
-          <ProgressBar value={qIdx + 1} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} />
-          <QuestionCard
-            q={currentQ}
-            selected={selected}
-            revealed={revealed}
-            setSelected={handleSelect}
-          />
-          {revealed && (
-            <div className="mt-4 flex justify-end">
+          <ProgressBar value={qIdx + (revealed ? 1 : 0)} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} pulse={progressPulse} />
+          <div key={qIdx} className="biz-question-slide">
+            <QuestionCard
+              q={currentQ}
+              selected={selected}
+              revealed={revealed}
+              setSelected={handleSelect}
+            />
+          </div>
+          {revealed && selected !== null && !checkAnswer(currentQ, selected) && (
+            <div className="mt-4 flex justify-end animate-[bizFade_.3s_ease-out_both]">
               <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
               </BizButton>
@@ -488,16 +529,20 @@ function Mini({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ProgressBar({ value, total, label }: { value: number; total: number; label: string }) {
-  const pct = Math.round((value / total) * 100);
+function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total: number; label: string; pulse?: number }) {
+  const pct = Math.max(0, Math.min(100, Math.round((value / total) * 100)));
   return (
     <div className="mb-3">
       <div className="flex justify-between items-center mb-1.5">
         <p className="ka text-[11px] text-[#5B6473] font-semibold uppercase tracking-wider">{label}</p>
         <p className="text-[11px] text-[#5B6473] font-mono">{pct}%</p>
       </div>
-      <div className="h-1.5 bg-[#E7E2D5] rounded-full overflow-hidden">
-        <div className="h-full bg-[#1E2A44] transition-all" style={{ width: `${pct}%` }} />
+      <div className={`h-2 bg-[#E7E2D5] rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
+        <div
+          key={pulse}
+          className="h-full bg-gradient-to-r from-[#1E2A44] to-[#C9A227] rounded-full"
+          style={{ width: `${pct}%`, transition: "width 700ms cubic-bezier(0.2,0.8,0.2,1)" }}
+        />
       </div>
     </div>
   );
@@ -571,12 +616,13 @@ function QuestionCard({
         const isSelected = selected === value;
         const isCorrect = revealed && value === correctValue;
         const isWrongPick = revealed && isSelected && !isCorrect;
+        const showBurst = isCorrect && isSelected;
         return (
           <button
             key={i}
             disabled={revealed}
             onClick={() => setSelected(value)}
-            className={`text-left px-4 py-3 rounded-xl border text-sm transition-all
+            className={`relative overflow-visible text-left px-4 py-3 rounded-xl border text-sm transition-all
               ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
               ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
               ${!revealed && isSelected ? "border-[#1E2A44] bg-[#FAF7F0] text-[#1E2A44]" : ""}
@@ -585,6 +631,7 @@ function QuestionCard({
             `}
           >
             <span className={typeof label === "string" && label.match(/[ა-ჰ]/) ? "ka" : ""}>{label}</span>
+            {showBurst && <ParticleBurst />}
           </button>
         );
       })}
@@ -718,13 +765,13 @@ function Results({
                 "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] p-6 text-center">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/15 blur-2xl pointer-events-none" />
         <div className="relative">
           <p className="ka text-[11px] uppercase tracking-wider text-[#F2D680] font-semibold">დღევანდელი შედეგი</p>
-          <p className="text-6xl font-bold mt-2">{pct}%</p>
-          <p className="ka text-sm text-[#F7F1E3]/80 mt-2">{correct} / {total} სწორი პასუხი</p>
+          <p className="text-6xl font-bold mt-2 tabular-nums"><CountUp to={pct} duration={1200} />%</p>
+          <p className="ka text-sm text-[#F7F1E3]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-[#F2D680] mt-3 font-semibold">{message}</p>
         </div>
       </div>
@@ -829,3 +876,56 @@ function Confetti({ seed }: { seed: number }): JSX.Element {
     </div>
   );
 }
+
+function ParticleBurst(): JSX.Element {
+  const particles = useMemo(() => {
+    const colors = ["#10B981", "#34D399", "#C9A227", "#E0B844", "#F2D680"];
+    return Array.from({ length: 10 }).map((_, i) => {
+      const angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.3;
+      const dist = 32 + Math.random() * 24;
+      return {
+        id: i,
+        bx: Math.cos(angle) * dist,
+        by: Math.sin(angle) * dist,
+        color: colors[i % colors.length],
+        delay: Math.random() * 60,
+      };
+    });
+  }, []);
+  return (
+    <span className="pointer-events-none absolute inset-0 overflow-visible" aria-hidden>
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className="biz-particle"
+          style={{
+            background: p.color,
+            ["--bx" as never]: `${p.bx}px`,
+            ["--by" as never]: `${p.by}px`,
+            animationDelay: `${p.delay}ms`,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function CountUp({ to, duration = 1000 }: { to: number; duration?: number }): JSX.Element {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const from = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to, duration]);
+  return <>{val}</>;
+}
+
