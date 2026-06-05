@@ -419,38 +419,59 @@ function makeGeorgianMistake(m: GeorgianMistake): QuizQuestion {
   };
 }
 
-const NEW_GENERATORS = [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeSentenceCorrect];
-const REVIEW_GENERATORS = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa];
+// Progressive generator pools by tier level.
+// Tier 1: easy recognition-heavy formats (MC, T/F, EN→KA recognition).
+// Tier 2: introduces fill-in-blank and sentence-correctness questions.
+// Tier 3: production-heavy — fill_blank, sentence_correct, KA→EN recall dominate.
+type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
+const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
+  1: [makeMcMeaning, makeTrueFalse, makeTrEnToKa, makeMcMeaning],
+  2: [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeSentenceCorrect, makeTrueFalse],
+  3: [makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank, makeMcMeaning],
+};
+const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
+  1: [makeMcMeaning, makeTrKaToEn, makeTrueFalse, makeTrEnToKa],
+  2: [makeFillBlank, makeTrKaToEn, makeMcMeaning, makeSentenceCorrect],
+  3: [makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank],
+};
 
 /**
- * Build a mixed quiz of ~12 questions for the session.
- * - First, one question per new word using a varied generator.
- * - Then review words mixed in.
- * - 2 Georgian mistake questions sprinkled in.
+ * Build a mixed quiz for the session.
+ * - Question type difficulty scales with tierLevel.
+ * - Review words (from earlier tiers when applicable) reinforce retention.
+ * - Georgian mistake questions sprinkled in.
  * - Never the same type twice in a row.
  */
-export function buildQuiz(newWords: VocabWord[], reviewKeys: string[]): QuizQuestion[] {
+export function buildQuiz(
+  newWords: VocabWord[],
+  reviewKeys: string[],
+  tierLevel: 1 | 2 | 3 = 1,
+): QuizQuestion[] {
   const pool = ALL_WORDS;
   const reviewWords = reviewKeys.map(findWord).filter(Boolean) as VocabWord[];
+
+  const newGens = NEW_GENERATORS_BY_TIER[tierLevel];
+  const reviewGens = REVIEW_GENERATORS_BY_TIER[tierLevel];
 
   const questions: QuizQuestion[] = [];
 
   newWords.forEach((w, i) => {
-    const gen = NEW_GENERATORS[i % NEW_GENERATORS.length];
+    const gen = newGens[i % newGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
   });
 
   reviewWords.forEach((w, i) => {
-    const gen = REVIEW_GENERATORS[i % REVIEW_GENERATORS.length];
+    const gen = reviewGens[i % reviewGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
   });
 
-  // Sprinkle 2 mistakes
-  const mistakes = pick(GEORGIAN_MISTAKES, 2).map(makeGeorgianMistake);
+  // 1 mistake on tier 1 to keep things gentle, 2 on higher tiers.
+  const mistakeCount = tierLevel === 1 ? 1 : 2;
+  const mistakes = pick(GEORGIAN_MISTAKES, mistakeCount).map(makeGeorgianMistake);
 
   // Shuffle but avoid back-to-back same type
   let merged = shuffle([...questions, ...mistakes]);
