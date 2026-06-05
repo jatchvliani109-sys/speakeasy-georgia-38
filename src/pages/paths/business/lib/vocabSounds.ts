@@ -39,14 +39,14 @@ function tone(
   const start = c.currentTime + (opts.delayMs ? opts.delayMs / 1000 : 0);
   const osc = c.createOscillator();
   const g = c.createGain();
-  osc.type = opts.type || "sine";
+  osc.type = opts.type || "square";
   osc.frequency.setValueAtTime(freq, start);
   if (opts.sweepTo) {
     osc.frequency.exponentialRampToValueAtTime(opts.sweepTo, start + durMs / 1000);
   }
-  const peak = opts.gain ?? 0.08;
+  const peak = opts.gain ?? 0.06;
   g.gain.setValueAtTime(0.0001, start);
-  g.gain.exponentialRampToValueAtTime(peak, start + 0.01);
+  g.gain.exponentialRampToValueAtTime(peak, start + 0.005);
   g.gain.exponentialRampToValueAtTime(0.0001, start + durMs / 1000);
   osc.connect(g).connect(c.destination);
   osc.start(start);
@@ -55,41 +55,39 @@ function tone(
 
 export function playCorrect() {
   if (!isSoundEnabled()) return;
-  tone(660, 90, { type: "sine", gain: 0.08 });
-  tone(990, 160, { type: "sine", gain: 0.08, delayMs: 70 });
+  tone(340, 70, { type: "square", gain: 0.06 });
+  tone(520, 110, { type: "square", gain: 0.05, delayMs: 60 });
 }
 
 export function playWrong() {
   if (!isSoundEnabled()) return;
-  tone(240, 180, { type: "sine", gain: 0.05, sweepTo: 170 });
+  tone(180, 220, { type: "square", gain: 0.05, sweepTo: 100 });
 }
 
 export function playCombo() {
   if (!isSoundEnabled()) return;
-  // shorter, energetic
-  tone(659, 80, { type: "triangle", gain: 0.08 });
-  tone(880, 80, { type: "triangle", gain: 0.08, delayMs: 70 });
-  tone(1175, 180, { type: "triangle", gain: 0.09, delayMs: 140 });
+  tone(320, 70, { type: "square", gain: 0.06 });
+  tone(440, 70, { type: "square", gain: 0.06, delayMs: 60 });
+  tone(600, 140, { type: "square", gain: 0.06, delayMs: 120 });
 }
 
 export function playMegaCombo() {
   if (!isSoundEnabled()) return;
-  // celebratory fanfare
-  tone(523, 110, { type: "triangle", gain: 0.08 });
-  tone(659, 110, { type: "triangle", gain: 0.08, delayMs: 100 });
-  tone(784, 110, { type: "triangle", gain: 0.08, delayMs: 200 });
-  tone(1046, 130, { type: "triangle", gain: 0.09, delayMs: 300 });
-  tone(1318, 320, { type: "sine", gain: 0.1, delayMs: 430 });
+  tone(280, 100, { type: "square", gain: 0.06 });
+  tone(360, 100, { type: "square", gain: 0.06, delayMs: 90 });
+  tone(480, 100, { type: "square", gain: 0.06, delayMs: 180 });
+  tone(640, 120, { type: "square", gain: 0.07, delayMs: 270 });
+  tone(800, 280, { type: "square", gain: 0.07, delayMs: 390 });
 }
 
 export function playComplete() {
   if (!isSoundEnabled()) return;
-  tone(523, 120, { type: "sine", gain: 0.08 });
-  tone(659, 120, { type: "sine", gain: 0.08, delayMs: 110 });
-  tone(880, 320, { type: "sine", gain: 0.09, delayMs: 220 });
+  tone(320, 110, { type: "square", gain: 0.06 });
+  tone(440, 110, { type: "square", gain: 0.06, delayMs: 100 });
+  tone(600, 300, { type: "square", gain: 0.06, delayMs: 200 });
 }
 
 export function playFlip() {
   if (!isSoundEnabled()) return;
-  tone(420, 90, { type: "sine", gain: 0.04, sweepTo: 720 });
+  tone(280, 80, { type: "square", gain: 0.04, sweepTo: 480 });
 }
