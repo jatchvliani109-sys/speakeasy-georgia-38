@@ -88,6 +88,7 @@ export default function VocabularyModule() {
       setTotalVocab(p.length);
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
+      setTierLevel(plan.tierLevel);
       if (!plan.newWords.length && !plan.reviewKeys.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
