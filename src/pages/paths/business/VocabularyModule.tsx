@@ -529,16 +529,20 @@ function Mini({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ProgressBar({ value, total, label }: { value: number; total: number; label: string }) {
-  const pct = Math.round((value / total) * 100);
+function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total: number; label: string; pulse?: number }) {
+  const pct = Math.max(0, Math.min(100, Math.round((value / total) * 100)));
   return (
     <div className="mb-3">
       <div className="flex justify-between items-center mb-1.5">
         <p className="ka text-[11px] text-[#5B6473] font-semibold uppercase tracking-wider">{label}</p>
         <p className="text-[11px] text-[#5B6473] font-mono">{pct}%</p>
       </div>
-      <div className="h-1.5 bg-[#E7E2D5] rounded-full overflow-hidden">
-        <div className="h-full bg-[#1E2A44] transition-all" style={{ width: `${pct}%` }} />
+      <div className={`h-2 bg-[#E7E2D5] rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
+        <div
+          key={pulse}
+          className="h-full bg-gradient-to-r from-[#1E2A44] to-[#C9A227] rounded-full"
+          style={{ width: `${pct}%`, transition: "width 700ms cubic-bezier(0.2,0.8,0.2,1)" }}
+        />
       </div>
     </div>
   );
