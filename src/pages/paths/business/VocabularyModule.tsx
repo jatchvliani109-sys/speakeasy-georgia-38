@@ -422,15 +422,17 @@ export default function VocabularyModule() {
 
       {stage === "quiz" && currentQ && (
         <>
-          <ProgressBar value={qIdx + 1} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} />
-          <QuestionCard
-            q={currentQ}
-            selected={selected}
-            revealed={revealed}
-            setSelected={handleSelect}
-          />
-          {revealed && (
-            <div className="mt-4 flex justify-end">
+          <ProgressBar value={qIdx + (revealed ? 1 : 0)} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} pulse={progressPulse} />
+          <div key={qIdx} className="biz-question-slide">
+            <QuestionCard
+              q={currentQ}
+              selected={selected}
+              revealed={revealed}
+              setSelected={handleSelect}
+            />
+          </div>
+          {revealed && selected !== null && !checkAnswer(currentQ, selected) && (
+            <div className="mt-4 flex justify-end animate-[bizFade_.3s_ease-out_both]">
               <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
               </BizButton>
