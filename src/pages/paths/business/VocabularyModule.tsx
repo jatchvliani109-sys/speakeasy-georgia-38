@@ -876,3 +876,56 @@ function Confetti({ seed }: { seed: number }): JSX.Element {
     </div>
   );
 }
+
+function ParticleBurst(): JSX.Element {
+  const particles = useMemo(() => {
+    const colors = ["#10B981", "#34D399", "#C9A227", "#E0B844", "#F2D680"];
+    return Array.from({ length: 10 }).map((_, i) => {
+      const angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.3;
+      const dist = 32 + Math.random() * 24;
+      return {
+        id: i,
+        bx: Math.cos(angle) * dist,
+        by: Math.sin(angle) * dist,
+        color: colors[i % colors.length],
+        delay: Math.random() * 60,
+      };
+    });
+  }, []);
+  return (
+    <span className="pointer-events-none absolute inset-0 overflow-visible" aria-hidden>
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className="biz-particle"
+          style={{
+            background: p.color,
+            ["--bx" as never]: `${p.bx}px`,
+            ["--by" as never]: `${p.by}px`,
+            animationDelay: `${p.delay}ms`,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function CountUp({ to, duration = 1000 }: { to: number; duration?: number }): JSX.Element {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const from = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to, duration]);
+  return <>{val}</>;
+}
+
