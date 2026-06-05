@@ -616,12 +616,13 @@ function QuestionCard({
         const isSelected = selected === value;
         const isCorrect = revealed && value === correctValue;
         const isWrongPick = revealed && isSelected && !isCorrect;
+        const showBurst = isCorrect && isSelected;
         return (
           <button
             key={i}
             disabled={revealed}
             onClick={() => setSelected(value)}
-            className={`text-left px-4 py-3 rounded-xl border text-sm transition-all
+            className={`relative overflow-visible text-left px-4 py-3 rounded-xl border text-sm transition-all
               ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
               ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
               ${!revealed && isSelected ? "border-[#1E2A44] bg-[#FAF7F0] text-[#1E2A44]" : ""}
@@ -630,6 +631,7 @@ function QuestionCard({
             `}
           >
             <span className={typeof label === "string" && label.match(/[ა-ჰ]/) ? "ka" : ""}>{label}</span>
+            {showBurst && <ParticleBurst />}
           </button>
         );
       })}
