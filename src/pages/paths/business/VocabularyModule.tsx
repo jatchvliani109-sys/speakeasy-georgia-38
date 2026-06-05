@@ -765,13 +765,13 @@ function Results({
                 "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] p-6 text-center">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/15 blur-2xl pointer-events-none" />
         <div className="relative">
           <p className="ka text-[11px] uppercase tracking-wider text-[#F2D680] font-semibold">დღევანდელი შედეგი</p>
-          <p className="text-6xl font-bold mt-2">{pct}%</p>
-          <p className="ka text-sm text-[#F7F1E3]/80 mt-2">{correct} / {total} სწორი პასუხი</p>
+          <p className="text-6xl font-bold mt-2 tabular-nums"><CountUp to={pct} duration={1200} />%</p>
+          <p className="ka text-sm text-[#F7F1E3]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-[#F2D680] mt-3 font-semibold">{message}</p>
         </div>
       </div>
