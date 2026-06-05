@@ -55,28 +55,38 @@ function tone(
 
 export function playCorrect() {
   if (!isSoundEnabled()) return;
-  tone(660, 110, { type: "sine", gain: 0.09 });
-  tone(990, 180, { type: "sine", gain: 0.09, delayMs: 80 });
+  tone(660, 90, { type: "sine", gain: 0.08 });
+  tone(990, 160, { type: "sine", gain: 0.08, delayMs: 70 });
 }
 
 export function playWrong() {
   if (!isSoundEnabled()) return;
-  tone(280, 200, { type: "triangle", gain: 0.06, sweepTo: 200 });
+  tone(240, 180, { type: "sine", gain: 0.05, sweepTo: 170 });
 }
 
 export function playCombo() {
   if (!isSoundEnabled()) return;
-  tone(523, 90, { type: "triangle", gain: 0.08 });
-  tone(659, 90, { type: "triangle", gain: 0.08, delayMs: 80 });
-  tone(784, 90, { type: "triangle", gain: 0.08, delayMs: 160 });
-  tone(1046, 220, { type: "triangle", gain: 0.09, delayMs: 240 });
+  // shorter, energetic
+  tone(659, 80, { type: "triangle", gain: 0.08 });
+  tone(880, 80, { type: "triangle", gain: 0.08, delayMs: 70 });
+  tone(1175, 180, { type: "triangle", gain: 0.09, delayMs: 140 });
+}
+
+export function playMegaCombo() {
+  if (!isSoundEnabled()) return;
+  // celebratory fanfare
+  tone(523, 110, { type: "triangle", gain: 0.08 });
+  tone(659, 110, { type: "triangle", gain: 0.08, delayMs: 100 });
+  tone(784, 110, { type: "triangle", gain: 0.08, delayMs: 200 });
+  tone(1046, 130, { type: "triangle", gain: 0.09, delayMs: 300 });
+  tone(1318, 320, { type: "sine", gain: 0.1, delayMs: 430 });
 }
 
 export function playComplete() {
   if (!isSoundEnabled()) return;
   tone(523, 120, { type: "sine", gain: 0.08 });
   tone(659, 120, { type: "sine", gain: 0.08, delayMs: 110 });
-  tone(880, 260, { type: "sine", gain: 0.09, delayMs: 220 });
+  tone(880, 320, { type: "sine", gain: 0.09, delayMs: 220 });
 }
 
 export function playFlip() {
