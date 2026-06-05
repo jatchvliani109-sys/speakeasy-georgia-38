@@ -114,7 +114,6 @@ export default function VocabularyModule() {
       setAnswers([]);
       setSelected(null);
       setRevealed(false);
-      setGiorgiState("idle");
       setStage("quiz");
       return;
     }
@@ -125,7 +124,6 @@ export default function VocabularyModule() {
     setAnswers([]);
     setSelected(null);
     setRevealed(false);
-    setGiorgiState(newWords.length ? "newWord" : "idle");
     if (newWords.length) playFlip();
     setStage(newWords.length ? "cards" : "quiz");
   };
@@ -134,16 +132,32 @@ export default function VocabularyModule() {
   const onNextCard = () => {
     if (cardIdx + 1 < newWords.length) {
       setCardIdx((i) => i + 1);
-      setGiorgiState("newWord");
       playFlip();
     } else {
       setStage("quiz");
-      setGiorgiState("idle");
     }
   };
 
   // QUIZ — single click flow
   const currentQ = quiz[qIdx];
+
+  const triggerStreak = (n: number) => {
+    if (n === 10 || (n > 10 && n % 10 === 0)) {
+      setStreakOverlay("mega");
+      setScreenFlash("mega");
+      setConfettiKey((k) => k + 1);
+      playMegaCombo();
+      window.setTimeout(() => setStreakOverlay(null), 2500);
+      window.setTimeout(() => setScreenFlash(null), 2500);
+    } else if (n === 5 || (n > 5 && n % 5 === 0)) {
+      setStreakOverlay("mid");
+      setScreenFlash("gold");
+      setProgressPulse((p) => p + 1);
+      playCombo();
+      window.setTimeout(() => setStreakOverlay(null), 1500);
+      window.setTimeout(() => setScreenFlash(null), 1500);
+    }
+  };
 
   const handleSelect = (val: string | number) => {
     if (revealed || !currentQ) return;
@@ -158,31 +172,33 @@ export default function VocabularyModule() {
       const nextCombo = combo + 1;
       setCombo(nextCombo);
       setBestCombo((b) => Math.max(b, nextCombo));
-      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) {
-        setGiorgiState("combo");
-        playCombo();
+      if (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0) || nextCombo === 10 || (nextCombo > 10 && nextCombo % 10 === 0)) {
+        triggerStreak(nextCombo);
       } else {
-        setGiorgiState("correct");
         playCorrect();
       }
+      // Auto-advance on correct after 1.5s (longer if streak overlay is showing)
+      const delay = (nextCombo === 10 || (nextCombo > 10 && nextCombo % 10 === 0)) ? 2700 : (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) ? 1700 : 1500;
+      if (autoAdvanceRef.current) window.clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = window.setTimeout(() => goNext(nextAnswers), delay);
     } else {
       setCombo(0);
-      setGiorgiState("wrong");
       playWrong();
+      // Wrong: do not auto-advance — let user review and click next.
     }
-    // No auto-advance — user clicks "შემდეგი" when ready.
   };
 
   const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
+    if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
       setSelected(null);
       setRevealed(false);
-      setGiorgiState("idle");
     } else {
       finishSession(ans);
     }
   };
+
 
   const finishSession = async (finalAnswers: { wordKey: string; correct: boolean }[]) => {
     if (!user) return;
