@@ -168,12 +168,42 @@ export function emptyProgressFor(w: VocabWord): ProgressRow {
 export type SessionPlan = {
   newWords: VocabWord[];
   reviewKeys: string[];
+  tierLevel: 1 | 2 | 3; // drives quiz question-type difficulty
 };
 
+// ---- Tier classification --------------------------------------------------
+// Tier 1 = foundation (core, weeks 1-3)
+// Tier 2 = intermediate (core, weeks 4-7)
+// Tier 3 = advanced (core, weeks 8+)
+// Tier 4 = field-specific
+function tierOf(w: VocabWord): 1 | 2 | 3 | 4 {
+  if (w.source === "field") return 4;
+  const week = w.week ?? 1;
+  if (week <= 3) return 1;
+  if (week <= 7) return 2;
+  return 3;
+}
+
+function wordsByTier() {
+  const t1: VocabWord[] = [];
+  const t2: VocabWord[] = [];
+  const t3: VocabWord[] = [];
+  for (const w of ALL_CORE_WORDS) {
+    const t = tierOf(w);
+    if (t === 1) t1.push(w);
+    else if (t === 2) t2.push(w);
+    else if (t === 3) t3.push(w);
+  }
+  return { t1, t2, t3 };
+}
+
+// Strict unlock thresholds — users must finish foundations before advanced words appear.
+const TIER2_UNLOCK_PCT = 0.8;  // 80% of Tier 1 mastered → Tier 2 unlocks
+const TIER3_UNLOCK_PCT = 0.7;  // 70% of Tier 2 mastered → Tier 3 unlocks
+const TIER4_UNLOCK_PCT = 0.5;  // 50% of Tier 1 mastered → field words allowed
+
 /**
- * Pick today's words.
- * - reviewKeys: progress rows whose due_at is past, sorted by due_at (oldest first), max 8.
- * - newWords: from core curriculum (week order) + field words, pick up to 6 that user hasn't seen yet.
+ * Pick today's words with progressive tier gating + cross-tier reinforcement.
  */
 export function planSession(
   progress: ProgressRow[],
@@ -182,47 +212,79 @@ export function planSession(
 ): SessionPlan {
   const now = Date.now();
   const seen = new Set(progress.map((p) => p.word_key));
+  const masteredKeys = new Set(progress.filter(checkMastery).map((p) => p.word_key));
 
+  const { t1, t2, t3 } = wordsByTier();
+  const t1Mastered = t1.filter((w) => masteredKeys.has(w.key)).length;
+  const t2Mastered = t2.filter((w) => masteredKeys.has(w.key)).length;
+
+  const t1Pct = t1.length ? t1Mastered / t1.length : 1;
+  const t2Pct = t2.length ? t2Mastered / t2.length : 0;
+
+  const tier2Unlocked = t1Pct >= TIER2_UNLOCK_PCT;
+  const tier3Unlocked = tier2Unlocked && t2Pct >= TIER3_UNLOCK_PCT;
+  const tier4Unlocked = t1Pct >= TIER4_UNLOCK_PCT;
+
+  const currentTier: 1 | 2 | 3 = tier3Unlocked ? 3 : tier2Unlocked ? 2 : 1;
+
+  // Due review words (real spaced repetition) — hardest first.
   const dueRows = progress
     .filter((p) => !checkMastery(p))
     .filter((p) => new Date(p.due_at).getTime() <= now)
-    .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
+    .sort((a, b) => a.confidence - b.confidence
+      || new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
 
-  // Surface difficult words first: lower confidence wins.
-  dueRows.sort((a, b) => a.confidence - b.confidence);
+  const reviewKeys = dueRows.slice(0, 8).map((r) => r.word_key);
 
-  const reviewKeys = dueRows.slice(0, 10).map((r) => r.word_key);
+  // Cross-tier reinforcement: in Tier 2+, surface previously-seen earlier-tier
+  // words even if not strictly due, so foundation vocab stays warm.
+  if (currentTier >= 2) {
+    const earlier = currentTier === 3 ? [...t1, ...t2] : t1;
+    const earlierSeen = earlier.filter((w) => seen.has(w.key) && !reviewKeys.includes(w.key));
+    const reinforce = pick(earlierSeen, currentTier === 3 ? 3 : 2).map((w) => w.key);
+    reviewKeys.push(...reinforce);
+  }
 
-  // Determine current core week by total mastered count (strict mastery).
-  const masteredCore = progress.filter(
-    (p) => p.source === "core" && checkMastery(p),
-  ).length;
-  const currentWeek = Math.min(4, Math.floor(masteredCore / 6) + 1);
-
-  const coreCandidates = CORE_WORDS.filter(
-    (w) => !seen.has(w.key) && (w.week || 1) <= currentWeek,
-  );
-  const fieldCandidates = fieldWordsFor(fields, goals).filter((w) => !seen.has(w.key));
+  // ---- New word selection in strict tier order ---------------------------
+  const t1Unseen = t1.filter((w) => !seen.has(w.key));
+  const t2Unseen = t2.filter((w) => !seen.has(w.key));
+  const t3Unseen = t3.filter((w) => !seen.has(w.key));
+  const fieldUnseen = tier4Unlocked
+    ? fieldWordsFor(fields, goals).filter((w) => !seen.has(w.key))
+    : [];
 
   const newWords: VocabWord[] = [];
-  // Up to 6 core, fill with up to 4 field words → 10 total
-  for (const w of coreCandidates) {
+  const TOTAL_NEW = 8;
+
+  const primary = currentTier === 3 ? t3Unseen : currentTier === 2 ? t2Unseen : t1Unseen;
+  for (const w of primary) {
     if (newWords.length >= 6) break;
     newWords.push(w);
   }
-  for (const w of fieldCandidates) {
-    if (newWords.length >= 10) break;
-    newWords.push(w);
-  }
-  // If still short, top up with any unseen core regardless of week
-  if (newWords.length < 8) {
-    for (const w of CORE_WORDS) {
-      if (newWords.length >= 10) break;
-      if (!seen.has(w.key) && !newWords.includes(w)) newWords.push(w);
+
+  // Field words only when unlocked, capped at 2 so core curriculum still dominates.
+  if (tier4Unlocked) {
+    let fieldAdded = 0;
+    for (const w of fieldUnseen) {
+      if (fieldAdded >= 2 || newWords.length >= TOTAL_NEW) break;
+      newWords.push(w);
+      fieldAdded++;
     }
   }
 
-  return { newWords, reviewKeys };
+  // Catch-up from earlier tiers only — NEVER leak in words from a higher
+  // locked tier even when the current tier is exhausted.
+  if (newWords.length < TOTAL_NEW) {
+    const fallback: VocabWord[] = [];
+    if (currentTier === 3) fallback.push(...t2Unseen, ...t1Unseen);
+    else if (currentTier === 2) fallback.push(...t1Unseen);
+    for (const w of fallback) {
+      if (newWords.length >= TOTAL_NEW) break;
+      if (!newWords.includes(w)) newWords.push(w);
+    }
+  }
+
+  return { newWords, reviewKeys, tierLevel: currentTier };
 }
 
 // ---------------- Quiz generation ----------------
