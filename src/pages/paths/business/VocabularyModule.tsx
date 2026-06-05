@@ -58,16 +58,14 @@ export default function VocabularyModule() {
   const [reviewMode, setReviewMode] = useState(false);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
-  const [giorgi, setGiorgi] = useState<GiorgiState>("idle");
-  const [giorgiSalt, setGiorgiSalt] = useState(0);
   const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
   const [confettiKey, setConfettiKey] = useState(0);
+  const [streakOverlay, setStreakOverlay] = useState<null | "mid" | "mega">(null);
+  const [progressPulse, setProgressPulse] = useState(0);
+  const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
+  const autoAdvanceRef = useRef<number | null>(null);
 
-  const setGiorgiState = (s: GiorgiState) => {
-    setGiorgi(s);
-    setGiorgiSalt((x) => x + 1);
-  };
   const toggleSound = () => {
     const next = !soundOn;
     setSoundOnState(next);
