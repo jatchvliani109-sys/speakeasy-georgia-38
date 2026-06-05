@@ -262,7 +262,6 @@ export default function VocabularyModule() {
     }
     masteredBaselineRef.current = newMastered;
 
-    setGiorgiState("complete");
     playComplete();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
