@@ -296,7 +296,7 @@ export default function VocabularyModule() {
     // skip the cards stage and go straight to quiz.
     setNewWords([]);
     setReviewKeys(pool.map((w) => w.key));
-    setQuiz(buildQuiz(pool, []));
+    setQuiz(buildQuiz(pool, [], tierLevel));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
