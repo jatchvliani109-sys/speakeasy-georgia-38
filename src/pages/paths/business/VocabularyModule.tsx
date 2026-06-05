@@ -19,13 +19,13 @@ import {
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
-import { GiorgiCharacter, type GiorgiState } from "./components/GiorgiCharacter";
 import {
   isSoundEnabled,
   playCombo,
   playComplete,
   playCorrect,
   playFlip,
+  playMegaCombo,
   playWrong,
   setSoundEnabled,
 } from "./lib/vocabSounds";
