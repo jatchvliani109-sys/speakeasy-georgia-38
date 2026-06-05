@@ -798,7 +798,7 @@ const TIER2: Mini[] = [
   ["negotiate","Negotiate","მოლაპარაკება","Let's negotiate the terms.","პირობებზე მოვილაპარაკოთ."],
   ["counteroffer","Counteroffer","საპასუხო შეთავაზება","Send a counteroffer.","საპასუხო შეთავაზება გააგზავნე."],
   ["concession","Concession","დათმობა","Small concession needed.","მცირე დათმობა საჭიროა."],
-  ["leverage-point","Leverage point","ბერკეტი","Use this as leverage.","ეს ბერკეტად გამოიყენე."],
+  ["leverage-point","Leverage point","ბერკეტი","This is a key leverage point.","ეს მნიშვნელოვანი ბერკეტია."],
   ["win-win","Win-win","ორმხრივი მოგება","It's a win-win.","ორმხრივი მოგებაა."],
   ["alignment","Alignment","შეთანხმება","We need alignment first.","ჯერ შეთანხმება გვჭირდება."],
   ["buy-in","Buy-in","მხარდაჭერა","Get leadership buy-in.","ხელმძღვანელობის მხარდაჭერა მიიღე."],

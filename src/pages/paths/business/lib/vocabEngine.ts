@@ -287,9 +287,20 @@ function makeMcMeaning(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 function makeFillBlank(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
   const sentence = word.exampleEn;
   const wordLower = word.en.toLowerCase();
-  // Look for word in sentence (case-insensitive). Match whole word or first space-separated piece.
-  const re = new RegExp(`\\b${wordLower.split(" ")[0]}\\w*`, "i");
-  if (!re.test(sentence)) return null;
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Try matching the full phrase first so multi-word terms like "engagement rate" work correctly.
+  const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
+  let re: RegExp;
+  if (fullRe.test(sentence)) {
+    re = fullRe;
+  } else {
+    // Fall back to matching just the first word.
+    const first = wordLower.split(" ")[0];
+    re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
+    if (!re.test(sentence)) return null;
+  }
+
   const masked = sentence.replace(re, "______");
   const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
   return {
