@@ -339,15 +339,41 @@ export default function VocabularyModule() {
         </div>
       </header>
 
-      {(stage === "cards" || stage === "quiz" || stage === "results") && (
-        <div className="mb-3 flex items-end justify-between gap-3">
-          <GiorgiCharacter state={giorgi} salt={giorgiSalt} size={120} />
-          {stage === "quiz" && combo >= 2 && (
-            <div className="ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm self-start mt-2">
-              <span className="biz-flame">🔥</span>
-              {combo} სწორი ზედიზედ
+      {stage === "quiz" && combo >= 2 && (
+        <div className="mb-3 flex items-center justify-end">
+          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
+            <span className="biz-flame">🔥</span>
+            {combo} სწორი ზედიზედ
+          </div>
+        </div>
+      )}
+
+      {/* Screen flash overlay for streaks */}
+      {screenFlash && (
+        <div
+          key={`flash-${screenFlash}-${streakOverlay}`}
+          className={`pointer-events-none fixed inset-0 z-40 ${screenFlash === "mega" ? "biz-mega-flash" : "biz-gold-flash"}`}
+        />
+      )}
+
+      {/* Streak message overlay */}
+      {streakOverlay === "mid" && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex">
+          <div className="absolute left-1/2 top-1/2 biz-streak-pop">
+            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#C9A227] to-[#E0B844] text-[#1E2A44] text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
+              🔥 5 სწორი პასუხი!
             </div>
-          )}
+          </div>
+        </div>
+      )}
+      {streakOverlay === "mega" && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex">
+          <div className="absolute left-1/2 top-1/2 biz-mega-pop">
+            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#C9A227] via-[#E0B844] to-[#F2D680] text-[#1E2A44] text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
+              <div className="text-4xl">⚡ 10 სწორი პასუხი!</div>
+              <div className="text-xl mt-1 text-[#1E2A44]/85">გაუჩერებელი ხარ!</div>
+            </div>
+          </div>
         </div>
       )}
 
