@@ -43,6 +43,7 @@ export default function VocabularyModule() {
   const [state, setState] = useState<BusinessState | null>(null);
   const [newWords, setNewWords] = useState<VocabWord[]>([]);
   const [reviewKeys, setReviewKeys] = useState<string[]>([]);
+  const [tierLevel, setTierLevel] = useState<1 | 2 | 3>(1);
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
