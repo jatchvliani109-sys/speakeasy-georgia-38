@@ -113,7 +113,7 @@ export default function AISpeakingCall() {
                     <button
                       key={t.id}
                       onClick={() => { setTopic(t); setStep("explain"); }}
-                      className="sp-card p-3.5 text-left hover:bg-[hsl(40_40%_96%)] transition-colors flex items-start gap-3"
+                      className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
                     >
                       <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center text-xl shrink-0">
                         {t.emoji}
@@ -158,7 +158,7 @@ export default function AISpeakingCall() {
             <ExplainItem text="შემდეგ ისევ ინგლისურად გააგრძელებ საუბარს." />
           </div>
 
-          <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-4">
+          <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-4">
             <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
             <div className="font-bold sp-text mt-1">{topic.title_en}</div>
             <div className="text-xs sp-text-muted ka mt-0.5">{topic.desc_ka}</div>
@@ -212,7 +212,7 @@ export default function AISpeakingCall() {
 function ExplainItem({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[hsl(175_70%_38%)] mt-2 shrink-0" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[hsl(33_69%_45%)] mt-2 shrink-0" />
       <p className="text-sm sp-text ka leading-relaxed">{text}</p>
     </div>
   );
@@ -502,7 +502,7 @@ function CallScreen({
             }`}
             style={{
               background:
-                "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(175 70% 42%))",
+                "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(33 69% 45%))",
               boxShadow: "0 12px 40px -10px hsl(220 50% 30% / 0.45)",
             }}
           >
@@ -529,7 +529,7 @@ function CallScreen({
           {/* Transcript (secondary) */}
           <div
             ref={transcriptRef}
-            className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(40_30%_88%)] p-3 space-y-2 text-[13px]"
+            className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(38_55%_82%)] p-3 space-y-2 text-[13px]"
           >
             {messages.length === 0 && !partial.ai && !partial.user && (
               <p className="text-center sp-text-muted ka text-xs py-6">
@@ -584,7 +584,7 @@ function CallScreen({
               onTouchEnd={(e) => { e.preventDefault(); setPttActive(false); }}
               className={`w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka transition-all select-none ${
                 pttActive
-                  ? "bg-[hsl(175_70%_38%)] text-white scale-[0.99] shadow-inner"
+                  ? "bg-[hsl(33_69%_45%)] text-white scale-[0.99] shadow-inner"
                   : "sp-btn-primary"
               }`}
             >
@@ -658,7 +658,7 @@ function CallScreen({
                     onChange={(e) => setHelpInput(e.target.value)}
                     rows={3}
                     placeholder="მაგ: მინდა პიცის შეკვეთა"
-                    className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                    className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
                   />
                   <button
                     onClick={submitHelp}
@@ -679,7 +679,7 @@ function CallScreen({
               {helpData && !helpLoading && (
                 <>
                   <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
-                  <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3 flex items-center justify-between gap-2">
                     <div className="font-bold sp-text text-base">{helpData.english}</div>
                     <SpeakButton text={helpData.english} />
                   </div>
@@ -721,7 +721,7 @@ function CallScreen({
                 onChange={(e) => setCorrectInput(e.target.value)}
                 rows={3}
                 placeholder="I would like to order pizza."
-                className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
               />
               <button
                 onClick={submitCorrection}
@@ -742,7 +742,7 @@ function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; tex
   return (
     <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
       <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-        role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(175_70%_30%)]"
+        role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(33_75%_28%)]"
       }`}>
         {role === "assistant" ? "AI" : "You"}
       </span>
@@ -955,7 +955,7 @@ function SummaryScreen({
           </button>
           <button
             onClick={onBackToSpeaking}
-            className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-4 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_40%_96%)] flex-1"
+            className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-4 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_91%_92%)] flex-1"
           >
             დაბრუნდი მთავარზე
           </button>

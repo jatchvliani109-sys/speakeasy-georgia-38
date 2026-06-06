@@ -47,7 +47,7 @@ export default function RoleplayList() {
                   <Link
                     key={s.id}
                     to={`/path/speaking/roleplay/${s.id}`}
-                    className="sp-card p-4 sm:p-5 flex flex-col gap-3 hover:border-[hsl(175_50%_60%)] hover:-translate-y-0.5 transition-all"
+                    className="sp-card p-4 sm:p-5 flex flex-col gap-3 hover:border-[hsl(33_70%_55%)] hover:-translate-y-0.5 transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <div className="w-12 h-12 rounded-xl sp-chip-teal flex items-center justify-center text-2xl shrink-0">

@@ -226,7 +226,7 @@ export default function SpeakingProgress() {
                     <span className="sp-text truncate">{p.phrase}</span>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-xs sp-text-muted">{p.score}%</span>
-                      <Link to="/path/speaking/pronunciation" className="text-xs font-semibold text-[hsl(175_70%_38%)] hover:underline">
+                      <Link to="/path/speaking/pronunciation" className="text-xs font-semibold text-[hsl(33_69%_45%)] hover:underline">
                         Practice again
                       </Link>
                     </div>
@@ -243,7 +243,7 @@ export default function SpeakingProgress() {
               <ul className="space-y-2 text-sm">
                 {recentTopics.map((t, i) => (
                   <li key={i} className="ka sp-text flex items-center gap-2">
-                    <span className="w-1 h-1 rounded-full bg-[hsl(175_70%_38%)]" />
+                    <span className="w-1 h-1 rounded-full bg-[hsl(33_69%_45%)]" />
                     {t}
                   </li>
                 ))}
