@@ -931,19 +931,24 @@ function SummaryScreen({
       <div className="max-w-md mx-auto space-y-4">
         <div className="sp-card-hero p-6 text-center sp-pop-in">
           <div className="mx-auto w-12 h-12 rounded-full bg-[hsl(41_100%_55%)] text-[hsl(31_53%_12%)] flex items-center justify-center mb-3">
-            <Sparkles className="w-6 h-6" />
+            {unlocked ? <Sparkles className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
           </div>
-          <h1 className="text-xl font-extrabold sp-text ka">სესია დასრულებულია</h1>
+          <h1 className="text-xl font-extrabold sp-text ka">
+            {unlocked ? `${TIER_LABEL_KA[unlocked]} დონე განბლოკილია!` : "სესია დასრულებულია"}
+          </h1>
           <p className="text-sm sp-text ka mt-2">
             {summary.encouragement_ka || getEncouragementKa(dailySeed())}
           </p>
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(41_100%_47%)] text-[hsl(31_53%_12%)] text-[11px] font-bold ka">
+            {TIER_LABEL_KA[tier]} {scored !== null ? `· ${scored}%` : ""}
+          </div>
         </div>
 
         <div className="sp-card p-4 grid grid-cols-2 gap-3">
           <Stat label_ka="თემა" value={topic.title_en} small />
           <Stat label_ka="დრო" value={`${minutes}:${String(seconds).padStart(2, "0")}`} />
           <Stat label_ka="შენი პასუხები" value={messages.filter((m) => m.role === "user").length} />
-          <Stat label_ka="დონე" value={LEVEL_LABEL_KA[topic.level]} small />
+          <Stat label_ka="დონე" value={GROUP_LABEL_KA[topic.group]} small />
         </div>
 
         {loading ? (
