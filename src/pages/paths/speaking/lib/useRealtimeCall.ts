@@ -37,7 +37,9 @@ const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
 export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+  const [micStream, setMicStream] = useState<MediaStream | null>(null);
+  const [aiStream, setAiStream] = useState<MediaStream | null>(null);
+
   const [micOn, setMicOn] = useState(false);
   const startingRef = useRef(false);
 
@@ -77,6 +79,8 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     responseActiveRef.current = false;
     startingRef.current = false;
     setMicOn(false);
+    setMicStream(null);
+    setAiStream(null);
   }, []);
 
   const stop = useCallback(() => {
@@ -233,6 +237,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       micRef.current = mic;
+      setMicStream(mic);
       // Start MUTED — caller decides when to enable (push-to-talk default).
       mic.getAudioTracks().forEach((t) => { t.enabled = false; });
       setMicOn(false);
@@ -272,6 +277,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       pc.ontrack = (e) => {
         dlog("remote track");
         audioEl.srcObject = e.streams[0];
+        setAiStream(e.streams[0]);
         audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
       };
 
@@ -364,5 +370,5 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
 
 
-  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn };
+  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream };
 }

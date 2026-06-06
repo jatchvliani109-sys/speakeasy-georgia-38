@@ -5,6 +5,7 @@ import {
   Loader2, RotateCcw, X, Radio, Clock, CheckCircle2, Lock,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
+import MicBubble from "./components/MicBubble";
 import SpeakButton from "@/components/SpeakButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -381,7 +382,7 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, sendUserText } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, micStream, aiStream } = useRealtimeCall({
     topic: topic.title_en,
     level,
     tier,
@@ -489,277 +490,282 @@ function CallScreen({
 
   const isConnected = status === "ready" || status === "listening" || status === "ai_speaking" || status === "thinking";
 
+  // Map underlying status into a single bubble-friendly state.
+  // User is "speaking" only when push-to-talk is held AND mic is live.
+  const bubbleState: "idle" | "ready" | "user_speaking" | "ai_speaking" | "thinking" | "connecting" =
+    status === "connecting" ? "connecting"
+    : status === "ai_speaking" ? "ai_speaking"
+    : status === "thinking" ? "thinking"
+    : (status === "listening" || (isConnected && pttActive)) ? "user_speaking"
+    : isConnected ? "ready"
+    : "idle";
+
+  const stateLabel =
+    status === "connecting" ? "ვუკავშირდები..."
+    : status === "ai_speaking" ? "AI პასუხობს..."
+    : status === "thinking" ? "ვფიქრობ..."
+    : bubbleState === "user_speaking" ? "გისმენ..."
+    : isConnected ? "დააჭირე სასაუბრებლად"
+    : status === "ended" ? "სესია დასრულდა"
+    : status === "error" ? (errorMsg ?? "შეცდომა")
+    : "დააწექი, რომ დაიწყო";
+
+  // Keep last 4 exchanges = last 8 messages
+  const visibleMessages = messages.slice(-8);
+
+  const handleBubblePress = () => {
+    if (!isConnected) {
+      if (status === "idle" || status === "ended" || status === "error") start();
+      return;
+    }
+    setPttActive(true);
+  };
+  const handleBubbleRelease = () => {
+    if (!isConnected) return;
+    setPttActive(false);
+  };
+
   return (
-    <SpeakingShell>
-      <div className="max-w-md mx-auto flex flex-col min-h-[calc(100vh-7rem)]">
-        {/* Top bar */}
-        <header className="flex items-center justify-between gap-3 mb-4">
+    <div
+      className="fixed inset-0 z-40 flex flex-col text-amber-50 overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(120% 80% at 50% 0%, hsl(28 35% 12%) 0%, hsl(24 30% 8%) 40%, hsl(20 25% 5%) 100%)",
+      }}
+    >
+      {/* Ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(closest-side at 50% 45%, hsl(33 70% 25% / 0.45), transparent 70%)",
+        }}
+      />
+
+      {/* Top bar */}
+      <header className="relative z-10 flex items-center justify-between px-5 pt-5">
+        <button
+          onClick={() => { stop(); onBack(); }}
+          className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 inline-flex items-center justify-center text-amber-100/80 transition-colors"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+
+        <div className="text-center min-w-0 px-3">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-amber-100/40 ka">თემა</div>
+          <div className="font-semibold text-amber-50/90 text-sm truncate max-w-[180px]">{topic.title_en}</div>
+          <div className="text-[10px] uppercase tracking-wider text-amber-100/40 ka mt-0.5">
+            {TIER_LABEL_KA[tier]} · {level}
+          </div>
+        </div>
+
+        {isConnected ? (
           <button
-            onClick={() => { stop(); onBack(); }}
-            className="w-9 h-9 rounded-full sp-chip inline-flex items-center justify-center"
-            aria-label="Back"
+            onClick={endSession}
+            className="w-9 h-9 rounded-full bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 inline-flex items-center justify-center transition-colors"
+            aria-label="End session"
+            title="დასრულება"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <PhoneOff className="w-4 h-4" />
           </button>
-          <div className="text-center min-w-0">
-            <div className="text-[10px] uppercase tracking-wider sp-text-muted ka">თემა</div>
-            <div className="font-bold sp-text text-sm truncate">{topic.title_en}</div>
-          </div>
-          {isConnected ? (
-            <button
-              onClick={endSession}
-              className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white px-3 h-9 text-xs font-bold ka"
-            >
-              <PhoneOff className="w-3.5 h-3.5" />
-              დასრულება
-            </button>
-          ) : (
-            <div className="w-[88px]" />
-          )}
-        </header>
+        ) : (
+          <div className="w-9 h-9" />
+        )}
+      </header>
 
+      {/* Center bubble */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
+        <MicBubble
+          state={bubbleState}
+          micStream={micStream}
+          aiStream={aiStream}
+          onPress={handleBubblePress}
+          onRelease={handleBubbleRelease}
+          active={pttActive}
+        />
 
-        {/* AI Tutor area */}
-        <div className="flex-1 flex flex-col items-center justify-start pt-4">
-          <div
-            className={`relative w-32 h-32 rounded-full flex items-center justify-center shrink-0 transition-transform ${
-              status === "ai_speaking" ? "sp-recording" : ""
-            }`}
-            style={{
-              background:
-                "linear-gradient(135deg, hsl(41 100% 55%), hsl(33 80% 45%) 60%, hsl(28 60% 25%))",
-              boxShadow: "0 12px 40px -10px hsl(31 60% 18% / 0.45)",
-            }}
+        <div className="mt-8 h-6 text-center">
+          <p
+            key={stateLabel}
+            className="ka text-[13px] tracking-wide text-amber-100/75 animate-fade-in"
           >
-            <Mic className="w-12 h-12 text-[hsl(40_91%_96%)]" aria-hidden />
-            {(status === "thinking" || status === "connecting") && (
-              <span className="absolute inset-0 rounded-full border-4 border-[hsl(40_91%_96%)]/40 border-t-transparent animate-spin" />
-            )}
-          </div>
-
-
-          {/* Transcript (secondary) */}
-          <div
-            ref={transcriptRef}
-            className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(38_55%_82%)] p-3 space-y-2 text-[13px]"
-          >
-            {messages.length === 0 && !partial.ai && !partial.user && (
-              <p className="text-center sp-text-muted ka text-xs py-6">
-                {status === "idle" ? "დააჭირე „დაიწყე“ რომ დაიწყო საუბარი."
-                  : status === "connecting" ? "ვუკავშირდები AI-ს..."
-                  : "Transcript will appear here."}
-              </p>
-            )}
-            {messages.map((m, i) => (
-              <TranscriptLine key={i} role={m.role} text={m.content} />
-            ))}
-            {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
-          </div>
-        </div>
-
-        {/* Bottom controls */}
-        <div className="mt-4 mb-2">
-          {status === "idle" || status === "ended" ? (
-            <button
-              onClick={start}
-              className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka"
-            >
-              <Mic className="w-5 h-5" />
-              {status === "ended" ? "თავიდან დაიწყე" : "დაიწყე საუბარი"}
-            </button>
-          ) : status === "error" ? (
-            <div className="space-y-2">
-              {errorMsg && (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 ka">
-                  {errorMsg}
-                </div>
-              )}
-              <button
-                onClick={start}
-                className="sp-btn-primary w-full inline-flex items-center justify-center gap-2 rounded-xl h-12 text-sm font-bold ka"
-              >
-                <RotateCcw className="w-4 h-4" />
-                სცადე თავიდან
-              </button>
-            </div>
-          ) : status === "connecting" ? (
-            <div className="text-center text-xs sp-text-muted ka inline-flex items-center justify-center gap-2 w-full h-12">
-              <Loader2 className="w-4 h-4 animate-spin" /> ვუკავშირდები...
-            </div>
-          ) : manualMode ? (
-            <button
-              type="button"
-              onMouseDown={() => setPttActive(true)}
-              onMouseUp={() => setPttActive(false)}
-              onMouseLeave={() => setPttActive(false)}
-              onTouchStart={(e) => { e.preventDefault(); setPttActive(true); }}
-              onTouchEnd={(e) => { e.preventDefault(); setPttActive(false); }}
-              className={`w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka transition-all select-none ${
-                pttActive
-                  ? "bg-[hsl(33_69%_45%)] text-white scale-[0.99] shadow-inner"
-                  : "sp-btn-primary"
-              }`}
-            >
-              <Mic className="w-5 h-5" />
-              {pttActive ? "ვლაპარაკობ..." : "დაიჭირე და ილაპარაკე"}
-            </button>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <div className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-2 text-xs font-bold ka">
-                <Radio className="w-3.5 h-3.5" /> ცოცხალი ხმოვანი კავშირი
-              </div>
-            </div>
-          )}
-
-          <p className="text-center text-[11px] sp-text-muted ka mt-2">
-            {isConnected
-              ? "AI დაიწყებს საუბარს. შენ პასუხისთვის დააჭირე ღილაკს და ილაპარაკე."
-              : ""}
+            {stateLabel}
           </p>
-
-          {/* Help + Correction */}
-          {isConnected && (
-            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={openHelp}
-                className="inline-flex items-center gap-1.5 rounded-full sp-chip-teal px-3 py-1.5 text-xs font-bold ka"
-              >
-                <Lightbulb className="w-3.5 h-3.5" />
-                დახმარება ქართულად
-              </button>
-              <button
-                type="button"
-                onClick={() => { setCorrectInput(""); setShowCorrect(true); }}
-                className="inline-flex items-center gap-1.5 rounded-full sp-chip px-3 py-1.5 text-xs font-bold ka border border-[hsl(220_22%_88%)]"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                AI-მ არასწორად გაიგო
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Georgian help card overlay */}
-        {showHelp && (
-          <div
-            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
-            onClick={() => setShowHelp(false)}
+        {status === "error" && (
+          <button
+            onClick={start}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 px-4 h-9 text-xs font-semibold ka transition-colors"
           >
-            <div
-              className="sp-card max-w-md w-full p-5 sp-pop-in"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg sp-chip-teal inline-flex items-center justify-center">
-                    <Lightbulb className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold sp-text ka">დახმარება ქართულად</h3>
-                </div>
-                <button onClick={() => setShowHelp(false)} className="sp-text-soft p-1">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {!helpData && !helpLoading && (
-                <>
-                  <label className="text-xs sp-text ka block mb-2">რისი თქმა გინდა ინგლისურად?</label>
-                  <textarea
-                    value={helpInput}
-                    onChange={(e) => setHelpInput(e.target.value)}
-                    rows={3}
-                    placeholder="მაგ: მინდა პიცის შეკვეთა"
-                    className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
-                  />
-                  <button
-                    onClick={submitHelp}
-                    disabled={!helpInput.trim()}
-                    className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
-                  >
-                    მაჩვენე ინგლისურად
-                  </button>
-                </>
-              )}
-
-              {helpLoading && (
-                <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
-                  <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
-                </div>
-              )}
-
-              {helpData && !helpLoading && (
-                <>
-                  <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
-                  <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3 flex items-center justify-between gap-2">
-                    <div className="font-bold sp-text text-base">{helpData.english}</div>
-                    <SpeakButton text={helpData.english} />
-                  </div>
-                  <div className="mt-2 text-sm sp-text ka">
-                    <span className="sp-text-muted">ნიშნავს:</span> „{helpData.georgian}“
-                  </div>
-
-                  <button
-                    onClick={() => setShowHelp(false)}
-                    className="sp-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka"
-                  >
-                    <Mic className="w-4 h-4" />
-                    ვცდი ინგლისურად
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
+            <RotateCcw className="w-3.5 h-3.5" />
+            სცადე თავიდან
+          </button>
         )}
 
-        {/* "AI heard me wrong" correction overlay */}
-        {showCorrect && (
-          <div
-            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
-            onClick={() => setShowCorrect(false)}
-          >
-            <div
-              className="sp-card max-w-md w-full p-5 sp-pop-in"
-              onClick={(e) => e.stopPropagation()}
+        {/* Secondary actions */}
+        {isConnected && (
+          <div className="mt-5 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={openHelp}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/5 hover:bg-white/10 px-3 py-1.5 text-[11px] font-semibold ka text-amber-100/80 transition-colors"
             >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <h3 className="font-bold sp-text ka">დაწერე რისი თქმაც გინდოდა</h3>
-                <button onClick={() => setShowCorrect(false)} className="sp-text-soft p-1">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <textarea
-                value={correctInput}
-                onChange={(e) => setCorrectInput(e.target.value)}
-                rows={3}
-                placeholder="I would like to order pizza."
-                className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
-              />
-              <button
-                onClick={submitCorrection}
-                disabled={!correctInput.trim()}
-                className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
-              >
-                გაგზავნა
-              </button>
-            </div>
+              <Lightbulb className="w-3.5 h-3.5" />
+              დახმარება ქართულად
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCorrectInput(""); setShowCorrect(true); }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/5 hover:bg-white/10 px-3 py-1.5 text-[11px] font-semibold ka text-amber-100/80 transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              არასწორად გაიგო
+            </button>
           </div>
         )}
       </div>
-    </SpeakingShell>
+
+      {/* Transcript */}
+      <div className="relative z-10 px-5 pb-6">
+        <div
+          ref={transcriptRef}
+          className="mx-auto max-w-md max-h-44 overflow-y-auto space-y-2.5 px-1 py-2"
+          style={{ maskImage: "linear-gradient(to bottom, transparent, black 18%, black 100%)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 18%, black 100%)" }}
+        >
+          {visibleMessages.length === 0 && !partial.ai && !partial.user && (
+            <p className="text-center text-[12px] ka text-amber-100/40 py-2">
+              {status === "connecting" ? "" : "ტრანსკრიფცია გამოჩნდება აქ"}
+            </p>
+          )}
+          {visibleMessages.map((m, i) => (
+            <TranscriptLine key={i} role={m.role} text={m.content} />
+          ))}
+          {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
+        </div>
+      </div>
+
+      {/* Georgian help card overlay */}
+      {showHelp && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+          onClick={() => setShowHelp(false)}
+        >
+          <div
+            className="sp-card max-w-md w-full p-5 sp-pop-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg sp-chip-teal inline-flex items-center justify-center">
+                  <Lightbulb className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold sp-text ka">დახმარება ქართულად</h3>
+              </div>
+              <button onClick={() => setShowHelp(false)} className="sp-text-soft p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {!helpData && !helpLoading && (
+              <>
+                <label className="text-xs sp-text ka block mb-2">რისი თქმა გინდა ინგლისურად?</label>
+                <textarea
+                  value={helpInput}
+                  onChange={(e) => setHelpInput(e.target.value)}
+                  rows={3}
+                  placeholder="მაგ: მინდა პიცის შეკვეთა"
+                  className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
+                />
+                <button
+                  onClick={submitHelp}
+                  disabled={!helpInput.trim()}
+                  className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+                >
+                  მაჩვენე ინგლისურად
+                </button>
+              </>
+            )}
+
+            {helpLoading && (
+              <div className="py-6 flex items-center justify-center sp-text-muted text-sm gap-2 ka">
+                <Loader2 className="w-4 h-4 animate-spin" /> ქართული დახმარება მზადდება...
+              </div>
+            )}
+
+            {helpData && !helpLoading && (
+              <>
+                <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
+                <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3 flex items-center justify-between gap-2">
+                  <div className="font-bold sp-text text-base">{helpData.english}</div>
+                  <SpeakButton text={helpData.english} />
+                </div>
+                <div className="mt-2 text-sm sp-text ka">
+                  <span className="sp-text-muted">ნიშნავს:</span> „{helpData.georgian}"
+                </div>
+
+                <button
+                  onClick={() => setShowHelp(false)}
+                  className="sp-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka"
+                >
+                  <Mic className="w-4 h-4" />
+                  ვცდი ინგლისურად
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* "AI heard me wrong" correction overlay */}
+      {showCorrect && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+          onClick={() => setShowCorrect(false)}
+        >
+          <div
+            className="sp-card max-w-md w-full p-5 sp-pop-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <h3 className="font-bold sp-text ka">დაწერე რისი თქმაც გინდოდა</h3>
+              <button onClick={() => setShowCorrect(false)} className="sp-text-soft p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <textarea
+              value={correctInput}
+              onChange={(e) => setCorrectInput(e.target.value)}
+              rows={3}
+              placeholder="I would like to order pizza."
+              className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
+            />
+            <button
+              onClick={submitCorrection}
+              disabled={!correctInput.trim()}
+              className="sp-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka disabled:opacity-50"
+            >
+              გაგზავნა
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
 function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; text: string; faded?: boolean }) {
+  const isUser = role === "user";
   return (
-    <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
-      <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-        role === "assistant" ? "text-[hsl(28_55%_30%)]" : "text-[hsl(33_75%_28%)]"
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} ${faded ? "opacity-60" : ""} animate-fade-in`}>
+      <div className={`max-w-[85%] text-[13px] leading-snug whitespace-pre-wrap break-words ${
+        isUser
+          ? "text-amber-50 text-right"
+          : "text-amber-100/55 text-left italic"
       }`}>
-        {role === "assistant" ? "AI" : "You"}
-      </span>
-      <div className="flex-1 min-w-0">
-        <div className="sp-text whitespace-pre-wrap break-words">{text}</div>
+        {text}
       </div>
     </div>
   );
