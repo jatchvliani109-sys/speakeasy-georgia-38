@@ -97,8 +97,11 @@ export default function SpeakingDashboard() {
           <PathSwitcher />
         </header>
 
-        {/* Today / AI Speaking Session card */}
-        <section className="sp-card-hero p-6 sm:p-7">
+        {/* Today's Practice — most prominent */}
+        <div className="flex items-center gap-2">
+          <span className="sp-eyebrow ka">დღევანდელი სავარჯიშო</span>
+        </div>
+        <section className="sp-card-hero p-6 sm:p-7 -mt-2">
           <div className="text-[10px] font-semibold tracking-[0.22em] uppercase opacity-80">
             AI Speaking Session
           </div>
