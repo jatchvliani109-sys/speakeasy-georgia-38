@@ -1,6 +1,5 @@
 // Inworld AI Text-to-Speech for the read-aloud speaker buttons.
 // Uses INWORLD_API_KEY from Supabase secrets — never exposed to the frontend.
-// Endpoint kept under the existing function name for frontend compatibility.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 function cleanForTTS(text: string): string {
@@ -31,6 +30,13 @@ function basicAuthHeader(apiKey: string) {
   return `Basic ${btoa(`${apiKey}:`)}`;
 }
 
+function b64ToBytes(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
@@ -52,24 +58,37 @@ Deno.serve(async (req) => {
         status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const res = await fetch("https://api.inworld.ai/v1/tts/synthesize", {
+
+    // Inworld TTS REST API: POST https://api.inworld.ai/tts/v1/voice
+    // Body: { text, voiceId, modelId }
+    // Response: { audioContent: <base64 mp3/wav> }
+    const voiceId = (typeof voice === "string" && voice) || "Ashley";
+    const res = await fetch("https://api.inworld.ai/tts/v1/voice", {
       method: "POST",
       headers: { Authorization: basicAuthHeader(apiKey), "Content-Type": "application/json" },
       body: JSON.stringify({
-        voice: (typeof voice === "string" && voice) || "alloy",
-        input: cleaned,
-        response_format: "mp3",
+        text: cleaned,
+        voiceId,
+        modelId: "inworld-tts-1",
       }),
     });
     if (!res.ok) {
       const err = await res.text();
       console.error("Inworld TTS failed", res.status, err.slice(0, 400));
-      return new Response(JSON.stringify({ error: "TTS_FAILED" }), {
+      return new Response(JSON.stringify({ error: "TTS_FAILED", detail: err.slice(0, 200) }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const buf = await res.arrayBuffer();
-    return new Response(buf, {
+    const json = await res.json().catch(() => null) as any;
+    const b64 = json?.audioContent ?? json?.audio ?? json?.audio_content;
+    if (!b64 || typeof b64 !== "string") {
+      console.error("Inworld TTS missing audioContent", JSON.stringify(json).slice(0, 300));
+      return new Response(JSON.stringify({ error: "TTS_EMPTY" }), {
+        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const bytes = b64ToBytes(b64);
+    return new Response(bytes, {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "audio/mpeg", "Cache-Control": "public, max-age=86400" },
     });
