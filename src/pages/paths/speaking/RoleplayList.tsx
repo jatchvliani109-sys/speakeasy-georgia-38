@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
 import SpeakingShell from "./components/SpeakingShell";
-import { SCENARIOS, Scenario } from "./data";
+import { SCENARIOS, Scenario, iconForScenario } from "./data";
 import { ArrowRight } from "lucide-react";
 
 const LEVEL_LABEL: Record<Scenario["level"], string> = {
