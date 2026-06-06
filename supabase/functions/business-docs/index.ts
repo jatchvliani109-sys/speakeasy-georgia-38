@@ -93,7 +93,7 @@ Return JSON:
 function resumeImprovePrompt(b: any, p: Profile) {
   return `${profileBlock(p)}
 
-TASK: Analyze the user's resume and give specific, actionable improvements.
+TASK: Analyze the user's resume and give specific, actionable improvements AND produce a fully rewritten, ready-to-use version of the resume.
 
 Resume text:
 """${(b.resumeText || p.rawResumeText || "").slice(0, 4000)}"""
@@ -115,9 +115,10 @@ Return JSON:
       "whyKa": "1-line Georgian explanation of why the rewrite is stronger"
     }
   ],
+  "rewrittenResume": "FULL rewritten resume in clean plain text English. STRICT RULES: (1) Keep EXACTLY the same sections and same order as the user's original (e.g. header/name, summary, experience, education, skills, etc. — only those that exist). (2) Keep ALL same factual information (companies, dates, roles, schools, skills). Do NOT invent or remove facts. (3) Rewrite phrasing with stronger professional language and action verbs; apply all suggestions above. (4) Use clear section headers in UPPERCASE on their own line, blank line between sections. (5) For experience entries: line 1 = Role — Company — Dates; following lines = '- ' bullets. (6) Plain text only, no markdown, real line breaks.",
   "highlights": []
 }
-Include 4-7 suggestions.`;
+Include 4-7 suggestions. The rewrittenResume must be the COMPLETE document the user can copy and paste.`;
 }
 
 function bioPrompt(b: any, p: Profile) {
