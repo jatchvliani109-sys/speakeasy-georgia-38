@@ -449,7 +449,6 @@ try {
                   },
                 },
                 output: {
-                  model: "inworld-tts-2",
                   voice: "Ashley",
                 },
               },
