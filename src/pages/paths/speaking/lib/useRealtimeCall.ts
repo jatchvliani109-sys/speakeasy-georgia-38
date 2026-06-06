@@ -47,10 +47,8 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const dcRef = useRef<RTCDataChannel | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const aiAnalyserRef = useRef<AnalyserNode | null>(null);
-  const aiRafRef = useRef<number | null>(null);
-  const aiSilentSinceRef = useRef<number>(0);
+  const aiAudioCheckRef = useRef<number | null>(null);
+  const aiAudioTimeRef = useRef(0);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
   const greetedRef = useRef(false);
@@ -63,19 +61,28 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   useEffect(() => { statusRef.current = status; }, [status]);
 
+  const setRtStatus = useCallback((next: RtStatus) => {
+    statusRef.current = next;
+    setStatus(next);
+  }, []);
+
+  const clearAiAudioMonitor = useCallback(() => {
+    if (aiAudioCheckRef.current) {
+      window.clearInterval(aiAudioCheckRef.current);
+      aiAudioCheckRef.current = null;
+    }
+    aiAudioTimeRef.current = 0;
+  }, []);
+
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
-    setStatus("error");
+    setRtStatus("error");
     onError?.(msg);
-  }, [onError]);
+  }, [onError, setRtStatus]);
 
   const cleanup = useCallback(() => {
     dlog("cleanup → closing data channel, peer connection, mic tracks");
-    if (aiRafRef.current) { cancelAnimationFrame(aiRafRef.current); aiRafRef.current = null; }
-    try { aiAnalyserRef.current?.disconnect(); } catch {}
-    aiAnalyserRef.current = null;
-    try { audioCtxRef.current?.close(); } catch {}
-    audioCtxRef.current = null;
+    clearAiAudioMonitor();
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
@@ -94,15 +101,15 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setMicStream(null);
     setAiStream(null);
     statusRef.current = "idle";
-  }, []);
+  }, [clearAiAudioMonitor]);
 
   const stop = useCallback(() => {
     if (endedRef.current) return;
     dlog("stop() called → ending session");
     endedRef.current = true;
     cleanup();
-    setStatus("ended");
-  }, [cleanup]);
+    setRtStatus("ended");
+  }, [cleanup, setRtStatus]);
 
   // Toggle mic track without tearing down the call (push-to-talk / manual mode).
   const setMicEnabled = useCallback((enabled: boolean) => {
