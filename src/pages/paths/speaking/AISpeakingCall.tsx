@@ -572,8 +572,8 @@ function CallScreen({
       </header>
 
       {/* Center bubble — explicitly bounded so it never pushes the transcript off-screen */}
-      <div className="relative z-10 flex-1 min-h-0 flex flex-col items-center justify-center px-8 pt-16 sm:pt-20 overflow-visible">
-        <div className="flex items-center justify-center max-h-full overflow-visible max-w-[min(360px,calc(100vw-96px))]">
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col items-center justify-center px-8 pt-24 sm:pt-28 pb-4 overflow-visible">
+        <div className="flex items-center justify-center overflow-visible" style={{ padding: "48px 0" }}>
           <MicBubble
             state={sessionState}
             micStream={micStream}
