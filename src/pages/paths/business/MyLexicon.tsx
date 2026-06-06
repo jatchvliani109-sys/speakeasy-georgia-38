@@ -228,8 +228,8 @@ function PhrasesTab() {
         <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-14 h-14 rounded-full bg-[#FAF7F0] border border-[#E7E2D5] grid place-items-center text-2xl">📖</div>
-          <h3 className="ka text-lg font-bold text-[#1E2A44] mt-3">ფრაზები ცარიელია</h3>
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><Library size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-[#1A2744] mt-3">ფრაზები ცარიელია</h3>
           <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
@@ -256,30 +256,30 @@ function PhrasesTab() {
                 ? (r.session_data?.briefing?.meetingTypeKa || r.title_raw)
                 : (TYPE_LABELS[r.title_raw] || r.session_data?.dailyFocusKa || r.title_raw);
             const sectionLabel = isInterview ? "გასაუბრება" : isMeeting ? "შეხვედრა" : "იმეილები";
-            const icon = isInterview ? "🤝" : isMeeting ? "🗓️" : "📨";
+            const KindIcon = isInterview ? Briefcase : isMeeting ? Users : Mail;
             const date = formatKaDate(r.completed_at);
             return (
-              <div key={r.id} className="bg-white border border-[#E7E2D5] rounded-2xl overflow-hidden transition">
+              <div key={r.id} className="bg-white border border-[#E2DDD0] rounded-lg overflow-hidden transition">
                 <button
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#FAF7F0] transition"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F5F0E8] transition"
                 >
-                  <div className="shrink-0 w-9 h-9 rounded-lg bg-[#1E2A44]/5 grid place-items-center text-base">{icon}</div>
+                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#1A2744]/5 border border-[#E2DDD0] text-[#1A2744] grid place-items-center">
+                    <KindIcon size={16} strokeWidth={2} />
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <p className="ka text-sm font-semibold text-[#1E2A44] truncate">
+                    <p className="ka text-sm font-semibold text-[#1A2744] truncate">
                       {sectionLabel} — {title}
                     </p>
-                    <p className="ka text-[11px] text-[#5B6473] mt-0.5">
+                    <p className="ka text-[11px] text-[#64748B] mt-0.5">
                       {date} · {vocab.length} ფრაზა
                     </p>
                   </div>
-                  <svg
-                    className={`shrink-0 w-4 h-4 text-[#5B6473] transition-transform ${isOpen ? "rotate-180" : ""}`}
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                    strokeLinecap="round" strokeLinejoin="round"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={2.25}
+                    className={`shrink-0 text-[#64748B] transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 pt-1 space-y-2 border-t border-[#F0EBDD]">
@@ -468,10 +468,10 @@ function WordsTab() {
                         key={l.id}
                         onClick={() => setLabel(r, r.manual_label === l.id ? null : l.id)}
                         title={l.label}
-                        className={`text-base w-7 h-7 grid place-items-center rounded-md border transition
-                          ${r.manual_label === l.id ? "border-[#1E2A44] bg-[#FAF7F0]" : "border-transparent hover:border-[#E7E2D5]"}`}
+                        className={`w-7 h-7 grid place-items-center rounded-md border transition
+                          ${r.manual_label === l.id ? "border-[#1A2744] bg-[#F5F0E8]" : "border-transparent hover:border-[#E2DDD0]"}`}
                       >
-                        {l.emoji}
+                        <span className="block w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
                       </button>
                     ))}
                   </div>
