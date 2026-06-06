@@ -972,14 +972,81 @@ function DocView({
         </p>
       )}
 
+      {/* Resume Improve: recommendations FIRST */}
+      {isResumeImprove && !editing && resumeMeta && (
+        <section className="mb-4 space-y-3">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold px-1">
+            რეკომენდაციები
+          </p>
+          {resumeMeta.summaryKa && (
+            <BizCard className="bg-[#F0F7F4] border-[#CDE3D8]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#0F766E] font-semibold mb-1">შეჯამება</p>
+              <p className="ka text-xs text-[#1E2A44] leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
+            </BizCard>
+          )}
+          {resumeMeta.toneAssessmentKa && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">ტონი</p>
+              <p className="ka text-xs text-[#1E2A44] leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
+            </BizCard>
+          )}
+          {Array.isArray(resumeMeta.missingKeywords) && resumeMeta.missingKeywords.length > 0 && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">Keywords რომელიც აკლია</p>
+              <div className="flex flex-wrap gap-1.5">
+                {resumeMeta.missingKeywords.map((k: string, i: number) => (
+                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-[#FFF6D1] text-[#1E2A44] border border-[#F2E6B0]">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </BizCard>
+          )}
+          {Array.isArray(resumeMeta.suggestions) && resumeMeta.suggestions.length > 0 && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">Before / After</p>
+              <ul className="space-y-3">
+                {resumeMeta.suggestions.map((s: any, i: number) => (
+                  <li key={i} className="border-t border-[#E7E2D5] first:border-t-0 pt-3 first:pt-0">
+                    {s.sectionKa && <p className="ka text-xs font-semibold text-[#1E2A44]">{s.sectionKa}</p>}
+                    {s.issueKa && <p className="ka text-[11px] text-[#5B6473] mt-1">{s.issueKa}</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                      {s.before && (
+                        <div className="bg-[#FEF3E2] rounded-md px-2 py-1.5 text-[11px]">
+                          <span className="ka font-semibold text-[#B45309]">Before: </span>
+                          <span className="text-[#1E2A44]">{s.before}</span>
+                        </div>
+                      )}
+                      {s.after && (
+                        <div className="bg-[#ECFDF5] rounded-md px-2 py-1.5 text-[11px]">
+                          <span className="ka font-semibold text-[#0F766E]">After: </span>
+                          <span className="text-[#1E2A44]">{s.after}</span>
+                        </div>
+                      )}
+                    </div>
+                    {s.whyKa && <p className="ka text-[11px] text-[#5B6473] mt-2">↳ {s.whyKa}</p>}
+                  </li>
+                ))}
+              </ul>
+            </BizCard>
+          )}
+        </section>
+      )}
+
+      {isResumeImprove && !editing && (
+        <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+          გაუმჯობესებული რეზიუმე
+        </p>
+      )}
+
       {/* Document */}
       <article className="bg-white border border-[#E7E2D5] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
         {editing ? (
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            rows={20}
-            className="w-full text-sm font-serif leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none"
+            rows={isResumeImprove ? 30 : 20}
+            className={`w-full text-sm leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
           />
         ) : (
           <div
@@ -988,6 +1055,7 @@ function DocView({
           />
         )}
       </article>
+
 
       {/* Email Fix: before/after + changes */}
       {doc.doc_type === "email_fix" && !editing && (() => {
