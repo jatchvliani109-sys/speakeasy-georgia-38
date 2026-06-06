@@ -24,10 +24,9 @@ function instructionsFor(level: string, topic: string, tier: Tier) {
   return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. ${tierGuidance(tier)} Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
 }
 
-function basicAuthHeader(apiKey: string) {
-  // Inworld expects Basic <base64(apiKey:)>  (note the trailing colon, empty password)
-  const encoded = btoa(`${apiKey}:`);
-  return `Basic ${encoded}`;
+function inworldAuthHeader(apiKey: string) {
+  const normalizedKey = apiKey.trim().replace(/^Basic\s+/i, "").replace(/^Bearer\s+/i, "");
+  return `Basic ${normalizedKey}`;
 }
 
 Deno.serve(async (req) => {
@@ -52,7 +51,7 @@ Deno.serve(async (req) => {
     const res = await fetch("https://api.inworld.ai/api/v1/realtime/sessions", {
       method: "POST",
       headers: {
-        Authorization: basicAuthHeader(INWORLD_API_KEY),
+        Authorization: inworldAuthHeader(INWORLD_API_KEY),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

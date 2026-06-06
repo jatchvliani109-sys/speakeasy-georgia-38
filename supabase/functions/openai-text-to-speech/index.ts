@@ -26,8 +26,9 @@ function cleanForTTS(text: string): string {
   return s;
 }
 
-function basicAuthHeader(apiKey: string) {
-  return `Basic ${btoa(`${apiKey}:`)}`;
+function inworldAuthHeader(apiKey: string) {
+  const normalizedKey = apiKey.trim().replace(/^Basic\s+/i, "").replace(/^Bearer\s+/i, "");
+  return `Basic ${normalizedKey}`;
 }
 
 function b64ToBytes(b64: string): Uint8Array {
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
     const voiceId = (typeof voice === "string" && voice) || "Ashley";
     const res = await fetch("https://api.inworld.ai/tts/v1/voice", {
       method: "POST",
-      headers: { Authorization: basicAuthHeader(apiKey), "Content-Type": "application/json" },
+      headers: { Authorization: inworldAuthHeader(apiKey), "Content-Type": "application/json" },
       body: JSON.stringify({
         text: cleaned,
         voiceId,
