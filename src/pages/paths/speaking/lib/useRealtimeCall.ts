@@ -432,7 +432,7 @@ try {
       dc.onopen = () => {
         dlog("data channel opened — sending session.update");
         try {
-          dc.send(JSON.stringify({
+         dc.send(JSON.stringify({
   type: "session.update",
   session: {
     type: "realtime",
@@ -441,10 +441,9 @@ try {
     output_modalities: ["audio", "text"],
     audio: {
       input: {
-        transcription: { model: "inworld/inworld-stt-1" },
         turn_detection: {
           type: "semantic_vad",
-          eagerness: "medium",
+          eagerness: "high",
           create_response: true,
           interrupt_response: true,
         },
