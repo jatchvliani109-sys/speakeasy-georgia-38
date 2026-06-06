@@ -809,6 +809,27 @@ type SessionSummary = {
   homework_ka?: string;
 };
 
+type Performance = "strong" | "average" | "weak";
+
+function evaluatePerformance(messages: Msg[], mistakesCount: number): { level: Performance; metCount: number } {
+  const userMsgs = messages.filter((m) => m.role === "user" && !m.pending && m.content.trim().length > 0);
+  const turns = userMsgs.length;
+  const totalWords = userMsgs.reduce((s, m) => s + m.content.trim().split(/\s+/).length, 0);
+  const avgWords = turns ? totalWords / turns : 0;
+  const longishTurns = userMsgs.filter((m) => m.content.trim().split(/\s+/).length >= 3).length;
+
+  const conditions = [
+    turns >= 4,                  // spoke at least 4 times
+    avgWords > 1.5,              // not just one-word answers
+    mistakesCount <= 2,          // relatively few basic mistakes
+    longishTurns >= Math.max(2, Math.floor(turns / 2)), // natural flow
+  ];
+  const met = conditions.filter(Boolean).length;
+  if (met >= 3) return { level: "strong", metCount: met };
+  if (met >= 2) return { level: "average", metCount: met };
+  return { level: "weak", metCount: met };
+}
+
 const NEXT_SUGGESTIONS: Record<string, string> = {
   intro: "School", school: "Family", family: "Hobbies", hobbies: "Daily Routine",
   routine: "At a Café", cafe: "Ordering Food", ordering: "Asking for Directions",
