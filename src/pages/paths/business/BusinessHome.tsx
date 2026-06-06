@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  Award,
+  BarChart2,
+  Clock,
+  FileText,
+  Library,
+  RotateCcw,
+  Sparkles,
+  Target,
+  Check,
+  ArrowRight,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
