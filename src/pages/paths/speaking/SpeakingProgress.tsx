@@ -4,7 +4,10 @@ import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
+import { MessageCircle, Repeat2, Volume2, Drama, Award, TrendingUp, TrendingDown } from "lucide-react";
+import { useSpeakingProgress } from "./lib/useSpeakingProgress";
+import ScenarioProgressMap from "./components/ScenarioProgressMap";
+import { scenarioById } from "./lib/scenarios";
 
 
 type LessonRow = {
@@ -105,18 +108,9 @@ export default function SpeakingProgress() {
         <p className="text-center py-12 sp-text-muted ka">იტვირთება...</p>
       ) : (
         <div className="space-y-6 max-w-3xl mx-auto">
-          <div>
-            <span className="sp-eyebrow ka">პროგრესი</span>
-            <h2 className="text-2xl font-extrabold ka sp-text mt-2 leading-snug">
-              შენი საუბრის გზა
-            </h2>
-            <p className="text-sm sp-text-muted ka mt-1.5">
-              ცოტ-ცოტა ყოველდღე — სწორედ ეს გვაძლევს შედეგს.
-            </p>
-          </div>
+          <ProgressOverview />
 
-
-
+          <ScenarioMapSection />
 
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
@@ -124,6 +118,9 @@ export default function SpeakingProgress() {
             <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ცდა" />
             <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
+
+          <StrongWeakSection />
+
 
           {/* Recent practice */}
           <Section title="ბოლო ვარჯიში">
@@ -294,4 +291,95 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Empty() {
   return <div className="text-sm sp-text-soft ka">ჯერ არ გაქვს დაწყებული.</div>;
+}
+
+function ProgressOverview() {
+  const { cefr, counts, mastered } = useSpeakingProgress();
+  return (
+    <div className="sp-card-hero p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <span className="sp-eyebrow">პროგრესი</span>
+          <h2 className="text-2xl font-extrabold ka mt-2 leading-snug">შენი საუბრის გზა</h2>
+          <p className="text-sm opacity-90 ka mt-1">
+            {counts.total} დონე დასრულებული · {mastered} სრულად ათვისებული სცენარი
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-[hsl(41_100%_47%)] text-[hsl(31_53%_12%)]">
+            <Award className="w-4 h-4" /> {cefr.code}
+          </div>
+          <div className="text-[11px] opacity-80 ka">{cefr.label_ka}</div>
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+        <TierStat label_ka="დამწყები" value={counts.easy} />
+        <TierStat label_ka="საშუალო" value={counts.medium} />
+        <TierStat label_ka="რთული" value={counts.hard} />
+      </div>
+    </div>
+  );
+}
+
+function TierStat({ label_ka, value }: { label_ka: string; value: number }) {
+  return (
+    <div className="rounded-lg bg-[hsl(31_53%_18%)]/40 border border-[hsl(33_60%_28%)]/40 py-2">
+      <div className="text-xl font-extrabold">{value}/17</div>
+      <div className="text-[10px] opacity-80 ka mt-0.5">{label_ka}</div>
+    </div>
+  );
+}
+
+function ScenarioMapSection() {
+  const { map } = useSpeakingProgress();
+  return (
+    <section className="space-y-2">
+      <h3 className="text-xs font-bold ka sp-text-muted uppercase tracking-wider">სცენარების რუკა</h3>
+      <ScenarioProgressMap map={map} />
+    </section>
+  );
+}
+
+function StrongWeakSection() {
+  const { strongest, weakest } = useSpeakingProgress();
+  if (!strongest.length && !weakest.length) return null;
+  return (
+    <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="sp-card p-4">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-bold sp-text-muted ka mb-2">
+          <TrendingUp className="w-3.5 h-3.5" /> ძლიერი თემები
+        </div>
+        {strongest.length ? (
+          <ul className="space-y-1.5 text-sm">
+            {strongest.map((s) => (
+              <li key={s.scenarioId} className="flex items-center justify-between gap-2">
+                <span className="sp-text truncate">{scenarioById(s.scenarioId)?.title_en ?? s.scenarioId}</span>
+                <span className="font-bold text-emerald-700">{s.avg}%</span>
+              </li>
+            ))}
+          </ul>
+        ) : <div className="text-xs sp-text-soft ka">ჯერ არ არის მონაცემები.</div>}
+      </div>
+      <div className="sp-card p-4">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-bold sp-text-muted ka mb-2">
+          <TrendingDown className="w-3.5 h-3.5" /> სამუშაოა საჭირო
+        </div>
+        {weakest.length ? (
+          <ul className="space-y-1.5 text-sm">
+            {weakest.map((s) => (
+              <li key={s.scenarioId} className="flex items-center justify-between gap-2">
+                <Link
+                  to={`/path/speaking/call?scenario=${s.scenarioId}`}
+                  className="sp-text truncate hover:underline"
+                >
+                  {scenarioById(s.scenarioId)?.title_en ?? s.scenarioId}
+                </Link>
+                <span className="font-bold text-amber-700">{s.avg}%</span>
+              </li>
+            ))}
+          </ul>
+        ) : <div className="text-xs sp-text-soft ka">ჯერ არ არის მონაცემები.</div>}
+      </div>
+    </section>
+  );
 }

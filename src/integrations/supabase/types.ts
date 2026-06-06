@@ -682,6 +682,36 @@ export type Database = {
         }
         Relationships: []
       }
+      speaking_scenario_progress: {
+        Row: {
+          completed_at: string
+          id: string
+          scenario_id: string
+          score: number
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          scenario_id: string
+          score?: number
+          tier: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          scenario_id?: string
+          score?: number
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vocabulary: {
         Row: {
           created_at: string

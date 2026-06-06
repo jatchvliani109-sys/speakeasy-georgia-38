@@ -25,6 +25,7 @@ export type RtEvent =
 type Args = {
   topic: string;
   level: string;
+  tier?: "easy" | "medium" | "hard";
   selectedLearningPath?: string;
   onEvent?: (e: RtEvent) => void;
   onError?: (msg: string) => void;
@@ -33,7 +34,7 @@ type Args = {
 const DEBUG = true;
 const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
 
-export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, onError }: Args) {
+export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
@@ -245,7 +246,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
     let usedModel: string | undefined;
     try {
       const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
-        body: { topic, level, selectedLearningPath },
+        body: { topic, level, tier, selectedLearningPath },
       });
       if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
       clientSecret = (data as any).client_secret?.value;
@@ -317,7 +318,7 @@ export function useRealtimeCall({ topic, level, selectedLearningPath, onEvent, o
       startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
-  }, [fail, handleServerEvent, level, selectedLearningPath, status, topic]);
+  }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
 
   return { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn };
 }

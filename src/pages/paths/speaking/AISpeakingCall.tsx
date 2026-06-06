@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb, Sparkles,
-  Loader2, RotateCcw, X, Radio, Clock,
-  Handshake, GraduationCap, Users as UsersIcon, Coffee, Palette, Clock3,
-  UtensilsCrossed, Map as MapIcon, ShoppingBag, Plane, CalendarDays,
-  Briefcase, MessageSquare, CalendarRange, Globe2, Puzzle, MessagesSquare,
-  type LucideIcon,
+  Loader2, RotateCcw, X, Radio, Clock, CheckCircle2, Lock,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakButton from "@/components/SpeakButton";
@@ -15,62 +11,30 @@ import { useAuth } from "@/lib/auth";
 import { recordSpeakingActivity } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
 import { useRealtimeCall, type RtStatus } from "./lib/useRealtimeCall";
-
-// --- Topics --------------------------------------------------------------
-
-type Level = "Beginner" | "Elementary" | "Intermediate";
-type Topic = {
-  id: string;
-  level: Level | "Free";
-  title_en: string;
-  desc_ka: string;
-  Icon: LucideIcon;
-  scene_en?: string; // hint for the AI
-};
-
-const TOPICS: Topic[] = [
-  { id: "intro", level: "Beginner", title_en: "Introducing Yourself", desc_ka: "გაიცანი AI და ისაუბრე საკუთარ თავზე.", Icon: Handshake },
-  { id: "school", level: "Beginner", title_en: "School", desc_ka: "ისაუბრე სკოლაზე და საგნებზე.", Icon: GraduationCap },
-  { id: "family", level: "Beginner", title_en: "Family", desc_ka: "ისაუბრე ოჯახის წევრებზე.", Icon: UsersIcon },
-  { id: "cafe", level: "Beginner", title_en: "At a Café", desc_ka: "შეუკვეთე სასმელი და ილაპარაკე ოფიციანტთან.", Icon: Coffee },
-  { id: "hobbies", level: "Beginner", title_en: "Hobbies", desc_ka: "მოყევი რა გიყვარს თავისუფალ დროს.", Icon: Palette },
-  { id: "routine", level: "Beginner", title_en: "Daily Routine", desc_ka: "ისაუბრე შენს დღიურ რუტინაზე.", Icon: Clock3 },
-
-  { id: "ordering", level: "Elementary", title_en: "Ordering Food", desc_ka: "შეუკვეთე საჭმელი რესტორანში.", Icon: UtensilsCrossed },
-  { id: "directions", level: "Elementary", title_en: "Asking for Directions", desc_ka: "ჰკითხე გზა ქალაქში.", Icon: MapIcon },
-  { id: "shopping", level: "Elementary", title_en: "Shopping", desc_ka: "იყიდე ტანსაცმელი ან ჰკითხე ფასი.", Icon: ShoppingBag },
-  { id: "travel", level: "Elementary", title_en: "Travel Basics", desc_ka: "სასტუმრო, ბილეთი, აეროპორტი.", Icon: Plane },
-  { id: "weekend", level: "Elementary", title_en: "Weekend Plans", desc_ka: "დაგეგმე შაბათ-კვირა მეგობართან.", Icon: CalendarDays },
-
-  { id: "interview", level: "Intermediate", title_en: "Job Interview", desc_ka: "ივარჯიშე გასაუბრებაზე.", Icon: Briefcase },
-  { id: "opinions", level: "Intermediate", title_en: "Giving Opinions", desc_ka: "გამოთქვი აზრი თემაზე.", Icon: MessageSquare },
-  { id: "plans", level: "Intermediate", title_en: "Making Plans", desc_ka: "შეთანხმდი მეგობართან გეგმაზე.", Icon: CalendarRange },
-  { id: "travel_conv", level: "Intermediate", title_en: "Travel Conversation", desc_ka: "ისაუბრე მოგზაურობის გამოცდილებაზე.", Icon: Globe2 },
-  { id: "problem", level: "Intermediate", title_en: "Problem Solving", desc_ka: "გადაჭერი სიტუაცია მხარდაჭერასთან.", Icon: Puzzle },
-
-  { id: "free", level: "Free", title_en: "Free Conversation", desc_ka: "ისაუბრე ნებისმიერ თემაზე.", Icon: MessagesSquare },
-];
-
-const LEVEL_LABEL_KA: Record<Topic["level"], string> = {
-  Beginner: "მარტივი",
-  Elementary: "საშუალო",
-  Intermediate: "რთული",
-  Free: "თავისუფალი",
-};
+import { SCENARIOS, GROUP_LABEL_KA, scenarioById, type Scenario, type ScenarioGroup } from "./lib/scenarios";
+import { TIERS, TIER_LABEL_KA, type Tier, scoreSession, isCompletionEligible, isTierUnlocked, isTierCompleted } from "./lib/progression";
+import { useSpeakingProgress } from "./lib/useSpeakingProgress";
+import { toast } from "sonner";
 
 // --- Types --------------------------------------------------------------
 
 type Msg = { role: "user" | "assistant"; content: string; pending?: boolean };
 type Step = "setup" | "explain" | "call" | "summary";
 
+// Backwards-compat alias so existing references downstream keep working.
+type Topic = Scenario;
+
 // --- Component ----------------------------------------------------------
 
 export default function AISpeakingCall() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { map, recordCompletion } = useSpeakingProgress();
 
   const [step, setStep] = useState<Step>("setup");
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [tier, setTier] = useState<Tier>("easy");
   const [level, setLevel] = useState<string>("Beginner");
 
   useEffect(() => {
@@ -85,8 +49,27 @@ export default function AISpeakingCall() {
     })();
   }, [user]);
 
+  // Deep-link support: ?scenario=cafe&tier=easy → jump to explain
+  useEffect(() => {
+    if (step !== "setup") return;
+    const sid = searchParams.get("scenario");
+    const tParam = (searchParams.get("tier") as Tier | null) ?? "easy";
+    if (!sid) return;
+    const found = scenarioById(sid);
+    if (!found) return;
+    if (!isTierUnlocked(map, sid, tParam)) {
+      toast.error("ეს დონე ჯერ დაბლოკილია — ჯერ წინა დონე გაიარე.");
+      return;
+    }
+    setTopic(found);
+    setTier(tParam);
+    setStep("explain");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, map, step]);
+
   // ---- Setup -----------------------------------------------------------
   if (step === "setup") {
+    const groups: ScenarioGroup[] = ["Beginner", "Elementary", "Intermediate", "Free"];
     return (
       <SpeakingShell>
         <div className="max-w-2xl mx-auto space-y-5">
@@ -104,35 +87,28 @@ export default function AISpeakingCall() {
             </div>
           </header>
 
-          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl, lvlIdx) => {
-            const items = TOPICS.filter((t) => t.level === lvl);
+          {groups.map((g, gIdx) => {
+            const items = SCENARIOS.filter((t) => t.group === g);
             if (!items.length) return null;
             return (
-              <section key={lvl}>
-                {lvlIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
+              <section key={g}>
+                {gIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
                 <h3 className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka mb-2">
-                  {LEVEL_LABEL_KA[lvl]}
+                  {GROUP_LABEL_KA[g]}
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {items.map((t) => {
-                    const Icon = t.Icon;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => { setTopic(t); setStep("explain"); }}
-                        className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
-                      >
-                        <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
-                          <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
-                      </button>
-                    );
-                  })}
+                <div className="grid grid-cols-1 gap-2">
+                  {items.map((t) => (
+                    <ScenarioRow
+                      key={t.id}
+                      scenario={t}
+                      map={map}
+                      onPick={(picked, pickedTier) => {
+                        setTopic(picked);
+                        setTier(pickedTier);
+                        setStep("explain");
+                      }}
+                    />
+                  ))}
                 </div>
               </section>
             );
@@ -167,7 +143,12 @@ export default function AISpeakingCall() {
           </div>
 
           <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-4">
-            <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[hsl(41_100%_47%)] text-[hsl(31_53%_12%)] ka">
+                {TIER_LABEL_KA[tier]}
+              </span>
+            </div>
             <div className="font-bold sp-text mt-1">{topic.title_en}</div>
             <div className="text-xs sp-text-muted ka mt-0.5">{topic.desc_ka}</div>
           </div>
@@ -189,10 +170,11 @@ export default function AISpeakingCall() {
     return (
       <CallScreen
         topic={topic}
+        tier={tier}
         level={level}
         onBack={() => setStep("explain")}
         onEnd={(messages, durationSec) => {
-          (window as any).__sp_call_data = { topic, level, messages, durationSec };
+          (window as any).__sp_call_data = { topic, tier, level, messages, durationSec };
           setStep("summary");
         }}
       />
@@ -201,13 +183,15 @@ export default function AISpeakingCall() {
 
   // ---- Summary ---------------------------------------------------------
   if (step === "summary" && topic) {
-    const data = (window as any).__sp_call_data ?? { topic, level, messages: [], durationSec: 0 };
+    const data = (window as any).__sp_call_data ?? { topic, tier, level, messages: [], durationSec: 0 };
     return (
       <SummaryScreen
         topic={data.topic}
+        tier={data.tier ?? tier}
         level={data.level}
         messages={data.messages}
         durationSec={data.durationSec}
+        recordCompletion={recordCompletion}
         onPracticeAgain={() => { setStep("setup"); }}
         onBackToSpeaking={() => navigate("/path/speaking")}
       />
@@ -215,6 +199,51 @@ export default function AISpeakingCall() {
   }
 
   return null;
+}
+
+function ScenarioRow({
+  scenario, map, onPick,
+}: {
+  scenario: Scenario;
+  map: ReturnType<typeof useSpeakingProgress>["map"];
+  onPick: (s: Scenario, t: Tier) => void;
+}) {
+  const Icon = scenario.Icon;
+  return (
+    <div className="sp-card p-3.5 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-bold sp-text text-[14px]">{scenario.title_en}</div>
+        <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{scenario.desc_ka}</div>
+      </div>
+      <div className="flex items-center gap-1 shrink-0">
+        {TIERS.map((t) => {
+          const unlocked = isTierUnlocked(map, scenario.id, t);
+          const done = isTierCompleted(map, scenario.id, t);
+          return (
+            <button
+              key={t}
+              disabled={!unlocked}
+              onClick={() => onPick(scenario, t)}
+              title={`${TIER_LABEL_KA[t]}${done ? " ✓" : unlocked ? "" : " (დაბლოკილია)"}`}
+              className={`h-9 min-w-9 px-2 rounded-lg text-[11px] font-bold ka inline-flex items-center justify-center gap-1 transition-colors ${
+                done
+                  ? "bg-[hsl(33_69%_45%)] text-[hsl(40_91%_96%)]"
+                  : unlocked
+                  ? "border border-[hsl(38_70%_72%)] bg-[hsl(40_91%_93%)] sp-text hover:bg-[hsl(40_91%_88%)]"
+                  : "bg-[hsl(38_25%_88%)] text-[hsl(30_15%_55%)] cursor-not-allowed"
+              }`}
+            >
+              {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : !unlocked ? <Lock className="w-3 h-3" /> : null}
+              {TIER_LABEL_KA[t]}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function ExplainItem({ text }: { text: string }) {
@@ -242,9 +271,10 @@ const STATUS_LABEL_KA: Record<RtStatus, string> = {
 // Automatic Georgian detection removed — user manually requests Georgian help.
 
 function CallScreen({
-  topic, level, onBack, onEnd,
+  topic, tier, level, onBack, onEnd,
 }: {
   topic: Topic;
+  tier: Tier;
   level: string;
   onBack: () => void;
   onEnd: (messages: Msg[], durationSec: number) => void;
@@ -345,6 +375,7 @@ function CallScreen({
   const { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn } = useRealtimeCall({
     topic: topic.title_en,
     level,
+    tier,
     selectedLearningPath: learningPath,
     onEvent: handleEvent,
   });
@@ -782,18 +813,22 @@ const NEXT_SUGGESTIONS: Record<string, string> = {
 };
 
 function SummaryScreen({
-  topic, level, messages, durationSec, onPracticeAgain, onBackToSpeaking,
+  topic, tier, level, messages, durationSec, recordCompletion, onPracticeAgain, onBackToSpeaking,
 }: {
   topic: Topic;
+  tier: Tier;
   level: string;
   messages: Msg[];
   durationSec: number;
+  recordCompletion: (input: { scenarioId: string; tier: Tier; score: number }) => Promise<{ newlyUnlockedTier: Tier | null; upgraded?: boolean }>;
   onPracticeAgain: () => void;
   onBackToSpeaking: () => void;
 }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<SessionSummary>({});
+  const [unlocked, setUnlocked] = useState<Tier | null>(null);
+  const [scored, setScored] = useState<number | null>(null);
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -801,7 +836,6 @@ function SummaryScreen({
     savedRef.current = true;
     (async () => {
       let summ: SessionSummary = {};
-      // Only request AI summary if there's actual conversation content.
       if (messages.length >= 2) {
         try {
           const r = await supabase.functions.invoke("ai-tutor", {
@@ -817,7 +851,15 @@ function SummaryScreen({
       setSummary(summ);
       setLoading(false);
 
-      // Save session
+      const userTurns = messages.filter((m) => m.role === "user").length;
+      const score = scoreSession({
+        userTurns,
+        mistakesCount: summ.mistakes?.length ?? 0,
+        phrasesCount: summ.useful_phrases?.length ?? 0,
+        durationSec,
+      });
+      setScored(score);
+
       if (user) {
         try {
           await supabase.from("lessons").insert({
@@ -828,9 +870,11 @@ function SummaryScreen({
               mode: "ai_speaking_call",
               topic: topic.title_en,
               topic_id: topic.id,
-              difficulty: topic.level,
+              difficulty: topic.group,
+              tier,
+              score,
               duration_sec: durationSec,
-              voice_prompts_completed: messages.filter((m) => m.role === "user").length,
+              voice_prompts_completed: userTurns,
               phrases_practiced: (summ.useful_phrases ?? []).length,
               mistakes: summ.mistakes ?? [],
               useful_phrases: summ.useful_phrases ?? [],
@@ -841,7 +885,6 @@ function SummaryScreen({
             completed: true,
             ended_at: new Date().toISOString(),
           });
-          // Save mistakes
           if (summ.mistakes?.length) {
             await supabase.from("mistakes").insert(
               summ.mistakes.map((m) => ({
@@ -853,7 +896,6 @@ function SummaryScreen({
               })),
             );
           }
-          // Save new words
           if (summ.new_words?.length) {
             await supabase.from("vocabulary").insert(
               summ.new_words.map((w) => ({
@@ -867,6 +909,15 @@ function SummaryScreen({
             );
           }
           await recordSpeakingActivity(user.id, "daily_speaking_lesson");
+
+          // Record progression — only if user actually engaged (>= 4 turns).
+          if (isCompletionEligible(userTurns)) {
+            const res = await recordCompletion({ scenarioId: topic.id, tier, score });
+            if (res.newlyUnlockedTier) {
+              setUnlocked(res.newlyUnlockedTier);
+              toast.success(`${TIER_LABEL_KA[res.newlyUnlockedTier]} დონე განბლოკილია!`);
+            }
+          }
         } catch (e: any) {
           console.warn("[speaking-call] save failed", e?.message);
         }
@@ -874,6 +925,7 @@ function SummaryScreen({
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const minutes = Math.floor(durationSec / 60);
   const seconds = durationSec % 60;
@@ -884,19 +936,24 @@ function SummaryScreen({
       <div className="max-w-md mx-auto space-y-4">
         <div className="sp-card-hero p-6 text-center sp-pop-in">
           <div className="mx-auto w-12 h-12 rounded-full bg-[hsl(41_100%_55%)] text-[hsl(31_53%_12%)] flex items-center justify-center mb-3">
-            <Sparkles className="w-6 h-6" />
+            {unlocked ? <Sparkles className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
           </div>
-          <h1 className="text-xl font-extrabold sp-text ka">სესია დასრულებულია</h1>
+          <h1 className="text-xl font-extrabold sp-text ka">
+            {unlocked ? `${TIER_LABEL_KA[unlocked]} დონე განბლოკილია!` : "სესია დასრულებულია"}
+          </h1>
           <p className="text-sm sp-text ka mt-2">
             {summary.encouragement_ka || getEncouragementKa(dailySeed())}
           </p>
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(41_100%_47%)] text-[hsl(31_53%_12%)] text-[11px] font-bold ka">
+            {TIER_LABEL_KA[tier]} {scored !== null ? `· ${scored}%` : ""}
+          </div>
         </div>
 
         <div className="sp-card p-4 grid grid-cols-2 gap-3">
           <Stat label_ka="თემა" value={topic.title_en} small />
           <Stat label_ka="დრო" value={`${minutes}:${String(seconds).padStart(2, "0")}`} />
           <Stat label_ka="შენი პასუხები" value={messages.filter((m) => m.role === "user").length} />
-          <Stat label_ka="დონე" value={LEVEL_LABEL_KA[topic.level]} small />
+          <Stat label_ka="დონე" value={GROUP_LABEL_KA[topic.group]} small />
         </div>
 
         {loading ? (
