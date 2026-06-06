@@ -436,7 +436,7 @@ try {
             type: "session.update",
             session: {
               type: "realtime",
-              model: "openai/gpt-4o-mini",
+              model: "openai/gpt-5-nano",
               instructions,
               output_modalities: ["audio", "text"],
               audio: {
