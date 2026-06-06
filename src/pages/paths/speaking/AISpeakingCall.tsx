@@ -1103,7 +1103,7 @@ function CelebrationModal({
     accent = "hsl(41 100% 55%)";
   } else if (performance === "average") {
     emoji = "🌟";
-    title = "კარგად იყო!";
+    title = "კარგი იყო!";
     body = "კიდევ ცოტა ვარჯიში და მომდევნო დონეზე გახვალ!";
     accent = "hsl(41 100% 55%)";
   } else {
