@@ -139,6 +139,39 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
+  const startAiAudioMonitor = useCallback((audioEl: HTMLAudioElement, remoteStream: MediaStream) => {
+    clearAiAudioMonitor();
+    setAiStream(remoteStream);
+
+    const markAiSpeaking = () => {
+      if (endedRef.current) return;
+      if (statusRef.current !== "listening") setRtStatus("ai_speaking");
+    };
+    const markAiStopped = () => {
+      if (endedRef.current || statusRef.current !== "ai_speaking") return;
+      setRtStatus(responseActiveRef.current ? "thinking" : "ready");
+    };
+
+    remoteStream.getAudioTracks().forEach((track) => {
+      if (track.readyState === "live" && !track.muted) markAiSpeaking();
+      track.onunmute = markAiSpeaking;
+      track.onmute = markAiStopped;
+      track.onended = markAiStopped;
+    });
+
+    aiAudioTimeRef.current = audioEl.currentTime || 0;
+    aiAudioCheckRef.current = window.setInterval(() => {
+      const previousTime = aiAudioTimeRef.current;
+      const currentTime = audioEl.currentTime || 0;
+      const isAdvancing = currentTime > previousTime + 0.005;
+      const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+      aiAudioTimeRef.current = currentTime;
+
+      if (responseActiveRef.current && isPlaying && isAdvancing) markAiSpeaking();
+      else if (!responseActiveRef.current || audioEl.paused || audioEl.ended) markAiStopped();
+    }, 100);
+  }, [clearAiAudioMonitor, setRtStatus]);
+
   const handleServerEvent = useCallback((ev: any) => {
     if (DEBUG && ev?.type && ev.type !== "response.audio.delta" && !ev.type.endsWith(".delta")) {
       dlog("event", ev.type);
@@ -146,7 +179,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     switch (ev?.type) {
       case "session.created":
       case "session.updated":
-        if (!responseActiveRef.current) setStatus("ready");
+        if (!responseActiveRef.current) setRtStatus("ready");
         // AI greets first — trigger one short opening response right after session is ready.
         if (!greetedRef.current && dcRef.current?.readyState === "open") {
           greetedRef.current = true;
@@ -163,21 +196,21 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         break;
       case "input_audio_buffer.speech_started":
         dlog("user speech started → pending transcript");
-        setStatus("listening");
+        setRtStatus("listening");
         onEvent?.({ kind: "user_turn_started" });
         break;
       case "input_audio_buffer.speech_stopped":
         dlog("user speech stopped");
-        setStatus("thinking");
+        setRtStatus("thinking");
         break;
       case "response.created":
         dlog("AI response started");
         responseActiveRef.current = true;
-        setStatus("thinking");
+        setRtStatus("ai_speaking");
         break;
       case "response.output_audio.delta":
       case "response.audio.delta":
-        setStatus("ai_speaking");
+        setRtStatus("ai_speaking");
         break;
       case "response.output_audio_transcript.delta":
       case "response.audio_transcript.delta": {
@@ -223,19 +256,19 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       case "response.completed":
         dlog("AI response completed");
         responseActiveRef.current = false;
-        setStatus("ready");
+        setRtStatus("ready");
         break;
       case "response.cancelled":
         dlog("response cancelled");
         responseActiveRef.current = false;
-        setStatus("ready");
+        setRtStatus("ready");
         break;
       case "error":
         console.warn("[rt] server error", ev);
         if (ev.error?.message) onError?.(ev.error.message);
         break;
     }
-  }, [onError, onEvent]);
+  }, [onError, onEvent, setRtStatus]);
 
   const start = useCallback(async () => {
     if (startingRef.current || pcRef.current ||
