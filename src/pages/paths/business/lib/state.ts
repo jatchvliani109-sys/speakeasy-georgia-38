@@ -60,6 +60,7 @@ export type BusinessState = {
   businessSelfIntroductionSkipped?: boolean;
   businessResumeUploaded?: boolean;
   businessResumeSkipped?: boolean;
+  firstMilestoneAcknowledged?: boolean;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -78,6 +79,7 @@ const empty = (): BusinessState => ({
   businessSelfIntroductionSkipped: false,
   businessResumeUploaded: false,
   businessResumeSkipped: false,
+  firstMilestoneAcknowledged: false,
 });
 
 export function loadBusiness(uid: string): BusinessState {

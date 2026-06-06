@@ -236,6 +236,42 @@ export type Database = {
         }
         Relationships: []
       }
+      business_reassessments: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          id: string
+          level_after: string | null
+          level_before: string | null
+          open_text: string | null
+          score_pct: number
+          test_version: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          level_after?: string | null
+          level_before?: string | null
+          open_text?: string | null
+          score_pct: number
+          test_version: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          level_after?: string | null
+          level_before?: string | null
+          open_text?: string | null
+          score_pct?: number
+          test_version?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_resumes: {
         Row: {
           achievements: Json
