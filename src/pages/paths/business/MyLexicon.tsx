@@ -228,8 +228,8 @@ function PhrasesTab() {
         <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><Library size={22} strokeWidth={2} /></div>
-          <h3 className="ka text-lg font-bold text-[#1A2744] mt-3">ფრაზები ცარიელია</h3>
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#3d6b9e]"><Library size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-[#3d6b9e] mt-3">ფრაზები ცარიელია</h3>
           <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
@@ -264,11 +264,11 @@ function PhrasesTab() {
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F5F0E8] transition"
                 >
-                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#1A2744]/5 border border-[#E2DDD0] text-[#1A2744] grid place-items-center">
+                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#3d6b9e]/5 border border-[#E2DDD0] text-[#3d6b9e] grid place-items-center">
                     <KindIcon size={16} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="ka text-sm font-semibold text-[#1A2744] truncate">
+                    <p className="ka text-sm font-semibold text-[#3d6b9e] truncate">
                       {sectionLabel} — {title}
                     </p>
                     <p className="ka text-[11px] text-[#64748B] mt-0.5">
@@ -417,7 +417,7 @@ function WordsTab() {
         <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><BookOpen size={22} strokeWidth={2} /></div>
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#3d6b9e]"><BookOpen size={22} strokeWidth={2} /></div>
           <h3 className="ka text-lg font-bold text-[#1E2A44] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
           <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
             დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
@@ -469,7 +469,7 @@ function WordsTab() {
                         onClick={() => setLabel(r, r.manual_label === l.id ? null : l.id)}
                         title={l.label}
                         className={`w-7 h-7 grid place-items-center rounded-md border transition
-                          ${r.manual_label === l.id ? "border-[#1A2744] bg-[#F5F0E8]" : "border-transparent hover:border-[#E2DDD0]"}`}
+                          ${r.manual_label === l.id ? "border-[#3d6b9e] bg-[#F5F0E8]" : "border-transparent hover:border-[#E2DDD0]"}`}
                       >
                         <span className="block w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
                       </button>

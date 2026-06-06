@@ -874,7 +874,7 @@ function Header({
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="ka text-xl font-bold text-[#1A2744] inline-flex items-center gap-2"><Mail size={18} strokeWidth={2.25} /> იმეილები</h1>
+        <h1 className="ka text-xl font-bold text-[#3d6b9e] inline-flex items-center gap-2"><Mail size={18} strokeWidth={2.25} /> იმეილები</h1>
         <span className="ka text-[11px] text-[#5B6473]">
           {curriculum ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}` : labelFor(session.emailType)}
         </span>

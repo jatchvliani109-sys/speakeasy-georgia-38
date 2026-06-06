@@ -29,11 +29,11 @@ export default function BusinessModule() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
       <div className="mb-5 flex items-start gap-3">
-        <span className="w-10 h-10 rounded-md bg-[#1A2744] text-[#F5F0E8] grid place-items-center shrink-0">
+        <span className="w-10 h-10 rounded-md bg-[#3d6b9e] text-[#F5F0E8] grid place-items-center shrink-0">
           <Icon size={18} strokeWidth={2} />
         </span>
         <div>
-          <h1 className="ka text-2xl font-bold text-[#1A2744]">{mod.title}</h1>
+          <h1 className="ka text-2xl font-bold text-[#3d6b9e]">{mod.title}</h1>
           <p className="ka text-sm text-[#64748B] mt-1">{mod.description}</p>
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function BusinessModule() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#C9A84C] font-semibold">
           მალე დაემატება
         </p>
-        <h3 className="ka text-base font-bold text-[#1A2744] mt-1">Coming next</h3>
+        <h3 className="ka text-base font-bold text-[#3d6b9e] mt-1">Coming next</h3>
         <p className="ka text-sm text-[#64748B] mt-2">
           ეს მოდული ამჟამად მზადდება.
         </p>

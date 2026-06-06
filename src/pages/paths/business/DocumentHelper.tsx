@@ -163,12 +163,12 @@ function HomeView({
             <button
               key={t.id}
               onClick={() => onTool(t.id)}
-              className="text-left bg-white border border-[#E2DDD0] rounded-lg p-4 hover:border-[#1A2744]/50 transition-colors"
+              className="text-left bg-white border border-[#E2DDD0] rounded-lg p-4 hover:border-[#3d6b9e]/50 transition-colors"
             >
-              <span className="w-9 h-9 rounded-md bg-[#1A2744] text-[#F5F0E8] grid place-items-center mb-3">
+              <span className="w-9 h-9 rounded-md bg-[#3d6b9e] text-[#F5F0E8] grid place-items-center mb-3">
                 <Icon size={16} strokeWidth={2} />
               </span>
-              <p className="ka font-semibold text-sm text-[#1A2744]">{t.title}</p>
+              <p className="ka font-semibold text-sm text-[#3d6b9e]">{t.title}</p>
               <p className="ka text-[11px] text-[#64748B] mt-1 leading-relaxed">{t.subtitle}</p>
             </button>
           );
@@ -209,13 +209,13 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-[#E2DDD0] rounded-md p-3 hover:border-[#1A2744]/50 transition-colors flex items-center gap-3"
+      className="w-full text-left bg-white border border-[#E2DDD0] rounded-md p-3 hover:border-[#3d6b9e]/50 transition-colors flex items-center gap-3"
     >
-      <span className="w-9 h-9 rounded-md bg-[#1A2744]/5 border border-[#E2DDD0] text-[#1A2744] grid place-items-center shrink-0">
+      <span className="w-9 h-9 rounded-md bg-[#3d6b9e]/5 border border-[#E2DDD0] text-[#3d6b9e] grid place-items-center shrink-0">
         <Icon size={16} strokeWidth={2} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="ka text-sm font-semibold text-[#1A2744] truncate">{doc.title}</p>
+        <p className="ka text-sm font-semibold text-[#3d6b9e] truncate">{doc.title}</p>
         <p className="ka text-[11px] text-[#64748B] mt-0.5">
           {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleDateString("ka-GE")}
         </p>
