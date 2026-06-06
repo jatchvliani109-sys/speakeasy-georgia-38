@@ -79,6 +79,7 @@ const empty = (): BusinessState => ({
   businessSelfIntroductionSkipped: false,
   businessResumeUploaded: false,
   businessResumeSkipped: false,
+  firstMilestoneAcknowledged: false,
 });
 
 export function loadBusiness(uid: string): BusinessState {
