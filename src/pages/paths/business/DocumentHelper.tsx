@@ -934,6 +934,8 @@ function DocView({
 
   const isResumeImprove = doc.doc_type === "resume_improve";
   const subject = (doc.meta as any)?.subject;
+  const resumeMeta = isResumeImprove ? ((doc.meta as any) || {}) : null;
+
 
   return (
     <>
