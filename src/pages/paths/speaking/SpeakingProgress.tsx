@@ -108,18 +108,9 @@ export default function SpeakingProgress() {
         <p className="text-center py-12 sp-text-muted ka">იტვირთება...</p>
       ) : (
         <div className="space-y-6 max-w-3xl mx-auto">
-          <div>
-            <span className="sp-eyebrow ka">პროგრესი</span>
-            <h2 className="text-2xl font-extrabold ka sp-text mt-2 leading-snug">
-              შენი საუბრის გზა
-            </h2>
-            <p className="text-sm sp-text-muted ka mt-1.5">
-              ცოტ-ცოტა ყოველდღე — სწორედ ეს გვაძლევს შედეგს.
-            </p>
-          </div>
+          <ProgressOverview />
 
-
-
+          <ScenarioMapSection />
 
           <div className="grid grid-cols-2 gap-3">
             <Stat Icon={MessageCircle} value={dailyLessons.length} label="საუბრის გაკვეთილი" />
@@ -127,6 +118,9 @@ export default function SpeakingProgress() {
             <Stat Icon={Volume2} value={pronCount} label="გამოთქმის ცდა" />
             <Stat Icon={Drama} value={roleplays.length} label="როლური საუბარი" />
           </div>
+
+          <StrongWeakSection />
+
 
           {/* Recent practice */}
           <Section title="ბოლო ვარჯიში">
