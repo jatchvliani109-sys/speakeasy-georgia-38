@@ -490,25 +490,21 @@ function CallScreen({
 
   const isConnected = status === "ready" || status === "listening" || status === "ai_speaking" || status === "thinking";
 
-  // Map underlying status into a single bubble-friendly state.
-  // User is "speaking" only when push-to-talk is held AND mic is live.
-  const bubbleState: "idle" | "ready" | "user_speaking" | "ai_speaking" | "thinking" | "connecting" =
+  // One visual state drives both the bubble color and the visible label.
+  const sessionState: "idle" | "ready" | "user_speaking" | "ai_speaking" | "connecting" =
     status === "connecting" ? "connecting"
-    : status === "ai_speaking" ? "ai_speaking"
-    : status === "thinking" ? "thinking"
-    : (status === "listening" || (isConnected && pttActive)) ? "user_speaking"
+    : status === "ai_speaking" || status === "thinking" ? "ai_speaking"
+    : status === "listening" || (isConnected && pttActive) ? "user_speaking"
     : isConnected ? "ready"
     : "idle";
 
   const stateLabel =
-    status === "connecting" ? "ვუკავშირდები..."
-    : status === "ai_speaking" ? "AI პასუხობს..."
-    : status === "thinking" ? "ვფიქრობ..."
-    : bubbleState === "user_speaking" ? "გისმენ..."
-    : isConnected ? "დააჭირე სასაუბრებლად"
+    sessionState === "connecting" ? "ვუკავშირდები..."
+    : sessionState === "ai_speaking" ? "AI პასუხობს..."
+    : sessionState === "user_speaking" ? "გისმენ..."
     : status === "ended" ? "სესია დასრულდა"
     : status === "error" ? (errorMsg ?? "შეცდომა")
-    : "დააწექი, რომ დაიწყო";
+    : "დააჭირე სასაუბრებლად";
 
   // Keep last 4 exchanges = last 8 messages
   const visibleMessages = messages.slice(-8);
@@ -576,10 +572,10 @@ function CallScreen({
       </header>
 
       {/* Center bubble — explicitly bounded so it never pushes the transcript off-screen */}
-      <div className="relative z-10 flex-1 min-h-0 flex flex-col items-center justify-center px-6 overflow-hidden">
-        <div className="flex items-center justify-center max-h-full">
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col items-center justify-center px-8 pt-16 sm:pt-20 overflow-visible">
+        <div className="flex items-center justify-center max-h-full overflow-visible max-w-[min(360px,calc(100vw-96px))]">
           <MicBubble
-            state={bubbleState}
+            state={sessionState}
             micStream={micStream}
             aiStream={aiStream}
             onPress={handleBubblePress}
