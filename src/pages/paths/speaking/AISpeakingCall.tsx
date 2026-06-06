@@ -381,7 +381,7 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText } = useRealtimeCall({
     topic: topic.title_en,
     level,
     tier,
