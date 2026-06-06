@@ -382,7 +382,7 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, micStream, aiStream } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, micStream, aiStream, aiAmplitude } = useRealtimeCall({
     topic: topic.title_en,
     level,
     tier,
@@ -578,10 +578,11 @@ function CallScreen({
             state={sessionState}
             micStream={micStream}
             aiStream={aiStream}
+            aiAmplitude={aiAmplitude}
             onPress={handleBubblePress}
             onRelease={handleBubbleRelease}
             active={pttActive}
-          />
+            />
         </div>
 
         <div className="mt-4 h-6 text-center shrink-0">
