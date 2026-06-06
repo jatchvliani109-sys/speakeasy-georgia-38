@@ -303,7 +303,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
                 },
                 output: {
                   model: "inworld-tts-2",
-                  voice: "Clive",
+                  voice: "Ashley",
                 },
               },
             },
