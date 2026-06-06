@@ -1,6 +1,6 @@
-// useRealtimeCall — connects the browser to OpenAI Realtime via WebRTC.
-// The OpenAI key stays server-side; we fetch an ephemeral client_secret from
-// the create-realtime-speaking-session edge function and use it as a Bearer.
+// useRealtimeCall — connects the browser to Inworld AI Realtime via WebRTC.
+// The INWORLD_API_KEY stays server-side; the create-realtime-speaking-session
+// edge function proxies the SDP exchange with Inworld's /v1/realtime/calls endpoint.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
