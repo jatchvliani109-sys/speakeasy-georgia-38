@@ -159,6 +159,12 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       track.onended = markAiStopped;
     });
 
+    audioEl.onplaying = markAiSpeaking;
+    audioEl.onplay = markAiSpeaking;
+    audioEl.onpause = markAiStopped;
+    audioEl.onended = markAiStopped;
+    audioEl.onwaiting = markAiStopped;
+
     aiAudioTimeRef.current = audioEl.currentTime || 0;
     aiAudioCheckRef.current = window.setInterval(() => {
       const previousTime = aiAudioTimeRef.current;
@@ -167,7 +173,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
       aiAudioTimeRef.current = currentTime;
 
-      if (responseActiveRef.current && isPlaying && isAdvancing) markAiSpeaking();
+      if ((responseActiveRef.current || statusRef.current === "ai_speaking") && isPlaying && isAdvancing) markAiSpeaking();
       else if (!responseActiveRef.current || audioEl.paused || audioEl.ended) markAiStopped();
     }, 100);
   }, [clearAiAudioMonitor, setRtStatus]);
@@ -421,7 +427,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
-  }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
+  }, [fail, handleServerEvent, level, tier, selectedLearningPath, setRtStatus, startAiAudioMonitor, status, topic]);
 
 
   return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream };
