@@ -47,10 +47,8 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const dcRef = useRef<RTCDataChannel | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const aiAnalyserRef = useRef<AnalyserNode | null>(null);
-  const aiRafRef = useRef<number | null>(null);
-  const aiSilentSinceRef = useRef<number>(0);
+  const aiAudioCheckRef = useRef<number | null>(null);
+  const aiAudioTimeRef = useRef(0);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
   const greetedRef = useRef(false);
@@ -63,19 +61,28 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   useEffect(() => { statusRef.current = status; }, [status]);
 
+  const setRtStatus = useCallback((next: RtStatus) => {
+    statusRef.current = next;
+    setStatus(next);
+  }, []);
+
+  const clearAiAudioMonitor = useCallback(() => {
+    if (aiAudioCheckRef.current) {
+      window.clearInterval(aiAudioCheckRef.current);
+      aiAudioCheckRef.current = null;
+    }
+    aiAudioTimeRef.current = 0;
+  }, []);
+
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
-    setStatus("error");
+    setRtStatus("error");
     onError?.(msg);
-  }, [onError]);
+  }, [onError, setRtStatus]);
 
   const cleanup = useCallback(() => {
     dlog("cleanup → closing data channel, peer connection, mic tracks");
-    if (aiRafRef.current) { cancelAnimationFrame(aiRafRef.current); aiRafRef.current = null; }
-    try { aiAnalyserRef.current?.disconnect(); } catch {}
-    aiAnalyserRef.current = null;
-    try { audioCtxRef.current?.close(); } catch {}
-    audioCtxRef.current = null;
+    clearAiAudioMonitor();
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
@@ -94,15 +101,15 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setMicStream(null);
     setAiStream(null);
     statusRef.current = "idle";
-  }, []);
+  }, [clearAiAudioMonitor]);
 
   const stop = useCallback(() => {
     if (endedRef.current) return;
     dlog("stop() called → ending session");
     endedRef.current = true;
     cleanup();
-    setStatus("ended");
-  }, [cleanup]);
+    setRtStatus("ended");
+  }, [cleanup, setRtStatus]);
 
   // Toggle mic track without tearing down the call (push-to-talk / manual mode).
   const setMicEnabled = useCallback((enabled: boolean) => {
@@ -132,6 +139,45 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
+  const startAiAudioMonitor = useCallback((audioEl: HTMLAudioElement, remoteStream: MediaStream) => {
+    clearAiAudioMonitor();
+    setAiStream(remoteStream);
+
+    const markAiSpeaking = () => {
+      if (endedRef.current) return;
+      if (statusRef.current !== "listening") setRtStatus("ai_speaking");
+    };
+    const markAiStopped = () => {
+      if (endedRef.current || statusRef.current !== "ai_speaking") return;
+      setRtStatus(responseActiveRef.current ? "thinking" : "ready");
+    };
+
+    remoteStream.getAudioTracks().forEach((track) => {
+      if (track.readyState === "live" && !track.muted) markAiSpeaking();
+      track.onunmute = markAiSpeaking;
+      track.onmute = markAiStopped;
+      track.onended = markAiStopped;
+    });
+
+    audioEl.onplaying = markAiSpeaking;
+    audioEl.onplay = markAiSpeaking;
+    audioEl.onpause = markAiStopped;
+    audioEl.onended = markAiStopped;
+    audioEl.onwaiting = markAiStopped;
+
+    aiAudioTimeRef.current = audioEl.currentTime || 0;
+    aiAudioCheckRef.current = window.setInterval(() => {
+      const previousTime = aiAudioTimeRef.current;
+      const currentTime = audioEl.currentTime || 0;
+      const isAdvancing = currentTime > previousTime + 0.005;
+      const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.readyState >= audioEl.HAVE_CURRENT_DATA;
+      aiAudioTimeRef.current = currentTime;
+
+      if (isPlaying && isAdvancing) markAiSpeaking();
+      else if (!responseActiveRef.current || audioEl.paused || audioEl.ended) markAiStopped();
+    }, 100);
+  }, [clearAiAudioMonitor, setRtStatus]);
+
   const handleServerEvent = useCallback((ev: any) => {
     if (DEBUG && ev?.type && ev.type !== "response.audio.delta" && !ev.type.endsWith(".delta")) {
       dlog("event", ev.type);
@@ -139,7 +185,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     switch (ev?.type) {
       case "session.created":
       case "session.updated":
-        if (!responseActiveRef.current) setStatus("ready");
+        if (!responseActiveRef.current) setRtStatus("ready");
         // AI greets first — trigger one short opening response right after session is ready.
         if (!greetedRef.current && dcRef.current?.readyState === "open") {
           greetedRef.current = true;
@@ -156,21 +202,21 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         break;
       case "input_audio_buffer.speech_started":
         dlog("user speech started → pending transcript");
-        setStatus("listening");
+        setRtStatus("listening");
         onEvent?.({ kind: "user_turn_started" });
         break;
       case "input_audio_buffer.speech_stopped":
         dlog("user speech stopped");
-        setStatus("thinking");
+        setRtStatus("thinking");
         break;
       case "response.created":
         dlog("AI response started");
         responseActiveRef.current = true;
-        setStatus("thinking");
+        setRtStatus("ai_speaking");
         break;
       case "response.output_audio.delta":
       case "response.audio.delta":
-        setStatus("ai_speaking");
+        setRtStatus("ai_speaking");
         break;
       case "response.output_audio_transcript.delta":
       case "response.audio_transcript.delta": {
@@ -216,19 +262,19 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       case "response.completed":
         dlog("AI response completed");
         responseActiveRef.current = false;
-        setStatus("ready");
+        setRtStatus("ready");
         break;
       case "response.cancelled":
         dlog("response cancelled");
         responseActiveRef.current = false;
-        setStatus("ready");
+        setRtStatus("ready");
         break;
       case "error":
         console.warn("[rt] server error", ev);
         if (ev.error?.message) onError?.(ev.error.message);
         break;
     }
-  }, [onError, onEvent]);
+  }, [onError, onEvent, setRtStatus]);
 
   const start = useCallback(async () => {
     if (startingRef.current || pcRef.current ||
@@ -241,7 +287,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setErrorMsg(null);
     endedRef.current = false;
     greetedRef.current = false;
-    setStatus("connecting");
+    setRtStatus("connecting");
     dlog("creating realtime session");
 
     let mic: MediaStream;
@@ -292,58 +338,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         const remoteStream = e.streams[0];
         audioEl.srcObject = remoteStream;
         audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
-
-        // Build an analyser-friendly stream via Web Audio. Routing the <audio>
-        // element through a MediaElementSource gives reliable amplitude data on
-        // remote WebRTC tracks (Chrome's createMediaStreamSource often returns
-        // silent buffers for remote tracks).
-        try {
-          const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-          const ctx = audioCtxRef.current ?? new AC();
-          audioCtxRef.current = ctx;
-          if (ctx.state === "suspended") ctx.resume().catch(() => {});
-
-          const src = ctx.createMediaElementSource(audioEl);
-          const analyser = ctx.createAnalyser();
-          analyser.fftSize = 1024;
-          analyser.smoothingTimeConstant = 0.7;
-          const dest = ctx.createMediaStreamDestination();
-          src.connect(analyser);
-          src.connect(dest);
-          src.connect(ctx.destination); // keep audible playback
-          aiAnalyserRef.current = analyser;
-          setAiStream(dest.stream);
-
-          const buf = new Uint8Array(analyser.fftSize);
-          const tick = () => {
-            const a = aiAnalyserRef.current;
-            if (!a) return;
-            a.getByteTimeDomainData(buf);
-            let sum = 0;
-            for (let i = 0; i < buf.length; i++) {
-              const v = (buf[i] - 128) / 128;
-              sum += v * v;
-            }
-            const rms = Math.sqrt(sum / buf.length);
-            const now = performance.now();
-            if (rms > 0.012) {
-              aiSilentSinceRef.current = now;
-              const s = statusRef.current;
-              if (s === "ready" || s === "thinking" || s === "listening") {
-                setStatus("ai_speaking");
-              }
-            } else if (statusRef.current === "ai_speaking") {
-              if (now - aiSilentSinceRef.current > 450) {
-                setStatus(responseActiveRef.current ? "thinking" : "ready");
-              }
-            }
-            aiRafRef.current = requestAnimationFrame(tick);
-          };
-          aiRafRef.current = requestAnimationFrame(tick);
-        } catch (err) {
-          console.warn("[rt] AI analyser setup failed, falling back to raw stream", err);
-          setAiStream(remoteStream);
-        }
+        startAiAudioMonitor(audioEl, remoteStream);
       };
 
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));
@@ -432,7 +427,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       startingRef.current = false;
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
-  }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
+  }, [fail, handleServerEvent, level, tier, selectedLearningPath, setRtStatus, startAiAudioMonitor, status, topic]);
 
 
   return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream };
