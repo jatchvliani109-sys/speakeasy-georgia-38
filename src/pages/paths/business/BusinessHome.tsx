@@ -242,6 +242,14 @@ export default function BusinessHome() {
 
   const emailsCount = progress.emails?.count ?? 0;
   const interviewCount = progress.interview?.count ?? 0;
+  const meetingsCount = progress.meetings?.count ?? 0;
+  const vocabSessionsCount = progress.vocabulary?.count ?? 0;
+  const allFourMilestone =
+    emailsCount >= 7 && interviewCount >= 7 && meetingsCount >= 7 && vocabSessionsCount >= 7;
+  const showMilestone = !!plan && allFourMilestone && !s.firstMilestoneAcknowledged;
+  const lastReassessmentLabel = lastReassessmentAt
+    ? new Date(lastReassessmentAt).toLocaleDateString("ka-GE", { year: "numeric", month: "short", day: "numeric" })
+    : "ჯერ არ გაგივლია";
 
   return (
     <BusinessShell>
