@@ -37,7 +37,7 @@ const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
 export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [model, setModel] = useState<string | null>(null);
+  
   const [micOn, setMicOn] = useState(false);
   const startingRef = useRef(false);
 
@@ -352,7 +352,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       }
       const answerSdp = await sdpRes.text();
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      setModel("openai/gpt-4o-mini");
+      
       startingRef.current = false;
       dlog("WebRTC connected");
 
@@ -364,5 +364,5 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
 
 
-  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn };
+  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn };
 }

@@ -381,7 +381,7 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText } = useRealtimeCall({
     topic: topic.title_en,
     level,
     tier,
@@ -518,29 +518,6 @@ function CallScreen({
           )}
         </header>
 
-        {isConnected && (
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="inline-flex items-center gap-1.5 rounded-full sp-chip px-2.5 py-1 text-[11px] font-mono">
-              <Clock className="w-3 h-3" />
-              {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
-            </div>
-          </div>
-        )}
-
-        {showTimeWarn && isConnected && (
-          <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[12px] text-amber-900 ka text-center">
-            სესია მალე დასრულდება.
-          </div>
-        )}
-
-        {import.meta.env.DEV && (
-          <div className="mb-3 rounded-md bg-slate-900/90 text-slate-100 px-2 py-1 font-mono text-[10px] flex flex-wrap items-center gap-x-3 gap-y-0.5 justify-center">
-            <span>status: {status}</span>
-            <span>mic: {micOn ? "on" : "off"}</span>
-            <span>time: {elapsed}s / 120s</span>
-            <span>model: {model ?? "-"}</span>
-          </div>
-        )}
 
         {/* AI Tutor area */}
         <div className="flex-1 flex flex-col items-center justify-start pt-4">
@@ -560,19 +537,6 @@ function CallScreen({
             )}
           </div>
 
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full sp-chip text-xs ka">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                status === "listening" ? "bg-emerald-500 animate-pulse" :
-                status === "ai_speaking" ? "bg-violet-500 animate-pulse" :
-                status === "thinking" || status === "connecting" ? "bg-amber-500 animate-pulse" :
-                status === "ready" ? "bg-emerald-500" :
-                status === "error" ? "bg-rose-500" :
-                "bg-slate-400"
-              }`}
-            />
-            {STATUS_LABEL_KA[status]}
-          </div>
 
           {/* Transcript (secondary) */}
           <div
