@@ -468,4 +468,6 @@ try {
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, setRtStatus, startAiAudioMonitor, status, topic]);
 
 
- return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream, aiAmplitude };
+  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream, aiAmplitude };
+}
+
