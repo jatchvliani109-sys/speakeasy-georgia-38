@@ -23,8 +23,8 @@ import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest"
 import BusinessPlan from "./pages/paths/business/BusinessPlan";
 import BusinessHome from "./pages/paths/business/BusinessHome";
 import BusinessModule from "./pages/paths/business/BusinessModule";
-import BusinessDictionary from "./pages/paths/business/BusinessDictionary";
-import VocabularyNotebook from "./pages/paths/business/VocabularyNotebook";
+import MyLexicon from "./pages/paths/business/MyLexicon";
+import { Navigate } from "react-router-dom";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
@@ -68,9 +68,10 @@ const App = () => (
             <Route path="/path/business/resume" element={<RequireAuth><BusinessResumeUpload /></RequireAuth>} />
             <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
-            <Route path="/path/business/dictionary" element={<RequireAuth><BusinessDictionary /></RequireAuth>} />
+            <Route path="/path/business/lexicon" element={<RequireAuth><MyLexicon /></RequireAuth>} />
+            <Route path="/path/business/dictionary" element={<Navigate to="/path/business/lexicon?tab=phrases" replace />} />
+            <Route path="/path/business/vocabulary/notebook" element={<Navigate to="/path/business/lexicon?tab=words" replace />} />
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
-            <Route path="/path/business/vocabulary/notebook" element={<RequireAuth><VocabularyNotebook /></RequireAuth>} />
 
             
             <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />

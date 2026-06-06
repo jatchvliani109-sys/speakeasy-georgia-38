@@ -779,7 +779,7 @@ export default function InterviewModule() {
           </BizCard>
 
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <BizButton variant="outline" onClick={() => navigate("/path/business/dictionary")}>
+            <BizButton variant="outline" onClick={() => navigate("/path/business/lexicon?tab=phrases")}>
               ლექსიკონის ნახვა
             </BizButton>
             <BizButton onClick={() => navigate("/path/business/home")}>

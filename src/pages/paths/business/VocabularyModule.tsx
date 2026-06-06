@@ -326,7 +326,7 @@ export default function VocabularyModule() {
             : "დღევანდელი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
-          <Link to="/path/business/vocabulary/notebook" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
+          <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#1E2A44] underline underline-offset-2">
             📔 ჩემი რვეული
           </Link>
           <button
@@ -403,7 +403,7 @@ export default function VocabularyModule() {
             ყველა მიმდინარე სიტყვა შესწავლილია. შემოამოწმე ხვალ ან გადახედე რვეულს.
           </p>
           <div className="mt-5">
-            <Link to="/path/business/vocabulary/notebook">
+            <Link to="/path/business/lexicon?tab=words">
               <BizButton>რვეულის ნახვა →</BizButton>
             </Link>
           </div>
@@ -827,7 +827,7 @@ function Results({
             დაშბორდზე დაბრუნება
           </BizButton>
         </Link>
-        <Link to="/path/business/vocabulary/notebook" className="block">
+        <Link to="/path/business/lexicon?tab=words" className="block">
           <p className="ka text-center text-xs text-[#1E2A44] underline underline-offset-2 mt-2">
             📔 ჩემი რვეულის ნახვა
           </p>
