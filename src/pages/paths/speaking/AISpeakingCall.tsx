@@ -537,19 +537,6 @@ function CallScreen({
             )}
           </div>
 
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full sp-chip text-xs ka">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                status === "listening" ? "bg-emerald-500 animate-pulse" :
-                status === "ai_speaking" ? "bg-violet-500 animate-pulse" :
-                status === "thinking" || status === "connecting" ? "bg-amber-500 animate-pulse" :
-                status === "ready" ? "bg-emerald-500" :
-                status === "error" ? "bg-rose-500" :
-                "bg-slate-400"
-              }`}
-            />
-            {STATUS_LABEL_KA[status]}
-          </div>
 
           {/* Transcript (secondary) */}
           <div
