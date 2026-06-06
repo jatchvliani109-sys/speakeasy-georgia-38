@@ -13,7 +13,7 @@ export default function Layout({ children, showLogout = true }: { children: Reac
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to={user ? "/dashboard" : "/"} className="flex items-center text-foreground hover:opacity-80 transition-opacity">
             <Wordmark size="md" />
           </Link>
