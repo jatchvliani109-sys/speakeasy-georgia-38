@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PathSwitcher from "@/components/PathSwitcher";
 import SpeakingShell from "./components/SpeakingShell";
-import { Headphones, Drama, LineChart, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Headphones, Drama, LineChart, ArrowRight, CheckCircle2, Award } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
+import { useSpeakingProgress } from "./lib/useSpeakingProgress";
+import DailyMissionCard from "./components/DailyMissionCard";
+import ScenarioProgressMap from "./components/ScenarioProgressMap";
 
 
 const SIDE_PATHS = [
@@ -87,72 +90,35 @@ export default function SpeakingDashboard() {
   return (
     <SpeakingShell>
       <div className="space-y-6 max-w-2xl mx-auto">
-        {/* Header */}
-        <header className="flex items-end justify-between gap-3">
-          <div>
-            <div className="sp-eyebrow ka">საუბარი</div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold ka sp-text leading-tight mt-2">საუბრის პრაქტიკა</h1>
-            <p className="text-sm sp-text-muted ka mt-1">ივარჯიშე ინგლისურად ყოველდღე.</p>
-          </div>
-          <PathSwitcher />
-        </header>
+        {/* Header with CEFR */}
+        <SpeakingHeader />
 
-        {/* Today's Practice — most prominent */}
-        <div className="flex items-center gap-2">
-          <span className="sp-eyebrow ka">დღევანდელი სავარჯიშო</span>
-        </div>
-        <section className="sp-card-hero p-6 sm:p-7 -mt-2">
-          <div className="text-[10px] font-semibold tracking-[0.22em] uppercase opacity-80">
-            AI Speaking Session
-          </div>
-          <h2 className="ka text-xl sm:text-2xl font-extrabold mt-2 leading-snug">
-            ისაუბრე ინგლისურად რეალურ საუბარში
-          </h2>
+        {/* Daily Mission — most prominent */}
+        <DailyMissionSection todayDone={todayDone} />
 
+        {/* Today's quick recap if practiced */}
+        {todayDone && stats?.todayLesson && (
+          <section className="sp-card p-4">
+            <div className="flex items-center gap-2 text-[hsl(33_75%_28%)] mb-2">
+              <CheckCircle2 className="w-4 h-4" />
+              <div className="font-semibold ka text-[13px]">დღეს უკვე ივარჯიშე</div>
+            </div>
+            <p className="ka text-sm sp-text">{getEncouragementKa(dailySeed())}</p>
+            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+              {stats?.todayLesson?.topic && (
+                <div className="col-span-2 flex justify-between">
+                  <dt className="sp-text-muted ka">თემა</dt>
+                  <dd className="font-semibold sp-text truncate ml-2">{stats.todayLesson.topic}</dd>
+                </div>
+              )}
+              <Row label_ka="ფრაზები" value={stats?.todayLesson?.phrases ?? 0} />
+              <Row label_ka="მცდელობები" value={stats?.todayLesson?.prompts ?? 0} />
+            </dl>
+          </section>
+        )}
 
-          {todayDone ? (
-            <>
-              <div className="mt-4 flex items-center gap-2 text-[hsl(33_75%_28%)]">
-                <CheckCircle2 className="w-4 h-4" />
-                <div className="font-semibold ka text-[13px]">დღეს უკვე ივარჯიშე</div>
-              </div>
-              <p className="ka text-sm sp-text mt-1">{getEncouragementKa(dailySeed())}</p>
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
-                {stats?.todayLesson?.topic && (
-                  <div className="col-span-2 flex justify-between">
-                    <dt className="sp-text-muted ka">თემა</dt>
-                    <dd className="font-semibold sp-text truncate ml-2">{stats.todayLesson.topic}</dd>
-                  </div>
-                )}
-                <Row label_ka="ფრაზები" value={stats?.todayLesson?.phrases ?? 0} />
-                <Row label_ka="მცდელობები" value={stats?.todayLesson?.prompts ?? 0} />
-              </dl>
-              <Link
-                to="/path/speaking/call"
-                className="sp-btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-xl h-11 px-5 text-sm font-bold ka w-full"
-              >
-                ახალი სესიის დაწყება
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </>
-          ) : (
-            <>
-              <p className="ka text-[13px] sp-text-muted mt-3 leading-relaxed">
-                ესაუბრე AI მასწავლებელს ინგლისურად. თუ გაიჭედები, შეგიძლია ქართულად ითხოვო დახმარება.
-              </p>
-              <Link
-                to="/path/speaking/call"
-                className="sp-btn-primary mt-4 inline-flex items-center justify-center gap-2 rounded-xl h-12 px-5 text-sm font-bold ka w-full"
-              >
-                საუბრის დაწყება
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <div className="mt-3 text-[11px] sp-text-soft ka text-center">
-                აირჩევ თემას და დაიწყებ AI-სთან ხმოვან საუბარს.
-              </div>
-            </>
-          )}
-        </section>
+        {/* Progression map preview */}
+        <ProgressMapSection />
 
         {/* Compact stats */}
         <section className="grid grid-cols-3 gap-2">
