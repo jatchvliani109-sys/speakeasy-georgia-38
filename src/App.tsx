@@ -24,6 +24,7 @@ import BusinessPlan from "./pages/paths/business/BusinessPlan";
 import BusinessHome from "./pages/paths/business/BusinessHome";
 import BusinessModule from "./pages/paths/business/BusinessModule";
 import MyLexicon from "./pages/paths/business/MyLexicon";
+import BusinessReassessment from "./pages/paths/business/BusinessReassessment";
 import { Navigate } from "react-router-dom";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
