@@ -327,14 +327,14 @@ export default function VocabularyModule() {
             : "დღევანდელი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
-          <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#1A2744] underline underline-offset-2 inline-flex items-center gap-1">
+          <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#3d6b9e] underline underline-offset-2 inline-flex items-center gap-1">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეული
           </Link>
           <button
             type="button"
             onClick={toggleSound}
             title={soundOn ? "ხმის გამორთვა" : "ხმის ჩართვა"}
-            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#E2DDD0] text-[#64748B] hover:text-[#1A2744] hover:bg-white transition"
+            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#E2DDD0] text-[#64748B] hover:text-[#3d6b9e] hover:bg-white transition"
           >
             {soundOn ? <Volume2 size={13} strokeWidth={2.25} /> : <VolumeX size={13} strokeWidth={2.25} />}
             <span>{soundOn ? "ხმა ჩართულია" : "ხმა გამორთულია"}</span>
@@ -829,7 +829,7 @@ function Results({
           </BizButton>
         </Link>
         <Link to="/path/business/lexicon?tab=words" className="block">
-          <p className="ka text-center text-xs text-[#1A2744] underline underline-offset-2 mt-2 inline-flex items-center gap-1 justify-center w-full">
+          <p className="ka text-center text-xs text-[#3d6b9e] underline underline-offset-2 mt-2 inline-flex items-center gap-1 justify-center w-full">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეულის ნახვა
           </p>
         </Link>
