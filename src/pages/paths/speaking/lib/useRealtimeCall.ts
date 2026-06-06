@@ -277,6 +277,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       pc.ontrack = (e) => {
         dlog("remote track");
         audioEl.srcObject = e.streams[0];
+        setAiStream(e.streams[0]);
         audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
       };
 
