@@ -16,61 +16,25 @@ import { TIERS, TIER_LABEL_KA, type Tier, scoreSession, isCompletionEligible, is
 import { useSpeakingProgress } from "./lib/useSpeakingProgress";
 import { toast } from "sonner";
 
-// --- Topics --------------------------------------------------------------
-
-type Level = "Beginner" | "Elementary" | "Intermediate";
-type Topic = {
-  id: string;
-  level: Level | "Free";
-  title_en: string;
-  desc_ka: string;
-  Icon: LucideIcon;
-  scene_en?: string; // hint for the AI
-};
-
-const TOPICS: Topic[] = [
-  { id: "intro", level: "Beginner", title_en: "Introducing Yourself", desc_ka: "გაიცანი AI და ისაუბრე საკუთარ თავზე.", Icon: Handshake },
-  { id: "school", level: "Beginner", title_en: "School", desc_ka: "ისაუბრე სკოლაზე და საგნებზე.", Icon: GraduationCap },
-  { id: "family", level: "Beginner", title_en: "Family", desc_ka: "ისაუბრე ოჯახის წევრებზე.", Icon: UsersIcon },
-  { id: "cafe", level: "Beginner", title_en: "At a Café", desc_ka: "შეუკვეთე სასმელი და ილაპარაკე ოფიციანტთან.", Icon: Coffee },
-  { id: "hobbies", level: "Beginner", title_en: "Hobbies", desc_ka: "მოყევი რა გიყვარს თავისუფალ დროს.", Icon: Palette },
-  { id: "routine", level: "Beginner", title_en: "Daily Routine", desc_ka: "ისაუბრე შენს დღიურ რუტინაზე.", Icon: Clock3 },
-
-  { id: "ordering", level: "Elementary", title_en: "Ordering Food", desc_ka: "შეუკვეთე საჭმელი რესტორანში.", Icon: UtensilsCrossed },
-  { id: "directions", level: "Elementary", title_en: "Asking for Directions", desc_ka: "ჰკითხე გზა ქალაქში.", Icon: MapIcon },
-  { id: "shopping", level: "Elementary", title_en: "Shopping", desc_ka: "იყიდე ტანსაცმელი ან ჰკითხე ფასი.", Icon: ShoppingBag },
-  { id: "travel", level: "Elementary", title_en: "Travel Basics", desc_ka: "სასტუმრო, ბილეთი, აეროპორტი.", Icon: Plane },
-  { id: "weekend", level: "Elementary", title_en: "Weekend Plans", desc_ka: "დაგეგმე შაბათ-კვირა მეგობართან.", Icon: CalendarDays },
-
-  { id: "interview", level: "Intermediate", title_en: "Job Interview", desc_ka: "ივარჯიშე გასაუბრებაზე.", Icon: Briefcase },
-  { id: "opinions", level: "Intermediate", title_en: "Giving Opinions", desc_ka: "გამოთქვი აზრი თემაზე.", Icon: MessageSquare },
-  { id: "plans", level: "Intermediate", title_en: "Making Plans", desc_ka: "შეთანხმდი მეგობართან გეგმაზე.", Icon: CalendarRange },
-  { id: "travel_conv", level: "Intermediate", title_en: "Travel Conversation", desc_ka: "ისაუბრე მოგზაურობის გამოცდილებაზე.", Icon: Globe2 },
-  { id: "problem", level: "Intermediate", title_en: "Problem Solving", desc_ka: "გადაჭერი სიტუაცია მხარდაჭერასთან.", Icon: Puzzle },
-
-  { id: "free", level: "Free", title_en: "Free Conversation", desc_ka: "ისაუბრე ნებისმიერ თემაზე.", Icon: MessagesSquare },
-];
-
-const LEVEL_LABEL_KA: Record<Topic["level"], string> = {
-  Beginner: "მარტივი",
-  Elementary: "საშუალო",
-  Intermediate: "რთული",
-  Free: "თავისუფალი",
-};
-
 // --- Types --------------------------------------------------------------
 
 type Msg = { role: "user" | "assistant"; content: string; pending?: boolean };
 type Step = "setup" | "explain" | "call" | "summary";
+
+// Backwards-compat alias so existing references downstream keep working.
+type Topic = Scenario;
 
 // --- Component ----------------------------------------------------------
 
 export default function AISpeakingCall() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { map, recordCompletion } = useSpeakingProgress();
 
   const [step, setStep] = useState<Step>("setup");
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [tier, setTier] = useState<Tier>("easy");
   const [level, setLevel] = useState<string>("Beginner");
 
   useEffect(() => {
@@ -85,8 +49,27 @@ export default function AISpeakingCall() {
     })();
   }, [user]);
 
+  // Deep-link support: ?scenario=cafe&tier=easy → jump to explain
+  useEffect(() => {
+    if (step !== "setup") return;
+    const sid = searchParams.get("scenario");
+    const tParam = (searchParams.get("tier") as Tier | null) ?? "easy";
+    if (!sid) return;
+    const found = scenarioById(sid);
+    if (!found) return;
+    if (!isTierUnlocked(map, sid, tParam)) {
+      toast.error("ეს დონე ჯერ დაბლოკილია — ჯერ წინა დონე გაიარე.");
+      return;
+    }
+    setTopic(found);
+    setTier(tParam);
+    setStep("explain");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, map, step]);
+
   // ---- Setup -----------------------------------------------------------
   if (step === "setup") {
+    const groups: ScenarioGroup[] = ["Beginner", "Elementary", "Intermediate", "Free"];
     return (
       <SpeakingShell>
         <div className="max-w-2xl mx-auto space-y-5">
@@ -104,35 +87,28 @@ export default function AISpeakingCall() {
             </div>
           </header>
 
-          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl, lvlIdx) => {
-            const items = TOPICS.filter((t) => t.level === lvl);
+          {groups.map((g, gIdx) => {
+            const items = SCENARIOS.filter((t) => t.group === g);
             if (!items.length) return null;
             return (
-              <section key={lvl}>
-                {lvlIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
+              <section key={g}>
+                {gIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
                 <h3 className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka mb-2">
-                  {LEVEL_LABEL_KA[lvl]}
+                  {GROUP_LABEL_KA[g]}
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {items.map((t) => {
-                    const Icon = t.Icon;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => { setTopic(t); setStep("explain"); }}
-                        className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
-                      >
-                        <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
-                          <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
-                      </button>
-                    );
-                  })}
+                <div className="grid grid-cols-1 gap-2">
+                  {items.map((t) => (
+                    <ScenarioRow
+                      key={t.id}
+                      scenario={t}
+                      map={map}
+                      onPick={(picked, pickedTier) => {
+                        setTopic(picked);
+                        setTier(pickedTier);
+                        setStep("explain");
+                      }}
+                    />
+                  ))}
                 </div>
               </section>
             );
