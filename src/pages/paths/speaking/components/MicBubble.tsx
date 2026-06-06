@@ -142,15 +142,15 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
         );
       })}
 
-      {/* AI flowing wave rings */}
+      {/* AI flowing wave rings — gold */}
       {isAi && (
         <>
-          <span aria-hidden className="absolute inset-0 rounded-full border-2 border-cyan-300/35"
-            style={{ animation: "mb-wave 2.2s ease-out infinite" }} />
-          <span aria-hidden className="absolute inset-0 rounded-full border-2 border-teal-300/25"
-            style={{ animation: "mb-wave 2.8s ease-out infinite", animationDelay: "400ms" }} />
-          <span aria-hidden className="absolute inset-0 rounded-full border border-cyan-200/20"
-            style={{ animation: "mb-wave 3.4s ease-out infinite", animationDelay: "800ms" }} />
+          <span aria-hidden className="absolute inset-0 rounded-full border-2"
+            style={{ borderColor: `hsl(${palette.edge} / 0.35)`, animation: "mb-wave 2.2s ease-out infinite" }} />
+          <span aria-hidden className="absolute inset-0 rounded-full border-2"
+            style={{ borderColor: `hsl(${palette.edge} / 0.25)`, animation: "mb-wave 2.8s ease-out infinite", animationDelay: "400ms" }} />
+          <span aria-hidden className="absolute inset-0 rounded-full border"
+            style={{ borderColor: `hsl(${palette.edge} / 0.20)`, animation: "mb-wave 3.4s ease-out infinite", animationDelay: "800ms" }} />
         </>
       )}
 
