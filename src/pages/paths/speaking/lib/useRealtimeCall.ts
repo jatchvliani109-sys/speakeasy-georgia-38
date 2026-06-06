@@ -242,24 +242,6 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       return fail("მიკროფონის გამოყენებისთვის საჭიროა ნებართვა.");
     }
 
-    let clientSecret: string | undefined;
-    let usedModel: string | undefined;
-    try {
-      const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
-        body: { topic, level, tier, selectedLearningPath },
-      });
-      if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
-      clientSecret = (data as any).client_secret?.value;
-      usedModel = (data as any).model;
-      if (!clientSecret) throw new Error("Missing client secret");
-      setModel(usedModel ?? null);
-      dlog("realtime session created, model =", usedModel);
-    } catch (e: any) {
-      console.error("[rt] session creation failed", e);
-      startingRef.current = false;
-      return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
-    }
-
     try {
       const pc = new RTCPeerConnection();
       pcRef.current = pc;
@@ -295,19 +277,21 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      // Inworld: session id is the `key` query param; no Bearer token from client.
-      const resp = await fetch(`https://api.inworld.ai/v1/realtime/calls?key=${encodeURIComponent(clientSecret!)}&protocol=realtime`, {
-        method: "POST",
-        headers: { "Content-Type": "application/sdp" },
-        body: offer.sdp ?? "",
+      // Proxy SDP exchange through the edge function (keeps INWORLD_API_KEY server-side).
+      const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
+        body: { sdp: offer.sdp ?? "", topic, level, tier, selectedLearningPath },
       });
-      if (!resp.ok) {
-        const t = await resp.text().catch(() => "");
-        console.error("[rt] sdp exchange failed", resp.status, t);
+      if (error || (data as any)?.error) {
+        console.error("[rt] sdp exchange failed", error, data);
         startingRef.current = false;
         return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
       }
-      const answerSdp = await resp.text();
+      const answerSdp: string | undefined = (data as any)?.sdp;
+      if (!answerSdp) {
+        startingRef.current = false;
+        return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
+      }
+      setModel((data as any)?.model ?? null);
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
       startingRef.current = false;
       dlog("WebRTC connected");
@@ -317,6 +301,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
     }
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
+
 
   return { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn };
 }
