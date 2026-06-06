@@ -67,7 +67,7 @@ const Index = () => {
         <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B7280] ka mb-5 text-center">
           სამი მიმართულება — შენი მიზნისთვის
         </div>
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
           {features.map((f, i) => (
             <article
               key={f.title}

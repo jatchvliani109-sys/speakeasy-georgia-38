@@ -483,7 +483,7 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
               მოდულები
             </p>
-            <div className="space-y-2">
+            <div className="grid gap-2 md:grid-cols-2">
               {BUSINESS_MODULES.map((m) => {
                 const count = progress[m.slug]?.count ?? 0;
                 const started = count > 0;
