@@ -1273,11 +1273,7 @@ function BioVersions({
   const saveDraft = async () => {
     if (!editingKey) return;
     const newMeta = { ...meta, [editingKey]: draft };
-    // Keep main content in sync with "medium" (the default)
-    const newContent =
-      editingKey === "medium"
-        ? `📌 SHORT\n${newMeta.short || ""}\n\n📌 MEDIUM\n${draft}\n\n📌 FULL\n${newMeta.full || ""}`
-        : `📌 SHORT\n${newMeta.short || ""}\n\n📌 MEDIUM\n${newMeta.medium || ""}\n\n📌 FULL\n${newMeta.full || ""}`;
+    const newContent = (newMeta.medium || newMeta.short || newMeta.full || "").trim();
     await updateDocument(doc.id, { meta: newMeta, content: newContent });
     onUpdated({ ...doc, meta: newMeta, content: newContent });
     setEditingKey(null);
