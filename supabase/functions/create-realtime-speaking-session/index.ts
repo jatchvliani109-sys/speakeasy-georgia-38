@@ -1,12 +1,11 @@
-// Creates an Inworld AI Realtime session for the AI Speaking Call.
-// Uses INWORLD_API_KEY (server-side only) with HTTP Basic auth.
-// Returns a session id that the browser uses as the `key` query parameter
-// when establishing the WebRTC / WebSocket connection to Inworld.
+// Proxies the Inworld Realtime WebRTC SDP exchange so the INWORLD_API_KEY
+// stays server-side. Client posts its SDP offer here; we forward to Inworld
+// with Bearer auth and return the SDP answer.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const INWORLD_API_KEY = Deno.env.get("INWORLD_API_KEY");
-const PRIMARY_MODEL = "inworld-voice-1";
+const MODEL = "gpt-4o-mini"; // placeholder; Inworld uses its own model list. Adjust if needed.
 
 type Tier = "easy" | "medium" | "hard";
 
@@ -25,8 +24,8 @@ function instructionsFor(level: string, topic: string, tier: Tier) {
 }
 
 function inworldAuthHeader(apiKey: string) {
-  const normalizedKey = apiKey.trim().replace(/^Basic\s+/i, "").replace(/^Bearer\s+/i, "");
-  return `Basic ${normalizedKey}`;
+  const k = apiKey.trim().replace(/^Basic\s+/i, "").replace(/^Bearer\s+/i, "");
+  return `Bearer ${k}`;
 }
 
 Deno.serve(async (req) => {
@@ -41,66 +40,68 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
+    const sdp = String(body?.sdp ?? "");
+    if (!sdp) {
+      return new Response(JSON.stringify({ error: "Missing sdp" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const topic = String(body?.topic ?? "Free conversation").slice(0, 120);
     const level = String(body?.level ?? "Beginner").slice(0, 40);
     const tierRaw = String(body?.tier ?? "easy").toLowerCase();
     const tier: Tier = tierRaw === "hard" ? "hard" : tierRaw === "medium" ? "medium" : "easy";
-    const voice = "alloy";
     const instructions = instructionsFor(level, topic, tier);
 
-    const res = await fetch("https://api.inworld.ai/api/v1/realtime/sessions", {
+    const res = await fetch("https://api.inworld.ai/v1/realtime/calls", {
       method: "POST",
       headers: {
         Authorization: inworldAuthHeader(INWORLD_API_KEY),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: PRIMARY_MODEL,
-        instructions,
-        audio: {
-          input: {
-            transcription: { model: "whisper-1" },
-            turn_detection: {
-              type: "server_vad",
-              threshold: 0.55,
-              prefix_padding_ms: 250,
-              silence_duration_ms: 550,
-              create_response: true,
-              interrupt_response: true,
+        sdp,
+        session: {
+          instructions,
+          output_modalities: ["audio", "text"],
+          audio: {
+            input: {
+              transcription: { model: "inworld/inworld-stt-1" },
+              turn_detection: {
+                type: "semantic_vad",
+                eagerness: "medium",
+                create_response: true,
+                interrupt_response: true,
+              },
             },
+            output: { model: "inworld-tts-2", voice: "Dennis", speed: 1.0 },
           },
-          output: { voice },
         },
       }),
     });
 
-    const json = await res.json().catch(() => ({}));
-
+    const text = await res.text();
     if (!res.ok) {
-      console.error("[inworld] session create failed", res.status, json);
+      console.error("[inworld] call create failed", res.status, text);
       return new Response(
-        JSON.stringify({ error: json?.error?.message ?? json?.message ?? "Inworld session error" }),
+        JSON.stringify({ error: "Inworld call error", status: res.status, detail: text }),
         { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const sessionId = json?.id ?? json?.session_id ?? json?.sessionId;
-    if (!sessionId) {
-      console.error("[inworld] missing session id in response", json);
-      return new Response(JSON.stringify({ error: "Missing session id from Inworld" }), {
+    let json: any = {};
+    try { json = JSON.parse(text); } catch { /* unexpected */ }
+    const answerSdp = json?.sdp;
+    if (!answerSdp) {
+      console.error("[inworld] missing sdp in response", json);
+      return new Response(JSON.stringify({ error: "Missing sdp in Inworld response" }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     return new Response(
-      JSON.stringify({
-        session_id: sessionId,
-        // Backwards-compatible shape: the frontend reads client_secret.value as the key.
-        client_secret: { value: sessionId, expires_at: json?.expires_at ?? null },
-        model: PRIMARY_MODEL,
-        voice,
-      }),
+      JSON.stringify({ sdp: answerSdp, id: json?.id ?? null, ice_servers: json?.ice_servers ?? [], model: MODEL }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
