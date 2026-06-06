@@ -154,6 +154,22 @@ const clearAiAudioMonitor = useCallback(() => {
     } catch (e) { console.warn("[rt] sendUserText failed", e); }
   }, []);
 
+  // Ask the AI to naturally wrap up the conversation (used near the time limit).
+  const requestWrapUp = useCallback(() => {
+    const dc = dcRef.current;
+    if (!dc || dc.readyState !== "open") return;
+    try {
+      dc.send(JSON.stringify({
+        type: "response.create",
+        response: {
+          instructions:
+            "We are almost out of time. In ONE short warm English sentence (max 18 words), gently wrap up the conversation — say it was really nice talking and ask if they have any last thoughts. Do NOT start a new topic. Do NOT ask a follow-up question after this.",
+        },
+      }));
+      dlog("wrap-up response.create sent");
+    } catch (e) { console.warn("[rt] requestWrapUp failed", e); }
+  }, []);
+
   useEffect(() => () => { dlog("session cleanup on unmount"); endedRef.current = true; cleanup(); }, [cleanup]);
 
   const startAiAudioMonitor = useCallback((audioEl: HTMLAudioElement, remoteStream: MediaStream) => {
