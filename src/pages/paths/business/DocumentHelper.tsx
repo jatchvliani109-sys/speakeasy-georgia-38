@@ -1246,3 +1246,108 @@ function Footer({ onBack, onNext, disabled }: { onBack: () => void; onNext: () =
     </div>
   );
 }
+
+/* ---------- Bio versions (copy + edit per version) ---------- */
+function BioVersions({
+  doc,
+  onUpdated,
+}: {
+  doc: BusinessDocument;
+  onUpdated: (d: BusinessDocument) => void;
+}) {
+  const meta = (doc.meta as any) || {};
+  const [editingKey, setEditingKey] = useState<null | "short" | "medium" | "full">(null);
+  const [draft, setDraft] = useState("");
+
+  const labels: Record<"short" | "medium" | "full", string> = {
+    short: "მოკლე",
+    medium: "საშუალო",
+    full: "სრული",
+  };
+
+  const startEdit = (k: "short" | "medium" | "full") => {
+    setDraft(meta[k] || "");
+    setEditingKey(k);
+  };
+
+  const saveDraft = async () => {
+    if (!editingKey) return;
+    const newMeta = { ...meta, [editingKey]: draft };
+    // Keep main content in sync with "medium" (the default)
+    const newContent =
+      editingKey === "medium"
+        ? `📌 SHORT\n${newMeta.short || ""}\n\n📌 MEDIUM\n${draft}\n\n📌 FULL\n${newMeta.full || ""}`
+        : `📌 SHORT\n${newMeta.short || ""}\n\n📌 MEDIUM\n${newMeta.medium || ""}\n\n📌 FULL\n${newMeta.full || ""}`;
+    await updateDocument(doc.id, { meta: newMeta, content: newContent });
+    onUpdated({ ...doc, meta: newMeta, content: newContent });
+    setEditingKey(null);
+    toast({ title: "შენახულია" });
+  };
+
+  return (
+    <section className="mt-5 space-y-3">
+      <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold px-1">
+        სამი ვერსია
+      </p>
+      {(["short", "medium", "full"] as const).map((k) => {
+        const text: string = meta[k] || "";
+        if (!text && editingKey !== k) return null;
+        const isEditing = editingKey === k;
+        return (
+          <BizCard key={k}>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <p className="ka text-xs font-semibold text-[#1E2A44]">{labels[k]}</p>
+              <div className="flex gap-2">
+                {!isEditing && (
+                  <>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(text);
+                        toast({ title: `${labels[k]} ვერსია კოპირებულია` });
+                      }}
+                      className="ka text-[11px] font-semibold bg-[#1E2A44] text-[#F7F1E3] px-2.5 py-1.5 rounded-lg hover:bg-[#15203A]"
+                    >
+                      📋 კოპირება
+                    </button>
+                    <button
+                      onClick={() => startEdit(k)}
+                      className="ka text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E7E2D5] hover:border-[#1E2A44]/40 text-[#1E2A44]"
+                    >
+                      ✏️ რედაქტირება
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            {isEditing ? (
+              <>
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={k === "full" ? 10 : k === "medium" ? 6 : 4}
+                  className="w-full rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm font-serif text-[#1E2A44] focus:outline-none focus:border-[#1E2A44]"
+                />
+                <div className="flex justify-end gap-2 mt-2">
+                  <BizButton variant="ghost" onClick={() => setEditingKey(null)}>გაუქმება</BizButton>
+                  <BizButton onClick={saveDraft}>შენახვა</BizButton>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(draft);
+                      toast({ title: "კოპირებულია" });
+                    }}
+                    className="ka text-xs font-semibold bg-[#1E2A44] text-[#F7F1E3] px-3 py-2 rounded-xl hover:bg-[#15203A]"
+                  >
+                    📋 კოპირება
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm font-serif text-[#1E2A44] whitespace-pre-wrap leading-relaxed">{text}</p>
+            )}
+          </BizCard>
+        );
+      })}
+    </section>
+  );
+}
+
