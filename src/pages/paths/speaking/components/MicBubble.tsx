@@ -77,8 +77,8 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
   const isAi = state === "ai_speaking";
   const isThinking = state === "thinking" || state === "connecting";
 
-  const reactive = Math.min(isUser ? userLevel : isAi ? Math.max(aiLevel, 0.22) : 0, 0.72);
-  const scale = 1 + reactive * 0.1;
+  const reactive = Math.min(isUser ? userLevel : isAi ? Math.max(aiLevel, 0.22) : 0, 0.55);
+  const scale = 1 + reactive * 0.06;
 
   // Palette per state
   const palette = isUser
