@@ -104,9 +104,9 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
       onMouseLeave={() => onRelease?.()}
       onTouchStart={(e) => { e.preventDefault(); onPress?.(); }}
       onTouchEnd={(e) => { e.preventDefault(); onRelease?.(); }}
-      className="relative outline-none select-none touch-none"
+      className="relative outline-none select-none touch-none overflow-visible"
       aria-label="Push to talk"
-      style={{ width: "clamp(210px, min(42dvh, 62vw), 280px)", height: "clamp(210px, min(42dvh, 62vw), 280px)" }}
+      style={{ width: "clamp(180px, min(34dvh, 50vw), 240px)", height: "clamp(180px, min(34dvh, 50vw), 240px)" }}
     >
       {/* Soft ambient halo */}
       <span
