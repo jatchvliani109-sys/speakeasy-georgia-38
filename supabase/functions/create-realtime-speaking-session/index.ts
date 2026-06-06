@@ -1,11 +1,10 @@
-// Proxies the Inworld Realtime WebRTC SDP exchange so the INWORLD_API_KEY
-// stays server-side. Client posts its SDP offer here; we forward to Inworld
-// with Bearer auth and return the SDP answer.
+// Returns Inworld realtime connection info to the frontend:
+// the API key, ICE servers, and the WebRTC calls URL. The frontend performs
+// the SDP exchange directly with Inworld per their official WebRTC docs.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const INWORLD_API_KEY = Deno.env.get("INWORLD_API_KEY");
-const MODEL = "inworld-realtime-1";
 
 type Tier = "easy" | "medium" | "hard";
 
@@ -23,11 +22,6 @@ function instructionsFor(level: string, topic: string, tier: Tier) {
   return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. ${tierGuidance(tier)} Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
 }
 
-function inworldAuthHeader(apiKey: string) {
-  const k = apiKey.trim().replace(/^Basic\s+/i, "").replace(/^Bearer\s+/i, "");
-  return `Bearer ${k}`;
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -40,68 +34,36 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const sdp = String(body?.sdp ?? "");
-    if (!sdp) {
-      return new Response(JSON.stringify({ error: "Missing sdp" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
     const topic = String(body?.topic ?? "Free conversation").slice(0, 120);
     const level = String(body?.level ?? "Beginner").slice(0, 40);
     const tierRaw = String(body?.tier ?? "easy").toLowerCase();
     const tier: Tier = tierRaw === "hard" ? "hard" : tierRaw === "medium" ? "medium" : "easy";
     const instructions = instructionsFor(level, topic, tier);
 
-    const res = await fetch("https://api.inworld.ai/v1/realtime/calls", {
-      method: "POST",
-      headers: {
-        Authorization: inworldAuthHeader(INWORLD_API_KEY),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sdp,
-        session: {
-          instructions,
-          output_modalities: ["audio", "text"],
-          audio: {
-            input: {
-              transcription: { model: "inworld/inworld-stt-1" },
-              turn_detection: {
-                type: "semantic_vad",
-                eagerness: "medium",
-                create_response: true,
-                interrupt_response: true,
-              },
-            },
-            output: { model: "inworld-tts-2", voice: "Dennis", speed: 1.0 },
-          },
-        },
-      }),
-    });
-
-    const text = await res.text();
-    if (!res.ok) {
-      console.error("[inworld] call create failed", res.status, text);
-      return new Response(
-        JSON.stringify({ error: "Inworld call error", status: res.status, detail: text }),
-        { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    let json: any = {};
-    try { json = JSON.parse(text); } catch { /* unexpected */ }
-    const answerSdp = json?.sdp;
-    if (!answerSdp) {
-      console.error("[inworld] missing sdp in response", json);
-      return new Response(JSON.stringify({ error: "Missing sdp in Inworld response" }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Fetch ICE servers from Inworld
+    let iceServers: any[] = [];
+    try {
+      const iceRes = await fetch("https://api.inworld.ai/v1/realtime/ice-servers", {
+        headers: { Authorization: `Bearer ${INWORLD_API_KEY}` },
       });
+      if (iceRes.ok) {
+        const iceJson = await iceRes.json().catch(() => ({}));
+        iceServers = iceJson?.iceServers ?? iceJson?.ice_servers ?? [];
+      } else {
+        const txt = await iceRes.text();
+        console.warn("[inworld] ice-servers fetch failed", iceRes.status, txt.slice(0, 200));
+      }
+    } catch (e) {
+      console.warn("[inworld] ice-servers error", (e as Error).message);
     }
 
     return new Response(
-      JSON.stringify({ sdp: answerSdp, id: json?.id ?? null, ice_servers: json?.ice_servers ?? [], model: MODEL }),
+      JSON.stringify({
+        api_key: INWORLD_API_KEY,
+        ice_servers: iceServers,
+        webrtc_url: "https://api.inworld.ai/v1/realtime/calls",
+        instructions,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
