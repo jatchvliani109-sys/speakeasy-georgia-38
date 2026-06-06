@@ -47,23 +47,39 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const dcRef = useRef<RTCDataChannel | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const aiAnalyserRef = useRef<AnalyserNode | null>(null);
+  const aiRafRef = useRef<number | null>(null);
+  const aiSilentSinceRef = useRef<number>(0);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
   const greetedRef = useRef(false);
   const topicRef = useRef(topic);
   topicRef.current = topic;
+  const statusRef = useRef<RtStatus>("idle");
 
   const aiBufRef = useRef<Map<string, string>>(new Map());
   const userBufRef = useRef<Map<string, string>>(new Map());
 
+  const setStatusSafe = useCallback((s: RtStatus) => {
+    statusRef.current = s;
+    setStatus(s);
+  }, []);
+
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
+    statusRef.current = "error";
     setStatus("error");
     onError?.(msg);
   }, [onError]);
 
   const cleanup = useCallback(() => {
     dlog("cleanup → closing data channel, peer connection, mic tracks");
+    if (aiRafRef.current) { cancelAnimationFrame(aiRafRef.current); aiRafRef.current = null; }
+    try { aiAnalyserRef.current?.disconnect(); } catch {}
+    aiAnalyserRef.current = null;
+    try { audioCtxRef.current?.close(); } catch {}
+    audioCtxRef.current = null;
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
@@ -81,6 +97,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setMicOn(false);
     setMicStream(null);
     setAiStream(null);
+    statusRef.current = "idle";
   }, []);
 
   const stop = useCallback(() => {
