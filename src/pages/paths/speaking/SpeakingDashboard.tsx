@@ -155,6 +155,55 @@ export default function SpeakingDashboard() {
   );
 }
 
+function SpeakingHeader() {
+  const { cefr, counts, mastered } = useSpeakingProgress();
+  return (
+    <header className="flex items-end justify-between gap-3">
+      <div className="min-w-0">
+        <div className="sp-eyebrow ka">საუბარი</div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold ka sp-text leading-tight mt-2">საუბრის პრაქტიკა</h1>
+        <p className="text-sm sp-text-muted ka mt-1">
+          {counts.total > 0
+            ? `${counts.total} დასრულებული · ${mastered} სრულად ათვისებული`
+            : "ივარჯიშე ინგლისურად ყოველდღე."}
+        </p>
+      </div>
+      <div className="flex flex-col items-end gap-2 shrink-0">
+        <div
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[hsl(33_69%_45%)] text-[hsl(40_91%_96%)]"
+          title={`${cefr.code} — ${cefr.label_en}`}
+        >
+          <Award className="w-3.5 h-3.5" />
+          {cefr.code} · <span className="ka">{cefr.label_ka}</span>
+        </div>
+        <PathSwitcher />
+      </div>
+    </header>
+  );
+}
+
+function DailyMissionSection({ todayDone }: { todayDone: boolean }) {
+  const { mission } = useSpeakingProgress();
+  return <DailyMissionCard mission={mission} doneToday={todayDone} tomorrow={mission} />;
+}
+
+function ProgressMapSection() {
+  const { map, loading } = useSpeakingProgress();
+  if (loading) return null;
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="sp-eyebrow ka">სცენარების რუკა</span>
+        <Link to="/path/speaking/progress" className="text-[11px] font-semibold text-[hsl(33_69%_45%)] ka">
+          სრულად →
+        </Link>
+      </div>
+      <ScenarioProgressMap map={map} compact />
+    </section>
+  );
+}
+
+
 function Stat({ label, value }: { label: React.ReactNode; value: number | string }) {
   return (
     <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] py-2.5 text-center">
