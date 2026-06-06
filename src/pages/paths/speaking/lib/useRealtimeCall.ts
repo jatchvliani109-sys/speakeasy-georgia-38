@@ -39,6 +39,9 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [micStream, setMicStream] = useState<MediaStream | null>(null);
   const [aiStream, setAiStream] = useState<MediaStream | null>(null);
+  const [aiAmplitude, setAiAmplitude] = useState(0);
+const aiAudioCtxRef = useRef<AudioContext | null>(null);
+const aiRafRef = useRef<number | null>(null);
 
   const [micOn, setMicOn] = useState(false);
   const startingRef = useRef(false);
@@ -66,12 +69,19 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setStatus(next);
   }, []);
 
-  const clearAiAudioMonitor = useCallback(() => {
+const clearAiAudioMonitor = useCallback(() => {
     if (aiAudioCheckRef.current) {
       window.clearInterval(aiAudioCheckRef.current);
       aiAudioCheckRef.current = null;
     }
+    if (aiRafRef.current) {
+      cancelAnimationFrame(aiRafRef.current);
+      aiRafRef.current = null;
+    }
+    try { aiAudioCtxRef.current?.close(); } catch {}
+    aiAudioCtxRef.current = null;
     aiAudioTimeRef.current = 0;
+    setAiAmplitude(0);
   }, []);
 
   const fail = useCallback((msg: string) => {
@@ -142,6 +152,34 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const startAiAudioMonitor = useCallback((audioEl: HTMLAudioElement, remoteStream: MediaStream) => {
     clearAiAudioMonitor();
     setAiStream(remoteStream);
+    // Amplitude analysis via MediaElementSource (reliable for WebRTC audio)
+try {
+  const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+  const ctx = new AC();
+  aiAudioCtxRef.current = ctx;
+  const source = ctx.createMediaElementSource(audioEl);
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.65;
+  source.connect(analyser);
+  source.connect(ctx.destination); // Must connect to destination or audio won't play
+  const buf = new Uint8Array(analyser.fftSize);
+  const pollAmplitude = () => {
+    if (endedRef.current) { setAiAmplitude(0); return; }
+    analyser.getByteTimeDomainData(buf);
+    let sum = 0;
+    for (let i = 0; i < buf.length; i++) {
+      const v = (buf[i] - 128) / 128;
+      sum += v * v;
+    }
+    const rms = Math.sqrt(sum / buf.length);
+    setAiAmplitude((prev) => prev * 0.4 + Math.min(1, rms * 5) * 0.6);
+    aiRafRef.current = requestAnimationFrame(pollAmplitude);
+  };
+  pollAmplitude();
+} catch (e) {
+  console.warn("[rt] AI amplitude analyser failed", e);
+}
 
     const markAiSpeaking = () => {
       if (endedRef.current) return;
@@ -430,5 +468,4 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, setRtStatus, startAiAudioMonitor, status, topic]);
 
 
-  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream };
-}
+ return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn, micStream, aiStream, aiAmplitude };
