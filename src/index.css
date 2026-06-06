@@ -88,9 +88,6 @@
   :lang(ka), .ka {
     font-family: 'Noto Sans Georgian', 'Inter', system-ui, sans-serif;
   }
-  :lang(ka), .ka {
-    font-family: 'Noto Sans Georgian', 'Inter', system-ui, sans-serif;
-  }
 }
 
 @layer utilities {
