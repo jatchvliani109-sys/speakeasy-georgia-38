@@ -5,7 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Square } from "lucide-react";
-import { SCENARIOS } from "./data";
+import { SCENARIOS, iconForScenario } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -105,7 +105,7 @@ export default function RoleplaySession() {
         ended_at: new Date().toISOString(),
       });
       await recordSpeakingActivity(user.id, "roleplay");
-      toast.success("როლური სავარჯიშო დასრულდა! 🎉");
+      toast.success("როლური სავარჯიშო დასრულდა!");
       navigate("/path/speaking/progress");
     } catch (e: any) {
       toast.error(e.message ?? "ვერ შევინახე");
@@ -121,8 +121,8 @@ export default function RoleplaySession() {
       <div className="flex flex-col h-[calc(100vh-11rem)]">
         <div className="sp-card-hero p-4 sm:p-5 mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[hsl(175_70%_38%)] text-white flex items-center justify-center text-2xl shrink-0">
-              {scenario.emoji}
+            <div className="w-12 h-12 rounded-xl bg-[hsl(33_69%_45%)] text-[hsl(40_91%_96%)] flex items-center justify-center shrink-0">
+              {(() => { const Icon = iconForScenario(scenario.id); return <Icon className="w-6 h-6" />; })()}
             </div>
             <div className="min-w-0 text-sm">
               <div className="ka sp-text">
@@ -155,7 +155,7 @@ export default function RoleplaySession() {
               <div className="px-4 py-2 rounded-2xl sp-card">
                 <div className="flex gap-1">
                   <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(220 50% 30%)" }} />
-                  <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(175 70% 38%)", animationDelay: "100ms" }} />
+                  <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(33 69% 45%)", animationDelay: "100ms" }} />
                   <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(210 70% 45%)", animationDelay: "200ms" }} />
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function RoleplaySession() {
                   key={s}
                   type="button"
                   onClick={() => send(s)}
-                  className="sp-chip px-3 py-1.5 rounded-full text-xs hover:bg-[hsl(40_40%_92%)] transition-colors"
+                  className="sp-chip px-3 py-1.5 rounded-full text-xs hover:bg-[hsl(40_91%_88%)] transition-colors"
                 >
                   {s}
                 </button>
@@ -203,7 +203,7 @@ export default function RoleplaySession() {
           </div>
           <div className="flex items-center justify-between">
             <MicPlaceholder />
-            <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_40%_94%)]" onClick={finish} disabled={ending || messages.length < 2}>
+            <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_91%_90%)]" onClick={finish} disabled={ending || messages.length < 2}>
               <Square className="w-4 h-4" /> {ending ? "..." : "დასრულება"}
             </Button>
           </div>

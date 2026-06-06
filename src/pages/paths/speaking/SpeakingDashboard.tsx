@@ -97,8 +97,11 @@ export default function SpeakingDashboard() {
           <PathSwitcher />
         </header>
 
-        {/* Today / AI Speaking Session card */}
-        <section className="sp-card-hero p-6 sm:p-7">
+        {/* Today's Practice — most prominent */}
+        <div className="flex items-center gap-2">
+          <span className="sp-eyebrow ka">დღევანდელი სავარჯიშო</span>
+        </div>
+        <section className="sp-card-hero p-6 sm:p-7 -mt-2">
           <div className="text-[10px] font-semibold tracking-[0.22em] uppercase opacity-80">
             AI Speaking Session
           </div>
@@ -109,7 +112,7 @@ export default function SpeakingDashboard() {
 
           {todayDone ? (
             <>
-              <div className="mt-4 flex items-center gap-2 text-[hsl(175_70%_30%)]">
+              <div className="mt-4 flex items-center gap-2 text-[hsl(33_75%_28%)]">
                 <CheckCircle2 className="w-4 h-4" />
                 <div className="font-semibold ka text-[13px]">დღეს უკვე ივარჯიშე</div>
               </div>
@@ -162,12 +165,12 @@ export default function SpeakingDashboard() {
         {/* Other practice */}
         <section>
           <h3 className="text-xs font-bold ka sp-text-muted uppercase tracking-wider mb-2">სხვა ვარჯიშები</h3>
-          <div className="sp-card divide-y divide-[hsl(220_22%_92%)] overflow-hidden">
+          <div className="sp-card divide-y divide-[hsl(38_55%_84%)] overflow-hidden">
             {SIDE_PATHS.map((p) => (
               <Link
                 key={p.to}
                 to={p.to}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-[hsl(40_40%_96%)] transition-colors"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[hsl(40_91%_92%)] transition-colors"
               >
                 <div className="w-9 h-9 rounded-lg sp-chip-teal flex items-center justify-center shrink-0">
                   <p.Icon className="w-4 h-4" />
@@ -188,7 +191,7 @@ export default function SpeakingDashboard() {
 
 function Stat({ label, value }: { label: React.ReactNode; value: number | string }) {
   return (
-    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] py-2.5 text-center">
+    <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] py-2.5 text-center">
       <div className="text-lg font-extrabold sp-text leading-none">{value}</div>
       <div className="text-[10px] sp-text-muted mt-1">{label}</div>
     </div>

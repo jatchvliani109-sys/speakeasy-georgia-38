@@ -251,7 +251,7 @@ export default function SpeakingRecorder({
             disabled={isRecording || isProcessing}
             className="inline-flex items-center gap-1.5 rounded-full sp-btn-teal px-3.5 py-1.5 text-xs font-semibold ka disabled:opacity-50"
           >
-            <Mic className="w-3.5 h-3.5" /> 🎤 {recordLabel ?? "ჩაწერა"}
+            <Mic className="w-3.5 h-3.5" /> {recordLabel ?? "ჩაწერა"}
           </button>
         )}
         {isRecording && (
@@ -318,7 +318,7 @@ export default function SpeakingRecorder({
             </div>
           </div>
           <div className="mt-2.5 pt-2.5 border-t border-[hsl(40_30%_88%)] text-sm ka sp-text flex items-start gap-2">
-            <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(175 60% 38%)" }} />
+            <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(33 69% 45%)" }} />
             <span>{feedback}</span>
           </div>
           {missing.length > 0 && (

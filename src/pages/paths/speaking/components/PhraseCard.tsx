@@ -61,7 +61,7 @@ export default function PhraseCard({ english, georgian, example, practiced, onPr
       {enableRecording && (
         <div className="mt-3 pt-3 sp-rule space-y-2">
           <div className="rounded-lg bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-2.5">
-            <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+            <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>
               თქვი ეს ფრაზა · Say this
             </div>
             <div className="text-[15px] font-semibold sp-text mt-0.5 break-words">"{target}"</div>

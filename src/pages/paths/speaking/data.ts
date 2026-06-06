@@ -215,3 +215,30 @@ export function pickDailyTopic(
   const candidates = fresh.length ? fresh : pool;
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
+
+// Lucide icon mapping for scenarios (replaces emoji rendering everywhere).
+import {
+  Handshake, GraduationCap, Coffee, Users as UsersIcon,
+  UtensilsCrossed, Map as MapIcon, ShoppingBag, Plane,
+  Briefcase, MessageSquare, Puzzle, CalendarDays,
+  type LucideIcon,
+} from "lucide-react";
+
+export const SCENARIO_ICONS: Record<string, LucideIcon> = {
+  meet_friend: Handshake,
+  at_school: GraduationCap,
+  at_cafe_basic: Coffee,
+  family_talk: UsersIcon,
+  order_food: UtensilsCrossed,
+  directions: MapIcon,
+  shopping: ShoppingBag,
+  travel_basics: Plane,
+  interview: Briefcase,
+  opinions: MessageSquare,
+  problem_solving: Puzzle,
+  make_plans: CalendarDays,
+};
+
+export function iconForScenario(id: string): LucideIcon {
+  return SCENARIO_ICONS[id] ?? MessageSquare;
+}

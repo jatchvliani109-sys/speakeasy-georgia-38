@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb,
+  ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb, Sparkles,
   Loader2, RotateCcw, X, Radio, Clock,
+  Handshake, GraduationCap, Users as UsersIcon, Coffee, Palette, Clock3,
+  UtensilsCrossed, Map as MapIcon, ShoppingBag, Plane, CalendarDays,
+  Briefcase, MessageSquare, CalendarRange, Globe2, Puzzle, MessagesSquare,
+  type LucideIcon,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakButton from "@/components/SpeakButton";
@@ -20,31 +24,31 @@ type Topic = {
   level: Level | "Free";
   title_en: string;
   desc_ka: string;
-  emoji: string;
+  Icon: LucideIcon;
   scene_en?: string; // hint for the AI
 };
 
 const TOPICS: Topic[] = [
-  { id: "intro", level: "Beginner", title_en: "Introducing Yourself", desc_ka: "გაიცანი AI და ისაუბრე საკუთარ თავზე.", emoji: "👋" },
-  { id: "school", level: "Beginner", title_en: "School", desc_ka: "ისაუბრე სკოლაზე და საგნებზე.", emoji: "🎒" },
-  { id: "family", level: "Beginner", title_en: "Family", desc_ka: "ისაუბრე ოჯახის წევრებზე.", emoji: "👨‍👩‍👧" },
-  { id: "cafe", level: "Beginner", title_en: "At a Café", desc_ka: "შეუკვეთე სასმელი და ილაპარაკე ოფიციანტთან.", emoji: "☕" },
-  { id: "hobbies", level: "Beginner", title_en: "Hobbies", desc_ka: "მოყევი რა გიყვარს თავისუფალ დროს.", emoji: "🎨" },
-  { id: "routine", level: "Beginner", title_en: "Daily Routine", desc_ka: "ისაუბრე შენს დღიურ რუტინაზე.", emoji: "🕗" },
+  { id: "intro", level: "Beginner", title_en: "Introducing Yourself", desc_ka: "გაიცანი AI და ისაუბრე საკუთარ თავზე.", Icon: Handshake },
+  { id: "school", level: "Beginner", title_en: "School", desc_ka: "ისაუბრე სკოლაზე და საგნებზე.", Icon: GraduationCap },
+  { id: "family", level: "Beginner", title_en: "Family", desc_ka: "ისაუბრე ოჯახის წევრებზე.", Icon: UsersIcon },
+  { id: "cafe", level: "Beginner", title_en: "At a Café", desc_ka: "შეუკვეთე სასმელი და ილაპარაკე ოფიციანტთან.", Icon: Coffee },
+  { id: "hobbies", level: "Beginner", title_en: "Hobbies", desc_ka: "მოყევი რა გიყვარს თავისუფალ დროს.", Icon: Palette },
+  { id: "routine", level: "Beginner", title_en: "Daily Routine", desc_ka: "ისაუბრე შენს დღიურ რუტინაზე.", Icon: Clock3 },
 
-  { id: "ordering", level: "Elementary", title_en: "Ordering Food", desc_ka: "შეუკვეთე საჭმელი რესტორანში.", emoji: "🍽️" },
-  { id: "directions", level: "Elementary", title_en: "Asking for Directions", desc_ka: "ჰკითხე გზა ქალაქში.", emoji: "🗺️" },
-  { id: "shopping", level: "Elementary", title_en: "Shopping", desc_ka: "იყიდე ტანსაცმელი ან ჰკითხე ფასი.", emoji: "🛍️" },
-  { id: "travel", level: "Elementary", title_en: "Travel Basics", desc_ka: "სასტუმრო, ბილეთი, აეროპორტი.", emoji: "✈️" },
-  { id: "weekend", level: "Elementary", title_en: "Weekend Plans", desc_ka: "დაგეგმე შაბათ-კვირა მეგობართან.", emoji: "📅" },
+  { id: "ordering", level: "Elementary", title_en: "Ordering Food", desc_ka: "შეუკვეთე საჭმელი რესტორანში.", Icon: UtensilsCrossed },
+  { id: "directions", level: "Elementary", title_en: "Asking for Directions", desc_ka: "ჰკითხე გზა ქალაქში.", Icon: MapIcon },
+  { id: "shopping", level: "Elementary", title_en: "Shopping", desc_ka: "იყიდე ტანსაცმელი ან ჰკითხე ფასი.", Icon: ShoppingBag },
+  { id: "travel", level: "Elementary", title_en: "Travel Basics", desc_ka: "სასტუმრო, ბილეთი, აეროპორტი.", Icon: Plane },
+  { id: "weekend", level: "Elementary", title_en: "Weekend Plans", desc_ka: "დაგეგმე შაბათ-კვირა მეგობართან.", Icon: CalendarDays },
 
-  { id: "interview", level: "Intermediate", title_en: "Job Interview", desc_ka: "ივარჯიშე გასაუბრებაზე.", emoji: "💼" },
-  { id: "opinions", level: "Intermediate", title_en: "Giving Opinions", desc_ka: "გამოთქვი აზრი თემაზე.", emoji: "💭" },
-  { id: "plans", level: "Intermediate", title_en: "Making Plans", desc_ka: "შეთანხმდი მეგობართან გეგმაზე.", emoji: "🗓️" },
-  { id: "travel_conv", level: "Intermediate", title_en: "Travel Conversation", desc_ka: "ისაუბრე მოგზაურობის გამოცდილებაზე.", emoji: "🌍" },
-  { id: "problem", level: "Intermediate", title_en: "Problem Solving", desc_ka: "გადაჭერი სიტუაცია მხარდაჭერასთან.", emoji: "🧩" },
+  { id: "interview", level: "Intermediate", title_en: "Job Interview", desc_ka: "ივარჯიშე გასაუბრებაზე.", Icon: Briefcase },
+  { id: "opinions", level: "Intermediate", title_en: "Giving Opinions", desc_ka: "გამოთქვი აზრი თემაზე.", Icon: MessageSquare },
+  { id: "plans", level: "Intermediate", title_en: "Making Plans", desc_ka: "შეთანხმდი მეგობართან გეგმაზე.", Icon: CalendarRange },
+  { id: "travel_conv", level: "Intermediate", title_en: "Travel Conversation", desc_ka: "ისაუბრე მოგზაურობის გამოცდილებაზე.", Icon: Globe2 },
+  { id: "problem", level: "Intermediate", title_en: "Problem Solving", desc_ka: "გადაჭერი სიტუაცია მხარდაჭერასთან.", Icon: Puzzle },
 
-  { id: "free", level: "Free", title_en: "Free Conversation", desc_ka: "ისაუბრე ნებისმიერ თემაზე.", emoji: "💬" },
+  { id: "free", level: "Free", title_en: "Free Conversation", desc_ka: "ისაუბრე ნებისმიერ თემაზე.", Icon: MessagesSquare },
 ];
 
 const LEVEL_LABEL_KA: Record<Topic["level"], string> = {
@@ -100,31 +104,35 @@ export default function AISpeakingCall() {
             </div>
           </header>
 
-          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl) => {
+          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl, lvlIdx) => {
             const items = TOPICS.filter((t) => t.level === lvl);
             if (!items.length) return null;
             return (
               <section key={lvl}>
+                {lvlIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
                 <h3 className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka mb-2">
                   {LEVEL_LABEL_KA[lvl]}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {items.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => { setTopic(t); setStep("explain"); }}
-                      className="sp-card p-3.5 text-left hover:bg-[hsl(40_40%_96%)] transition-colors flex items-start gap-3"
-                    >
-                      <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center text-xl shrink-0">
-                        {t.emoji}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
-                        <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
-                      </div>
-                      <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
-                    </button>
-                  ))}
+                  {items.map((t) => {
+                    const Icon = t.Icon;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => { setTopic(t); setStep("explain"); }}
+                        className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
+                      >
+                        <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
+                          <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
+                        </div>
+                        <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
+                      </button>
+                    );
+                  })}
                 </div>
               </section>
             );
@@ -158,7 +166,7 @@ export default function AISpeakingCall() {
             <ExplainItem text="შემდეგ ისევ ინგლისურად გააგრძელებ საუბარს." />
           </div>
 
-          <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-4">
+          <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-4">
             <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
             <div className="font-bold sp-text mt-1">{topic.title_en}</div>
             <div className="text-xs sp-text-muted ka mt-0.5">{topic.desc_ka}</div>
@@ -212,7 +220,7 @@ export default function AISpeakingCall() {
 function ExplainItem({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[hsl(175_70%_38%)] mt-2 shrink-0" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[hsl(33_69%_45%)] mt-2 shrink-0" />
       <p className="text-sm sp-text ka leading-relaxed">{text}</p>
     </div>
   );
@@ -497,18 +505,18 @@ function CallScreen({
         {/* AI Tutor area */}
         <div className="flex-1 flex flex-col items-center justify-start pt-4">
           <div
-            className={`relative w-32 h-32 rounded-full flex items-center justify-center text-5xl shrink-0 transition-transform ${
+            className={`relative w-32 h-32 rounded-full flex items-center justify-center shrink-0 transition-transform ${
               status === "ai_speaking" ? "sp-recording" : ""
             }`}
             style={{
               background:
-                "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(175 70% 42%))",
-              boxShadow: "0 12px 40px -10px hsl(220 50% 30% / 0.45)",
+                "linear-gradient(135deg, hsl(41 100% 55%), hsl(33 80% 45%) 60%, hsl(28 60% 25%))",
+              boxShadow: "0 12px 40px -10px hsl(31 60% 18% / 0.45)",
             }}
           >
-            <span aria-hidden>🎙️</span>
+            <Mic className="w-12 h-12 text-[hsl(40_91%_96%)]" aria-hidden />
             {(status === "thinking" || status === "connecting") && (
-              <span className="absolute inset-0 rounded-full border-4 border-white/40 border-t-transparent animate-spin" />
+              <span className="absolute inset-0 rounded-full border-4 border-[hsl(40_91%_96%)]/40 border-t-transparent animate-spin" />
             )}
           </div>
 
@@ -529,7 +537,7 @@ function CallScreen({
           {/* Transcript (secondary) */}
           <div
             ref={transcriptRef}
-            className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(40_30%_88%)] p-3 space-y-2 text-[13px]"
+            className="w-full mt-5 max-h-56 overflow-y-auto rounded-xl bg-[hsl(40_45%_98%)] border border-[hsl(38_55%_82%)] p-3 space-y-2 text-[13px]"
           >
             {messages.length === 0 && !partial.ai && !partial.user && (
               <p className="text-center sp-text-muted ka text-xs py-6">
@@ -584,7 +592,7 @@ function CallScreen({
               onTouchEnd={(e) => { e.preventDefault(); setPttActive(false); }}
               className={`w-full inline-flex items-center justify-center gap-2 rounded-xl h-14 text-base font-bold ka transition-all select-none ${
                 pttActive
-                  ? "bg-[hsl(175_70%_38%)] text-white scale-[0.99] shadow-inner"
+                  ? "bg-[hsl(33_69%_45%)] text-white scale-[0.99] shadow-inner"
                   : "sp-btn-primary"
               }`}
             >
@@ -658,7 +666,7 @@ function CallScreen({
                     onChange={(e) => setHelpInput(e.target.value)}
                     rows={3}
                     placeholder="მაგ: მინდა პიცის შეკვეთა"
-                    className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                    className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text ka focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
                   />
                   <button
                     onClick={submitHelp}
@@ -679,7 +687,7 @@ function CallScreen({
               {helpData && !helpLoading && (
                 <>
                   <div className="ka text-xs sp-text-muted mb-1">თქვი ასე:</div>
-                  <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3 flex items-center justify-between gap-2">
                     <div className="font-bold sp-text text-base">{helpData.english}</div>
                     <SpeakButton text={helpData.english} />
                   </div>
@@ -721,7 +729,7 @@ function CallScreen({
                 onChange={(e) => setCorrectInput(e.target.value)}
                 rows={3}
                 placeholder="I would like to order pizza."
-                className="w-full rounded-xl border border-[hsl(40_30%_88%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(175_70%_38%)]"
+                className="w-full rounded-xl border border-[hsl(38_55%_82%)] bg-[hsl(40_45%_98%)] p-3 text-sm sp-text focus:outline-none focus:ring-2 focus:ring-[hsl(33_69%_45%)]"
               />
               <button
                 onClick={submitCorrection}
@@ -742,7 +750,7 @@ function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; tex
   return (
     <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
       <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-        role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(175_70%_30%)]"
+        role === "assistant" ? "text-[hsl(28_55%_30%)]" : "text-[hsl(33_75%_28%)]"
       }`}>
         {role === "assistant" ? "AI" : "You"}
       </span>
@@ -875,7 +883,9 @@ function SummaryScreen({
     <SpeakingShell>
       <div className="max-w-md mx-auto space-y-4">
         <div className="sp-card-hero p-6 text-center sp-pop-in">
-          <div className="text-3xl mb-2">🎉</div>
+          <div className="mx-auto w-12 h-12 rounded-full bg-[hsl(41_100%_55%)] text-[hsl(31_53%_12%)] flex items-center justify-center mb-3">
+            <Sparkles className="w-6 h-6" />
+          </div>
           <h1 className="text-xl font-extrabold sp-text ka">სესია დასრულებულია</h1>
           <p className="text-sm sp-text ka mt-2">
             {summary.encouragement_ka || getEncouragementKa(dailySeed())}
@@ -955,7 +965,7 @@ function SummaryScreen({
           </button>
           <button
             onClick={onBackToSpeaking}
-            className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-4 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_40%_96%)] flex-1"
+            className="inline-flex items-center justify-center gap-2 rounded-xl h-11 px-4 text-sm font-bold ka border border-[hsl(220_22%_88%)] sp-text hover:bg-[hsl(40_91%_92%)] flex-1"
           >
             დაბრუნდი მთავარზე
           </button>

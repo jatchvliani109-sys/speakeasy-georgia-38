@@ -355,7 +355,7 @@ export default function DailyLesson() {
             <Mic className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+            <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>
               საუბრის მწვრთნელი
             </div>
             <div className="flex items-center gap-1 mt-1.5">
@@ -363,7 +363,7 @@ export default function DailyLesson() {
                 <div key={s.key} className="flex-1 flex flex-col items-center gap-1" title={s.label}>
                   <div
                     className={`w-full h-1 rounded-full ${
-                      i <= currentIdx ? "bg-[hsl(175_70%_38%)]" : "bg-[hsl(220_22%_90%)]"
+                      i <= currentIdx ? "bg-[hsl(33_69%_45%)]" : "bg-[hsl(38_45%_82%)]"
                     }`}
                   />
                   <span className={`text-[9px] ka font-medium ${i === currentIdx ? "sp-text" : "sp-text-soft"}`}>
@@ -378,14 +378,14 @@ export default function DailyLesson() {
         {step === "topic" && (
           <>
             <div className="sp-card-hero p-5 sm:p-6">
-              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(40_91%_82%)]">
                 დღევანდელი თემა
               </div>
               <h2 className="text-2xl font-extrabold mt-2 sp-text leading-snug">{plan.title_en}</h2>
               <div className="text-base ka mt-1.5 sp-text-muted">{plan.title_ka}</div>
             </div>
             <div className="sp-card p-5 space-y-3">
-              <Row icon={<Target className="w-4 h-4" style={{ color: "hsl(175 70% 38%)" }} />} label="მიზანი" value={plan.goal_ka} />
+              <Row icon={<Target className="w-4 h-4" style={{ color: "hsl(33 69% 45%)" }} />} label="მიზანი" value={plan.goal_ka} />
               <Row
                 icon={<Clock className="w-4 h-4" style={{ color: "hsl(210 70% 45%)" }} />}
                 label="ხანგრძლივობა"
@@ -506,7 +506,7 @@ export default function DailyLesson() {
                     <Users className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+                    <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>
                       სცენარი
                     </div>
                     {plan.scenario_ka && <div className="text-sm ka sp-text mt-0.5">{plan.scenario_ka}</div>}
@@ -526,7 +526,7 @@ export default function DailyLesson() {
                 <div className="text-xs sp-text-soft ka">კითხვა {promptIdx + 1} / {prompts.length}</div>
                 <div className="flex gap-1">
                   {prompts.map((_, i) => (
-                    <div key={i} className={`w-6 h-1 rounded-full ${i <= promptIdx ? "bg-[hsl(175_70%_38%)]" : "bg-[hsl(220_22%_90%)]"}`} />
+                    <div key={i} className={`w-6 h-1 rounded-full ${i <= promptIdx ? "bg-[hsl(33_69%_45%)]" : "bg-[hsl(38_45%_82%)]"}`} />
                   ))}
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function DailyLesson() {
               {/* Prompt card */}
               <div className="sp-card p-5 space-y-4">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>
+                  <div className="text-[11px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>
                     Speak in English · უპასუხე ინგლისურად
                   </div>
                   <div className="text-xs ka sp-text-muted mt-1">
@@ -552,7 +552,7 @@ export default function DailyLesson() {
                     <ul className="space-y-1">
                       {examples.map((ex, i) => (
                         <li key={i} className="text-sm sp-text flex items-center gap-2">
-                          <span className="text-[hsl(175_70%_38%)]">•</span>
+                          <span className="text-[hsl(33_69%_45%)]">•</span>
                           <span>{ex}</span>
                           <SpeakButton text={ex} />
                         </li>
@@ -615,7 +615,7 @@ export default function DailyLesson() {
                       onClick={() => setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: "", feedback: "", loading: false, typing: false } }))}
                       className="text-xs ka sp-text-soft underline hover:sp-text"
                     >
-                      🎤 Back to voice
+                      Back to voice
                     </button>
                   </div>
                 )}
@@ -623,7 +623,7 @@ export default function DailyLesson() {
                 {/* Loading feedback */}
                 {result?.loading && (
                   <div className="flex items-center gap-2 text-sm sp-text-muted ka">
-                    <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(175 70% 38%)" }} />
+                    <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "hsl(33 69% 45%)" }} />
                     AI ამოწმებს პასუხს...
                   </div>
                 )}
@@ -631,13 +631,13 @@ export default function DailyLesson() {
                 {/* Result */}
                 {result?.transcript && !result?.loading && (
                   <div className="space-y-3">
-                    <div className="rounded-xl bg-[hsl(40_45%_96%)] border border-[hsl(40_30%_88%)] p-3">
+                    <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3">
                       <div className="text-[10px] font-bold uppercase tracking-wider sp-text-soft ka">Heard · გაიგე</div>
                       <div className="text-sm sp-text mt-0.5 break-words">{result.transcript}</div>
                     </div>
                     {result.feedback && (
-                      <div className="rounded-xl bg-[hsl(175_60%_96%)] border border-[hsl(175_40%_85%)] p-3">
-                        <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(175 70% 28%)" }}>Feedback</div>
+                      <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>Feedback</div>
                         <div className="text-sm sp-text mt-0.5 whitespace-pre-wrap break-words">{result.feedback}</div>
                       </div>
                     )}
@@ -661,7 +661,7 @@ export default function DailyLesson() {
               </div>
 
               <div className="flex justify-end">
-                <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_40%_94%)]" onClick={goReview}>
+                <Button variant="ghost" size="sm" className="ka sp-text hover:bg-[hsl(40_91%_90%)]" onClick={goReview}>
                   Finish Lesson
                 </Button>
               </div>
@@ -754,7 +754,7 @@ export default function DailyLesson() {
 
             {bestCorrection && (
               <div className="sp-card-hero p-5">
-                <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+                <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(40_91%_82%)]">
                   ⭐ საუკეთესო გასწორება
                 </div>
                 <div className="text-base font-bold mt-2 sp-text">"{bestCorrection.corrected}"</div>

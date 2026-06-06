@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import PageHeader from "@/components/PageHeader";
 import SpeakingShell from "./components/SpeakingShell";
-import { SCENARIOS, Scenario } from "./data";
+import { SCENARIOS, Scenario, iconForScenario } from "./data";
 import { ArrowRight } from "lucide-react";
 
 const LEVEL_LABEL: Record<Scenario["level"], string> = {
@@ -32,38 +32,42 @@ export default function RoleplayList() {
           </p>
         </div>
 
-        {groups.map((lvl) => {
+        {groups.map((lvl, gIdx) => {
           const items = SCENARIOS.filter((s) => s.level === lvl);
           if (!items.length) return null;
           return (
             <section key={lvl} className="space-y-3">
+              {gIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ka ${LEVEL_CHIP[lvl]}`}>
                   {LEVEL_LABEL[lvl]}
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {items.map((s) => (
-                  <Link
-                    key={s.id}
-                    to={`/path/speaking/roleplay/${s.id}`}
-                    className="sp-card p-4 sm:p-5 flex flex-col gap-3 hover:border-[hsl(175_50%_60%)] hover:-translate-y-0.5 transition-all"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-xl sp-chip-teal flex items-center justify-center text-2xl shrink-0">
-                        {s.emoji}
+                {items.map((s) => {
+                  const Icon = iconForScenario(s.id);
+                  return (
+                    <Link
+                      key={s.id}
+                      to={`/path/speaking/roleplay/${s.id}`}
+                      className="sp-card p-4 sm:p-5 flex flex-col gap-3 hover:border-[hsl(33_70%_55%)] hover:-translate-y-0.5 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+                          <Icon className="w-6 h-6" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold ka sp-text text-[15px] leading-snug">{s.title_ka}</div>
+                          <div className="text-xs sp-text-muted ka mt-1 leading-relaxed">{s.description_ka}</div>
+                        </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold ka sp-text text-[15px] leading-snug">{s.title_ka}</div>
-                        <div className="text-xs sp-text-muted ka mt-1 leading-relaxed">{s.description_ka}</div>
+                      <div className="flex items-center justify-between mt-1 pt-3 sp-rule">
+                        <span className="text-xs ka sp-text-soft">დაწყება</span>
+                        <ArrowRight className="w-4 h-4 sp-text-soft" />
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-1 pt-3 sp-rule">
-                      <span className="text-xs ka sp-text-soft">დაწყება</span>
-                      <ArrowRight className="w-4 h-4 sp-text-soft" />
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           );

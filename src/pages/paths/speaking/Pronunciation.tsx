@@ -64,11 +64,11 @@ export default function Pronunciation() {
       <div className="space-y-5 max-w-3xl mx-auto">
         <section className="sp-card-hero p-5 sm:p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[hsl(175_70%_38%)] text-white flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-[hsl(33_69%_45%)] text-white flex items-center justify-center shrink-0">
               <Headphones className="w-6 h-6" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(175_60%_75%)]">
+              <div className="text-[11px] font-bold uppercase tracking-wider ka text-[hsl(40_91%_82%)]">
                 გამოთქმის ბანკი · {level}
               </div>
               <h2 className="text-xl font-extrabold ka sp-text mt-1 leading-snug">
@@ -86,13 +86,13 @@ export default function Pronunciation() {
             </div>
             <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
               <div
-                className="h-full bg-[hsl(175_70%_55%)] transition-all"
+                className="h-full bg-[hsl(41_100%_55%)] transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
           </div>
-          <div className="mt-4 text-[11px] ka text-[hsl(175_60%_82%)]">
-            🎤 თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
+          <div className="mt-4 text-[11px] ka text-[hsl(40_91%_85%)] flex items-center gap-1.5">
+            <Headphones className="w-3.5 h-3.5" /> თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
           </div>
         </section>
 
