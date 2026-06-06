@@ -104,31 +104,35 @@ export default function AISpeakingCall() {
             </div>
           </header>
 
-          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl) => {
+          {(["Beginner", "Elementary", "Intermediate", "Free"] as Topic["level"][]).map((lvl, lvlIdx) => {
             const items = TOPICS.filter((t) => t.level === lvl);
             if (!items.length) return null;
             return (
               <section key={lvl}>
+                {lvlIdx > 0 && <div className="sp-curve-divider" aria-hidden="true" />}
                 <h3 className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka mb-2">
                   {LEVEL_LABEL_KA[lvl]}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {items.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => { setTopic(t); setStep("explain"); }}
-                      className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
-                    >
-                      <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center text-xl shrink-0">
-                        {t.emoji}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
-                        <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
-                      </div>
-                      <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
-                    </button>
-                  ))}
+                  {items.map((t) => {
+                    const Icon = t.Icon;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => { setTopic(t); setStep("explain"); }}
+                        className="sp-card p-3.5 text-left hover:bg-[hsl(40_91%_92%)] transition-colors flex items-start gap-3"
+                      >
+                        <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold sp-text text-[14px]">{t.title_en}</div>
+                          <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{t.desc_ka}</div>
+                        </div>
+                        <ArrowRight className="w-4 h-4 sp-text-soft mt-2 shrink-0" />
+                      </button>
+                    );
+                  })}
                 </div>
               </section>
             );
