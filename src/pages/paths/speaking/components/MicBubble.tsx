@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, Loader2, Sparkles } from "lucide-react";
+import { Mic, Loader2 } from "lucide-react";
 
 type State = "idle" | "ready" | "user_speaking" | "ai_speaking" | "thinking" | "connecting";
 
@@ -68,26 +68,17 @@ function useAmplitude(stream: MediaStream | null | undefined, enabled: boolean) 
   return level;
 }
 
-export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiAmpProp, onPress, onRelease, active }: Props) {
+export default function MicBubble({ state, micStream, onPress, onRelease, active }: Props) {
+  // Only react to the user's mic — bubble looks identical whether AI or user is speaking.
   const userLevel = useAmplitude(micStream, state === "user_speaking");
-  const aiStreamLevel = useAmplitude(aiStream, state === "ai_speaking");
-  const aiLevel = aiAmpProp !== undefined ? aiAmpProp : aiStreamLevel;
-
-  const isUser = state === "user_speaking";
-  const isAi = state === "ai_speaking";
   const isThinking = state === "thinking" || state === "connecting";
 
-  const reactive = Math.min(isUser ? userLevel : isAi ? Math.max(aiLevel, 0.22) : 0, 0.55);
+  const reactive = Math.min(userLevel, 0.55);
   const scale = 1 + reactive * 0.06;
 
-  // Always gold — no color switching between states
-  const palette = { core: "41 100% 60%", glow: "38 90% 50%", edge: "45 100% 70%" };
+  const palette = { glow: "38 90% 50%", edge: "45 100% 70%" };
+  const glow = `0 0 ${55 + reactive * 70}px ${14 + reactive * 22}px hsl(${palette.glow} / ${0.30 + reactive * 0.30})`;
 
-  const glow = isUser || isAi
-    ? `0 0 ${55 + reactive * 70}px ${14 + reactive * 22}px hsl(${palette.glow} / ${0.38 + reactive * 0.30})`
-    : "0 0 50px 6px hsl(41 100% 55% / 0.20)";
-
-  // 4 amplitude-driven rings for user state
   const rings = [0.0, 0.18, 0.36, 0.55];
 
   return (
@@ -108,25 +99,23 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{
           background: `radial-gradient(circle at 50% 50%, hsl(${palette.glow} / 0.30), transparent 65%)`,
-            transform: `scale(${1 + reactive * 0.18})`,
-          transition: "transform 120ms ease-out, background 400ms ease",
+          transform: `scale(${1 + reactive * 0.18})`,
+          transition: "transform 120ms ease-out",
         }}
       />
 
-      {/* Idle slow breathing ring */}
-      {!isUser && !isAi && !isThinking && (
-        <span
-          aria-hidden
-          className="absolute inset-8 rounded-full border border-amber-300/20"
-          style={{ animation: "mb-breathe 3.4s ease-in-out infinite" }}
-        />
-      )}
+      {/* Slow breathing ring — always on (except when actively reacting to mic) */}
+      <span
+        aria-hidden
+        className="absolute inset-8 rounded-full border border-amber-300/20"
+        style={{ animation: "mb-breathe 3.4s ease-in-out infinite" }}
+      />
 
-      {/* User amplitude rings — expand outward with voice */}
-      {isUser && rings.map((threshold, i) => {
+      {/* Amplitude rings — driven by mic only */}
+      {rings.map((threshold, i) => {
         const v = Math.min(0.72, Math.max(0, userLevel - threshold));
         const s = 1 + v * 0.36 + i * 0.025;
-        const op = Math.max(0, 0.55 - i * 0.12) * (v > 0 ? 1 : 0.2);
+        const op = Math.max(0, 0.55 - i * 0.12) * (v > 0 ? 1 : 0);
         return (
           <span
             key={i}
@@ -142,19 +131,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
         );
       })}
 
-      {/* AI flowing wave rings — gold */}
-      {isAi && (
-        <>
-          <span aria-hidden className="absolute inset-0 rounded-full border-2"
-            style={{ borderColor: `hsl(${palette.edge} / 0.35)`, animation: "mb-wave 2.2s ease-out infinite" }} />
-          <span aria-hidden className="absolute inset-0 rounded-full border-2"
-            style={{ borderColor: `hsl(${palette.edge} / 0.25)`, animation: "mb-wave 2.8s ease-out infinite", animationDelay: "400ms" }} />
-          <span aria-hidden className="absolute inset-0 rounded-full border"
-            style={{ borderColor: `hsl(${palette.edge} / 0.20)`, animation: "mb-wave 3.4s ease-out infinite", animationDelay: "800ms" }} />
-        </>
-      )}
-
-      {/* Core orb */}
+      {/* Core orb — same look regardless of state */}
       <span
         aria-hidden
         className="absolute left-1/2 top-1/2 overflow-hidden"
@@ -164,47 +141,13 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
           marginLeft: -95,
           marginTop: -95,
           transform: `scale(${scale})`,
-          transition: isUser || isAi
-            ? "transform 80ms ease-out, box-shadow 160ms ease-out, border-radius 600ms ease-in-out"
-            : "transform 700ms ease-in-out, box-shadow 500ms ease, border-radius 800ms ease",
+          transition: "transform 120ms ease-out, box-shadow 200ms ease-out",
           background: `radial-gradient(circle at 30% 28%, hsl(48 100% 75%), hsl(38 92% 52%) 52%, hsl(25 65% 20%) 100%)`,
           boxShadow: glow,
-          borderRadius: isAi ? "50% 48% 52% 46% / 46% 52% 48% 54%" : "50%",
-          animation: isAi
-            ? "mb-morph 4.5s ease-in-out infinite"
-            : !isUser && !isAi && !isThinking
-            ? "mb-breathe 3.6s ease-in-out infinite"
-            : "none",
+          borderRadius: "50%",
+          animation: "mb-breathe 3.6s ease-in-out infinite",
         }}
       >
-        {/* AI flowing inner shimmer (lava-lamp feel) — gold tones */}
-        {isAi && (
-          <>
-            <span
-              aria-hidden
-              className="absolute -inset-4"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent, hsl(48 100% 80% / 0.5), transparent 35%, hsl(38 95% 65% / 0.45), transparent 65%, hsl(45 100% 75% / 0.4), transparent)",
-                animation: "spin 5s linear infinite",
-                mixBlendMode: "screen",
-                filter: "blur(6px)",
-              }}
-            />
-            <span
-              aria-hidden
-              className="absolute -inset-2"
-              style={{
-                background:
-                  "radial-gradient(60% 40% at 30% 70%, hsl(48 100% 80% / 0.55), transparent 70%), radial-gradient(50% 35% at 70% 30%, hsl(38 95% 65% / 0.5), transparent 70%)",
-                animation: "mb-flow 3.6s ease-in-out infinite",
-                mixBlendMode: "screen",
-                filter: "blur(4px)",
-              }}
-            />
-          </>
-        )}
-        {/* Soft inner highlight */}
         <span
           aria-hidden
           className="absolute inset-0"
@@ -215,14 +158,12 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
         />
       </span>
 
-      {/* Icon */}
+      {/* Icon — always mic, except spinner when connecting */}
       <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {isThinking ? (
           <Loader2 className="w-10 h-10 text-amber-50 animate-spin" />
-        ) : isAi ? (
-          <Sparkles className="w-10 h-10 text-amber-50 drop-shadow-lg" />
         ) : (
-          <Mic className={`w-10 h-10 ${isUser ? "text-amber-50" : "text-amber-100"} drop-shadow-lg`} />
+          <Mic className="w-10 h-10 text-amber-50 drop-shadow-lg" />
         )}
       </span>
 
@@ -235,21 +176,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
       <style>{`
         @keyframes mb-breathe {
           0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.05); opacity: 0.92; }
-        }
-        @keyframes mb-wave {
-          0% { transform: scale(0.95); opacity: 0.55; }
-          100% { transform: scale(1.6); opacity: 0; }
-        }
-        @keyframes mb-morph {
-          0%, 100% { border-radius: 50% 48% 52% 46% / 46% 52% 48% 54%; }
-          25%     { border-radius: 46% 54% 48% 52% / 52% 46% 54% 48%; }
-          50%     { border-radius: 52% 46% 54% 48% / 48% 54% 46% 52%; }
-          75%     { border-radius: 48% 52% 46% 54% / 54% 48% 52% 46%; }
-        }
-        @keyframes mb-flow {
-          0%, 100% { transform: translate(0%, 0%) rotate(0deg); }
-          50% { transform: translate(4%, -4%) rotate(20deg); }
+          50% { transform: scale(1.04); opacity: 0.95; }
         }
       `}</style>
     </button>
