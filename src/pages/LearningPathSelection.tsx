@@ -142,7 +142,7 @@ export default function LearningPathSelection() {
           </p>
         </header>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {LEARNING_PATHS.map((p, idx) => {
             const theme = THEMES[p.id as LearningPathId];
             const Icon = theme.icon;

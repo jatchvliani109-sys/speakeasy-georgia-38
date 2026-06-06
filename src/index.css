@@ -78,11 +78,13 @@
 @layer base {
   * { @apply border-border; }
   html { font-family: 'Inter', 'Noto Sans Georgian', system-ui, sans-serif; }
+  html, body { overflow-x: hidden; max-width: 100%; }
   body {
     @apply bg-background text-foreground antialiased;
     background: var(--gradient-soft);
     min-height: 100vh;
   }
+  img, video, svg { max-width: 100%; height: auto; }
   :lang(ka), .ka {
     font-family: 'Noto Sans Georgian', 'Inter', system-ui, sans-serif;
   }
