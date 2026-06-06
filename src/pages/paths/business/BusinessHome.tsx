@@ -349,7 +349,8 @@ export default function BusinessHome() {
           {/* Milestone celebration */}
           {showMilestone && (
             <section className="mb-5 animate-fade-in">
-              <div className="relative overflow-hidden rounded-lg bg-[#3d6b9e] text-[#F5F0E8] p-6 border border-[#3d6b9e]">
+              <div className="relative overflow-hidden rounded-lg bg-[#3d6b9e] text-[#F5F0E8] p-6 pb-14 border border-[#3d6b9e]">
+                <SectionCurve variant="dune" color="#F5F0E8" position="bottom" height={48} />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
                     <Award size={16} strokeWidth={2.25} className="text-[#C9A84C]" />
