@@ -243,7 +243,25 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     }
 
     try {
-      const pc = new RTCPeerConnection();
+      // Get Inworld connection info (api key, ICE servers, webrtc url, instructions) from edge function
+      const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
+        body: { topic, level, tier, selectedLearningPath },
+      });
+      if (error || (data as any)?.error) {
+        console.error("[rt] session info failed", error, data);
+        startingRef.current = false;
+        return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
+      }
+      const apiKey: string = (data as any)?.api_key;
+      const iceServers: RTCIceServer[] = (data as any)?.ice_servers ?? [];
+      const webrtcUrl: string = (data as any)?.webrtc_url ?? "https://api.inworld.ai/v1/realtime/calls";
+      const instructions: string = (data as any)?.instructions ?? "";
+      if (!apiKey) {
+        startingRef.current = false;
+        return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
+      }
+
+      const pc = new RTCPeerConnection({ iceServers });
       pcRef.current = pc;
 
       // Persistent remote audio element
@@ -259,12 +277,39 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));
 
-      const dc = pc.createDataChannel("inworld-events");
+      const dc = pc.createDataChannel("oai-events");
       dcRef.current = dc;
       dc.onmessage = (e) => {
         try { handleServerEvent(JSON.parse(e.data)); } catch (err) { console.warn("[rt] parse fail", err); }
       };
-      dc.onopen = () => { dlog("data channel opened"); };
+      dc.onopen = () => {
+        dlog("data channel opened — sending session.update");
+        try {
+          dc.send(JSON.stringify({
+            type: "session.update",
+            session: {
+              type: "realtime",
+              model: "openai/gpt-4o-mini",
+              instructions,
+              output_modalities: ["audio", "text"],
+              audio: {
+                input: {
+                  turn_detection: {
+                    type: "semantic_vad",
+                    eagerness: "high",
+                    create_response: true,
+                    interrupt_response: true,
+                  },
+                },
+                output: {
+                  model: "inworld-tts-2",
+                  voice: "Clive",
+                },
+              },
+            },
+          }));
+        } catch (err) { console.warn("[rt] session.update send failed", err); }
+      };
       dc.onclose = () => { dlog("data channel closed"); };
 
       pc.onconnectionstatechange = () => {
@@ -277,24 +322,40 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      // Proxy SDP exchange through the edge function (keeps INWORLD_API_KEY server-side).
-      const { data, error } = await supabase.functions.invoke("create-realtime-speaking-session", {
-        body: { sdp: offer.sdp ?? "", topic, level, tier, selectedLearningPath },
+      // Wait for ICE gathering to complete so the SDP contains all candidates
+      await new Promise<void>((resolve) => {
+        if (pc.iceGatheringState === "complete") return resolve();
+        const check = () => {
+          if (pc.iceGatheringState === "complete") {
+            pc.removeEventListener("icegatheringstatechange", check);
+            resolve();
+          }
+        };
+        pc.addEventListener("icegatheringstatechange", check);
+        // Safety timeout
+        setTimeout(() => resolve(), 3000);
       });
-      if (error || (data as any)?.error) {
-        console.error("[rt] sdp exchange failed", error, data);
+
+      const sdpRes = await fetch(webrtcUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/sdp",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: pc.localDescription?.sdp ?? offer.sdp ?? "",
+      });
+      if (!sdpRes.ok) {
+        const txt = await sdpRes.text();
+        console.error("[rt] inworld sdp exchange failed", sdpRes.status, txt.slice(0, 300));
         startingRef.current = false;
         return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
       }
-      const answerSdp: string | undefined = (data as any)?.sdp;
-      if (!answerSdp) {
-        startingRef.current = false;
-        return fail("საუბრის სესია ვერ დაიწყო. სცადე თავიდან.");
-      }
-      setModel((data as any)?.model ?? null);
+      const answerSdp = await sdpRes.text();
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
+      setModel("openai/gpt-4o-mini");
       startingRef.current = false;
       dlog("WebRTC connected");
+
     } catch (e: any) {
       console.error("[rt] webrtc error", e);
       startingRef.current = false;
