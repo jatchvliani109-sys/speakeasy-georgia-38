@@ -47,14 +47,21 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const dcRef = useRef<RTCDataChannel | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const aiAnalyserRef = useRef<AnalyserNode | null>(null);
+  const aiRafRef = useRef<number | null>(null);
+  const aiSilentSinceRef = useRef<number>(0);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
   const greetedRef = useRef(false);
   const topicRef = useRef(topic);
   topicRef.current = topic;
+  const statusRef = useRef<RtStatus>("idle");
 
   const aiBufRef = useRef<Map<string, string>>(new Map());
   const userBufRef = useRef<Map<string, string>>(new Map());
+
+  useEffect(() => { statusRef.current = status; }, [status]);
 
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
@@ -64,6 +71,11 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   const cleanup = useCallback(() => {
     dlog("cleanup → closing data channel, peer connection, mic tracks");
+    if (aiRafRef.current) { cancelAnimationFrame(aiRafRef.current); aiRafRef.current = null; }
+    try { aiAnalyserRef.current?.disconnect(); } catch {}
+    aiAnalyserRef.current = null;
+    try { audioCtxRef.current?.close(); } catch {}
+    audioCtxRef.current = null;
     try { dcRef.current?.close(); } catch {}
     try { pcRef.current?.getSenders().forEach((s) => s.track?.stop()); } catch {}
     try { pcRef.current?.close(); } catch {}
@@ -81,6 +93,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setMicOn(false);
     setMicStream(null);
     setAiStream(null);
+    statusRef.current = "idle";
   }, []);
 
   const stop = useCallback(() => {
@@ -276,9 +289,61 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       audioRef.current = audioEl;
       pc.ontrack = (e) => {
         dlog("remote track");
-        audioEl.srcObject = e.streams[0];
-        setAiStream(e.streams[0]);
+        const remoteStream = e.streams[0];
+        audioEl.srcObject = remoteStream;
         audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
+
+        // Build an analyser-friendly stream via Web Audio. Routing the <audio>
+        // element through a MediaElementSource gives reliable amplitude data on
+        // remote WebRTC tracks (Chrome's createMediaStreamSource often returns
+        // silent buffers for remote tracks).
+        try {
+          const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+          const ctx = audioCtxRef.current ?? new AC();
+          audioCtxRef.current = ctx;
+          if (ctx.state === "suspended") ctx.resume().catch(() => {});
+
+          const src = ctx.createMediaElementSource(audioEl);
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 1024;
+          analyser.smoothingTimeConstant = 0.7;
+          const dest = ctx.createMediaStreamDestination();
+          src.connect(analyser);
+          src.connect(dest);
+          src.connect(ctx.destination); // keep audible playback
+          aiAnalyserRef.current = analyser;
+          setAiStream(dest.stream);
+
+          const buf = new Uint8Array(analyser.fftSize);
+          const tick = () => {
+            const a = aiAnalyserRef.current;
+            if (!a) return;
+            a.getByteTimeDomainData(buf);
+            let sum = 0;
+            for (let i = 0; i < buf.length; i++) {
+              const v = (buf[i] - 128) / 128;
+              sum += v * v;
+            }
+            const rms = Math.sqrt(sum / buf.length);
+            const now = performance.now();
+            if (rms > 0.012) {
+              aiSilentSinceRef.current = now;
+              const s = statusRef.current;
+              if (s === "ready" || s === "thinking" || s === "listening") {
+                setStatus("ai_speaking");
+              }
+            } else if (statusRef.current === "ai_speaking") {
+              if (now - aiSilentSinceRef.current > 450) {
+                setStatus(responseActiveRef.current ? "thinking" : "ready");
+              }
+            }
+            aiRafRef.current = requestAnimationFrame(tick);
+          };
+          aiRafRef.current = requestAnimationFrame(tick);
+        } catch (err) {
+          console.warn("[rt] AI analyser setup failed, falling back to raw stream", err);
+          setAiStream(remoteStream);
+        }
       };
 
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));

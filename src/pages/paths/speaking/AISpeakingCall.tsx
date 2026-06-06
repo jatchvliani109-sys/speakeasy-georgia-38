@@ -575,18 +575,20 @@ function CallScreen({
         )}
       </header>
 
-      {/* Center bubble */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        <MicBubble
-          state={bubbleState}
-          micStream={micStream}
-          aiStream={aiStream}
-          onPress={handleBubblePress}
-          onRelease={handleBubbleRelease}
-          active={pttActive}
-        />
+      {/* Center bubble — explicitly bounded so it never pushes the transcript off-screen */}
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col items-center justify-center px-6 overflow-hidden">
+        <div className="flex items-center justify-center max-h-full">
+          <MicBubble
+            state={bubbleState}
+            micStream={micStream}
+            aiStream={aiStream}
+            onPress={handleBubblePress}
+            onRelease={handleBubbleRelease}
+            active={pttActive}
+          />
+        </div>
 
-        <div className="mt-8 h-6 text-center">
+        <div className="mt-4 h-6 text-center shrink-0">
           <p
             key={stateLabel}
             className="ka text-[13px] tracking-wide text-amber-100/75 animate-fade-in"
@@ -598,7 +600,7 @@ function CallScreen({
         {status === "error" && (
           <button
             onClick={start}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 px-4 h-9 text-xs font-semibold ka transition-colors"
+            className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 px-4 h-9 text-xs font-semibold ka transition-colors shrink-0"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             სცადე თავიდან
@@ -607,7 +609,7 @@ function CallScreen({
 
         {/* Secondary actions */}
         {isConnected && (
-          <div className="mt-5 flex items-center justify-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-2 shrink-0">
             <button
               type="button"
               onClick={openHelp}
@@ -628,18 +630,23 @@ function CallScreen({
         )}
       </div>
 
-      {/* Transcript — fixed height, never collapses */}
-      <div className="relative z-10 px-4 pb-5 shrink-0">
-        <div className="mx-auto max-w-md relative rounded-2xl bg-black/40 backdrop-blur-md border border-white/5 shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.6)]">
+      {/* Transcript — fixed-height bottom panel, always fully visible */}
+      <div
+        className="relative z-20 shrink-0 px-4 pb-4 pt-2"
+        style={{
+          background: "linear-gradient(to top, hsl(20 25% 4% / 0.95) 30%, hsl(20 25% 4% / 0.6) 75%, transparent)",
+        }}
+      >
+        <div className="mx-auto max-w-md relative rounded-2xl bg-black/55 backdrop-blur-md border border-white/10 shadow-[0_-10px_40px_-12px_rgba(0,0,0,0.7)]">
           {/* Top fade indicating more above */}
           <div
             aria-hidden
-            className="pointer-events-none absolute top-0 left-0 right-0 h-8 rounded-t-2xl"
-            style={{ background: "linear-gradient(to bottom, hsl(24 30% 8% / 0.95), transparent)" }}
+            className="pointer-events-none absolute top-0 left-0 right-0 h-8 rounded-t-2xl z-10"
+            style={{ background: "linear-gradient(to bottom, hsl(0 0% 0% / 0.7), transparent)" }}
           />
           <div
             ref={transcriptRef}
-            className="h-40 overflow-y-auto space-y-2.5 px-4 py-3 scroll-smooth"
+            className="h-[150px] overflow-y-auto space-y-2.5 px-4 py-3 scroll-smooth"
           >
             {visibleMessages.length === 0 && !partial.ai && !partial.user && (
               <p className="text-center text-[12px] ka text-amber-100/40 py-10">
@@ -653,6 +660,7 @@ function CallScreen({
           </div>
         </div>
       </div>
+
 
 
 
