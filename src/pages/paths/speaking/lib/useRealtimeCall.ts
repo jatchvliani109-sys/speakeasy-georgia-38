@@ -433,27 +433,34 @@ try {
         dlog("data channel opened — sending session.update");
         try {
           dc.send(JSON.stringify({
-            type: "session.update",
-            session: {
-              type: "realtime",
-              model: "openai/gpt-4.1-mini",
-              instructions,
-              output_modalities: ["audio", "text"],
-              audio: {
-                input: {
-                  turn_detection: {
-                    type: "semantic_vad",
-                    eagerness: "high",
-                    create_response: true,
-                    interrupt_response: true,
-                  },
-                },
-                output: {
-                  voice: "Ashley",
-                },
-              },
-            },
-          }));
+  type: "session.update",
+  session: {
+    type: "realtime",
+    model: "openai/gpt-4.1-mini",
+    instructions,
+    output_modalities: ["audio", "text"],
+    audio: {
+      input: {
+        transcription: { model: "inworld/inworld-stt-1" },
+        turn_detection: {
+          type: "semantic_vad",
+          eagerness: "medium",
+          create_response: true,
+          interrupt_response: true,
+        },
+      },
+      output: {
+        model: "inworld-tts-2",
+        voice: "Cloe",
+      },
+    },
+    providerData: {
+      tts: {
+        conversational: true,
+      },
+    },
+  },
+}));
         } catch (err) { console.warn("[rt] session.update send failed", err); }
       };
       dc.onclose = () => { dlog("data channel closed"); };
