@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb,
   Loader2, RotateCcw, X, Radio, Clock,
+  Handshake, GraduationCap, Users as UsersIcon, Coffee, Palette, Clock3,
+  UtensilsCrossed, Map as MapIcon, ShoppingBag, Plane, CalendarDays,
+  Briefcase, MessageSquare, CalendarRange, Globe2, Puzzle, MessagesSquare,
+  type LucideIcon,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakButton from "@/components/SpeakButton";
