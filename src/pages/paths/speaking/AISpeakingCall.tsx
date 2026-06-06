@@ -402,13 +402,19 @@ function CallScreen({
     onEnd(messagesRef.current, dur);
   }, [stop, onEnd]);
 
-  // Hard safety: 2-min cap + 90s warn. Cleanup on unmount + tab close.
+  // Smart 2-min session: warn at 90s, ask AI to wrap up at 105s, hard cutoff at 120s.
+  const wrapUpSentRef = useRef(false);
   useEffect(() => {
     startedAtRef.current = Date.now();
     const id = setInterval(() => {
       const sec = Math.floor((Date.now() - startedAtRef.current) / 1000);
       setElapsed(sec);
       if (sec >= 90 && !showTimeWarn) setShowTimeWarn(true);
+      if (sec >= 105 && !wrapUpSentRef.current) {
+        wrapUpSentRef.current = true;
+        console.log("[rt] 105s reached → asking AI to wrap up");
+        try { requestWrapUp(); } catch {}
+      }
       if (sec >= 120) {
         console.log("[rt] session ended by timer (120s hard cap)");
         clearInterval(id);
