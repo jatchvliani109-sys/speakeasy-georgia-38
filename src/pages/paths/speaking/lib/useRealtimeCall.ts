@@ -450,7 +450,7 @@ try {
       },
       output: {
         model: "inworld-tts-2",
-        voice: "Cloe",
+        voice: "Chloe",
       },
     },
     providerData: {
