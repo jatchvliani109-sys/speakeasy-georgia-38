@@ -4,7 +4,10 @@ import SpeakingShell from "./components/SpeakingShell";
 import PageHeader from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Repeat2, Volume2, Drama } from "lucide-react";
+import { MessageCircle, Repeat2, Volume2, Drama, Award, TrendingUp, TrendingDown } from "lucide-react";
+import { useSpeakingProgress } from "./lib/useSpeakingProgress";
+import ScenarioProgressMap from "./components/ScenarioProgressMap";
+import { scenarioById } from "./lib/scenarios";
 
 
 type LessonRow = {
