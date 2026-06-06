@@ -80,17 +80,11 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
   const reactive = Math.min(isUser ? userLevel : isAi ? Math.max(aiLevel, 0.22) : 0, 0.55);
   const scale = 1 + reactive * 0.06;
 
-  // Palette per state
-  const palette = isUser
-    ? { core: "33 95% 60%", glow: "33 100% 55%", edge: "45 100% 70%" }
-    : isAi
-    ? { core: "190 85% 55%", glow: "195 95% 55%", edge: "175 80% 65%" }
-    : { core: "41 100% 60%", glow: "38 90% 50%", edge: "45 100% 70%" };
+  // Always gold — no color switching between states
+  const palette = { core: "41 100% 60%", glow: "38 90% 50%", edge: "45 100% 70%" };
 
-  const glow = isUser
-    ? `0 0 ${50 + reactive * 90}px ${12 + reactive * 30}px hsl(${palette.glow} / ${0.35 + reactive * 0.35})`
-    : isAi
-    ? `0 0 ${70 + reactive * 50}px ${18 + reactive * 16}px hsl(${palette.glow} / ${0.40 + reactive * 0.25})`
+  const glow = isUser || isAi
+    ? `0 0 ${55 + reactive * 70}px ${14 + reactive * 22}px hsl(${palette.glow} / ${0.38 + reactive * 0.30})`
     : "0 0 50px 6px hsl(41 100% 55% / 0.20)";
 
   // 4 amplitude-driven rings for user state
