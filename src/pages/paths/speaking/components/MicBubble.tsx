@@ -75,8 +75,8 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
   const isAi = state === "ai_speaking";
   const isThinking = state === "thinking" || state === "connecting";
 
-  const reactive = isUser ? userLevel : isAi ? Math.max(aiLevel, 0.18) : 0;
-  const scale = 1 + reactive * 0.16;
+  const reactive = Math.min(isUser ? userLevel : isAi ? Math.max(aiLevel, 0.22) : 0, 0.72);
+  const scale = 1 + reactive * 0.1;
 
   // Palette per state
   const palette = isUser
@@ -104,7 +104,7 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
       onTouchEnd={(e) => { e.preventDefault(); onRelease?.(); }}
       className="relative outline-none select-none touch-none"
       aria-label="Push to talk"
-      style={{ width: 280, height: 280 }}
+      style={{ width: "clamp(210px, 42dvh, 280px)", height: "clamp(210px, 42dvh, 280px)" }}
     >
       {/* Soft ambient halo */}
       <span
@@ -112,7 +112,7 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{
           background: `radial-gradient(circle at 50% 50%, hsl(${palette.glow} / 0.30), transparent 65%)`,
-          transform: `scale(${1 + reactive * 0.35})`,
+            transform: `scale(${1 + reactive * 0.18})`,
           transition: "transform 120ms ease-out, background 400ms ease",
         }}
       />
@@ -128,8 +128,8 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
 
       {/* User amplitude rings — expand outward with voice */}
       {isUser && rings.map((threshold, i) => {
-        const v = Math.max(0, userLevel - threshold);
-        const s = 1 + v * 1.4 + i * 0.06;
+        const v = Math.min(0.72, Math.max(0, userLevel - threshold));
+        const s = 1 + v * 0.58 + i * 0.035;
         const op = Math.max(0, 0.55 - i * 0.12) * (v > 0 ? 1 : 0.2);
         return (
           <span
