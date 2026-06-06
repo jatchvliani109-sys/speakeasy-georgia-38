@@ -167,11 +167,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
           transition: isUser || isAi
             ? "transform 80ms ease-out, box-shadow 160ms ease-out, border-radius 600ms ease-in-out"
             : "transform 700ms ease-in-out, box-shadow 500ms ease, border-radius 800ms ease",
-          background: isAi
-            ? `radial-gradient(circle at 32% 28%, hsl(185 95% 75%), hsl(195 85% 48%) 50%, hsl(210 70% 18%) 100%)`
-            : isUser
-            ? `radial-gradient(circle at 30% 28%, hsl(48 100% 78%), hsl(33 95% 55%) 50%, hsl(20 70% 22%) 100%)`
-            : `radial-gradient(circle at 30% 28%, hsl(48 100% 72%), hsl(38 90% 52%) 55%, hsl(25 60% 20%) 100%)`,
+          background: `radial-gradient(circle at 30% 28%, hsl(48 100% 75%), hsl(38 92% 52%) 52%, hsl(25 65% 20%) 100%)`,
           boxShadow: glow,
           borderRadius: isAi ? "50% 48% 52% 46% / 46% 52% 48% 54%" : "50%",
           animation: isAi
@@ -181,7 +177,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
             : "none",
         }}
       >
-        {/* AI flowing inner shimmer (lava-lamp feel) */}
+        {/* AI flowing inner shimmer (lava-lamp feel) — gold tones */}
         {isAi && (
           <>
             <span
@@ -189,7 +185,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
               className="absolute -inset-4"
               style={{
                 background:
-                  "conic-gradient(from 0deg, transparent, hsl(180 90% 80% / 0.5), transparent 35%, hsl(200 95% 70% / 0.45), transparent 65%, hsl(170 90% 75% / 0.4), transparent)",
+                  "conic-gradient(from 0deg, transparent, hsl(48 100% 80% / 0.5), transparent 35%, hsl(38 95% 65% / 0.45), transparent 65%, hsl(45 100% 75% / 0.4), transparent)",
                 animation: "spin 5s linear infinite",
                 mixBlendMode: "screen",
                 filter: "blur(6px)",
@@ -200,7 +196,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
               className="absolute -inset-2"
               style={{
                 background:
-                  "radial-gradient(60% 40% at 30% 70%, hsl(180 90% 80% / 0.55), transparent 70%), radial-gradient(50% 35% at 70% 30%, hsl(200 90% 70% / 0.5), transparent 70%)",
+                  "radial-gradient(60% 40% at 30% 70%, hsl(48 100% 80% / 0.55), transparent 70%), radial-gradient(50% 35% at 70% 30%, hsl(38 95% 65% / 0.5), transparent 70%)",
                 animation: "mb-flow 3.6s ease-in-out infinite",
                 mixBlendMode: "screen",
                 filter: "blur(4px)",
