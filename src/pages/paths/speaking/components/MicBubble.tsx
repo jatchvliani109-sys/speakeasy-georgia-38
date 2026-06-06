@@ -104,7 +104,7 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
       onTouchEnd={(e) => { e.preventDefault(); onRelease?.(); }}
       className="relative outline-none select-none touch-none"
       aria-label="Push to talk"
-      style={{ width: "clamp(210px, 42dvh, 280px)", height: "clamp(210px, 42dvh, 280px)" }}
+      style={{ width: "clamp(210px, min(42dvh, 62vw), 280px)", height: "clamp(210px, min(42dvh, 62vw), 280px)" }}
     >
       {/* Soft ambient halo */}
       <span
@@ -129,7 +129,7 @@ export default function MicBubble({ state, micStream, aiStream, onPress, onRelea
       {/* User amplitude rings — expand outward with voice */}
       {isUser && rings.map((threshold, i) => {
         const v = Math.min(0.72, Math.max(0, userLevel - threshold));
-        const s = 1 + v * 0.58 + i * 0.035;
+        const s = 1 + v * 0.36 + i * 0.025;
         const op = Math.max(0, 0.55 - i * 0.12) * (v > 0 ? 1 : 0.2);
         return (
           <span
