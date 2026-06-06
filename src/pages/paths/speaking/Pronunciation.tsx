@@ -91,8 +91,8 @@ export default function Pronunciation() {
               />
             </div>
           </div>
-          <div className="mt-4 text-[11px] ka text-[hsl(40_91%_85%)]">
-            🎤 თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
+          <div className="mt-4 text-[11px] ka text-[hsl(40_91%_85%)] flex items-center gap-1.5">
+            <Headphones className="w-3.5 h-3.5" /> თითოეულ ფრაზაზე შეგიძლია ჩაწერო შენი ხმა და მიიღო მარტივი უკუკავშირი.
           </div>
         </section>
 

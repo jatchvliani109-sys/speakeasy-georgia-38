@@ -883,7 +883,9 @@ function SummaryScreen({
     <SpeakingShell>
       <div className="max-w-md mx-auto space-y-4">
         <div className="sp-card-hero p-6 text-center sp-pop-in">
-          <div className="text-3xl mb-2">🎉</div>
+          <div className="mx-auto w-12 h-12 rounded-full bg-[hsl(41_100%_55%)] text-[hsl(31_53%_12%)] flex items-center justify-center mb-3">
+            <Sparkles className="w-6 h-6" />
+          </div>
           <h1 className="text-xl font-extrabold sp-text ka">სესია დასრულებულია</h1>
           <p className="text-sm sp-text ka mt-2">
             {summary.encouragement_ka || getEncouragementKa(dailySeed())}
