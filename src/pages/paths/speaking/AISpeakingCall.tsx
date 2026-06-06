@@ -125,7 +125,13 @@ export default function AISpeakingCall() {
         <div className="max-w-md mx-auto space-y-5">
           <header className="flex items-center gap-3">
             <button
-              onClick={() => setStep("setup")}
+              onClick={() => {
+                if (searchParams.get("scenario")) {
+                  navigate("/path/speaking");
+                } else {
+                  setStep("setup");
+                }
+              }}
               className="w-9 h-9 rounded-full sp-chip inline-flex items-center justify-center"
               aria-label="Back"
             >
