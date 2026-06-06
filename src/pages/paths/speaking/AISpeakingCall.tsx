@@ -757,15 +757,15 @@ function CallScreen({
 }
 
 function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; text: string; faded?: boolean }) {
+  const isUser = role === "user";
   return (
-    <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
-      <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-        role === "assistant" ? "text-[hsl(28_55%_30%)]" : "text-[hsl(33_75%_28%)]"
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} ${faded ? "opacity-60" : ""} animate-fade-in`}>
+      <div className={`max-w-[85%] text-[13px] leading-snug whitespace-pre-wrap break-words ${
+        isUser
+          ? "text-amber-50 text-right"
+          : "text-amber-100/55 text-left italic"
       }`}>
-        {role === "assistant" ? "AI" : "You"}
-      </span>
-      <div className="flex-1 min-w-0">
-        <div className="sp-text whitespace-pre-wrap break-words">{text}</div>
+        {text}
       </div>
     </div>
   );
