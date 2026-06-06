@@ -61,10 +61,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   const aiBufRef = useRef<Map<string, string>>(new Map());
   const userBufRef = useRef<Map<string, string>>(new Map());
 
-  const setStatusSafe = useCallback((s: RtStatus) => {
-    statusRef.current = s;
-    setStatus(s);
-  }, []);
+  useEffect(() => { statusRef.current = status; }, [status]);
 
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
