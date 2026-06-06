@@ -13,9 +13,20 @@ const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
 const PRIMARY_MODEL = "gpt-realtime-mini";
 const FALLBACK_MODEL = "gpt-realtime-2";
 
-function instructionsFor(level: string, topic: string) {
-  // Short prompt. Be lenient — don't ask user to repeat unless truly unintelligible.
-  return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
+type Tier = "easy" | "medium" | "hard";
+
+function tierGuidance(tier: Tier): string {
+  if (tier === "easy") {
+    return "DIFFICULTY: EASY. Use A1 vocabulary only. Short sentences (max 8 words). Speak slowly and clearly. Be very patient. Confirm understanding often. Ask one simple yes/no or short-answer question at a time. If the learner pauses, gently offer a hint.";
+  }
+  if (tier === "medium") {
+    return "DIFFICULTY: MEDIUM. Use B1 vocabulary. Natural conversational pace with multi-clause sentences (10-15 words). Occasionally ask follow-up questions. Light, friendly corrections inline. Avoid idioms unless common.";
+  }
+  return "DIFFICULTY: HARD. Use B2/C1 vocabulary. Native conversational pace. Include idioms and unexpected topic pivots. Push the learner with opinion questions and hypotheticals. No hand-holding — assume strong comprehension.";
+}
+
+function instructionsFor(level: string, topic: string, tier: Tier) {
+  return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. ${tierGuidance(tier)} Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
 }
 
 Deno.serve(async (req) => {
@@ -32,8 +43,10 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const topic = String(body?.topic ?? "Free conversation").slice(0, 120);
     const level = String(body?.level ?? "Beginner").slice(0, 40);
+    const tierRaw = String(body?.tier ?? "easy").toLowerCase();
+    const tier: Tier = tierRaw === "hard" ? "hard" : tierRaw === "medium" ? "medium" : "easy";
     const voice = "alloy";
-    const instructions = instructionsFor(level, topic);
+    const instructions = instructionsFor(level, topic, tier);
 
     async function createClientSecret(model: string) {
       const res = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
