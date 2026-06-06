@@ -188,13 +188,33 @@ try {
   console.warn("[rt] AI amplitude analyser failed", e);
 }
 
+    const MIN_SPEAKING_HOLD_MS = 600;
+    const STOP_DEBOUNCE_MS = 800;
     const markAiSpeaking = () => {
       if (endedRef.current) return;
-      if (statusRef.current !== "listening") setRtStatus("ai_speaking");
+      if (aiStopTimerRef.current) {
+        window.clearTimeout(aiStopTimerRef.current);
+        aiStopTimerRef.current = null;
+      }
+      if (statusRef.current !== "ai_speaking" && statusRef.current !== "listening") {
+        aiSpeakingSinceRef.current = Date.now();
+        setRtStatus("ai_speaking");
+      } else if (statusRef.current === "ai_speaking" && aiSpeakingSinceRef.current === 0) {
+        aiSpeakingSinceRef.current = Date.now();
+      }
     };
     const markAiStopped = () => {
       if (endedRef.current || statusRef.current !== "ai_speaking") return;
-      setRtStatus(responseActiveRef.current ? "thinking" : "ready");
+      if (aiStopTimerRef.current) return; // already pending
+      const elapsed = Date.now() - (aiSpeakingSinceRef.current || 0);
+      const holdRemaining = Math.max(0, MIN_SPEAKING_HOLD_MS - elapsed);
+      const delay = Math.max(STOP_DEBOUNCE_MS, holdRemaining);
+      aiStopTimerRef.current = window.setTimeout(() => {
+        aiStopTimerRef.current = null;
+        if (endedRef.current || statusRef.current !== "ai_speaking") return;
+        aiSpeakingSinceRef.current = 0;
+        setRtStatus(responseActiveRef.current ? "thinking" : "ready");
+      }, delay);
     };
 
     remoteStream.getAudioTracks().forEach((track) => {
