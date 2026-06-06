@@ -122,7 +122,25 @@ export default function BusinessHome() {
       });
       setVocabWordCount(vocabWords.count ?? 0);
 
-      // Plan a preview of today's vocab session for the dashboard card.
+      // Last reassessment + phrase count (used in milestone celebration).
+      try {
+        const { data: ra } = await supabase
+          .from("business_reassessments")
+          .select("created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!cancelled) setLastReassessmentAt(ra?.created_at ?? null);
+      } catch {}
+      try {
+        const [{ count: emailPhr }, { count: intPhr }, { count: meetPhr }] = await Promise.all([
+          supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+          supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+          supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+        ]);
+        if (!cancelled) setPhraseCount((emailPhr ?? 0) + (intPhr ?? 0) + (meetPhr ?? 0));
+      } catch {}
       try {
         const vp = await loadProgress(user.id);
         if (!cancelled) {
