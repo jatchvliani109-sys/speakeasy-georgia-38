@@ -259,7 +259,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));
 
-      const dc = pc.createDataChannel("oai-events");
+      const dc = pc.createDataChannel("inworld-events");
       dcRef.current = dc;
       dc.onmessage = (e) => {
         try { handleServerEvent(JSON.parse(e.data)); } catch (err) { console.warn("[rt] parse fail", err); }
