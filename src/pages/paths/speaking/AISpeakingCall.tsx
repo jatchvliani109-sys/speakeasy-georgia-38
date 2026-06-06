@@ -750,7 +750,7 @@ function TranscriptLine({ role, text, faded }: { role: "user" | "assistant"; tex
   return (
     <div className={`flex gap-2 ${faded ? "opacity-60" : ""}`}>
       <span className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 shrink-0 ${
-        role === "assistant" ? "text-[hsl(265_50%_45%)]" : "text-[hsl(33_75%_28%)]"
+        role === "assistant" ? "text-[hsl(28_55%_30%)]" : "text-[hsl(33_75%_28%)]"
       }`}>
         {role === "assistant" ? "AI" : "You"}
       </span>
