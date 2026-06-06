@@ -79,6 +79,8 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     responseActiveRef.current = false;
     startingRef.current = false;
     setMicOn(false);
+    setMicStream(null);
+    setAiStream(null);
   }, []);
 
   const stop = useCallback(() => {
