@@ -305,6 +305,94 @@ export default function BusinessHome() {
 
       {plan && (
         <>
+          {/* Level Assessment button — visible near level display */}
+          <section className="mb-5">
+            <button
+              onClick={() => navigate("/path/business/reassessment")}
+              className="w-full text-left bg-white border-2 border-[#E7E2D5] hover:border-[#1E2A44]/40 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-2xl shrink-0">📊</div>
+                <div className="flex-1 min-w-0">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+                    შენი მიმდინარე დონე
+                  </p>
+                  <p className="ka font-bold text-[#1E2A44] text-base mt-0.5">
+                    {LEVEL_LABELS[plan.level]}
+                  </p>
+                  <p className="ka text-[11px] text-[#5B6473] mt-0.5">
+                    ბოლო შეფასება: {lastReassessmentLabel}
+                  </p>
+                </div>
+                <span className="ka inline-flex items-center gap-1 text-xs font-semibold text-[#1E2A44] bg-[#FAF7F0] border border-[#E7E2D5] rounded-xl px-3 py-2 shrink-0">
+                  დონის შეფასება →
+                </span>
+              </div>
+            </button>
+          </section>
+
+          {/* Milestone celebration — all 4 modules at 7+ sessions */}
+          {showMilestone && (
+            <section className="mb-5 animate-fade-in">
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F766E] to-[#1E2A44] text-[#F7F1E3] p-6 shadow-[0_12px_32px_-12px_rgba(15,118,110,0.5)]">
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#C9A227]/20 blur-2xl pointer-events-none" />
+                <div className="absolute top-3 right-4 text-3xl animate-fade-in">🎉</div>
+                <div className="relative">
+                  <span className="ka text-[10px] uppercase tracking-wider bg-[#C9A227]/25 text-[#F2D680] px-2 py-1 rounded-md font-semibold">
+                    მიღწევა განბლოკილია
+                  </span>
+                  <h2 className="ka text-xl font-bold mt-3">
+                    გილოცავ — დაასრულე პირველი დონე! 🏅
+                  </h2>
+                  <p className="ka text-sm text-[#F7F1E3]/85 mt-2 leading-relaxed">
+                    შენ შეასრულე 7+ სესია ოთხივე მოდულში. ეს სერიოზული ნაბიჯია.
+                  </p>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-[#F7F1E3]/10 rounded-xl px-2 py-3">
+                      <div className="text-xl font-bold">
+                        {emailsCount + interviewCount + meetingsCount + vocabSessionsCount}
+                      </div>
+                      <div className="ka text-[10px] text-[#F7F1E3]/70 mt-0.5">სესია</div>
+                    </div>
+                    <div className="bg-[#F7F1E3]/10 rounded-xl px-2 py-3">
+                      <div className="text-xl font-bold">{vocabWordCount}</div>
+                      <div className="ka text-[10px] text-[#F7F1E3]/70 mt-0.5">სიტყვა</div>
+                    </div>
+                    <div className="bg-[#F7F1E3]/10 rounded-xl px-2 py-3">
+                      <div className="text-xl font-bold">{phraseCount}</div>
+                      <div className="ka text-[10px] text-[#F7F1E3]/70 mt-0.5">ფრაზა</div>
+                    </div>
+                  </div>
+                  <p className="ka text-sm font-semibold text-[#F2D680] mt-4">
+                    შეამოწმე რამდენად გაიზარდე — გაიარე ხელახალი შეფასება
+                  </p>
+                  <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={() => {
+                        if (user) saveBusiness(user.id, { firstMilestoneAcknowledged: true });
+                        navigate("/path/business/reassessment");
+                      }}
+                      className="ka inline-flex items-center justify-center gap-2 bg-[#C9A227] text-[#1E2A44] hover:bg-[#D8B547] transition-colors px-5 py-3 rounded-xl font-bold text-sm"
+                    >
+                      ხელახალი შეფასების დაწყება →
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (user) {
+                          const next = saveBusiness(user.id, { firstMilestoneAcknowledged: true });
+                          setS(next);
+                        }
+                      }}
+                      className="ka inline-flex items-center justify-center px-5 py-3 rounded-xl text-sm font-semibold text-[#F7F1E3]/80 hover:text-[#F7F1E3] border border-[#F7F1E3]/20 hover:border-[#F7F1E3]/40 transition-colors"
+                    >
+                      მოგვიანებით
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* 2. Today's Focus */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
