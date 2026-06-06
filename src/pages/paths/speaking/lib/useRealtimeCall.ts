@@ -52,6 +52,8 @@ const aiRafRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const aiAudioCheckRef = useRef<number | null>(null);
   const aiAudioTimeRef = useRef(0);
+  const aiStopTimerRef = useRef<number | null>(null);
+  const aiSpeakingSinceRef = useRef<number>(0);
   const endedRef = useRef(false);
   const responseActiveRef = useRef(false);
   const greetedRef = useRef(false);
@@ -78,6 +80,11 @@ const clearAiAudioMonitor = useCallback(() => {
       cancelAnimationFrame(aiRafRef.current);
       aiRafRef.current = null;
     }
+    if (aiStopTimerRef.current) {
+      window.clearTimeout(aiStopTimerRef.current);
+      aiStopTimerRef.current = null;
+    }
+    aiSpeakingSinceRef.current = 0;
     try { aiAudioCtxRef.current?.close(); } catch {}
     aiAudioCtxRef.current = null;
     aiAudioTimeRef.current = 0;
