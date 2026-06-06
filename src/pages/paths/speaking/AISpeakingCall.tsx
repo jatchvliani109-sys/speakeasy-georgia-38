@@ -634,16 +634,16 @@ function CallScreen({
           background: "linear-gradient(to top, hsl(20 25% 4% / 0.95) 30%, hsl(20 25% 4% / 0.6) 75%, transparent)",
         }}
       >
-        <div className="mx-auto max-w-md relative rounded-2xl bg-black/55 backdrop-blur-md border border-white/10 shadow-[0_-10px_40px_-12px_rgba(0,0,0,0.7)]">
-          {/* Top fade indicating more above */}
+        <div className="mx-auto max-w-md relative rounded-2xl bg-black/55 backdrop-blur-md border border-white/10 shadow-[0_-10px_40px_-12px_rgba(0,0,0,0.7)] overflow-hidden">
+          {/* Top fade indicating more above — sits above scroll content but doesn't shift it */}
           <div
             aria-hidden
-            className="pointer-events-none absolute top-0 left-0 right-0 h-8 rounded-t-2xl z-10"
-            style={{ background: "linear-gradient(to bottom, hsl(0 0% 0% / 0.7), transparent)" }}
+            className="pointer-events-none absolute top-0 left-0 right-0 h-6 z-10"
+            style={{ background: "linear-gradient(to bottom, hsl(0 0% 0% / 0.55), transparent)" }}
           />
           <div
             ref={transcriptRef}
-            className="h-[150px] overflow-y-auto space-y-2.5 px-4 py-3 scroll-smooth"
+            className="h-[160px] overflow-y-auto space-y-2.5 px-4 pt-6 pb-6 scroll-smooth"
           >
             {visibleMessages.length === 0 && !partial.ai && !partial.user && (
               <p className="text-center text-[12px] ka text-amber-100/40 py-10">
@@ -654,6 +654,8 @@ function CallScreen({
               <TranscriptLine key={i} role={m.role} text={m.content} />
             ))}
             {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
+            {/* Bottom spacer so last message clears the container edge */}
+            <div aria-hidden className="h-2" />
           </div>
         </div>
       </div>
