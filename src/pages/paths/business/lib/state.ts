@@ -217,11 +217,13 @@ export const LEVEL_LABELS: Record<BusinessLevel, string> = {
 
 // Modules
 
+import { Briefcase, Mail, Users, BookOpen, type LucideIcon } from "lucide-react";
+
 export type BusinessModule = {
   slug: string;
   title: string;
   description: string;
-  icon: string;
+  icon: LucideIcon;
 };
 
 export const BUSINESS_MODULES: BusinessModule[] = [
@@ -229,25 +231,25 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     slug: "interview",
     title: "გასაუბრება",
     description: "ივარჯიშე გავრცელებულ კითხვებზე და გააუმჯობესე პასუხები.",
-    icon: "🤝",
+    icon: Briefcase,
   },
   {
     slug: "emails",
     title: "იმეილები და პროფესიული წერა",
     description: "დაწერე უფრო სწორი, თავაზიანი და პროფესიული იმეილები.",
-    icon: "📨",
+    icon: Mail,
   },
   {
     slug: "meetings",
     title: "შეხვედრები და სამუშაო კომუნიკაცია",
     description: "ისწავლე როგორ გამოთქვა აზრი, დასვა კითხვა და ჩაერთო სამუშაო საუბარში.",
-    icon: "🗓️",
+    icon: Users,
   },
   {
     slug: "vocabulary",
     title: "ბიზნეს ლექსიკა",
     description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
-    icon: "📚",
+    icon: BookOpen,
   },
 ];
 
