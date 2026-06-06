@@ -505,18 +505,18 @@ function CallScreen({
         {/* AI Tutor area */}
         <div className="flex-1 flex flex-col items-center justify-start pt-4">
           <div
-            className={`relative w-32 h-32 rounded-full flex items-center justify-center text-5xl shrink-0 transition-transform ${
+            className={`relative w-32 h-32 rounded-full flex items-center justify-center shrink-0 transition-transform ${
               status === "ai_speaking" ? "sp-recording" : ""
             }`}
             style={{
               background:
-                "linear-gradient(135deg, hsl(265 70% 55%), hsl(210 70% 45%) 60%, hsl(33 69% 45%))",
-              boxShadow: "0 12px 40px -10px hsl(220 50% 30% / 0.45)",
+                "linear-gradient(135deg, hsl(41 100% 55%), hsl(33 80% 45%) 60%, hsl(28 60% 25%))",
+              boxShadow: "0 12px 40px -10px hsl(31 60% 18% / 0.45)",
             }}
           >
-            <span aria-hidden>🎙️</span>
+            <Mic className="w-12 h-12 text-[hsl(40_91%_96%)]" aria-hidden />
             {(status === "thinking" || status === "connecting") && (
-              <span className="absolute inset-0 rounded-full border-4 border-white/40 border-t-transparent animate-spin" />
+              <span className="absolute inset-0 rounded-full border-4 border-[hsl(40_91%_96%)]/40 border-t-transparent animate-spin" />
             )}
           </div>
 
