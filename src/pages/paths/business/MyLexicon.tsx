@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { BookOpen, Briefcase, ChevronDown, Library, Mail, Users } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -48,9 +49,9 @@ function formatKaDate(iso: string | null): string {
 
 // ---------- Words tab labels ----------
 const LABELS = [
-  { id: "easy", emoji: "🟢", label: "ადვილი" },
-  { id: "okay", emoji: "🟡", label: "საშუალო" },
-  { id: "difficult", emoji: "🔴", label: "რთული" },
+  { id: "easy", dot: "#10B981", label: "ადვილი" },
+  { id: "okay", dot: "#C9A84C", label: "საშუალო" },
+  { id: "difficult", dot: "#DC2626", label: "რთული" },
 ] as const;
 
 type TabKey = "phrases" | "words";
