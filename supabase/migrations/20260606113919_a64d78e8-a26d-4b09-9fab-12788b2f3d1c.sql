@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.speaking_scenario_progress TO authenticated; GRANT ALL ON public.speaking_scenario_progress TO service_role;
