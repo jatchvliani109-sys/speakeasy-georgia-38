@@ -281,7 +281,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
     setErrorMsg(null);
     endedRef.current = false;
     greetedRef.current = false;
-    setStatus("connecting");
+    setRtStatus("connecting");
     dlog("creating realtime session");
 
     let mic: MediaStream;
@@ -332,58 +332,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         const remoteStream = e.streams[0];
         audioEl.srcObject = remoteStream;
         audioEl.play().catch((err) => console.warn("[rt] audio play blocked", err));
-
-        // Build an analyser-friendly stream via Web Audio. Routing the <audio>
-        // element through a MediaElementSource gives reliable amplitude data on
-        // remote WebRTC tracks (Chrome's createMediaStreamSource often returns
-        // silent buffers for remote tracks).
-        try {
-          const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-          const ctx = audioCtxRef.current ?? new AC();
-          audioCtxRef.current = ctx;
-          if (ctx.state === "suspended") ctx.resume().catch(() => {});
-
-          const src = ctx.createMediaElementSource(audioEl);
-          const analyser = ctx.createAnalyser();
-          analyser.fftSize = 1024;
-          analyser.smoothingTimeConstant = 0.7;
-          const dest = ctx.createMediaStreamDestination();
-          src.connect(analyser);
-          src.connect(dest);
-          src.connect(ctx.destination); // keep audible playback
-          aiAnalyserRef.current = analyser;
-          setAiStream(dest.stream);
-
-          const buf = new Uint8Array(analyser.fftSize);
-          const tick = () => {
-            const a = aiAnalyserRef.current;
-            if (!a) return;
-            a.getByteTimeDomainData(buf);
-            let sum = 0;
-            for (let i = 0; i < buf.length; i++) {
-              const v = (buf[i] - 128) / 128;
-              sum += v * v;
-            }
-            const rms = Math.sqrt(sum / buf.length);
-            const now = performance.now();
-            if (rms > 0.012) {
-              aiSilentSinceRef.current = now;
-              const s = statusRef.current;
-              if (s === "ready" || s === "thinking" || s === "listening") {
-                setStatus("ai_speaking");
-              }
-            } else if (statusRef.current === "ai_speaking") {
-              if (now - aiSilentSinceRef.current > 450) {
-                setStatus(responseActiveRef.current ? "thinking" : "ready");
-              }
-            }
-            aiRafRef.current = requestAnimationFrame(tick);
-          };
-          aiRafRef.current = requestAnimationFrame(tick);
-        } catch (err) {
-          console.warn("[rt] AI analyser setup failed, falling back to raw stream", err);
-          setAiStream(remoteStream);
-        }
+        startAiAudioMonitor(audioEl, remoteStream);
       };
 
       mic.getTracks().forEach((t) => pc.addTrack(t, mic));
