@@ -37,7 +37,9 @@ const dlog = (...a: any[]) => { if (DEBUG) console.log("[rt]", ...a); };
 export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEvent, onError }: Args) {
   const [status, setStatus] = useState<RtStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+  const [micStream, setMicStream] = useState<MediaStream | null>(null);
+  const [aiStream, setAiStream] = useState<MediaStream | null>(null);
+
   const [micOn, setMicOn] = useState(false);
   const startingRef = useRef(false);
 
