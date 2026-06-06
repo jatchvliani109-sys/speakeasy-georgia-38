@@ -170,7 +170,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       const previousTime = aiAudioTimeRef.current;
       const currentTime = audioEl.currentTime || 0;
       const isAdvancing = currentTime > previousTime + 0.005;
-      const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+      const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.readyState >= audioEl.HAVE_CURRENT_DATA;
       aiAudioTimeRef.current = currentTime;
 
       if ((responseActiveRef.current || statusRef.current === "ai_speaking") && isPlaying && isAdvancing) markAiSpeaking();
