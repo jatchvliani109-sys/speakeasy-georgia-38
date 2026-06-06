@@ -730,16 +730,17 @@ function ResumeImproveFlow({
         resumeText,
         jobDescription,
       });
-      const formatted = formatResumeImprove(r);
+      const rewritten: string = (r.rewrittenResume || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "resume_improve",
-        title: r.title || "რეზიუმეს გაუმჯობესება",
-        content: formatted,
+        title: r.title || "გაუმჯობესებული რეზიუმე",
+        content: rewritten || resumeText,
         meta: {
+          summaryKa: r.content,
           toneAssessmentKa: r.toneAssessmentKa,
           missingKeywords: r.missingKeywords,
           suggestions: r.suggestions,
-          summary: r.content,
+          originalResume: resumeText,
         },
         inputs: { jobDescription },
         highlights: [],
@@ -751,6 +752,7 @@ function ResumeImproveFlow({
       setLoading(false);
     }
   };
+
 
   return (
     <div>
@@ -829,7 +831,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
     setLoading(true);
     try {
       const r = await callDocs({ action: "bio_write", profile, purpose, tone });
-      const formatted = `📌 SHORT\n${r.short || ""}\n\n📌 MEDIUM\n${r.medium || ""}\n\n📌 FULL\n${r.full || ""}`;
+      const formatted = (r.medium || r.short || r.full || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "bio",
         title: r.title || `პროფესიული ბიო — ${purpose}`,
@@ -932,6 +934,8 @@ function DocView({
 
   const isResumeImprove = doc.doc_type === "resume_improve";
   const subject = (doc.meta as any)?.subject;
+  const resumeMeta = isResumeImprove ? ((doc.meta as any) || {}) : null;
+
 
   return (
     <>
@@ -968,22 +972,93 @@ function DocView({
         </p>
       )}
 
-      {/* Document */}
-      <article className="bg-white border border-[#E7E2D5] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
-        {editing ? (
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={20}
-            className="w-full text-sm font-serif leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none"
-          />
-        ) : (
-          <div
-            className={`text-sm leading-relaxed text-[#1E2A44] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
-            dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
-          />
-        )}
-      </article>
+      {/* Resume Improve: recommendations FIRST */}
+      {isResumeImprove && !editing && resumeMeta && (
+        <section className="mb-4 space-y-3">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold px-1">
+            რეკომენდაციები
+          </p>
+          {resumeMeta.summaryKa && (
+            <BizCard className="bg-[#F0F7F4] border-[#CDE3D8]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#0F766E] font-semibold mb-1">შეჯამება</p>
+              <p className="ka text-xs text-[#1E2A44] leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
+            </BizCard>
+          )}
+          {resumeMeta.toneAssessmentKa && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">ტონი</p>
+              <p className="ka text-xs text-[#1E2A44] leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
+            </BizCard>
+          )}
+          {Array.isArray(resumeMeta.missingKeywords) && resumeMeta.missingKeywords.length > 0 && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">Keywords რომელიც აკლია</p>
+              <div className="flex flex-wrap gap-1.5">
+                {resumeMeta.missingKeywords.map((k: string, i: number) => (
+                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-[#FFF6D1] text-[#1E2A44] border border-[#F2E6B0]">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </BizCard>
+          )}
+          {Array.isArray(resumeMeta.suggestions) && resumeMeta.suggestions.length > 0 && (
+            <BizCard>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2">Before / After</p>
+              <ul className="space-y-3">
+                {resumeMeta.suggestions.map((s: any, i: number) => (
+                  <li key={i} className="border-t border-[#E7E2D5] first:border-t-0 pt-3 first:pt-0">
+                    {s.sectionKa && <p className="ka text-xs font-semibold text-[#1E2A44]">{s.sectionKa}</p>}
+                    {s.issueKa && <p className="ka text-[11px] text-[#5B6473] mt-1">{s.issueKa}</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                      {s.before && (
+                        <div className="bg-[#FEF3E2] rounded-md px-2 py-1.5 text-[11px]">
+                          <span className="ka font-semibold text-[#B45309]">Before: </span>
+                          <span className="text-[#1E2A44]">{s.before}</span>
+                        </div>
+                      )}
+                      {s.after && (
+                        <div className="bg-[#ECFDF5] rounded-md px-2 py-1.5 text-[11px]">
+                          <span className="ka font-semibold text-[#0F766E]">After: </span>
+                          <span className="text-[#1E2A44]">{s.after}</span>
+                        </div>
+                      )}
+                    </div>
+                    {s.whyKa && <p className="ka text-[11px] text-[#5B6473] mt-2">↳ {s.whyKa}</p>}
+                  </li>
+                ))}
+              </ul>
+            </BizCard>
+          )}
+        </section>
+      )}
+
+      {isResumeImprove && !editing && (
+        <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-2 px-1">
+          გაუმჯობესებული რეზიუმე
+        </p>
+      )}
+
+      {/* Document — hidden for bio (BioVersions covers all three) */}
+      {!(doc.doc_type === "bio" && !editing) && (
+        <article className="bg-white border border-[#E7E2D5] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
+          {editing ? (
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={isResumeImprove ? 30 : 20}
+              className={`w-full text-sm leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
+            />
+          ) : (
+            <div
+              className={`text-sm leading-relaxed text-[#1E2A44] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
+              dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
+            />
+          )}
+        </article>
+      )}
+
+
 
       {/* Email Fix: before/after + changes */}
       {doc.doc_type === "email_fix" && !editing && (() => {
@@ -1044,27 +1119,11 @@ function DocView({
       })()}
 
 
-      {/* Bio versions quick pick */}
+      {/* Bio versions — each with copy + edit */}
       {doc.doc_type === "bio" && !editing && (
-        <div className="flex gap-2 mt-3 flex-wrap">
-          {(["short", "medium", "full"] as const).map((v) => {
-            const text = (doc.meta as any)?.[v];
-            if (!text) return null;
-            return (
-              <button
-                key={v}
-                onClick={() => {
-                  navigator.clipboard.writeText(text);
-                  toast({ title: `${v} ვერსია კოპირებულია` });
-                }}
-                className="ka text-xs px-3 py-1.5 rounded-full border border-[#E7E2D5] hover:border-[#1E2A44]/40 text-[#1E2A44]"
-              >
-                📋 {v}
-              </button>
-            );
-          })}
-        </div>
+        <BioVersions doc={doc} onUpdated={onUpdated} />
       )}
+
 
       {/* Highlights legend */}
       {doc.highlights?.length > 0 && !editing && (
@@ -1190,3 +1249,104 @@ function Footer({ onBack, onNext, disabled }: { onBack: () => void; onNext: () =
     </div>
   );
 }
+
+/* ---------- Bio versions (copy + edit per version) ---------- */
+function BioVersions({
+  doc,
+  onUpdated,
+}: {
+  doc: BusinessDocument;
+  onUpdated: (d: BusinessDocument) => void;
+}) {
+  const meta = (doc.meta as any) || {};
+  const [editingKey, setEditingKey] = useState<null | "short" | "medium" | "full">(null);
+  const [draft, setDraft] = useState("");
+
+  const labels: Record<"short" | "medium" | "full", string> = {
+    short: "მოკლე",
+    medium: "საშუალო",
+    full: "სრული",
+  };
+
+  const startEdit = (k: "short" | "medium" | "full") => {
+    setDraft(meta[k] || "");
+    setEditingKey(k);
+  };
+
+  const saveDraft = async () => {
+    if (!editingKey) return;
+    const newMeta = { ...meta, [editingKey]: draft };
+    const newContent = (newMeta.medium || newMeta.short || newMeta.full || "").trim();
+    await updateDocument(doc.id, { meta: newMeta, content: newContent });
+    onUpdated({ ...doc, meta: newMeta, content: newContent });
+    setEditingKey(null);
+    toast({ title: "შენახულია" });
+  };
+
+  return (
+    <section className="mt-5 space-y-3">
+      <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold px-1">
+        სამი ვერსია
+      </p>
+      {(["short", "medium", "full"] as const).map((k) => {
+        const text: string = meta[k] || "";
+        if (!text && editingKey !== k) return null;
+        const isEditing = editingKey === k;
+        return (
+          <BizCard key={k}>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <p className="ka text-xs font-semibold text-[#1E2A44]">{labels[k]}</p>
+              <div className="flex gap-2">
+                {!isEditing && (
+                  <>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(text);
+                        toast({ title: `${labels[k]} ვერსია კოპირებულია` });
+                      }}
+                      className="ka text-[11px] font-semibold bg-[#1E2A44] text-[#F7F1E3] px-2.5 py-1.5 rounded-lg hover:bg-[#15203A]"
+                    >
+                      📋 კოპირება
+                    </button>
+                    <button
+                      onClick={() => startEdit(k)}
+                      className="ka text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E7E2D5] hover:border-[#1E2A44]/40 text-[#1E2A44]"
+                    >
+                      ✏️ რედაქტირება
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            {isEditing ? (
+              <>
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={k === "full" ? 10 : k === "medium" ? 6 : 4}
+                  className="w-full rounded-xl border border-[#E7E2D5] bg-white px-3 py-2 text-sm font-serif text-[#1E2A44] focus:outline-none focus:border-[#1E2A44]"
+                />
+                <div className="flex justify-end gap-2 mt-2">
+                  <BizButton variant="ghost" onClick={() => setEditingKey(null)}>გაუქმება</BizButton>
+                  <BizButton onClick={saveDraft}>შენახვა</BizButton>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(draft);
+                      toast({ title: "კოპირებულია" });
+                    }}
+                    className="ka text-xs font-semibold bg-[#1E2A44] text-[#F7F1E3] px-3 py-2 rounded-xl hover:bg-[#15203A]"
+                  >
+                    📋 კოპირება
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm font-serif text-[#1E2A44] whitespace-pre-wrap leading-relaxed">{text}</p>
+            )}
+          </BizCard>
+        );
+      })}
+    </section>
+  );
+}
+
