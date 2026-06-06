@@ -70,6 +70,7 @@ const App = () => (
             <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
             <Route path="/path/business/lexicon" element={<RequireAuth><MyLexicon /></RequireAuth>} />
+            <Route path="/path/business/reassessment" element={<RequireAuth><BusinessReassessment /></RequireAuth>} />
             <Route path="/path/business/dictionary" element={<Navigate to="/path/business/lexicon?tab=phrases" replace />} />
             <Route path="/path/business/vocabulary/notebook" element={<Navigate to="/path/business/lexicon?tab=words" replace />} />
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
