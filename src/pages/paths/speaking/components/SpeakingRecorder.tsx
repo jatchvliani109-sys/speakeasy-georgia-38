@@ -318,7 +318,7 @@ export default function SpeakingRecorder({
             </div>
           </div>
           <div className="mt-2.5 pt-2.5 border-t border-[hsl(40_30%_88%)] text-sm ka sp-text flex items-start gap-2">
-            <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(175 60% 38%)" }} />
+            <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(33 69% 45%)" }} />
             <span>{feedback}</span>
           </div>
           {missing.length > 0 && (

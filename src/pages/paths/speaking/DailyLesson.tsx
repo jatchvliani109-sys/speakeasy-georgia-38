@@ -636,7 +636,7 @@ export default function DailyLesson() {
                       <div className="text-sm sp-text mt-0.5 break-words">{result.transcript}</div>
                     </div>
                     {result.feedback && (
-                      <div className="rounded-xl bg-[hsl(175_60%_96%)] border border-[hsl(175_40%_85%)] p-3">
+                      <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-3">
                         <div className="text-[10px] font-bold uppercase tracking-wider ka" style={{ color: "hsl(33 75% 28%)" }}>Feedback</div>
                         <div className="text-sm sp-text mt-0.5 whitespace-pre-wrap break-words">{result.feedback}</div>
                       </div>

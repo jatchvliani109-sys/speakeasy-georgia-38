@@ -86,7 +86,7 @@ export default function Pronunciation() {
             </div>
             <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
               <div
-                className="h-full bg-[hsl(175_70%_55%)] transition-all"
+                className="h-full bg-[hsl(41_100%_55%)] transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
