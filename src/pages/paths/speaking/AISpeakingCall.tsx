@@ -165,10 +165,11 @@ export default function AISpeakingCall() {
     return (
       <CallScreen
         topic={topic}
+        tier={tier}
         level={level}
         onBack={() => setStep("explain")}
         onEnd={(messages, durationSec) => {
-          (window as any).__sp_call_data = { topic, level, messages, durationSec };
+          (window as any).__sp_call_data = { topic, tier, level, messages, durationSec };
           setStep("summary");
         }}
       />
@@ -177,13 +178,15 @@ export default function AISpeakingCall() {
 
   // ---- Summary ---------------------------------------------------------
   if (step === "summary" && topic) {
-    const data = (window as any).__sp_call_data ?? { topic, level, messages: [], durationSec: 0 };
+    const data = (window as any).__sp_call_data ?? { topic, tier, level, messages: [], durationSec: 0 };
     return (
       <SummaryScreen
         topic={data.topic}
+        tier={data.tier ?? tier}
         level={data.level}
         messages={data.messages}
         durationSec={data.durationSec}
+        recordCompletion={recordCompletion}
         onPracticeAgain={() => { setStep("setup"); }}
         onBackToSpeaking={() => navigate("/path/speaking")}
       />
@@ -191,6 +194,51 @@ export default function AISpeakingCall() {
   }
 
   return null;
+}
+
+function ScenarioRow({
+  scenario, map, onPick,
+}: {
+  scenario: Scenario;
+  map: ReturnType<typeof useSpeakingProgress>["map"];
+  onPick: (s: Scenario, t: Tier) => void;
+}) {
+  const Icon = scenario.Icon;
+  return (
+    <div className="sp-card p-3.5 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl sp-chip-teal flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-bold sp-text text-[14px]">{scenario.title_en}</div>
+        <div className="text-[12px] sp-text-muted ka leading-snug mt-0.5">{scenario.desc_ka}</div>
+      </div>
+      <div className="flex items-center gap-1 shrink-0">
+        {TIERS.map((t) => {
+          const unlocked = isTierUnlocked(map, scenario.id, t);
+          const done = isTierCompleted(map, scenario.id, t);
+          return (
+            <button
+              key={t}
+              disabled={!unlocked}
+              onClick={() => onPick(scenario, t)}
+              title={`${TIER_LABEL_KA[t]}${done ? " ✓" : unlocked ? "" : " (დაბლოკილია)"}`}
+              className={`h-9 min-w-9 px-2 rounded-lg text-[11px] font-bold ka inline-flex items-center justify-center gap-1 transition-colors ${
+                done
+                  ? "bg-[hsl(33_69%_45%)] text-[hsl(40_91%_96%)]"
+                  : unlocked
+                  ? "border border-[hsl(38_70%_72%)] bg-[hsl(40_91%_93%)] sp-text hover:bg-[hsl(40_91%_88%)]"
+                  : "bg-[hsl(38_25%_88%)] text-[hsl(30_15%_55%)] cursor-not-allowed"
+              }`}
+            >
+              {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : !unlocked ? <Lock className="w-3 h-3" /> : null}
+              {TIER_LABEL_KA[t]}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function ExplainItem({ text }: { text: string }) {
