@@ -5,7 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Square } from "lucide-react";
-import { SCENARIOS } from "./data";
+import { SCENARIOS, iconForScenario } from "./data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -121,8 +121,8 @@ export default function RoleplaySession() {
       <div className="flex flex-col h-[calc(100vh-11rem)]">
         <div className="sp-card-hero p-4 sm:p-5 mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[hsl(33_69%_45%)] text-white flex items-center justify-center text-2xl shrink-0">
-              {scenario.emoji}
+            <div className="w-12 h-12 rounded-xl bg-[hsl(33_69%_45%)] text-[hsl(40_91%_96%)] flex items-center justify-center shrink-0">
+              {(() => { const Icon = iconForScenario(scenario.id); return <Icon className="w-6 h-6" />; })()}
             </div>
             <div className="min-w-0 text-sm">
               <div className="ka sp-text">
