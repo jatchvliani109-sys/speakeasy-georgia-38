@@ -1061,7 +1061,98 @@ function SummaryScreen({
           </button>
         </div>
       </div>
+
+      {showCelebration && performance && (
+        <CelebrationModal
+          performance={performance}
+          unlockedTier={unlocked}
+          currentTier={tier}
+          onClose={() => setShowCelebration(false)}
+        />
+      )}
     </SpeakingShell>
+  );
+}
+
+function CelebrationModal({
+  performance, unlockedTier, currentTier, onClose,
+}: {
+  performance: Performance;
+  unlockedTier: Tier | null;
+  currentTier: Tier;
+  onClose: () => void;
+}) {
+  let emoji = "🌟";
+  let title = "";
+  let body = "";
+  let accent = "hsl(41 100% 55%)";
+
+  if (performance === "strong" && unlockedTier) {
+    emoji = unlockedTier === "hard" ? "💪" : "🎉";
+    title = unlockedTier === "hard" ? "ოსტატი ხარ!" : "შენი ინგლისური საოცარია!";
+    body = unlockedTier === "hard"
+      ? "რთულ დონეზე გადადიხარ! გააგრძელე!"
+      : "საშუალო დონეზე გადადიხარ! განაგრძე ასე!";
+    accent = "hsl(140 65% 45%)";
+  } else if (performance === "strong") {
+    emoji = "✨";
+    title = "ძალიან კარგად ისაუბრე!";
+    body = currentTier === "hard"
+      ? "შენ უკვე ოსტატი ხარ ამ თემაში!"
+      : "ეს დონე უკვე გავლილია — სცადე უფრო რთული!";
+    accent = "hsl(41 100% 55%)";
+  } else if (performance === "average") {
+    emoji = "🌟";
+    title = "კარგად იყო!";
+    body = "კიდევ ცოტა ვარჯიში და მომდევნო დონეზე გახვალ!";
+    accent = "hsl(41 100% 55%)";
+  } else {
+    emoji = "💪";
+    title = "არ ინერვიულო!";
+    body = "ყველა ოსტატი დამწყებიდან იწყებს. სცადე კიდევ ერთხელ!";
+    accent = "hsl(28 80% 55%)";
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-5 animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="sp-card max-w-sm w-full p-7 text-center sp-pop-in relative overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+        style={{ boxShadow: `0 20px 60px -10px ${accent}` }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-1.5"
+          style={{ background: accent }}
+        />
+        <div
+          className="mx-auto text-6xl mb-3 select-none"
+          style={{ animation: "sp-pop-in 600ms cubic-bezier(.2,.9,.3,1.4) both" }}
+        >
+          {emoji}
+        </div>
+        <h2 className="text-2xl font-extrabold sp-text ka mb-2">{title}</h2>
+        <p className="text-sm sp-text ka leading-relaxed">{body}</p>
+        {unlockedTier && (
+          <div
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold ka"
+            style={{ background: accent, color: "white" }}
+          >
+            <Sparkles className="w-4 h-4" />
+            {TIER_LABEL_KA[unlockedTier]} დონე განბლოკილია
+          </div>
+        )}
+        <button
+          onClick={onClose}
+          className="sp-btn-primary w-full mt-6 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka"
+        >
+          განაგრძე
+        </button>
+      </div>
+    </div>
   );
 }
 
