@@ -1116,27 +1116,11 @@ function DocView({
       })()}
 
 
-      {/* Bio versions quick pick */}
+      {/* Bio versions — each with copy + edit */}
       {doc.doc_type === "bio" && !editing && (
-        <div className="flex gap-2 mt-3 flex-wrap">
-          {(["short", "medium", "full"] as const).map((v) => {
-            const text = (doc.meta as any)?.[v];
-            if (!text) return null;
-            return (
-              <button
-                key={v}
-                onClick={() => {
-                  navigator.clipboard.writeText(text);
-                  toast({ title: `${v} ვერსია კოპირებულია` });
-                }}
-                className="ka text-xs px-3 py-1.5 rounded-full border border-[#E7E2D5] hover:border-[#1E2A44]/40 text-[#1E2A44]"
-              >
-                📋 {v}
-              </button>
-            );
-          })}
-        </div>
+        <BioVersions doc={doc} onUpdated={onUpdated} />
       )}
+
 
       {/* Highlights legend */}
       {doc.highlights?.length > 0 && !editing && (
