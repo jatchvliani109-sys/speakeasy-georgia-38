@@ -822,6 +822,8 @@ function SummaryScreen({
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<SessionSummary>({});
+  const [unlocked, setUnlocked] = useState<Tier | null>(null);
+  const [scored, setScored] = useState<number | null>(null);
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -829,7 +831,6 @@ function SummaryScreen({
     savedRef.current = true;
     (async () => {
       let summ: SessionSummary = {};
-      // Only request AI summary if there's actual conversation content.
       if (messages.length >= 2) {
         try {
           const r = await supabase.functions.invoke("ai-tutor", {
@@ -845,7 +846,15 @@ function SummaryScreen({
       setSummary(summ);
       setLoading(false);
 
-      // Save session
+      const userTurns = messages.filter((m) => m.role === "user").length;
+      const score = scoreSession({
+        userTurns,
+        mistakesCount: summ.mistakes?.length ?? 0,
+        phrasesCount: summ.useful_phrases?.length ?? 0,
+        durationSec,
+      });
+      setScored(score);
+
       if (user) {
         try {
           await supabase.from("lessons").insert({
@@ -856,9 +865,11 @@ function SummaryScreen({
               mode: "ai_speaking_call",
               topic: topic.title_en,
               topic_id: topic.id,
-              difficulty: topic.level,
+              difficulty: topic.group,
+              tier,
+              score,
               duration_sec: durationSec,
-              voice_prompts_completed: messages.filter((m) => m.role === "user").length,
+              voice_prompts_completed: userTurns,
               phrases_practiced: (summ.useful_phrases ?? []).length,
               mistakes: summ.mistakes ?? [],
               useful_phrases: summ.useful_phrases ?? [],
@@ -869,7 +880,6 @@ function SummaryScreen({
             completed: true,
             ended_at: new Date().toISOString(),
           });
-          // Save mistakes
           if (summ.mistakes?.length) {
             await supabase.from("mistakes").insert(
               summ.mistakes.map((m) => ({
@@ -881,7 +891,6 @@ function SummaryScreen({
               })),
             );
           }
-          // Save new words
           if (summ.new_words?.length) {
             await supabase.from("vocabulary").insert(
               summ.new_words.map((w) => ({
@@ -895,6 +904,15 @@ function SummaryScreen({
             );
           }
           await recordSpeakingActivity(user.id, "daily_speaking_lesson");
+
+          // Record progression — only if user actually engaged (>= 4 turns).
+          if (isCompletionEligible(userTurns)) {
+            const res = await recordCompletion({ scenarioId: topic.id, tier, score });
+            if (res.newlyUnlockedTier) {
+              setUnlocked(res.newlyUnlockedTier);
+              toast.success(`${TIER_LABEL_KA[res.newlyUnlockedTier]} დონე განბლოკილია!`);
+            }
+          }
         } catch (e: any) {
           console.warn("[speaking-call] save failed", e?.message);
         }
@@ -902,6 +920,7 @@ function SummaryScreen({
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const minutes = Math.floor(durationSec / 60);
   const seconds = durationSec % 60;
