@@ -143,7 +143,12 @@ export default function AISpeakingCall() {
           </div>
 
           <div className="rounded-xl bg-[hsl(40_91%_93%)] border border-[hsl(38_55%_82%)] p-4">
-            <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider sp-text-muted ka">თემა</div>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[hsl(41_100%_47%)] text-[hsl(31_53%_12%)] ka">
+                {TIER_LABEL_KA[tier]}
+              </span>
+            </div>
             <div className="font-bold sp-text mt-1">{topic.title_en}</div>
             <div className="text-xs sp-text-muted ka mt-0.5">{topic.desc_ka}</div>
           </div>
