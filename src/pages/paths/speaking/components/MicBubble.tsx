@@ -7,6 +7,7 @@ type Props = {
   state: State;
   micStream?: MediaStream | null;
   aiStream?: MediaStream | null;
+  aiAmplitude?: number;
   onPress?: () => void;
   onRelease?: () => void;
   active?: boolean;
@@ -67,9 +68,10 @@ function useAmplitude(stream: MediaStream | null | undefined, enabled: boolean) 
   return level;
 }
 
-export default function MicBubble({ state, micStream, aiStream, onPress, onRelease, active }: Props) {
+export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiAmpProp, onPress, onRelease, active }: Props) {
   const userLevel = useAmplitude(micStream, state === "user_speaking");
-  const aiLevel = useAmplitude(aiStream, state === "ai_speaking");
+  const aiStreamLevel = useAmplitude(aiStream, state === "ai_speaking");
+  const aiLevel = aiAmpProp !== undefined ? aiAmpProp : aiStreamLevel;
 
   const isUser = state === "user_speaking";
   const isAi = state === "ai_speaking";
