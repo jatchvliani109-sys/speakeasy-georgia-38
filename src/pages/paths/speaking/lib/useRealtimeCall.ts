@@ -65,7 +65,6 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
 
   const fail = useCallback((msg: string) => {
     setErrorMsg(msg);
-    statusRef.current = "error";
     setStatus("error");
     onError?.(msg);
   }, [onError]);
