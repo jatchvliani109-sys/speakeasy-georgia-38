@@ -1039,22 +1039,25 @@ function DocView({
         </p>
       )}
 
-      {/* Document */}
-      <article className="bg-white border border-[#E7E2D5] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
-        {editing ? (
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={isResumeImprove ? 30 : 20}
-            className={`w-full text-sm leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
-          />
-        ) : (
-          <div
-            className={`text-sm leading-relaxed text-[#1E2A44] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
-            dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
-          />
-        )}
-      </article>
+      {/* Document — hidden for bio (BioVersions covers all three) */}
+      {!(doc.doc_type === "bio" && !editing) && (
+        <article className="bg-white border border-[#E7E2D5] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
+          {editing ? (
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={isResumeImprove ? 30 : 20}
+              className={`w-full text-sm leading-relaxed text-[#1E2A44] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
+            />
+          ) : (
+            <div
+              className={`text-sm leading-relaxed text-[#1E2A44] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
+              dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
+            />
+          )}
+        </article>
+      )}
+
 
 
       {/* Email Fix: before/after + changes */}
