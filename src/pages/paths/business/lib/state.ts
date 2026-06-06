@@ -60,6 +60,7 @@ export type BusinessState = {
   businessSelfIntroductionSkipped?: boolean;
   businessResumeUploaded?: boolean;
   businessResumeSkipped?: boolean;
+  firstMilestoneAcknowledged?: boolean;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
