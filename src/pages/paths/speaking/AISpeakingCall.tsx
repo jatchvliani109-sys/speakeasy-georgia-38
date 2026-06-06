@@ -856,6 +856,8 @@ function SummaryScreen({
   const [summary, setSummary] = useState<SessionSummary>({});
   const [unlocked, setUnlocked] = useState<Tier | null>(null);
   const [scored, setScored] = useState<number | null>(null);
+  const [performance, setPerformance] = useState<Performance | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -878,14 +880,18 @@ function SummaryScreen({
       setSummary(summ);
       setLoading(false);
 
-      const userTurns = messages.filter((m) => m.role === "user").length;
+      const userTurns = messages.filter((m) => m.role === "user" && !m.pending).length;
+      const mistakesCount = summ.mistakes?.length ?? 0;
       const score = scoreSession({
         userTurns,
-        mistakesCount: summ.mistakes?.length ?? 0,
+        mistakesCount,
         phrasesCount: summ.useful_phrases?.length ?? 0,
         durationSec,
       });
       setScored(score);
+
+      const perf = evaluatePerformance(messages, mistakesCount);
+      setPerformance(perf.level);
 
       if (user) {
         try {
@@ -900,6 +906,7 @@ function SummaryScreen({
               difficulty: topic.group,
               tier,
               score,
+              performance: perf.level,
               duration_sec: durationSec,
               voice_prompts_completed: userTurns,
               phrases_practiced: (summ.useful_phrases ?? []).length,
@@ -937,17 +944,16 @@ function SummaryScreen({
           }
           await recordSpeakingActivity(user.id, "daily_speaking_lesson");
 
-          // Record progression — only if user actually engaged (>= 4 turns).
-          if (isCompletionEligible(userTurns)) {
+          // Progression: only unlock the next tier on STRONG performance.
+          if (perf.level === "strong" && isCompletionEligible(userTurns)) {
             const res = await recordCompletion({ scenarioId: topic.id, tier, score });
-            if (res.newlyUnlockedTier) {
-              setUnlocked(res.newlyUnlockedTier);
-              toast.success(`${TIER_LABEL_KA[res.newlyUnlockedTier]} დონე განბლოკილია!`);
-            }
+            if (res.newlyUnlockedTier) setUnlocked(res.newlyUnlockedTier);
           }
         } catch (e: any) {
           console.warn("[speaking-call] save failed", e?.message);
         }
+        // Trigger celebration modal after we know perf + unlock state.
+        setTimeout(() => setShowCelebration(true), 350);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
