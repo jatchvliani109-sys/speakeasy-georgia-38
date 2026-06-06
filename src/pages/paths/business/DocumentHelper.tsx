@@ -730,16 +730,17 @@ function ResumeImproveFlow({
         resumeText,
         jobDescription,
       });
-      const formatted = formatResumeImprove(r);
+      const rewritten: string = (r.rewrittenResume || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "resume_improve",
-        title: r.title || "რეზიუმეს გაუმჯობესება",
-        content: formatted,
+        title: r.title || "გაუმჯობესებული რეზიუმე",
+        content: rewritten || resumeText,
         meta: {
+          summaryKa: r.content,
           toneAssessmentKa: r.toneAssessmentKa,
           missingKeywords: r.missingKeywords,
           suggestions: r.suggestions,
-          summary: r.content,
+          originalResume: resumeText,
         },
         inputs: { jobDescription },
         highlights: [],
@@ -751,6 +752,7 @@ function ResumeImproveFlow({
       setLoading(false);
     }
   };
+
 
   return (
     <div>
