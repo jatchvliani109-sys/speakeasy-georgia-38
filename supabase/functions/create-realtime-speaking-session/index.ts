@@ -5,7 +5,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const INWORLD_API_KEY = Deno.env.get("INWORLD_API_KEY");
-const MODEL = "gpt-4o-mini"; // placeholder; Inworld uses its own model list. Adjust if needed.
+const MODEL = "inworld-realtime-1";
 
 type Tier = "easy" | "medium" | "hard";
 
