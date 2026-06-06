@@ -237,6 +237,7 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       micRef.current = mic;
+      setMicStream(mic);
       // Start MUTED — caller decides when to enable (push-to-talk default).
       mic.getAudioTracks().forEach((t) => { t.enabled = false; });
       setMicOn(false);
