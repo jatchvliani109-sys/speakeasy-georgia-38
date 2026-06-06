@@ -266,9 +266,10 @@ const STATUS_LABEL_KA: Record<RtStatus, string> = {
 // Automatic Georgian detection removed — user manually requests Georgian help.
 
 function CallScreen({
-  topic, level, onBack, onEnd,
+  topic, tier, level, onBack, onEnd,
 }: {
   topic: Topic;
+  tier: Tier;
   level: string;
   onBack: () => void;
   onEnd: (messages: Msg[], durationSec: number) => void;
@@ -369,6 +370,7 @@ function CallScreen({
   const { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn } = useRealtimeCall({
     topic: topic.title_en,
     level,
+    tier,
     selectedLearningPath: learningPath,
     onEvent: handleEvent,
   });
@@ -806,12 +808,14 @@ const NEXT_SUGGESTIONS: Record<string, string> = {
 };
 
 function SummaryScreen({
-  topic, level, messages, durationSec, onPracticeAgain, onBackToSpeaking,
+  topic, tier, level, messages, durationSec, recordCompletion, onPracticeAgain, onBackToSpeaking,
 }: {
   topic: Topic;
+  tier: Tier;
   level: string;
   messages: Msg[];
   durationSec: number;
+  recordCompletion: (input: { scenarioId: string; tier: Tier; score: number }) => Promise<{ newlyUnlockedTier: Tier | null; upgraded?: boolean }>;
   onPracticeAgain: () => void;
   onBackToSpeaking: () => void;
 }) {
