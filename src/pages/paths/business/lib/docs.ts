@@ -1,5 +1,6 @@
 // Helpers for the Document Helper section.
 import { supabase } from "@/integrations/supabase/client";
+import { Mail, FileText, FileCheck, User, Wrench, type LucideIcon } from "lucide-react";
 import type { BusinessState } from "./state";
 
 export type DocType = "email" | "cover_letter" | "resume_improve" | "bio" | "email_fix";
@@ -12,12 +13,12 @@ export const DOC_TYPE_LABELS: Record<DocType, string> = {
   email_fix: "გასწორებული იმეილი",
 };
 
-export const DOC_TYPE_ICONS: Record<DocType, string> = {
-  email: "✉️",
-  cover_letter: "📝",
-  resume_improve: "📄",
-  bio: "👤",
-  email_fix: "🛠",
+export const DOC_TYPE_ICONS: Record<DocType, LucideIcon> = {
+  email: Mail,
+  cover_letter: FileText,
+  resume_improve: FileCheck,
+  bio: User,
+  email_fix: Wrench,
 };
 
 export type Highlight = { phrase: string; whyKa: string };
