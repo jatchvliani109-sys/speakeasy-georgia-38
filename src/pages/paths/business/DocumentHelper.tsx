@@ -831,7 +831,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
     setLoading(true);
     try {
       const r = await callDocs({ action: "bio_write", profile, purpose, tone });
-      const formatted = `📌 SHORT\n${r.short || ""}\n\n📌 MEDIUM\n${r.medium || ""}\n\n📌 FULL\n${r.full || ""}`;
+      const formatted = (r.medium || r.short || r.full || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "bio",
         title: r.title || `პროფესიული ბიო — ${purpose}`,
