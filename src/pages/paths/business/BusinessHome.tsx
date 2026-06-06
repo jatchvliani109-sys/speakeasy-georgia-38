@@ -88,6 +88,8 @@ export default function BusinessHome() {
   const [vocabPreview, setVocabPreview] = useState<VocabWord | null>(null);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
   const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
+  const [lastReassessmentAt, setLastReassessmentAt] = useState<string | null>(null);
+  const [phraseCount, setPhraseCount] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
