@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Mic, MicOff, PhoneOff, Lightbulb, Sparkles,
-  Loader2, RotateCcw, X, Radio, Clock,
-  Handshake, GraduationCap, Users as UsersIcon, Coffee, Palette, Clock3,
-  UtensilsCrossed, Map as MapIcon, ShoppingBag, Plane, CalendarDays,
-  Briefcase, MessageSquare, CalendarRange, Globe2, Puzzle, MessagesSquare,
-  type LucideIcon,
+  Loader2, RotateCcw, X, Radio, Clock, CheckCircle2, Lock,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
 import SpeakButton from "@/components/SpeakButton";
@@ -15,6 +11,10 @@ import { useAuth } from "@/lib/auth";
 import { recordSpeakingActivity } from "./lib/tracker";
 import { getEncouragementKa, dailySeed } from "./lib/encouragement";
 import { useRealtimeCall, type RtStatus } from "./lib/useRealtimeCall";
+import { SCENARIOS, GROUP_LABEL_KA, scenarioById, type Scenario, type ScenarioGroup } from "./lib/scenarios";
+import { TIERS, TIER_LABEL_KA, type Tier, scoreSession, isCompletionEligible, isTierUnlocked, isTierCompleted } from "./lib/progression";
+import { useSpeakingProgress } from "./lib/useSpeakingProgress";
+import { toast } from "sonner";
 
 // --- Topics --------------------------------------------------------------
 
