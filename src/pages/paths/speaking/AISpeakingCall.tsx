@@ -178,7 +178,10 @@ export default function AISpeakingCall() {
         topic={topic}
         tier={tier}
         level={level}
-        onBack={() => setStep("explain")}
+        onBack={() => {
+          if (searchParams.get("scenario")) navigate("/path/speaking");
+          else setStep("explain");
+        }}
         onEnd={(messages, durationSec) => {
           (window as any).__sp_call_data = { topic, tier, level, messages, durationSec };
           setStep("summary");
