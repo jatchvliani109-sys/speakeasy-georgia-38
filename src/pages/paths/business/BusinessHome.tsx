@@ -415,7 +415,8 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#64748B] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <Target size={12} strokeWidth={2.25} /> დღევანდელი ფოკუსი
             </p>
-            <div className="relative overflow-hidden rounded-lg bg-[#3d6b9e] text-[#F5F0E8] p-6 border border-[#3d6b9e]">
+            <div className="relative overflow-hidden rounded-lg bg-[#3d6b9e] text-[#F5F0E8] p-6 pb-14 border border-[#3d6b9e]">
+              <SectionCurve variant="crest" color="#F5F0E8" position="bottom" height={44 } />
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="ka text-[10px] uppercase tracking-wider text-[#C9A84C] font-semibold">
