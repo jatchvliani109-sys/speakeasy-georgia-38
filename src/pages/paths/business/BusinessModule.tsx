@@ -25,19 +25,24 @@ export default function BusinessModule() {
     );
   }
 
+  const Icon = mod.icon;
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
-      <div className="mb-5">
-        <div className="text-2xl mb-2">{mod.icon}</div>
-        <h1 className="ka text-2xl font-bold text-[#1E2A44]">{mod.title}</h1>
-        <p className="ka text-sm text-[#5B6473] mt-1">{mod.description}</p>
+      <div className="mb-5 flex items-start gap-3">
+        <span className="w-10 h-10 rounded-md bg-[#1A2744] text-[#F5F0E8] grid place-items-center shrink-0">
+          <Icon size={18} strokeWidth={2} />
+        </span>
+        <div>
+          <h1 className="ka text-2xl font-bold text-[#1A2744]">{mod.title}</h1>
+          <p className="ka text-sm text-[#64748B] mt-1">{mod.description}</p>
+        </div>
       </div>
       <BizCard>
-        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A84C] font-semibold">
           მალე დაემატება
         </p>
-        <h3 className="ka text-base font-bold text-[#1E2A44] mt-1">Coming next</h3>
-        <p className="ka text-sm text-[#5B6473] mt-2">
+        <h3 className="ka text-base font-bold text-[#1A2744] mt-1">Coming next</h3>
+        <p className="ka text-sm text-[#64748B] mt-2">
           ეს მოდული ამჟამად მზადდება.
         </p>
       </BizCard>
