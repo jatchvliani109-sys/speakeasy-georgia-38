@@ -220,7 +220,7 @@ export default function MicBubble({ state, micStream, aiStream, aiAmplitude: aiA
         {isThinking ? (
           <Loader2 className="w-10 h-10 text-amber-50 animate-spin" />
         ) : isAi ? (
-          <Sparkles className="w-10 h-10 text-cyan-50 drop-shadow-lg" />
+          <Sparkles className="w-10 h-10 text-amber-50 drop-shadow-lg" />
         ) : (
           <Mic className={`w-10 h-10 ${isUser ? "text-amber-50" : "text-amber-100"} drop-shadow-lg`} />
         )}
