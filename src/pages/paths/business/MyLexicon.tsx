@@ -417,7 +417,7 @@ function WordsTab() {
         <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-14 h-14 rounded-full bg-[#FAF7F0] border border-[#E7E2D5] grid place-items-center text-2xl">📚</div>
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><BookOpen size={22} strokeWidth={2} /></div>
           <h3 className="ka text-lg font-bold text-[#1E2A44] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
           <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
             დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
