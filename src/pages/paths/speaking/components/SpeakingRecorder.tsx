@@ -251,7 +251,7 @@ export default function SpeakingRecorder({
             disabled={isRecording || isProcessing}
             className="inline-flex items-center gap-1.5 rounded-full sp-btn-teal px-3.5 py-1.5 text-xs font-semibold ka disabled:opacity-50"
           >
-            <Mic className="w-3.5 h-3.5" /> 🎤 {recordLabel ?? "ჩაწერა"}
+            <Mic className="w-3.5 h-3.5" /> {recordLabel ?? "ჩაწერა"}
           </button>
         )}
         {isRecording && (

@@ -105,7 +105,7 @@ export default function RoleplaySession() {
         ended_at: new Date().toISOString(),
       });
       await recordSpeakingActivity(user.id, "roleplay");
-      toast.success("როლური სავარჯიშო დასრულდა! 🎉");
+      toast.success("როლური სავარჯიშო დასრულდა!");
       navigate("/path/speaking/progress");
     } catch (e: any) {
       toast.error(e.message ?? "ვერ შევინახე");

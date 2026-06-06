@@ -615,7 +615,7 @@ export default function DailyLesson() {
                       onClick={() => setPromptResults((prev) => ({ ...prev, [promptIdx]: { transcript: "", feedback: "", loading: false, typing: false } }))}
                       className="text-xs ka sp-text-soft underline hover:sp-text"
                     >
-                      🎤 Back to voice
+                      Back to voice
                     </button>
                   </div>
                 )}
