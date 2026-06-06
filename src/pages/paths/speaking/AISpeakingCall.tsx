@@ -628,24 +628,33 @@ function CallScreen({
         )}
       </div>
 
-      {/* Transcript */}
-      <div className="relative z-10 px-5 pb-6">
-        <div
-          ref={transcriptRef}
-          className="mx-auto max-w-md max-h-44 overflow-y-auto space-y-2.5 px-1 py-2"
-          style={{ maskImage: "linear-gradient(to bottom, transparent, black 18%, black 100%)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 18%, black 100%)" }}
-        >
-          {visibleMessages.length === 0 && !partial.ai && !partial.user && (
-            <p className="text-center text-[12px] ka text-amber-100/40 py-2">
-              {status === "connecting" ? "" : "ტრანსკრიფცია გამოჩნდება აქ"}
-            </p>
-          )}
-          {visibleMessages.map((m, i) => (
-            <TranscriptLine key={i} role={m.role} text={m.content} />
-          ))}
-          {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
+      {/* Transcript — fixed height, never collapses */}
+      <div className="relative z-10 px-4 pb-5 shrink-0">
+        <div className="mx-auto max-w-md relative rounded-2xl bg-black/40 backdrop-blur-md border border-white/5 shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.6)]">
+          {/* Top fade indicating more above */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute top-0 left-0 right-0 h-8 rounded-t-2xl"
+            style={{ background: "linear-gradient(to bottom, hsl(24 30% 8% / 0.95), transparent)" }}
+          />
+          <div
+            ref={transcriptRef}
+            className="h-40 overflow-y-auto space-y-2.5 px-4 py-3 scroll-smooth"
+          >
+            {visibleMessages.length === 0 && !partial.ai && !partial.user && (
+              <p className="text-center text-[12px] ka text-amber-100/40 py-10">
+                {status === "connecting" ? "ვუკავშირდები..." : "ტრანსკრიფცია გამოჩნდება აქ"}
+              </p>
+            )}
+            {visibleMessages.map((m, i) => (
+              <TranscriptLine key={i} role={m.role} text={m.content} />
+            ))}
+            {partial.ai && <TranscriptLine role="assistant" text={partial.ai} faded />}
+          </div>
         </div>
       </div>
+
+
 
       {/* Georgian help card overlay */}
       {showHelp && (
