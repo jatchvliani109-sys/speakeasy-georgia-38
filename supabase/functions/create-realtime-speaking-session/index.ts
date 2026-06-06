@@ -10,12 +10,30 @@ type Tier = "easy" | "medium" | "hard";
 
 function tierGuidance(tier: Tier): string {
   if (tier === "easy") {
-    return "DIFFICULTY: EASY. Use A1 vocabulary only. Short sentences (max 8 words). Speak slowly and clearly. Be very patient. Confirm understanding often. Ask one simple yes/no or short-answer question at a time. If the learner pauses, gently offer a hint.";
+    return `DIFFICULTY: EASY (A1-A2).
+- Speak SLOWLY and CLEARLY. Simple vocabulary only.
+- Short sentences (max 8 words). One clause at a time.
+- Ask ONE simple question at a time (yes/no or short answer).
+- Be VERY patient. Wait for the learner. Never rush.
+- If the learner struggles, gently simplify even more, offer a hint.
+- Topics stay simple and predictable. No idioms. No surprise pivots.`;
   }
   if (tier === "medium") {
-    return "DIFFICULTY: MEDIUM. Use B1 vocabulary. Natural conversational pace with multi-clause sentences (10-15 words). Occasionally ask follow-up questions. Light, friendly corrections inline. Avoid idioms unless common.";
+    return `DIFFICULTY: MEDIUM (B1).
+- Speak at a more natural conversational pace.
+- Use wider vocabulary including some common idioms.
+- Ask follow-up questions that require more than one-word answers.
+- React naturally — show genuine interest in what the learner says.
+- Occasionally introduce mild unexpected turns.
+- Don't over-explain or over-simplify. Trust the learner.`;
   }
-  return "DIFFICULTY: HARD. Use B2/C1 vocabulary. Native conversational pace. Include idioms and unexpected topic pivots. Push the learner with opinion questions and hypotheticals. No hand-holding — assume strong comprehension.";
+  return `DIFFICULTY: HARD (B2/C1).
+- Speak at full natural NATIVE speed.
+- Use complex vocabulary, idioms, natural contractions ("gonna", "kinda", "y'know").
+- Ask complex situational and opinion questions, hypotheticals.
+- CHALLENGE the learner: push back, ask for clarification, express surprise, disagree politely.
+- Conversation should feel completely real and unpredictable.
+- ZERO hand-holding. Assume strong comprehension.`;
 }
 
 function instructionsFor(level: string, topic: string, tier: Tier) {

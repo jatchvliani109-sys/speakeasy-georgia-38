@@ -382,7 +382,7 @@ function CallScreen({
     }
   }, []);
 
-  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, micStream, aiStream, aiAmplitude } = useRealtimeCall({
+  const { status, errorMsg, start, stop, setMicEnabled, sendUserText, requestWrapUp, micStream, aiStream, aiAmplitude } = useRealtimeCall({
     topic: topic.title_en,
     level,
     tier,
@@ -402,13 +402,19 @@ function CallScreen({
     onEnd(messagesRef.current, dur);
   }, [stop, onEnd]);
 
-  // Hard safety: 2-min cap + 90s warn. Cleanup on unmount + tab close.
+  // Smart 2-min session: warn at 90s, ask AI to wrap up at 105s, hard cutoff at 120s.
+  const wrapUpSentRef = useRef(false);
   useEffect(() => {
     startedAtRef.current = Date.now();
     const id = setInterval(() => {
       const sec = Math.floor((Date.now() - startedAtRef.current) / 1000);
       setElapsed(sec);
       if (sec >= 90 && !showTimeWarn) setShowTimeWarn(true);
+      if (sec >= 105 && !wrapUpSentRef.current) {
+        wrapUpSentRef.current = true;
+        console.log("[rt] 105s reached → asking AI to wrap up");
+        try { requestWrapUp(); } catch {}
+      }
       if (sec >= 120) {
         console.log("[rt] session ended by timer (120s hard cap)");
         clearInterval(id);
@@ -803,6 +809,27 @@ type SessionSummary = {
   homework_ka?: string;
 };
 
+type Performance = "strong" | "average" | "weak";
+
+function evaluatePerformance(messages: Msg[], mistakesCount: number): { level: Performance; metCount: number } {
+  const userMsgs = messages.filter((m) => m.role === "user" && !m.pending && m.content.trim().length > 0);
+  const turns = userMsgs.length;
+  const totalWords = userMsgs.reduce((s, m) => s + m.content.trim().split(/\s+/).length, 0);
+  const avgWords = turns ? totalWords / turns : 0;
+  const longishTurns = userMsgs.filter((m) => m.content.trim().split(/\s+/).length >= 3).length;
+
+  const conditions = [
+    turns >= 4,                  // spoke at least 4 times
+    avgWords > 1.5,              // not just one-word answers
+    mistakesCount <= 2,          // relatively few basic mistakes
+    longishTurns >= Math.max(2, Math.floor(turns / 2)), // natural flow
+  ];
+  const met = conditions.filter(Boolean).length;
+  if (met >= 3) return { level: "strong", metCount: met };
+  if (met >= 2) return { level: "average", metCount: met };
+  return { level: "weak", metCount: met };
+}
+
 const NEXT_SUGGESTIONS: Record<string, string> = {
   intro: "School", school: "Family", family: "Hobbies", hobbies: "Daily Routine",
   routine: "At a Café", cafe: "Ordering Food", ordering: "Asking for Directions",
@@ -829,6 +856,8 @@ function SummaryScreen({
   const [summary, setSummary] = useState<SessionSummary>({});
   const [unlocked, setUnlocked] = useState<Tier | null>(null);
   const [scored, setScored] = useState<number | null>(null);
+  const [performance, setPerformance] = useState<Performance | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -851,14 +880,18 @@ function SummaryScreen({
       setSummary(summ);
       setLoading(false);
 
-      const userTurns = messages.filter((m) => m.role === "user").length;
+      const userTurns = messages.filter((m) => m.role === "user" && !m.pending).length;
+      const mistakesCount = summ.mistakes?.length ?? 0;
       const score = scoreSession({
         userTurns,
-        mistakesCount: summ.mistakes?.length ?? 0,
+        mistakesCount,
         phrasesCount: summ.useful_phrases?.length ?? 0,
         durationSec,
       });
       setScored(score);
+
+      const perf = evaluatePerformance(messages, mistakesCount);
+      setPerformance(perf.level);
 
       if (user) {
         try {
@@ -873,6 +906,7 @@ function SummaryScreen({
               difficulty: topic.group,
               tier,
               score,
+              performance: perf.level,
               duration_sec: durationSec,
               voice_prompts_completed: userTurns,
               phrases_practiced: (summ.useful_phrases ?? []).length,
@@ -910,17 +944,16 @@ function SummaryScreen({
           }
           await recordSpeakingActivity(user.id, "daily_speaking_lesson");
 
-          // Record progression — only if user actually engaged (>= 4 turns).
-          if (isCompletionEligible(userTurns)) {
+          // Progression: only unlock the next tier on STRONG performance.
+          if (perf.level === "strong" && isCompletionEligible(userTurns)) {
             const res = await recordCompletion({ scenarioId: topic.id, tier, score });
-            if (res.newlyUnlockedTier) {
-              setUnlocked(res.newlyUnlockedTier);
-              toast.success(`${TIER_LABEL_KA[res.newlyUnlockedTier]} დონე განბლოკილია!`);
-            }
+            if (res.newlyUnlockedTier) setUnlocked(res.newlyUnlockedTier);
           }
         } catch (e: any) {
           console.warn("[speaking-call] save failed", e?.message);
         }
+        // Trigger celebration modal after we know perf + unlock state.
+        setTimeout(() => setShowCelebration(true), 350);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1028,7 +1061,98 @@ function SummaryScreen({
           </button>
         </div>
       </div>
+
+      {showCelebration && performance && (
+        <CelebrationModal
+          performance={performance}
+          unlockedTier={unlocked}
+          currentTier={tier}
+          onClose={() => setShowCelebration(false)}
+        />
+      )}
     </SpeakingShell>
+  );
+}
+
+function CelebrationModal({
+  performance, unlockedTier, currentTier, onClose,
+}: {
+  performance: Performance;
+  unlockedTier: Tier | null;
+  currentTier: Tier;
+  onClose: () => void;
+}) {
+  let emoji = "🌟";
+  let title = "";
+  let body = "";
+  let accent = "hsl(41 100% 55%)";
+
+  if (performance === "strong" && unlockedTier) {
+    emoji = unlockedTier === "hard" ? "💪" : "🎉";
+    title = unlockedTier === "hard" ? "ოსტატი ხარ!" : "შენი ინგლისური საოცარია!";
+    body = unlockedTier === "hard"
+      ? "რთულ დონეზე გადადიხარ! გააგრძელე!"
+      : "საშუალო დონეზე გადადიხარ! განაგრძე ასე!";
+    accent = "hsl(140 65% 45%)";
+  } else if (performance === "strong") {
+    emoji = "✨";
+    title = "ძალიან კარგად ისაუბრე!";
+    body = currentTier === "hard"
+      ? "შენ უკვე ოსტატი ხარ ამ თემაში!"
+      : "ეს დონე უკვე გავლილია — სცადე უფრო რთული!";
+    accent = "hsl(41 100% 55%)";
+  } else if (performance === "average") {
+    emoji = "🌟";
+    title = "კარგად იყო!";
+    body = "კიდევ ცოტა ვარჯიში და მომდევნო დონეზე გახვალ!";
+    accent = "hsl(41 100% 55%)";
+  } else {
+    emoji = "💪";
+    title = "არ ინერვიულო!";
+    body = "ყველა ოსტატი დამწყებიდან იწყებს. სცადე კიდევ ერთხელ!";
+    accent = "hsl(28 80% 55%)";
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-5 animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="sp-card max-w-sm w-full p-7 text-center sp-pop-in relative overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+        style={{ boxShadow: `0 20px 60px -10px ${accent}` }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-1.5"
+          style={{ background: accent }}
+        />
+        <div
+          className="mx-auto text-6xl mb-3 select-none"
+          style={{ animation: "sp-pop-in 600ms cubic-bezier(.2,.9,.3,1.4) both" }}
+        >
+          {emoji}
+        </div>
+        <h2 className="text-2xl font-extrabold sp-text ka mb-2">{title}</h2>
+        <p className="text-sm sp-text ka leading-relaxed">{body}</p>
+        {unlockedTier && (
+          <div
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold ka"
+            style={{ background: accent, color: "white" }}
+          >
+            <Sparkles className="w-4 h-4" />
+            {TIER_LABEL_KA[unlockedTier]} დონე განბლოკილია
+          </div>
+        )}
+        <button
+          onClick={onClose}
+          className="sp-btn-primary w-full mt-6 inline-flex items-center justify-center gap-2 rounded-xl h-11 text-sm font-bold ka"
+        >
+          განაგრძე
+        </button>
+      </div>
+    </div>
   );
 }
 
