@@ -554,7 +554,7 @@ export default function BusinessHome() {
                 <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.meetings?.count ?? 0) + (progress.vocabulary?.count ?? 0))} />
               </div>
               <Link
-                to="/path/business/dictionary"
+                to="/path/business/lexicon"
                 className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#1E2A44] text-[#F7F1E3] hover:bg-[#15203A] transition-colors text-sm font-semibold"
               >
                 <span className="flex items-center gap-2">
