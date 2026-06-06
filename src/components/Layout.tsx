@@ -44,7 +44,7 @@ export default function Layout({ children, showLogout = true }: { children: Reac
           )}
         </div>
       </header>
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-6">{children}</main>
+      <main className="flex-1 max-w-2xl lg:max-w-5xl xl:max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</main>
     </div>
   );
 }
