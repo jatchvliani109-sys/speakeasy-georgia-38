@@ -5,6 +5,7 @@ import {
   Loader2, RotateCcw, X, Radio, Clock, CheckCircle2, Lock,
 } from "lucide-react";
 import SpeakingShell from "./components/SpeakingShell";
+import MicBubble from "./components/MicBubble";
 import SpeakButton from "@/components/SpeakButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
