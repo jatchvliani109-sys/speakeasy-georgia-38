@@ -1,17 +1,12 @@
-// Creates an ephemeral OpenAI Realtime client secret for the AI Speaking Call.
-// Uses the GA Realtime API: POST /v1/realtime/client_secrets
-//
-// Optimized for low cost + natural conversation:
-// - Cheapest model first (gpt-realtime-mini), fallback gpt-realtime-2
-// - Short, focused tutor instructions (no long prompts)
-// - Faster turn detection (shorter silence padding)
-// - Hard cap on response length (max_response_output_tokens)
+// Creates an Inworld AI Realtime session for the AI Speaking Call.
+// Uses INWORLD_API_KEY (server-side only) with HTTP Basic auth.
+// Returns a session id that the browser uses as the `key` query parameter
+// when establishing the WebRTC / WebSocket connection to Inworld.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
-const PRIMARY_MODEL = "gpt-realtime-mini";
-const FALLBACK_MODEL = "gpt-realtime-2";
+const INWORLD_API_KEY = Deno.env.get("INWORLD_API_KEY");
+const PRIMARY_MODEL = "inworld-voice-1";
 
 type Tier = "easy" | "medium" | "hard";
 
@@ -29,11 +24,17 @@ function instructionsFor(level: string, topic: string, tier: Tier) {
   return `Friendly English tutor for Georgian learners. Topic: ${topic}. Level: ${level}. ${tierGuidance(tier)} Assume the user is speaking English (possibly with accent). Be lenient: if you can guess the meaning, accept it, briefly offer a better phrasing, and continue. Reply in 1-2 short sentences max, ask ONE question at a time. Do NOT say "repeat" or "try again" unless speech is completely unclear. Do NOT speak Georgian. Never drill pronunciation.`;
 }
 
+function basicAuthHeader(apiKey: string) {
+  // Inworld expects Basic <base64(apiKey:)>  (note the trailing colon, empty password)
+  const encoded = btoa(`${apiKey}:`);
+  return `Basic ${encoded}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  if (!OPENAI_KEY) {
-    return new Response(JSON.stringify({ error: "OPENAI_API_KEY not configured" }), {
+  if (!INWORLD_API_KEY) {
+    return new Response(JSON.stringify({ error: "INWORLD_API_KEY not configured" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -48,70 +49,63 @@ Deno.serve(async (req) => {
     const voice = "alloy";
     const instructions = instructionsFor(level, topic, tier);
 
-    async function createClientSecret(model: string) {
-      const res = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENAI_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          session: {
-            type: "realtime",
-            model,
-            instructions,
-            audio: {
-              input: {
-                transcription: { model: "whisper-1" },
-                turn_detection: {
-                  type: "server_vad",
-                  threshold: 0.55,
-                  prefix_padding_ms: 250,
-                  silence_duration_ms: 550,
-                  create_response: true,
-                  interrupt_response: true,
-                },
-              },
-              output: { voice },
+    const res = await fetch("https://api.inworld.ai/api/v1/realtime/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: basicAuthHeader(INWORLD_API_KEY),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: PRIMARY_MODEL,
+        instructions,
+        audio: {
+          input: {
+            transcription: { model: "whisper-1" },
+            turn_detection: {
+              type: "server_vad",
+              threshold: 0.55,
+              prefix_padding_ms: 250,
+              silence_duration_ms: 550,
+              create_response: true,
+              interrupt_response: true,
             },
           },
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      return { res, json };
-    }
+          output: { voice },
+        },
+      }),
+    });
 
-    let { res, json } = await createClientSecret(PRIMARY_MODEL);
-    let usedModel = PRIMARY_MODEL;
-    if (!res.ok) {
-      console.warn("[realtime] primary failed, trying fallback", res.status, json);
-      const retry = await createClientSecret(FALLBACK_MODEL);
-      res = retry.res;
-      json = retry.json;
-      usedModel = FALLBACK_MODEL;
-    }
+    const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      console.error("[realtime] openai error", res.status, json);
+      console.error("[inworld] session create failed", res.status, json);
       return new Response(
-        JSON.stringify({ error: json?.error?.message ?? "OpenAI session error" }),
+        JSON.stringify({ error: json?.error?.message ?? json?.message ?? "Inworld session error" }),
         { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const clientSecretValue = json?.value ?? json?.client_secret?.value;
-    const expiresAt = json?.expires_at ?? json?.client_secret?.expires_at;
+    const sessionId = json?.id ?? json?.session_id ?? json?.sessionId;
+    if (!sessionId) {
+      console.error("[inworld] missing session id in response", json);
+      return new Response(JSON.stringify({ error: "Missing session id from Inworld" }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(
       JSON.stringify({
-        client_secret: { value: clientSecretValue, expires_at: expiresAt },
-        model: usedModel,
+        session_id: sessionId,
+        // Backwards-compatible shape: the frontend reads client_secret.value as the key.
+        client_secret: { value: sessionId, expires_at: json?.expires_at ?? null },
+        model: PRIMARY_MODEL,
         voice,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("[realtime] error", e);
+    console.error("[inworld] error", e);
     return new Response(JSON.stringify({ error: String((e as Error)?.message ?? e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

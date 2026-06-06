@@ -295,12 +295,10 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const resp = await fetch(`https://api.openai.com/v1/realtime/calls?model=${encodeURIComponent(usedModel!)}`, {
+      // Inworld: session id is the `key` query param; no Bearer token from client.
+      const resp = await fetch(`https://api.inworld.ai/v1/realtime/calls?key=${encodeURIComponent(clientSecret!)}&protocol=realtime`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${clientSecret}`,
-          "Content-Type": "application/sdp",
-        },
+        headers: { "Content-Type": "application/sdp" },
         body: offer.sdp ?? "",
       });
       if (!resp.ok) {
