@@ -364,5 +364,5 @@ export function useRealtimeCall({ topic, level, tier, selectedLearningPath, onEv
   }, [fail, handleServerEvent, level, tier, selectedLearningPath, status, topic]);
 
 
-  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, model, micOn };
+  return { status, errorMsg, start, stop, setMicEnabled, sendUserText, micOn };
 }
