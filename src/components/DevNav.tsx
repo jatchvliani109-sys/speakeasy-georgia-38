@@ -49,33 +49,6 @@ const GROUPS: Group[] = [
     ],
   },
   {
-    title: "Speaking",
-    items: [
-      { to: "/path/speaking", label: "Speaking dashboard" },
-      { to: "/path/speaking/call", label: "AI speaking session" },
-      { to: "/path/speaking/pronunciation", label: "Listen & repeat" },
-      { to: "/path/speaking/roleplay", label: "Roleplay list" },
-      { to: "/path/speaking/progress", label: "Speaking progress" },
-    ],
-  },
-  {
-    title: "Speaking — scenarios",
-    items: [
-      { to: "/path/speaking/roleplay/meet_friend", label: "Meet a new friend" },
-      { to: "/path/speaking/roleplay/at_school", label: "At school" },
-      { to: "/path/speaking/roleplay/at_cafe_basic", label: "At a café" },
-      { to: "/path/speaking/roleplay/family_talk", label: "Family talk" },
-      { to: "/path/speaking/roleplay/order_food", label: "Ordering food" },
-      { to: "/path/speaking/roleplay/directions", label: "Asking directions" },
-      { to: "/path/speaking/roleplay/shopping", label: "Shopping" },
-      { to: "/path/speaking/roleplay/travel_basics", label: "Travel basics" },
-      { to: "/path/speaking/roleplay/interview", label: "Job interview" },
-      { to: "/path/speaking/roleplay/opinions", label: "Giving opinions" },
-      { to: "/path/speaking/roleplay/problem_solving", label: "Problem solving" },
-      { to: "/path/speaking/roleplay/make_plans", label: "Making plans" },
-    ],
-  },
-  {
     title: "Business English",
     items: [
       { to: "/path/business", label: "Business gate (router)" },
