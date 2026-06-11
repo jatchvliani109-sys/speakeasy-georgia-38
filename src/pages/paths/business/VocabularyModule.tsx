@@ -849,7 +849,7 @@ function SummaryStat({ label, value }: { label: string; value: number }) {
 
 function Confetti({ seed }: { seed: number }): JSX.Element {
   const pieces = useMemo(() => {
-    const colors = ["#A84060", "#6B1E3E", "#C97A90", "#5A8A6A", "#EF4444", "#E8C2CC"];
+    const colors = ["#A84060", "#6B1E3E", "#C97A90", "#5A8A6A", "#C0392B", "#E8C2CC"];
     return Array.from({ length: 36 }).map((_, i) => ({
       id: `${seed}-${i}`,
       left: Math.random() * 100,

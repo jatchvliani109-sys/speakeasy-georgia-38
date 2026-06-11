@@ -51,7 +51,7 @@ function formatKaDate(iso: string | null): string {
 const LABELS = [
   { id: "easy", dot: "#5A8A6A", label: "ადვილი" },
   { id: "okay", dot: "#A84060", label: "საშუალო" },
-  { id: "difficult", dot: "#DC2626", label: "რთული" },
+  { id: "difficult", dot: "#A52A1B", label: "რთული" },
 ] as const;
 
 type TabKey = "phrases" | "words";
