@@ -490,7 +490,7 @@ export default function InterviewModule() {
       {(step === "interview" || step === "verdict") && (
         <div className="space-y-3">
           {/* Interview "set" card */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-4 shadow-[0_12px_30px_-15px_rgba(30,42,68,0.5)]">
+          <div className="rounded-2xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-4 shadow-[0_12px_30px_-15px_rgba(107,30,62,0.5)]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#A84060] text-[#6B1E3E] grid place-items-center font-bold text-sm">
                 {initials(b.interviewerName)}
@@ -705,14 +705,14 @@ export default function InterviewModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-7 shadow-[0_20px_50px_-20px_rgba(30,42,68,0.6)]">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-7 shadow-[0_20px_50px_-20px_rgba(107,30,62,0.6)]">
             <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#A84060]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
             <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#5A8A6A]/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
               <div className="mx-auto relative w-20 h-20">
                 <div className="absolute inset-0 rounded-full bg-[#A84060]/15 animate-[ping_1.6s_ease-out_1]" />
                 <div className="absolute inset-0 rounded-full border border-[#A84060]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(201,162,39,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
                   <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#6B1E3E]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>

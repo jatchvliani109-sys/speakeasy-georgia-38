@@ -1049,7 +1049,7 @@ function DocView({
 
       {/* Document — hidden for bio (BioVersions covers all three) */}
       {!(doc.doc_type === "bio" && !editing) && (
-        <article className="bg-white border border-[#E8D5DA] rounded-2xl p-6 shadow-[0_1px_2px_rgba(30,42,68,0.04),0_8px_24px_-12px_rgba(30,42,68,0.12)]">
+        <article className="bg-white border border-[#E8D5DA] rounded-2xl p-6 shadow-[0_1px_2px_rgba(107,30,62,0.04),0_8px_24px_-12px_rgba(107,30,62,0.12)]">
           {editing ? (
             <textarea
               value={editContent}

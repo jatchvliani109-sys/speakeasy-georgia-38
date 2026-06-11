@@ -547,7 +547,7 @@ export default function MeetingsModule() {
       {(step === "meeting" || step === "verdict") && (
         <div className="space-y-3">
           {/* Meeting room header */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#5A8A6A] via-[#5A8A6A] to-[#3F6649] text-[#F0F7F2] p-4 shadow-[0_12px_30px_-15px_rgba(15,118,110,0.45)]">
+          <div className="rounded-2xl bg-gradient-to-br from-[#5A8A6A] via-[#5A8A6A] to-[#3F6649] text-[#F0F7F2] p-4 shadow-[0_12px_30px_-15px_rgba(90,138,106,0.45)]">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="ka text-[10px] uppercase tracking-wider text-[#C8DCCF] font-semibold">
@@ -789,14 +789,14 @@ export default function MeetingsModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5A8A6A] via-[#5A8A6A] to-[#3F6649] text-[#F0F7F2] p-7 shadow-[0_20px_50px_-20px_rgba(15,118,110,0.6)]">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5A8A6A] via-[#5A8A6A] to-[#3F6649] text-[#F0F7F2] p-7 shadow-[0_20px_50px_-20px_rgba(90,138,106,0.6)]">
             <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#A84060]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
             <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#C8DCCF]/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
               <div className="mx-auto relative w-20 h-20">
                 <div className="absolute inset-0 rounded-full bg-[#C8DCCF]/20 animate-[ping_1.6s_ease-out_1]" />
                 <div className="absolute inset-0 rounded-full border border-[#C8DCCF]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(201,162,39,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
                   <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#3F6649]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>
