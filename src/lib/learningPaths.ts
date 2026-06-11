@@ -1,5 +1,4 @@
 export type LearningPathId =
-  | "speaking"
   | "business_english"
   | "national_exam";
 
@@ -12,13 +11,6 @@ export type LearningPath = {
 };
 
 export const LEARNING_PATHS: LearningPath[] = [
-  {
-    id: "speaking",
-    title: "საუბრის გაუმჯობესება",
-    description: "ივარჯიშე ინგლისურად საუბარში AI მასწავლებელთან.",
-    icon: "🎙️",
-    route: "/path/speaking",
-  },
   {
     id: "business_english",
     title: "ბიზნეს ინგლისური",

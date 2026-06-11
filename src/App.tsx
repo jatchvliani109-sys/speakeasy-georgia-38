@@ -10,13 +10,6 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import LearningPathSelection from "./pages/LearningPathSelection";
-import SpeakingDashboard from "./pages/paths/speaking/SpeakingDashboard";
-import SpeakingDailyLesson from "./pages/paths/speaking/DailyLesson";
-import AISpeakingCall from "./pages/paths/speaking/AISpeakingCall";
-import SpeakingPronunciation from "./pages/paths/speaking/Pronunciation";
-import SpeakingRoleplayList from "./pages/paths/speaking/RoleplayList";
-import SpeakingRoleplaySession from "./pages/paths/speaking/RoleplaySession";
-import SpeakingProgress from "./pages/paths/speaking/SpeakingProgress";
 import BusinessGate from "./pages/paths/business/BusinessGate";
 import BusinessSetup from "./pages/paths/business/BusinessSetup";
 import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest";
@@ -52,14 +45,6 @@ const App = () => (
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
             
-            <Route path="/path/speaking" element={<RequireAuth><SpeakingDashboard /></RequireAuth>} />
-            <Route path="/path/speaking/call" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
-            <Route path="/path/speaking/daily" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
-            <Route path="/path/speaking/daily-legacy" element={<RequireAuth><SpeakingDailyLesson /></RequireAuth>} />
-            <Route path="/path/speaking/pronunciation" element={<RequireAuth><SpeakingPronunciation /></RequireAuth>} />
-            <Route path="/path/speaking/roleplay" element={<RequireAuth><SpeakingRoleplayList /></RequireAuth>} />
-            <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
-            <Route path="/path/speaking/progress" element={<RequireAuth><SpeakingProgress /></RequireAuth>} />
             
             <Route path="/path/business" element={<RequireAuth><BusinessGate /></RequireAuth>} />
             <Route path="/path/business/setup" element={<RequireAuth><BusinessSetup /></RequireAuth>} />

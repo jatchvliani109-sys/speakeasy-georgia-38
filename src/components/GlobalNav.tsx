@@ -16,16 +16,6 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "საუბრის გაუმჯობესება",
-    items: [
-      { to: "/path/speaking", label: "Speaking Dashboard" },
-      { to: "/path/speaking/call", label: "AI Speaking Session" },
-      { to: "/path/speaking/pronunciation", label: "Pronunciation Practice" },
-      { to: "/path/speaking/roleplay", label: "Roleplay Practice" },
-      { to: "/path/speaking/progress", label: "Speaking Progress" },
-    ],
-  },
-  {
     title: "ბიზნეს ინგლისური",
     items: [
       { to: "/path/business/home", label: "Business Dashboard" },
@@ -106,14 +96,12 @@ export default function GlobalNav() {
 
 export const TESTING_SHORTCUTS: NavItem[] = [
   { to: "/learning-path", label: "Path Selection" },
-  { to: "/path/speaking", label: "Speaking" },
   { to: "/path/business/home", label: "Business" },
   { to: "/path/exam", label: "Exam" },
   { to: "/path/business/setup", label: "Biz Setup" },
   { to: "/path/business/test", label: "Biz Test" },
   { to: "/path/business/plan", label: "Biz Plan" },
   { to: "/path/business/self-introduction", label: "Self-Intro" },
-  { to: "/path/speaking/call", label: "AI Session" },
 ];
 
 export function TestingShortcuts() {
