@@ -299,7 +299,7 @@ export default function BusinessHome() {
           >
             <RotateCcw size={11} strokeWidth={2.25} /> reset
           </button>
-          <PathSwitcher />
+          
         </div>
       </header>
 
