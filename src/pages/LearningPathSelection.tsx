@@ -131,7 +131,7 @@ export default function LearningPathSelection() {
         >
           <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
             <span className="h-px w-6 bg-[#C9A227]" />
-            SpeakEasy
+            SpeakBusy
             <span className="h-px w-6 bg-[#C9A227]" />
           </div>
           <h1 className="ka text-3xl sm:text-4xl font-extrabold text-[#071A2F] leading-tight">
