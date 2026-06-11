@@ -9,12 +9,12 @@ type Props = {
 };
 
 /**
- * SpeakEasy wordmark.
+ * SpeakBusy wordmark.
  *
  * A quiet, editorial wordmark: "Speak" set in a refined contemporary serif
- * (Fraunces) at a light weight, paired with "Easy" in the same family at a
- * medium weight + italic. A single hairline underscore beneath the "e" of
- * "Easy" acts as a minimal speech-line — the only graphic gesture.
+ * (Fraunces) at a light weight, paired with "Busy" in the same family at a
+ * medium weight + italic. A single hairline underscore beneath the "y" of
+ * "Busy" acts as a minimal speech-line — the only graphic gesture.
  *
  * Uses currentColor so it sits cleanly on both light (cream/warm white) and
  * dark (muted navy) backgrounds.

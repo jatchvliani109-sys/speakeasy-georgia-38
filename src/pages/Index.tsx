@@ -34,7 +34,7 @@ const Index = () => {
       <section className="py-12 sm:py-16 text-center ka">
         <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
           <span className="h-px w-6 bg-[#C9A227]" />
-          SpeakEasy
+          SpeakBusy
           <span className="h-px w-6 bg-[#C9A227]" />
         </div>
         <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mt-5 mb-5 ka text-[#071A2F] tracking-tight">
