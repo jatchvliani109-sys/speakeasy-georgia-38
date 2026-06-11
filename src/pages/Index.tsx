@@ -1,16 +1,9 @@
 import { Link, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { ArrowRight, Mic, Briefcase, GraduationCap } from "lucide-react";
+import { ArrowRight, Briefcase, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
-  {
-    icon: Mic,
-    eyebrow: "Speaking",
-    title: "საუბრის განვითარება",
-    desc: "ივარჯიშე ნამდვილ AI მასწავლებელთან — სტრუქტურირებული სესიები და რეალურ სიტუაციებზე დაფუძნებული დიალოგები, რომლებიც გაძლიერებს თავდაჯერებას, გამოთქმასა და ბუნებრივ მეტყველებას.",
-  },
-  {
     icon: Briefcase,
     eyebrow: "Business English",
     title: "ბიზნეს ინგლისური",
