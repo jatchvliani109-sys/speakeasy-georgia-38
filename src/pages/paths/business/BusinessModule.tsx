@@ -34,7 +34,7 @@ export default function BusinessModule() {
         </span>
         <div>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E]">{mod.title}</h1>
-          <p className="ka text-sm text-[#6B6B6B] mt-1">{mod.description}</p>
+          <p className="ka text-sm text-[#4A4A4A] mt-1">{mod.description}</p>
         </div>
       </div>
       <BizCard>
@@ -42,7 +42,7 @@ export default function BusinessModule() {
           მალე დაემატება
         </p>
         <h3 className="ka text-base font-bold text-[#5C1A2E] mt-1">Coming next</h3>
-        <p className="ka text-sm text-[#6B6B6B] mt-2">
+        <p className="ka text-sm text-[#4A4A4A] mt-2">
           ეს მოდული ამჟამად მზადდება.
         </p>
       </BizCard>

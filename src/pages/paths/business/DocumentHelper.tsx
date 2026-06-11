@@ -67,7 +67,7 @@ export default function DocumentHelper() {
   if (!user || !profile) {
     return (
       <BusinessShell>
-        <div className="ka text-[#6B6B6B]">იტვირთება...</div>
+        <div className="ka text-[#4A4A4A]">იტვირთება...</div>
       </BusinessShell>
     );
   }
@@ -79,7 +79,7 @@ export default function DocumentHelper() {
           ბიზნეს ინგლისური
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დოკუმენტების ასისტენტი</h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-1">
+        <p className="ka text-sm text-[#4A4A4A] mt-1">
           რეალური პროფესიული დოკუმენტები — შენი მონაცემებით, წამიერად.
         </p>
       </header>
@@ -169,7 +169,7 @@ function HomeView({
                 <Icon size={16} strokeWidth={2} />
               </span>
               <p className="ka font-semibold text-sm text-[#5C1A2E]">{t.title}</p>
-              <p className="ka text-[11px] text-[#6B6B6B] mt-1 leading-relaxed">{t.subtitle}</p>
+              <p className="ka text-[11px] text-[#4A4A4A] mt-1 leading-relaxed">{t.subtitle}</p>
             </button>
           );
         })}
@@ -177,7 +177,7 @@ function HomeView({
 
       <section>
         <div className="flex items-center justify-between mb-2 px-1">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
             ჩემი დოკუმენტები
           </p>
           {docs.length > 3 && (
@@ -188,7 +188,7 @@ function HomeView({
         </div>
         {docs.length === 0 ? (
           <BizCard className="bg-[#F8F5F0] border-dashed">
-            <p className="ka text-xs text-[#6B6B6B]">
+            <p className="ka text-xs text-[#4A4A4A]">
               ჯერ არ შეგიქმნია დოკუმენტი. აირჩიე ერთ-ერთი ხელსაწყო ზემოთ.
             </p>
           </BizCard>
@@ -216,11 +216,11 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
       </span>
       <div className="flex-1 min-w-0">
         <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{doc.title}</p>
-        <p className="ka text-[11px] text-[#6B6B6B] mt-0.5">
+        <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
           {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleDateString("ka-GE")}
         </p>
       </div>
-      <span className="text-[#6B6B6B]">→</span>
+      <span className="text-[#4A4A4A]">→</span>
     </button>
   );
 }
@@ -254,7 +254,7 @@ function LibraryView({
 
   return (
     <>
-      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
+      <button onClick={onBack} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] mb-3">
         ← უკან
       </button>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-3">ჩემი დოკუმენტები</h2>
@@ -276,14 +276,14 @@ function LibraryView({
 
       {filtered.length === 0 ? (
         <BizCard className="bg-[#F8F5F0] border-dashed">
-          <p className="ka text-xs text-[#6B6B6B]">დოკუმენტი არ მოიძებნა.</p>
+          <p className="ka text-xs text-[#4A4A4A]">დოკუმენტი არ მოიძებნა.</p>
         </BizCard>
       ) : filter === "all" ? (
         <div className="space-y-5">
           {(Object.keys(grouped) as DocType[]).map((t) =>
             grouped[t].length ? (
               <section key={t}>
-                <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
                   {DOC_TYPE_LABELS[t]}
                 </p>
                 <div className="space-y-2">
@@ -294,7 +294,7 @@ function LibraryView({
                         onClick={async () => {
                           if (confirm("წავშალო ეს დოკუმენტი?")) await onDelete(d.id);
                         }}
-                        className="text-[#6B6B6B] hover:text-red-600 text-xs px-2"
+                        className="text-[#4A4A4A] hover:text-red-600 text-xs px-2"
                         aria-label="წაშლა"
                       >
                         🗑
@@ -315,7 +315,7 @@ function LibraryView({
                 onClick={async () => {
                   if (confirm("წავშალო ეს დოკუმენტი?")) await onDelete(d.id);
                 }}
-                className="text-[#6B6B6B] hover:text-red-600 text-xs px-2"
+                className="text-[#4A4A4A] hover:text-red-600 text-xs px-2"
                 aria-label="წაშლა"
               >
                 🗑
@@ -346,7 +346,7 @@ function ToolView({
   onUploadResume: () => void;
 }) {
   const Common = (
-    <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
+    <button onClick={onBack} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] mb-3">
       ← უკან
     </button>
   );
@@ -430,7 +430,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
   return (
     <div>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული იმეილი</h2>
-      <p className="ka text-xs text-[#6B6B6B] mb-4">3 მოკლე კითხვა → დასრულებული იმეილი.</p>
+      <p className="ka text-xs text-[#4A4A4A] mb-4">3 მოკლე კითხვა → დასრულებული იმეილი.</p>
 
       <ProgressDots total={4} current={step} />
 
@@ -512,7 +512,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
       {step === 3 && (
         <BizCard className="mt-4">
           <p className="ka text-sm text-[#5C1A2E] font-semibold">მზად ხართ?</p>
-          <p className="ka text-xs text-[#6B6B6B] mt-1">
+          <p className="ka text-xs text-[#4A4A4A] mt-1">
             AI გენერირებს იმეილს თქვენი მონაცემებითა და კონტექსტით.
           </p>
           <div className="flex justify-between mt-4">
@@ -574,7 +574,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
   return (
     <div>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
-      <p className="ka text-xs text-[#6B6B6B] mb-4">
+      <p className="ka text-xs text-[#4A4A4A] mb-4">
         ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
       </p>
       <BizCard>
@@ -645,7 +645,7 @@ function CoverLetterFlow({
     return (
       <BizCard className="bg-[#F8F5F0] border-[#F0E8D8]">
         <p className="ka text-sm font-semibold text-[#5C1A2E]">ჯერ ატვირთე რეზიუმე</p>
-        <p className="ka text-xs text-[#6B6B6B] mt-1">
+        <p className="ka text-xs text-[#4A4A4A] mt-1">
           სამოტივაციო წერილს ვამზადებთ შენი გამოცდილების მიხედვით.
         </p>
         <div className="mt-3">
@@ -684,7 +684,7 @@ function CoverLetterFlow({
   return (
     <div>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">სამოტივაციო წერილი</h2>
-      <p className="ka text-xs text-[#6B6B6B] mb-4">შენი რეზიუმე უკვე გვაქვს. შეიყვანე პოზიცია.</p>
+      <p className="ka text-xs text-[#4A4A4A] mb-4">შენი რეზიუმე უკვე გვაქვს. შეიყვანე პოზიცია.</p>
       <BizCard>
         <Label>სამუშაო პოზიცია *</Label>
         <input
@@ -765,10 +765,10 @@ function ResumeImproveFlow({
   return (
     <div>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">რეზიუმეს გაუმჯობესება</h2>
-      <p className="ka text-xs text-[#6B6B6B] mb-4">კონკრეტული რჩევები და "before/after" მაგალითები.</p>
+      <p className="ka text-xs text-[#4A4A4A] mb-4">კონკრეტული რჩევები და "before/after" მაგალითები.</p>
       <BizCard>
         {resumeReady ? (
-          <p className="ka text-[11px] text-[#6B6B6B] mb-3">
+          <p className="ka text-[11px] text-[#4A4A4A] mb-3">
             შენი ატვირთული რეზიუმე უკვე ჩატვირთულია. შეგიძლია შეცვალო ან დაამატო ტექსტი ქვემოთ.
           </p>
         ) : (
@@ -859,7 +859,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
   return (
     <div>
       <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული ბიო</h2>
-      <p className="ka text-xs text-[#6B6B6B] mb-4">სამი ვერსია: short, medium, full.</p>
+      <p className="ka text-xs text-[#4A4A4A] mb-4">სამი ვერსია: short, medium, full.</p>
       <BizCard>
         <Label>სად გამოიყენებ?</Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
@@ -947,7 +947,7 @@ function DocView({
 
   return (
     <>
-      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
+      <button onClick={onBack} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] mb-3">
         ← ჩემი დოკუმენტები
       </button>
 
@@ -962,7 +962,7 @@ function DocView({
           ) : (
             <h2 className="ka text-xl font-bold text-[#5C1A2E] truncate">{doc.title}</h2>
           )}
-          <p className="ka text-[11px] text-[#6B6B6B] mt-1">
+          <p className="ka text-[11px] text-[#4A4A4A] mt-1">
             {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleString("ka-GE")}
           </p>
         </div>
@@ -975,7 +975,7 @@ function DocView({
       </div>
 
       {subject && !editing && (
-        <p className="ka text-xs text-[#6B6B6B] mb-2">
+        <p className="ka text-xs text-[#4A4A4A] mb-2">
           <span className="font-semibold text-[#5C1A2E]">Subject:</span> {subject}
         </p>
       )}
@@ -983,7 +983,7 @@ function DocView({
       {/* Resume Improve: recommendations FIRST */}
       {isResumeImprove && !editing && resumeMeta && (
         <section className="mb-4 space-y-3">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold px-1">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold px-1">
             რეკომენდაციები
           </p>
           {resumeMeta.summaryKa && (
@@ -994,13 +994,13 @@ function DocView({
           )}
           {resumeMeta.toneAssessmentKa && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">ტონი</p>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-1">ტონი</p>
               <p className="ka text-xs text-[#5C1A2E] leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
             </BizCard>
           )}
           {Array.isArray(resumeMeta.missingKeywords) && resumeMeta.missingKeywords.length > 0 && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">Keywords რომელიც აკლია</p>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2">Keywords რომელიც აკლია</p>
               <div className="flex flex-wrap gap-1.5">
                 {resumeMeta.missingKeywords.map((k: string, i: number) => (
                   <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-[#FAF5E8] text-[#5C1A2E] border border-[#F0E8D8]">
@@ -1012,12 +1012,12 @@ function DocView({
           )}
           {Array.isArray(resumeMeta.suggestions) && resumeMeta.suggestions.length > 0 && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">Before / After</p>
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2">Before / After</p>
               <ul className="space-y-3">
                 {resumeMeta.suggestions.map((s: any, i: number) => (
                   <li key={i} className="border-t border-[#E0D8D0] first:border-t-0 pt-3 first:pt-0">
                     {s.sectionKa && <p className="ka text-xs font-semibold text-[#5C1A2E]">{s.sectionKa}</p>}
-                    {s.issueKa && <p className="ka text-[11px] text-[#6B6B6B] mt-1">{s.issueKa}</p>}
+                    {s.issueKa && <p className="ka text-[11px] text-[#4A4A4A] mt-1">{s.issueKa}</p>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                       {s.before && (
                         <div className="bg-[#FDF0EE] rounded-md px-2 py-1.5 text-[11px]">
@@ -1032,7 +1032,7 @@ function DocView({
                         </div>
                       )}
                     </div>
-                    {s.whyKa && <p className="ka text-[11px] text-[#6B6B6B] mt-2">↳ {s.whyKa}</p>}
+                    {s.whyKa && <p className="ka text-[11px] text-[#4A4A4A] mt-2">↳ {s.whyKa}</p>}
                   </li>
                 ))}
               </ul>
@@ -1042,7 +1042,7 @@ function DocView({
       )}
 
       {isResumeImprove && !editing && (
-        <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
           გაუმჯობესებული რეზიუმე
         </p>
       )}
@@ -1082,7 +1082,7 @@ function DocView({
               </BizCard>
             )}
             <section className="mt-4">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
                 შედარება — ორიგინალი / გაუმჯობესებული
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1098,7 +1098,7 @@ function DocView({
             </section>
             {changes.length > 0 && (
               <section className="mt-4">
-                <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
                   რა გასწორდა და რატომ
                 </p>
                 <ul className="space-y-2">
@@ -1115,7 +1115,7 @@ function DocView({
                         </div>
                       </div>
                       {c.whyKa && (
-                        <p className="ka text-[11px] text-[#6B6B6B] mt-2">↳ {c.whyKa}</p>
+                        <p className="ka text-[11px] text-[#4A4A4A] mt-2">↳ {c.whyKa}</p>
                       )}
                     </li>
                   ))}
@@ -1136,14 +1136,14 @@ function DocView({
       {/* Highlights legend */}
       {doc.highlights?.length > 0 && !editing && (
         <BizCard className="mt-4 bg-[#F8F5F0]">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2">
             ✨ მონიშნული ფრაზები
           </p>
           <ul className="space-y-2">
             {doc.highlights.map((h, i) => (
               <li key={i} className="text-xs">
                 <span className="font-semibold text-[#5C1A2E]">"{h.phrase}"</span>
-                <span className="ka text-[#6B6B6B]"> — {h.whyKa}</span>
+                <span className="ka text-[#4A4A4A]"> — {h.whyKa}</span>
               </li>
             ))}
           </ul>
@@ -1153,7 +1153,7 @@ function DocView({
       {/* Adjustments */}
       {!editing && (
         <section className="mt-5">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
             შესწორებები
           </p>
           <div className="flex flex-wrap gap-2">
@@ -1174,7 +1174,7 @@ function DocView({
               </button>
             ))}
           </div>
-          {adjusting && <p className="ka text-[11px] text-[#6B6B6B] mt-2">ვამუშავებ...</p>}
+          {adjusting && <p className="ka text-[11px] text-[#4A4A4A] mt-2">ვამუშავებ...</p>}
         </section>
       )}
 
@@ -1206,7 +1206,7 @@ function DocView({
 /* ============================ UI bits ============================ */
 
 function Label({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <p className={`ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold ${className}`}>{children}</p>;
+  return <p className={`ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold ${className}`}>{children}</p>;
 }
 
 function Chip({
@@ -1293,7 +1293,7 @@ function BioVersions({
 
   return (
     <section className="mt-5 space-y-3">
-      <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold px-1">
+      <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold px-1">
         სამი ვერსია
       </p>
       {(["short", "medium", "full"] as const).map((k) => {

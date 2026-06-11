@@ -148,7 +148,7 @@ export default function BusinessReassessment() {
   if (loading || !test) {
     return (
       <BusinessShell>
-        <div className="ka text-[#6B6B6B]">იტვირთება...</div>
+        <div className="ka text-[#4A4A4A]">იტვირთება...</div>
       </BusinessShell>
     );
   }
@@ -184,7 +184,7 @@ export default function BusinessReassessment() {
             შედეგი · ტესტი #{test.version}
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">{title}</h1>
-          <p className="text-sm text-[#6B6B6B] mt-1">Score: {resultPct}%</p>
+          <p className="text-sm text-[#4A4A4A] mt-1">Score: {resultPct}%</p>
           <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{blurb}</p>
 
           {weakAreas.length > 0 && went <= 0 && (
@@ -193,7 +193,7 @@ export default function BusinessReassessment() {
                 სფეროები სამუშაოდ
               </p>
               <p className="ka text-sm text-[#5C1A2E] mt-1">{weakAreas.join(" · ")}</p>
-              <p className="ka text-[11px] text-[#6B6B6B] mt-1">
+              <p className="ka text-[11px] text-[#4A4A4A] mt-1">
                 გირჩევთ შესაბამის მოდულში დამატებითი სესიების გაკეთებას.
               </p>
             </div>
@@ -215,19 +215,19 @@ export default function BusinessReassessment() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           კითხვა {idx + 1} / {total}
           {q?.type === "mcq" && (
-            <span className="ml-2 text-[#6B6B6B] normal-case tracking-normal">
+            <span className="ml-2 text-[#4A4A4A] normal-case tracking-normal">
               · {q.weight} pt
             </span>
           )}
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დონის შეფასება</h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-1">
+        <p className="ka text-sm text-[#4A4A4A] mt-1">
           12 კითხვა + არასავალდებულო წერითი დავალება. შენი წინა პროგრესი დაცულია.
         </p>
       </div>
 
       <BizCard>
-        {q?.promptKa && <p className="ka text-xs text-[#6B6B6B] mb-1">{q.promptKa}</p>}
+        {q?.promptKa && <p className="ka text-xs text-[#4A4A4A] mb-1">{q.promptKa}</p>}
         <p className="text-[#5C1A2E] font-semibold">{q?.prompt}</p>
 
         {q?.type === "mcq" ? (
@@ -262,7 +262,7 @@ export default function BusinessReassessment() {
               placeholder="Write your answer in English... (optional)"
               className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
-            <p className="ka text-xs text-[#6B6B6B] mt-2">
+            <p className="ka text-xs text-[#4A4A4A] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
             </p>
           </>

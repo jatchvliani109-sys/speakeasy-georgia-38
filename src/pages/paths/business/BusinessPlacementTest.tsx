@@ -252,7 +252,7 @@ export default function BusinessPlacementTest() {
             შენი დონე:{" "}
             <span className="text-[#5A8A6A]">{LEVEL_LABELS[resultLevel]}</span>
           </h1>
-          <p className="text-sm text-[#6B6B6B] mt-1">
+          <p className="text-sm text-[#4A4A4A] mt-1">
             Score: {resultPct}% (weighted)
           </p>
           <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">
@@ -274,7 +274,7 @@ export default function BusinessPlacementTest() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           კითხვა {idx + 1} / {total}
           {q.type === "mcq" && (
-            <span className="ml-2 text-[#6B6B6B] normal-case tracking-normal">
+            <span className="ml-2 text-[#4A4A4A] normal-case tracking-normal">
               · {q.weight} pt
             </span>
           )}
@@ -282,13 +282,13 @@ export default function BusinessPlacementTest() {
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           ბიზნეს ინგლისურის მოკლე ტესტი
         </h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-1">
+        <p className="ka text-sm text-[#4A4A4A] mt-1">
           ტესტი დაგვეხმარება გავიგოთ რა დონიდან დავიწყოთ.
         </p>
       </div>
 
       <BizCard>
-        {q.promptKa && <p className="ka text-xs text-[#6B6B6B] mb-1">{q.promptKa}</p>}
+        {q.promptKa && <p className="ka text-xs text-[#4A4A4A] mb-1">{q.promptKa}</p>}
         <p className="text-[#5C1A2E] font-semibold">{q.prompt}</p>
 
         {q.type === "mcq" ? (
@@ -325,7 +325,7 @@ export default function BusinessPlacementTest() {
               placeholder="Write your answer in English... (optional)"
               className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
-            <p className="ka text-xs text-[#6B6B6B] mt-2">
+            <p className="ka text-xs text-[#4A4A4A] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
             </p>
           </>

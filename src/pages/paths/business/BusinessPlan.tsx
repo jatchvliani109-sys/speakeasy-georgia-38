@@ -41,7 +41,7 @@ export default function BusinessPlan() {
 
 
   const plan = useMemo(() => s?.plan ?? null, [s]);
-  if (!s || !plan) return <BusinessShell><div className="text-[#6B6B6B] ka">იტვირთება...</div></BusinessShell>;
+  if (!s || !plan) return <BusinessShell><div className="text-[#4A4A4A] ka">იტვირთება...</div></BusinessShell>;
 
   return (
     <BusinessShell>
@@ -60,15 +60,15 @@ export default function BusinessPlan() {
       </BizCard>
 
       <BizCard className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
           რეკომენდებული პირველი მოდული
         </p>
         <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-1">{plan.recommendedModuleTitle}</h3>
-        <p className="ka text-xs text-[#6B6B6B] mt-1">შენი მიზნის შესაბამისად დავიწყოთ აქედან.</p>
+        <p className="ka text-xs text-[#4A4A4A] mt-1">შენი მიზნის შესაბამისად დავიწყოთ აქედან.</p>
       </BizCard>
 
       <BizCard className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2">
           ყოველკვირეული ფოკუსი
         </p>
         <ul className="space-y-2">
@@ -91,7 +91,7 @@ export default function BusinessPlan() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-[#E0D8D0] last:border-0">
-      <span className="ka text-xs text-[#6B6B6B]">{label}</span>
+      <span className="ka text-xs text-[#4A4A4A]">{label}</span>
       <span className="ka text-sm font-semibold text-[#5C1A2E]">{value}</span>
     </div>
   );

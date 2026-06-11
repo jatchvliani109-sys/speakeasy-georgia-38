@@ -255,7 +255,7 @@ export default function BusinessResumeUpload() {
           არჩევითი ნაბიჯი
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ატვირთე შენი რეზიუმე</h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-2 leading-relaxed">
+        <p className="ka text-sm text-[#4A4A4A] mt-2 leading-relaxed">
           ატვირთე შენი რეზიუმე და ჩვენ მოვარგებთ ყველა გაკვეთილს შენს პროფესიულ
           გამოცდილებას. ასევე გამოგადგება Cover Letter-ების და ელ-ფოსტების დასაწერად.
         </p>
@@ -281,7 +281,7 @@ export default function BusinessResumeUpload() {
                     {[existing.full_name, existing.job_title].filter(Boolean).join(" — ")}
                   </p>
                 )}
-                <p className="ka text-[11px] text-[#6B6B6B] mt-1">
+                <p className="ka text-[11px] text-[#4A4A4A] mt-1">
                   ატვირთულია: {formatDate(existing.created_at)}
                 </p>
               </div>
@@ -302,12 +302,12 @@ export default function BusinessResumeUpload() {
         <BizCard className="mb-4">
           {showReplace && (
             <div className="mb-3 flex items-center justify-between">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                 ახალი რეზიუმე ჩაანაცვლებს ძველს
               </p>
               <button
                 onClick={() => setShowReplace(false)}
-                className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] underline underline-offset-2"
+                className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
               >
                 გაუქმება
               </button>
@@ -333,7 +333,7 @@ export default function BusinessResumeUpload() {
             <p className="ka text-sm font-semibold text-[#5C1A2E]">
               {parsing ? "ვამუშავებ..." : "გადმოაგდე ფაილი ან აირჩიე"}
             </p>
-            <p className="ka text-xs text-[#6B6B6B] mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
+            <p className="ka text-xs text-[#4A4A4A] mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
             <input
               ref={inputRef}
               type="file"
@@ -348,7 +348,7 @@ export default function BusinessResumeUpload() {
           </div>
 
           {parsing && (
-            <p className="ka text-xs text-[#6B6B6B] mt-3 text-center">
+            <p className="ka text-xs text-[#4A4A4A] mt-3 text-center">
               მონაცემების ამოღება — შეიძლება დასჭირდეს რამდენიმე წამი...
             </p>
           )}
@@ -357,7 +357,7 @@ export default function BusinessResumeUpload() {
             <div className="mt-5 flex items-center justify-center">
               <button
                 onClick={skip}
-                className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] underline underline-offset-2"
+                className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
               >
                 გამოტოვება — შემდეგ ვცადო
               </button>
@@ -373,7 +373,7 @@ export default function BusinessResumeUpload() {
               <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                 ამოღებული მონაცემები
               </p>
-              <p className="ka text-xs text-[#6B6B6B] mt-1">
+              <p className="ka text-xs text-[#4A4A4A] mt-1">
                 გადაამოწმე და გაასწორე საჭიროების შემთხვევაში.
               </p>
             </div>
@@ -382,7 +382,7 @@ export default function BusinessResumeUpload() {
                 setFile(null);
                 setExtracted(null);
               }}
-              className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] underline underline-offset-2"
+              className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
             >
               ხელახლა ატვირთვა
             </button>
@@ -447,7 +447,7 @@ export default function BusinessResumeUpload() {
                 setFile(null);
                 setExtracted(null);
               }}
-              className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] underline underline-offset-2"
+              className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
             >
               სხვა ფაილის ატვირთვა
             </button>
@@ -474,7 +474,7 @@ function Field({
 }) {
   return (
     <div className="mb-3">
-      <label className="ka block text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">
+      <label className="ka block text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-1">
         {label}
       </label>
       {textarea ? (
