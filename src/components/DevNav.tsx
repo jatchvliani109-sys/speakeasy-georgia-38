@@ -44,7 +44,7 @@ const GROUPS: Group[] = [
       { to: "/", label: "Landing / Home", public: true },
       { to: "/auth", label: "Login / Register", public: true },
       { to: "/auth?mode=login", label: "Login screen", public: true },
-      { to: "/dashboard", label: "Path selection" },
+      
       { to: "/dashboard", label: "Dashboard router" },
     ],
   },
