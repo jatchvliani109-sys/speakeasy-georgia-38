@@ -1,6 +1,5 @@
 export type LearningPathId =
-  | "business_english"
-  | "national_exam";
+  | "business_english";
 
 export type LearningPath = {
   id: LearningPathId;
