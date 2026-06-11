@@ -30,18 +30,6 @@ const GROUPS: NavGroup[] = [
       { to: "/path/business/module/vocabulary", label: "Business Vocabulary" },
     ],
   },
-  {
-    title: "ეროვნული გამოცდები",
-    items: [
-      { to: "/path/exam", label: "Exam Dashboard" },
-      { to: "/path/exam?section=grammar", label: "Grammar" },
-      { to: "/path/exam?section=vocabulary", label: "Vocabulary" },
-      { to: "/path/exam?section=reading", label: "Reading" },
-      { to: "/path/exam?section=tests", label: "Tests" },
-      { to: "/path/exam?section=mock", label: "Mock Exam" },
-      { to: "/path/exam?section=results", label: "Results" },
-    ],
-  },
 ];
 
 export default function GlobalNav() {
