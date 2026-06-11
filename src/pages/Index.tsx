@@ -20,63 +20,63 @@ const Index = () => {
   return (
     <Layout showLogout={false}>
       <section className="py-12 sm:py-16 text-center ka">
-        <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
-          <span className="h-px w-6 bg-[#C9A227]" />
+        <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#A84060]">
+          <span className="h-px w-6 bg-[#A84060]" />
           SpeakBusy
-          <span className="h-px w-6 bg-[#C9A227]" />
+          <span className="h-px w-6 bg-[#A84060]" />
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mt-5 mb-5 ka text-[#071A2F] tracking-tight">
+        <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mt-5 mb-5 ka text-[#4A1429] tracking-tight">
           ისწავლე ინგლისური{" "}
-          <span className="block sm:inline text-[#0F2748]">თავდაჯერებულად</span>
+          <span className="block sm:inline text-[#5A1834]">თავდაჯერებულად</span>
         </h1>
-        <p className="text-base sm:text-lg text-[#6B7280] mb-9 max-w-md mx-auto ka leading-relaxed">
+        <p className="text-base sm:text-lg text-[#6B6B6B] mb-9 max-w-md mx-auto ka leading-relaxed">
           AI მასწავლებელი, რომელიც გესაუბრება ქართულად და ინგლისურად — შენი ტემპით.
         </p>
         <div className="flex flex-col gap-3 max-w-xs mx-auto">
           <Link
             to="/auth"
-            className="group inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[#071A2F] text-[#FAFAF7] text-sm font-semibold tracking-wide ka hover:bg-[#0F2748] transition-colors"
+            className="group inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[#4A1429] text-[#FAF6F7] text-sm font-semibold tracking-wide ka hover:bg-[#5A1834] transition-colors"
           >
             დაწყება
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
             to="/auth?mode=login"
-            className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-sm font-semibold ka text-[#071A2F] hover:bg-[#F7F1E3] transition-colors"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-sm font-semibold ka text-[#4A1429] hover:bg-[#F5EDEF] transition-colors"
           >
             უკვე მაქვს ანგარიში
           </Link>
         </div>
       </section>
 
-      <div className="h-px bg-[#E5E2D8] my-2" />
+      <div className="h-px bg-[#E8D5DA] my-2" />
 
       <section className="mt-10 mb-10">
-        <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B7280] ka mb-5 text-center">
+        <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B6B6B] ka mb-5 text-center">
           ბიზნეს ინგლისური — შენი მიზნისთვის
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
           {features.map((f, i) => (
             <article
               key={f.title}
-              className="group relative flex gap-5 p-5 sm:p-6 rounded-2xl bg-[#FAFAF7] border border-[#E5E2D8] ka transition-all hover:border-[#C9A227]/50 hover:shadow-[0_8px_24px_-16px_rgba(7,26,47,0.18)]"
+              className="group relative flex gap-5 p-5 sm:p-6 rounded-2xl bg-[#FAF6F7] border border-[#E8D5DA] ka transition-all hover:border-[#A84060]/50 hover:shadow-[0_8px_24px_-16px_rgba(74,20,41,0.18)]"
             >
               <div className="flex flex-col items-center shrink-0">
-                <div className="w-11 h-11 rounded-xl bg-[#071A2F] flex items-center justify-center text-[#C9A227]">
+                <div className="w-11 h-11 rounded-xl bg-[#4A1429] flex items-center justify-center text-[#A84060]">
                   <f.icon className="w-5 h-5" strokeWidth={1.5} />
                 </div>
-                <div className="mt-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-[#9CA3AF] tabular-nums">
+                <div className="mt-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-[#A8A8A8] tabular-nums">
                   0{i + 1}
                 </div>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A227]">
+                <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#A84060]">
                   {f.eyebrow}
                 </div>
-                <h3 className="font-bold text-[#071A2F] text-base sm:text-lg mt-1.5 tracking-tight">
+                <h3 className="font-bold text-[#4A1429] text-base sm:text-lg mt-1.5 tracking-tight">
                   {f.title}
                 </h3>
-                <p className="text-[13px] sm:text-sm text-[#6B7280] leading-relaxed mt-2">
+                <p className="text-[13px] sm:text-sm text-[#6B6B6B] leading-relaxed mt-2">
                   {f.desc}
                 </p>
               </div>

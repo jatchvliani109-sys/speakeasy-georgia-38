@@ -251,11 +251,11 @@ export default function BusinessResumeUpload() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
           არჩევითი ნაბიჯი
         </p>
-        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">ატვირთე შენი რეზიუმე</h1>
-        <p className="ka text-sm text-[#5B6473] mt-2 leading-relaxed">
+        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">ატვირთე შენი რეზიუმე</h1>
+        <p className="ka text-sm text-[#6B6B6B] mt-2 leading-relaxed">
           ატვირთე შენი რეზიუმე და ჩვენ მოვარგებთ ყველა გაკვეთილს შენს პროფესიულ
           გამოცდილებას. ასევე გამოგადგება Cover Letter-ების და ელ-ფოსტების დასაწერად.
         </p>
@@ -264,24 +264,24 @@ export default function BusinessResumeUpload() {
       {/* Existing resume view */}
       {loaded && existing && !showReplace && !extracted && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
             შენი ამჟამინდელი რეზიუმე
           </p>
-          <div className="mt-3 p-4 rounded-xl bg-[#FAF7F0] border border-[#E7E2D5]">
+          <div className="mt-3 p-4 rounded-xl bg-[#FAF6F7] border border-[#E8D5DA]">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#1E2A44] text-white grid place-items-center text-sm font-bold shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-[#6B1E3E] text-white grid place-items-center text-sm font-bold shrink-0">
                 PDF
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#1E2A44] truncate">
+                <p className="text-sm font-semibold text-[#6B1E3E] truncate">
                   {existing.file_name || "resume"}
                 </p>
                 {(existing.full_name || existing.job_title) && (
-                  <p className="text-xs text-[#374151] mt-0.5 truncate">
+                  <p className="text-xs text-[#1A1A1A] mt-0.5 truncate">
                     {[existing.full_name, existing.job_title].filter(Boolean).join(" — ")}
                   </p>
                 )}
-                <p className="ka text-[11px] text-[#5B6473] mt-1">
+                <p className="ka text-[11px] text-[#6B6B6B] mt-1">
                   ატვირთულია: {formatDate(existing.created_at)}
                 </p>
               </div>
@@ -302,12 +302,12 @@ export default function BusinessResumeUpload() {
         <BizCard className="mb-4">
           {showReplace && (
             <div className="mb-3 flex items-center justify-between">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                 ახალი რეზიუმე ჩაანაცვლებს ძველს
               </p>
               <button
                 onClick={() => setShowReplace(false)}
-                className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+                className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] underline underline-offset-2"
               >
                 გაუქმება
               </button>
@@ -323,17 +323,17 @@ export default function BusinessResumeUpload() {
             onClick={() => inputRef.current?.click()}
             className={`cursor-pointer rounded-2xl border-2 border-dashed transition-colors p-8 text-center ${
               dragging
-                ? "border-[#1E2A44] bg-[#1E2A44]/5"
-                : "border-[#E7E2D5] hover:border-[#1E2A44]/40 hover:bg-[#FAF7F0]"
+                ? "border-[#6B1E3E] bg-[#6B1E3E]/5"
+                : "border-[#E8D5DA] hover:border-[#6B1E3E]/40 hover:bg-[#FAF6F7]"
             }`}
           >
-            <div className="mx-auto w-12 h-12 rounded-full bg-[#1E2A44]/10 grid place-items-center text-[#1E2A44] text-xl mb-3">
+            <div className="mx-auto w-12 h-12 rounded-full bg-[#6B1E3E]/10 grid place-items-center text-[#6B1E3E] text-xl mb-3">
               ↑
             </div>
-            <p className="ka text-sm font-semibold text-[#1E2A44]">
+            <p className="ka text-sm font-semibold text-[#6B1E3E]">
               {parsing ? "ვამუშავებ..." : "გადმოაგდე ფაილი ან აირჩიე"}
             </p>
-            <p className="ka text-xs text-[#5B6473] mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
+            <p className="ka text-xs text-[#6B6B6B] mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
             <input
               ref={inputRef}
               type="file"
@@ -348,7 +348,7 @@ export default function BusinessResumeUpload() {
           </div>
 
           {parsing && (
-            <p className="ka text-xs text-[#5B6473] mt-3 text-center">
+            <p className="ka text-xs text-[#6B6B6B] mt-3 text-center">
               მონაცემების ამოღება — შეიძლება დასჭირდეს რამდენიმე წამი...
             </p>
           )}
@@ -357,7 +357,7 @@ export default function BusinessResumeUpload() {
             <div className="mt-5 flex items-center justify-center">
               <button
                 onClick={skip}
-                className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+                className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] underline underline-offset-2"
               >
                 გამოტოვება — შემდეგ ვცადო
               </button>
@@ -370,10 +370,10 @@ export default function BusinessResumeUpload() {
         <BizCard className="mb-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
                 ამოღებული მონაცემები
               </p>
-              <p className="ka text-xs text-[#5B6473] mt-1">
+              <p className="ka text-xs text-[#6B6B6B] mt-1">
                 გადაამოწმე და გაასწორე საჭიროების შემთხვევაში.
               </p>
             </div>
@@ -382,7 +382,7 @@ export default function BusinessResumeUpload() {
                 setFile(null);
                 setExtracted(null);
               }}
-              className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+              className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] underline underline-offset-2"
             >
               ხელახლა ატვირთვა
             </button>
@@ -447,7 +447,7 @@ export default function BusinessResumeUpload() {
                 setFile(null);
                 setExtracted(null);
               }}
-              className="ka text-xs text-[#5B6473] hover:text-[#1E2A44] underline underline-offset-2"
+              className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] underline underline-offset-2"
             >
               სხვა ფაილის ატვირთვა
             </button>
@@ -474,7 +474,7 @@ function Field({
 }) {
   return (
     <div className="mb-3">
-      <label className="ka block text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">
+      <label className="ka block text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">
         {label}
       </label>
       {textarea ? (
@@ -482,13 +482,13 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] bg-white resize-none"
+          className="w-full px-3 py-2 rounded-lg border border-[#E8D5DA] text-sm text-[#6B1E3E] outline-none focus:border-[#6B1E3E] bg-white resize-none"
         />
       ) : (
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] bg-white"
+          className="w-full px-3 py-2 rounded-lg border border-[#E8D5DA] text-sm text-[#6B1E3E] outline-none focus:border-[#6B1E3E] bg-white"
         />
       )}
     </div>

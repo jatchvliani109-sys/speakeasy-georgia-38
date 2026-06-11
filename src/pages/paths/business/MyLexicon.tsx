@@ -49,9 +49,9 @@ function formatKaDate(iso: string | null): string {
 
 // ---------- Words tab labels ----------
 const LABELS = [
-  { id: "easy", dot: "#10B981", label: "ადვილი" },
-  { id: "okay", dot: "#C9A84C", label: "საშუალო" },
-  { id: "difficult", dot: "#DC2626", label: "რთული" },
+  { id: "easy", dot: "#5A8A6A", label: "ადვილი" },
+  { id: "okay", dot: "#A84060", label: "საშუალო" },
+  { id: "difficult", dot: "#A52A1B", label: "რთული" },
 ] as const;
 
 type TabKey = "phrases" | "words";
@@ -74,17 +74,17 @@ export default function MyLexicon() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
       <header className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
           ბიზნეს ლექსიკონი
         </p>
-        <h1 className="ka text-2xl font-bold text-[#1E2A44] mt-1">ჩემი ლექსიკონი</h1>
-        <p className="ka text-sm text-[#5B6473] mt-1">
+        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">ჩემი ლექსიკონი</h1>
+        <p className="ka text-sm text-[#6B6B6B] mt-1">
           ფრაზები სესიებიდან და სიტყვები, რომლებიც შენ უკვე ისწავლე — ერთ ადგილას.
         </p>
       </header>
 
       {/* Tabs */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-[#F0EBDD] rounded-xl mb-4">
+      <div className="grid grid-cols-2 gap-1 p-1 bg-[#F0E5E9] rounded-xl mb-4">
         <TabBtn active={tab === "phrases"} onClick={() => setTab("phrases")}>
           ფრაზები
         </TabBtn>
@@ -112,8 +112,8 @@ function TabBtn({
       onClick={onClick}
       className={`ka text-sm font-semibold py-2 rounded-lg transition ${
         active
-          ? "bg-[#1E2A44] text-[#F7F1E3] shadow-sm"
-          : "text-[#5B6473] hover:text-[#1E2A44]"
+          ? "bg-[#6B1E3E] text-[#F5EDEF] shadow-sm"
+          : "text-[#6B6B6B] hover:text-[#6B1E3E]"
       }`}
     >
       {children}
@@ -208,13 +208,13 @@ function PhrasesTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#F2D680] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#E8C2CC] font-semibold">
               სულ {totalPhrases} ფრაზა შენახულია
             </p>
-            <p className="ka text-[11px] text-[#F7F1E3]/70 mt-1">
+            <p className="ka text-[11px] text-[#F5EDEF]/70 mt-1">
               {rows.length} სესია დასრულებული
             </p>
           </div>
@@ -225,12 +225,12 @@ function PhrasesTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა ფრაზებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-[#6B6B6B]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><Library size={22} strokeWidth={2} /></div>
-          <h3 className="ka text-lg font-bold text-[#1A2744] mt-3">ფრაზები ცარიელია</h3>
-          <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5EDEF] border border-[#E8D5DA] grid place-items-center text-[#6B1E3E]"><Library size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-[#6B1E3E] mt-3">ფრაზები ცარიელია</h3>
+          <p className="ka text-sm text-[#6B6B6B] mt-2 max-w-sm mx-auto">
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -241,7 +241,7 @@ function PhrasesTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#5B6473]">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-[#6B6B6B]">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -259,44 +259,44 @@ function PhrasesTab() {
             const KindIcon = isInterview ? Briefcase : isMeeting ? Users : Mail;
             const date = formatKaDate(r.completed_at);
             return (
-              <div key={r.id} className="bg-white border border-[#E2DDD0] rounded-lg overflow-hidden transition">
+              <div key={r.id} className="bg-white border border-[#E8D5DA] rounded-lg overflow-hidden transition">
                 <button
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F5F0E8] transition"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F5EDEF] transition"
                 >
-                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#1A2744]/5 border border-[#E2DDD0] text-[#1A2744] grid place-items-center">
+                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#6B1E3E]/5 border border-[#E8D5DA] text-[#6B1E3E] grid place-items-center">
                     <KindIcon size={16} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="ka text-sm font-semibold text-[#1A2744] truncate">
+                    <p className="ka text-sm font-semibold text-[#6B1E3E] truncate">
                       {sectionLabel} — {title}
                     </p>
-                    <p className="ka text-[11px] text-[#64748B] mt-0.5">
+                    <p className="ka text-[11px] text-[#6B6B6B] mt-0.5">
                       {date} · {vocab.length} ფრაზა
                     </p>
                   </div>
                   <ChevronDown
                     size={16}
                     strokeWidth={2.25}
-                    className={`shrink-0 text-[#64748B] transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-[#6B6B6B] transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-[#F0EBDD]">
+                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-[#F0E5E9]">
                     {vocab.length === 0 ? (
-                      <p className="ka text-xs text-[#5B6473] py-2">ფრაზები ვერ მოიძებნა.</p>
+                      <p className="ka text-xs text-[#6B6B6B] py-2">ფრაზები ვერ მოიძებნა.</p>
                     ) : (
                       vocab.map((v, i) => (
-                        <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
+                        <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
                           <div className="flex items-baseline justify-between gap-3">
-                            <p className="text-sm font-bold text-[#1E2A44]">{v.en}</p>
+                            <p className="text-sm font-bold text-[#6B1E3E]">{v.en}</p>
                           </div>
-                          <p className="ka text-xs text-[#5B6473] mt-0.5">{v.ka}</p>
+                          <p className="ka text-xs text-[#6B6B6B] mt-0.5">{v.ka}</p>
                           {v.exampleEn && (
-                            <p className="text-xs text-[#374151] mt-2 italic">"{v.exampleEn}"</p>
+                            <p className="text-xs text-[#1A1A1A] mt-2 italic">"{v.exampleEn}"</p>
                           )}
                           {v.exampleKa && (
-                            <p className="ka text-[11px] text-[#5B6473]">{v.exampleKa}</p>
+                            <p className="ka text-[11px] text-[#6B6B6B]">{v.exampleKa}</p>
                           )}
                         </div>
                       ))
@@ -382,13 +382,13 @@ function WordsTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-[#1E2A44] to-[#15203A] text-[#F7F1E3] border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#F2D680] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#E8C2CC] font-semibold">
               სულ {counts.total} სიტყვა შესწავლილია
             </p>
-            <p className="ka text-[11px] text-[#F7F1E3]/70 mt-1">
+            <p className="ka text-[11px] text-[#F5EDEF]/70 mt-1">
               {counts.mastered} დაძლეული · {counts.difficult} რთული
             </p>
           </div>
@@ -403,8 +403,8 @@ function WordsTab() {
             onClick={() => setFilter(f.id)}
             className={`ka shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition border
               ${filter === f.id
-                ? "bg-[#1E2A44] text-[#F7F1E3] border-[#1E2A44]"
-                : "bg-white text-[#1E2A44] border-[#E7E2D5] hover:bg-[#FAF7F0]"}`}
+                ? "bg-[#6B1E3E] text-[#F5EDEF] border-[#6B1E3E]"
+                : "bg-white text-[#6B1E3E] border-[#E8D5DA] hover:bg-[#FAF6F7]"}`}
           >
             {f.label}
           </button>
@@ -414,12 +414,12 @@ function WordsTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა სიტყვებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#5B6473]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-[#6B6B6B]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5F0E8] border border-[#E2DDD0] grid place-items-center text-[#1A2744]"><BookOpen size={22} strokeWidth={2} /></div>
-          <h3 className="ka text-lg font-bold text-[#1E2A44] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
-          <p className="ka text-sm text-[#5B6473] mt-2 max-w-sm mx-auto">
+          <div className="mx-auto w-12 h-12 rounded-md bg-[#F5EDEF] border border-[#E8D5DA] grid place-items-center text-[#6B1E3E]"><BookOpen size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-[#6B1E3E] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
+          <p className="ka text-sm text-[#6B6B6B] mt-2 max-w-sm mx-auto">
             დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -430,7 +430,7 @@ function WordsTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#5B6473]">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-[#6B6B6B]">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -438,28 +438,28 @@ function WordsTab() {
             const w = progressToWord(r);
             if (!w) return null;
             return (
-              <div key={r.word_key} className="bg-white border border-[#E7E2D5] rounded-2xl p-4">
+              <div key={r.word_key} className="bg-white border border-[#E8D5DA] rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-[#1E2A44]">{w.en}</h3>
+                      <h3 className="text-base font-bold text-[#6B1E3E]">{w.en}</h3>
                       <ReadAloudButton text={w.en} size="sm" />
                     </div>
-                    <p className="ka text-xs text-[#5B6473] mt-0.5">{w.ka}</p>
+                    <p className="ka text-xs text-[#6B6B6B] mt-0.5">{w.ka}</p>
                     {w.pronunciation && (
-                      <p className="ka text-[10px] text-[#C9A227] font-mono mt-0.5">[{w.pronunciation}]</p>
+                      <p className="ka text-[10px] text-[#A84060] font-mono mt-0.5">[{w.pronunciation}]</p>
                     )}
                   </div>
                   <ConfidenceDot c={r.confidence} />
                 </div>
                 {w.explanationKa && (
-                  <p className="ka text-xs text-[#374151] mt-2">{w.explanationKa}</p>
+                  <p className="ka text-xs text-[#1A1A1A] mt-2">{w.explanationKa}</p>
                 )}
                 {w.exampleEn && (
-                  <p className="text-xs text-[#1E2A44] italic mt-2">"{w.exampleEn}"</p>
+                  <p className="text-xs text-[#6B1E3E] italic mt-2">"{w.exampleEn}"</p>
                 )}
-                <div className="mt-3 pt-3 border-t border-[#F0EBDD] flex items-center justify-between gap-2">
-                  <p className="ka text-[10px] text-[#5B6473]">
+                <div className="mt-3 pt-3 border-t border-[#F0E5E9] flex items-center justify-between gap-2">
+                  <p className="ka text-[10px] text-[#6B6B6B]">
                     წყარო: {sourceLabelKa(r.source)}
                   </p>
                   <div className="flex gap-1">
@@ -469,7 +469,7 @@ function WordsTab() {
                         onClick={() => setLabel(r, r.manual_label === l.id ? null : l.id)}
                         title={l.label}
                         className={`w-7 h-7 grid place-items-center rounded-md border transition
-                          ${r.manual_label === l.id ? "border-[#1A2744] bg-[#F5F0E8]" : "border-transparent hover:border-[#E2DDD0]"}`}
+                          ${r.manual_label === l.id ? "border-[#6B1E3E] bg-[#F5EDEF]" : "border-transparent hover:border-[#E8D5DA]"}`}
                       >
                         <span className="block w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
                       </button>
@@ -503,10 +503,10 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-[#E7E2D5] text-sm text-[#1E2A44] placeholder:text-[#9CA3AF] outline-none focus:border-[#1E2A44] transition"
+        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-[#E8D5DA] text-sm text-[#6B1E3E] placeholder:text-[#A8A8A8] outline-none focus:border-[#6B1E3E] transition"
       />
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6473]"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B6B6B]"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
       >
         <circle cx="11" cy="11" r="7" />
@@ -517,11 +517,11 @@ function SearchInput({
 }
 
 function ConfidenceDot({ c }: { c: number }) {
-  const colors = ["#E7E2D5", "#FDE68A", "#FCD34D", "#86EFAC", "#34D399", "#10B981"];
+  const colors = ["#E8D5DA", "#E8C2CC", "#C97A90", "#86EFAC", "#7AA88A", "#5A8A6A"];
   return (
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="w-2 h-2 rounded-full" style={{ background: colors[Math.min(5, c)] }} />
-      <span className="text-[10px] text-[#5B6473] font-mono">{c}/5</span>
+      <span className="text-[10px] text-[#6B6B6B] font-mono">{c}/5</span>
     </div>
   );
 }

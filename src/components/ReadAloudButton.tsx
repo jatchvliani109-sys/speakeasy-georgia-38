@@ -133,8 +133,8 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
       className={[
         "inline-flex items-center justify-center rounded-full border transition-colors select-none",
         active
-          ? "border-[#1E2A44]/40 bg-[#1E2A44]/5 text-[#1E2A44]"
-          : "border-[#E7E2D5] bg-white/70 text-[#5B6473] hover:text-[#1E2A44] hover:border-[#1E2A44]/30 hover:bg-[#1E2A44]/5",
+          ? "border-[#6B1E3E]/40 bg-[#6B1E3E]/5 text-[#6B1E3E]"
+          : "border-[#E8D5DA] bg-white/70 text-[#6B6B6B] hover:text-[#6B1E3E] hover:border-[#6B1E3E]/30 hover:bg-[#6B1E3E]/5",
         sizeCls,
         className,
       ].join(" ")}
@@ -143,7 +143,7 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
         className={[
           iconCls,
           state === "loading" ? "animate-spin" : "",
-          active ? "text-[#0F766E]" : "",
+          active ? "text-[#5A8A6A]" : "",
         ].join(" ")}
       />
       {label && <span className="ka text-[11px] font-medium">{label}</span>}

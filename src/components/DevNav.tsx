@@ -99,13 +99,13 @@ export default function DevNav() {
         <button
           type="button"
           aria-label="Dev menu"
-          className="fixed z-[100] bottom-4 right-4 h-11 px-3 inline-flex items-center gap-1.5 rounded-full bg-[#0B0B0B] text-white text-[11px] font-mono uppercase tracking-wider shadow-lg border border-amber-500/60 hover:bg-amber-500 hover:text-black transition-colors"
+          className="fixed z-[100] bottom-4 right-4 h-11 px-3 inline-flex items-center gap-1.5 rounded-full bg-[#1A1A1A] text-white text-[11px] font-mono uppercase tracking-wider shadow-lg border border-amber-500/60 hover:bg-amber-500 hover:text-black transition-colors"
         >
           <Wrench className="w-3.5 h-3.5" />
           Dev
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[320px] sm:w-[360px] overflow-y-auto p-0 bg-[#0B0B0B] text-white border-l border-amber-500/40">
+      <SheetContent side="right" className="w-[320px] sm:w-[360px] overflow-y-auto p-0 bg-[#1A1A1A] text-white border-l border-amber-500/40">
         <SheetHeader className="px-5 pt-5 pb-3 border-b border-white/10">
           <SheetTitle className="font-mono text-xs uppercase tracking-[0.2em] text-amber-400 flex items-center gap-2">
             <Wrench className="w-3.5 h-3.5" /> Dev navigation

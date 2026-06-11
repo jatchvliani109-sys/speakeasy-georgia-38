@@ -322,11 +322,11 @@ export default function EmailsModule() {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
         <BizCard>
-          <p className="ka text-[#5B6473]">დღევანდელი სესია მზადდება შენი მიზნებისთვის...</p>
-          <div className="mt-3 h-2 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
-            <div className="h-full bg-[#1E2A44] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
+          <p className="ka text-[#6B6B6B]">დღევანდელი სესია მზადდება შენი მიზნებისთვის...</p>
+          <div className="mt-3 h-2 w-full bg-[#E8D5DA] rounded-full overflow-hidden">
+            <div className="h-full bg-[#6B1E3E] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
           </div>
-          {error && <p className="ka text-xs text-[#B91C1C] mt-3">{error}</p>}
+          {error && <p className="ka text-xs text-[#C0392B] mt-3">{error}</p>}
         </BizCard>
         <style>{`@keyframes loadbar { 0%{transform:translateX(-100%)} 100%{transform:translateX(250%)} }`}</style>
       </BusinessShell>
@@ -343,36 +343,36 @@ export default function EmailsModule() {
       {step === "focus" && (
         <>
           {previouslyLearned && (
-            <BizCard className="mb-3 bg-[#FAF7F0] border-dashed">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+            <BizCard className="mb-3 bg-[#FAF6F7] border-dashed">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                 წინა გაკვეთილიდან
               </p>
-              <p className="ka text-xs text-[#5B6473] mt-1">{previouslyLearned.topicKa}</p>
+              <p className="ka text-xs text-[#6B6B6B] mt-1">{previouslyLearned.topicKa}</p>
               <div className="mt-2 space-y-1.5">
                 {previouslyLearned.phrases.map((p, i) => (
-                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E7E2D5]">
-                    <p className="text-sm text-[#1E2A44] font-medium">"{p.en}"</p>
-                    <p className="ka text-[11px] text-[#5B6473]">{p.ka}</p>
+                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E8D5DA]">
+                    <p className="text-sm text-[#6B1E3E] font-medium">"{p.en}"</p>
+                    <p className="ka text-[11px] text-[#6B6B6B]">{p.ka}</p>
                   </div>
                 ))}
               </div>
-              <p className="ka text-[11px] text-[#C9A227] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+              <p className="ka text-[11px] text-[#A84060] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
             </BizCard>
           )}
-          <BizCard className="border-l-4 border-l-[#C9A227]">
+          <BizCard className="border-l-4 border-l-[#A84060]">
             {curriculum && (
-              <p className="ka text-[10px] uppercase tracking-wider text-[#5B6473] font-semibold mb-1">
+              <p className="ka text-[10px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">
                 ეტაპი {curriculum.step} / {curriculum.total}
                 {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
               </p>
             )}
-            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
               დღევანდელი ფოკუსი · ~{minutes} წუთი
             </p>
-            <h2 className="ka text-xl font-bold text-[#1E2A44] mt-2 leading-snug">
+            <h2 className="ka text-xl font-bold text-[#6B1E3E] mt-2 leading-snug">
               {session.dailyFocusKa}
             </h2>
-            <p className="ka text-sm text-[#5B6473] mt-3">
+            <p className="ka text-sm text-[#6B6B6B] mt-3">
               დღეს ერთად ვიმუშავებთ {labelFor(session.emailType)} ტიპის იმეილზე — შენი მიზნებისა და სფეროს გათვალისწინებით.
             </p>
             <div className="mt-5 flex justify-end">
@@ -384,22 +384,22 @@ export default function EmailsModule() {
 
       {step === "warmup" && session.warmUp && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
             გახურება · 1-2 წუთი
           </p>
-          <p className="ka text-sm font-semibold text-[#1E2A44] mt-2">{session.warmUp.promptKa}</p>
+          <p className="ka text-sm font-semibold text-[#6B1E3E] mt-2">{session.warmUp.promptKa}</p>
           <div className="mt-3 space-y-2">
             {session.warmUp.options.map((o, i) => {
               const isPicked = warmupChoice === i;
               const reveal = warmupChoice !== null;
               const correct = o.isBetter;
               const ringClass = !reveal
-                ? "border-[#E7E2D5] hover:border-[#1E2A44]"
+                ? "border-[#E8D5DA] hover:border-[#6B1E3E]"
                 : correct
-                  ? "border-[#0F766E] bg-[#F0FDF9]"
+                  ? "border-[#5A8A6A] bg-[#F0F7F2]"
                   : isPicked
-                    ? "border-[#B45309] bg-[#FFFBEA]"
-                    : "border-[#E7E2D5] opacity-60";
+                    ? "border-[#C0392B] bg-[#FAF6F7]"
+                    : "border-[#E8D5DA] opacity-60";
               return (
                 <button
                   key={i}
@@ -407,12 +407,12 @@ export default function EmailsModule() {
                   onClick={() => setWarmupChoice(i)}
                   className={`w-full text-left p-3 rounded-lg border transition ${ringClass}`}
                 >
-                  <p className="text-xs font-semibold text-[#5B6473]">Option {o.label}</p>
-                  <p className="text-sm text-[#1E2A44] mt-1 whitespace-pre-wrap">{o.text}</p>
+                  <p className="text-xs font-semibold text-[#6B6B6B]">Option {o.label}</p>
+                  <p className="text-sm text-[#6B1E3E] mt-1 whitespace-pre-wrap">{o.text}</p>
                   {reveal && o.issuesKa?.length > 0 && (
                     <ul className="ka mt-2 space-y-0.5">
                       {o.issuesKa.map((it, j) => (
-                        <li key={j} className="text-[11px] text-[#5B6473]">• {it}</li>
+                        <li key={j} className="text-[11px] text-[#6B6B6B]">• {it}</li>
                       ))}
                     </ul>
                   )}
@@ -421,7 +421,7 @@ export default function EmailsModule() {
             })}
           </div>
           {warmupChoice !== null && (
-            <p className="ka text-xs text-[#1E2A44] mt-3 p-3 bg-[#FAF7F0] rounded-lg border border-[#E7E2D5]">
+            <p className="ka text-xs text-[#6B1E3E] mt-3 p-3 bg-[#FAF6F7] rounded-lg border border-[#E8D5DA]">
               💡 {session.warmUp.explanationKa}
             </p>
           )}
@@ -436,25 +436,25 @@ export default function EmailsModule() {
 
       {step === "learn" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">სწავლა</p>
-          <h3 className="ka text-lg font-bold text-[#1E2A44] mt-1">{session.learn.titleKa}</h3>
-          <p className="ka text-sm text-[#374151] mt-2 leading-relaxed">{session.learn.explanationKa}</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">სწავლა</p>
+          <h3 className="ka text-lg font-bold text-[#6B1E3E] mt-1">{session.learn.titleKa}</h3>
+          <p className="ka text-sm text-[#1A1A1A] mt-2 leading-relaxed">{session.learn.explanationKa}</p>
 
           {session.learn.structure && session.learn.structure.length > 0 && (
             <div className="mt-4">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
                 იმეილის სტრუქტურა
               </p>
               <div className="mt-2 space-y-2">
                 {session.learn.structure.map((p, i) => (
-                  <div key={i} className="flex gap-3 p-3 rounded-lg bg-white border border-[#E7E2D5]">
-                    <div className="shrink-0 w-7 h-7 rounded-full bg-[#1E2A44] text-white text-xs grid place-items-center font-bold">
+                  <div key={i} className="flex gap-3 p-3 rounded-lg bg-white border border-[#E8D5DA]">
+                    <div className="shrink-0 w-7 h-7 rounded-full bg-[#6B1E3E] text-white text-xs grid place-items-center font-bold">
                       {i + 1}
                     </div>
                     <div className="min-w-0">
-                      <p className="ka text-sm font-semibold text-[#1E2A44]">{p.partKa}</p>
-                      <p className="ka text-[11px] text-[#5B6473]">{p.purposeKa}</p>
-                      <p className="text-xs text-[#374151] mt-1 italic">"{p.exampleEn}"</p>
+                      <p className="ka text-sm font-semibold text-[#6B1E3E]">{p.partKa}</p>
+                      <p className="ka text-[11px] text-[#6B6B6B]">{p.purposeKa}</p>
+                      <p className="text-xs text-[#1A1A1A] mt-1 italic">"{p.exampleEn}"</p>
                     </div>
                   </div>
                 ))}
@@ -464,10 +464,10 @@ export default function EmailsModule() {
 
           <div className="mt-4 space-y-2">
             {session.learn.examples.map((ex, i) => (
-              <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
-                <p className="text-sm text-[#1E2A44]">{ex.en}</p>
-                <p className="ka text-xs text-[#5B6473] mt-0.5">{ex.ka}</p>
-                {ex.noteKa && <p className="ka text-[11px] text-[#C9A227] mt-1">💡 {ex.noteKa}</p>}
+              <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
+                <p className="text-sm text-[#6B1E3E]">{ex.en}</p>
+                <p className="ka text-xs text-[#6B6B6B] mt-0.5">{ex.ka}</p>
+                {ex.noteKa && <p className="ka text-[11px] text-[#A84060] mt-1">💡 {ex.noteKa}</p>}
               </div>
             ))}
           </div>
@@ -481,22 +481,22 @@ export default function EmailsModule() {
 
       {step === "example" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">რეალური მაგალითი</p>
-          <p className="ka text-xs text-[#5B6473] mt-2 italic">{session.realExample.contextKa}</p>
-          <div className="mt-3 border border-[#E7E2D5] rounded-xl overflow-hidden">
-            <div className="px-4 py-2 bg-[#1E2A44]/5 border-b border-[#E7E2D5]">
-              <p className="text-xs text-[#5B6473]">Subject</p>
-              <p className="text-sm font-semibold text-[#1E2A44]">{session.realExample.subject}</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">რეალური მაგალითი</p>
+          <p className="ka text-xs text-[#6B6B6B] mt-2 italic">{session.realExample.contextKa}</p>
+          <div className="mt-3 border border-[#E8D5DA] rounded-xl overflow-hidden">
+            <div className="px-4 py-2 bg-[#6B1E3E]/5 border-b border-[#E8D5DA]">
+              <p className="text-xs text-[#6B6B6B]">Subject</p>
+              <p className="text-sm font-semibold text-[#6B1E3E]">{session.realExample.subject}</p>
             </div>
-            <div className="px-4 py-3 bg-white whitespace-pre-wrap text-sm text-[#1E2A44] leading-relaxed">
+            <div className="px-4 py-3 bg-white whitespace-pre-wrap text-sm text-[#6B1E3E] leading-relaxed">
               {session.realExample.body}
             </div>
           </div>
           {session.realExample.annotationsKa?.length > 0 && (
             <ul className="mt-3 space-y-1">
               {session.realExample.annotationsKa.map((a, i) => (
-                <li key={i} className="ka text-xs text-[#5B6473] flex gap-2">
-                  <span className="text-[#C9A227]">●</span>
+                <li key={i} className="ka text-xs text-[#6B6B6B] flex gap-2">
+                  <span className="text-[#A84060]">●</span>
                   <span>{a}</span>
                 </li>
               ))}
@@ -508,15 +508,15 @@ export default function EmailsModule() {
 
       {step === "practice" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">მთავარი დავალება</p>
-          <div className="mt-2 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0]">
-            <p className="ka text-sm text-[#1E2A44] leading-relaxed">{session.practice.scenarioKa}</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">მთავარი დავალება</p>
+          <div className="mt-2 p-3 rounded-lg bg-[#FAF6F7] border border-[#F5DDE3]">
+            <p className="ka text-sm text-[#6B1E3E] leading-relaxed">{session.practice.scenarioKa}</p>
           </div>
-          <p className="ka text-sm font-semibold text-[#1E2A44] mt-3">{session.practice.promptKa}</p>
+          <p className="ka text-sm font-semibold text-[#6B1E3E] mt-3">{session.practice.promptKa}</p>
           {session.practice.hintsKa?.length > 0 && (
             <ul className="mt-2 space-y-0.5">
               {session.practice.hintsKa.map((h, i) => (
-                <li key={i} className="ka text-xs text-[#5B6473]">• {h}</li>
+                <li key={i} className="ka text-xs text-[#6B6B6B]">• {h}</li>
               ))}
             </ul>
           )}
@@ -524,9 +524,9 @@ export default function EmailsModule() {
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
             placeholder="Write your email here in English..."
-            className="mt-3 w-full min-h-[180px] p-3 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] resize-y"
+            className="mt-3 w-full min-h-[180px] p-3 rounded-lg border border-[#E8D5DA] text-sm text-[#6B1E3E] outline-none focus:border-[#6B1E3E] resize-y"
           />
-          {error && <p className="ka text-xs text-[#B91C1C] mt-2">{error}</p>}
+          {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
           <NavRow
             onBack={() => setStep("example")}
             onNext={submitForFeedback}
@@ -538,30 +538,30 @@ export default function EmailsModule() {
 
       {step === "feedback" && feedback && (
         <div className="space-y-3">
-          <BizCard className="border-l-4 border-l-[#1E2A44]">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+          <BizCard className="border-l-4 border-l-[#6B1E3E]">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
               პასუხი {session.practice.recipientRole}-დან
             </p>
-            <div className="mt-3 border border-[#E7E2D5] rounded-xl overflow-hidden">
-              <div className="px-4 py-2 bg-[#1E2A44]/5 border-b border-[#E7E2D5]">
-                <p className="text-sm font-semibold text-[#1E2A44]">{feedback.inCharacter.subject}</p>
+            <div className="mt-3 border border-[#E8D5DA] rounded-xl overflow-hidden">
+              <div className="px-4 py-2 bg-[#6B1E3E]/5 border-b border-[#E8D5DA]">
+                <p className="text-sm font-semibold text-[#6B1E3E]">{feedback.inCharacter.subject}</p>
               </div>
-              <div className="px-4 py-3 bg-white whitespace-pre-wrap text-sm text-[#1E2A44] leading-relaxed">
+              <div className="px-4 py-3 bg-white whitespace-pre-wrap text-sm text-[#6B1E3E] leading-relaxed">
                 {feedback.inCharacter.body}
               </div>
             </div>
           </BizCard>
 
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">AI feedback</p>
-            <p className="ka text-sm text-[#1E2A44] mt-2">{feedback.feedback.summaryKa}</p>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">AI feedback</p>
+            <p className="ka text-sm text-[#6B1E3E] mt-2">{feedback.feedback.summaryKa}</p>
 
             {feedback.feedback.worked?.length > 0 && (
               <div className="mt-3">
-                <p className="ka text-xs font-semibold text-[#0F766E]">✓ რა გამოგივიდა</p>
+                <p className="ka text-xs font-semibold text-[#5A8A6A]">✓ რა გამოგივიდა</p>
                 <ul className="mt-1 space-y-0.5">
                   {feedback.feedback.worked.map((w, i) => (
-                    <li key={i} className="ka text-xs text-[#374151]">• {w}</li>
+                    <li key={i} className="ka text-xs text-[#1A1A1A]">• {w}</li>
                   ))}
                 </ul>
               </div>
@@ -569,10 +569,10 @@ export default function EmailsModule() {
 
             {feedback.feedback.improve?.length > 0 && (
               <div className="mt-3">
-                <p className="ka text-xs font-semibold text-[#B45309]">↗ რა გავაუმჯობესოთ</p>
+                <p className="ka text-xs font-semibold text-[#C0392B]">↗ რა გავაუმჯობესოთ</p>
                 <ul className="mt-1 space-y-0.5">
                   {feedback.feedback.improve.map((w, i) => (
-                    <li key={i} className="ka text-xs text-[#374151]">• {w}</li>
+                    <li key={i} className="ka text-xs text-[#1A1A1A]">• {w}</li>
                   ))}
                 </ul>
               </div>
@@ -580,12 +580,12 @@ export default function EmailsModule() {
 
             {feedback.feedback.suggestions?.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="ka text-xs font-semibold text-[#1E2A44]">კონკრეტული რჩევები</p>
+                <p className="ka text-xs font-semibold text-[#6B1E3E]">კონკრეტული რჩევები</p>
                 {feedback.feedback.suggestions.map((s, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
-                    <p className="text-xs text-[#B91C1C] line-through">{s.before}</p>
-                    <p className="text-sm text-[#0F766E] mt-1">{s.after}</p>
-                    <p className="ka text-[11px] text-[#5B6473] mt-1">{s.whyKa}</p>
+                  <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
+                    <p className="text-xs text-[#C0392B] line-through">{s.before}</p>
+                    <p className="text-sm text-[#5A8A6A] mt-1">{s.after}</p>
+                    <p className="ka text-[11px] text-[#6B6B6B] mt-1">{s.whyKa}</p>
                   </div>
                 ))}
               </div>
@@ -593,10 +593,10 @@ export default function EmailsModule() {
 
             {feedback.feedback.rewriteEn && (
               <details className="mt-3 group">
-                <summary className="ka text-xs font-semibold text-[#1E2A44] cursor-pointer">
+                <summary className="ka text-xs font-semibold text-[#6B1E3E] cursor-pointer">
                   გაუმჯობესებული ვერსია
                 </summary>
-                <div className="mt-2 p-3 rounded-lg bg-white border border-[#E7E2D5] whitespace-pre-wrap text-sm text-[#1E2A44]">
+                <div className="mt-2 p-3 rounded-lg bg-white border border-[#E8D5DA] whitespace-pre-wrap text-sm text-[#6B1E3E]">
                   {feedback.feedback.rewriteEn}
                 </div>
               </details>
@@ -608,40 +608,40 @@ export default function EmailsModule() {
       )}
 
       {step === "improve" && feedback && (
-        <BizCard className="border-l-4 border-l-[#C9A227]">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">გავაუმჯობესოთ ერთი ნაწილი</p>
-          <p className="ka text-sm font-semibold text-[#1E2A44] mt-2">
+        <BizCard className="border-l-4 border-l-[#A84060]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">გავაუმჯობესოთ ერთი ნაწილი</p>
+          <p className="ka text-sm font-semibold text-[#6B1E3E] mt-2">
             {feedback.feedback.improveFocus?.instructionKa || "გადაწერე ეს ნაწილი უკეთეს ვერსიად:"}
           </p>
           {(feedback.feedback.improveFocus?.originalSnippet || feedback.feedback.suggestions?.[0]?.before) && (
-            <div className="mt-2 p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
-              <p className="text-xs text-[#5B6473]">შენი ორიგინალი:</p>
-              <p className="text-sm text-[#1E2A44] mt-1 italic">
+            <div className="mt-2 p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
+              <p className="text-xs text-[#6B6B6B]">შენი ორიგინალი:</p>
+              <p className="text-sm text-[#6B1E3E] mt-1 italic">
                 "{feedback.feedback.improveFocus?.originalSnippet || feedback.feedback.suggestions?.[0]?.before}"
               </p>
             </div>
           )}
           {feedback.feedback.improveFocus?.hintKa && (
-            <p className="ka text-xs text-[#5B6473] mt-2">💡 {feedback.feedback.improveFocus.hintKa}</p>
+            <p className="ka text-xs text-[#6B6B6B] mt-2">💡 {feedback.feedback.improveFocus.hintKa}</p>
           )}
           {(() => {
             const v = improveAck?.verdict;
             const locked = !!improveAck && v === "better";
             const tone =
               v === "better"
-                ? { bg: "bg-[#F0FDF9]", border: "border-[#A7F3D0]", text: "text-[#065F46]", icon: "✓" }
+                ? { bg: "bg-[#F0F7F2]", border: "border-[#C8DCCF]", text: "text-[#3F6649]", icon: "✓" }
                 : v === "similar"
-                ? { bg: "bg-[#FFFBEA]", border: "border-[#F2E6B0]", text: "text-[#92400E]", icon: "≈" }
+                ? { bg: "bg-[#FAF6F7]", border: "border-[#F5DDE3]", text: "text-[#A52A1B]", icon: "≈" }
                 : v === "worse"
-                ? { bg: "bg-[#FEF2F2]", border: "border-[#FECACA]", text: "text-[#991B1B]", icon: "↻" }
-                : { bg: "bg-[#FFFBEA]", border: "border-[#F2E6B0]", text: "text-[#92400E]", icon: "✎" };
+                ? { bg: "bg-[#FDF0EE]", border: "border-[#F5C9C3]", text: "text-[#991B1B]", icon: "↻" }
+                : { bg: "bg-[#FAF6F7]", border: "border-[#F5DDE3]", text: "text-[#A52A1B]", icon: "✎" };
             return (
               <>
-                <div className="mt-4 p-4 rounded-xl bg-[#FFFBEA] border-2 border-[#C9A227]/40 shadow-sm">
-                  <label htmlFor="improve-input" className="ka block text-sm font-bold text-[#1E2A44]">
+                <div className="mt-4 p-4 rounded-xl bg-[#FAF6F7] border-2 border-[#A84060]/40 shadow-sm">
+                  <label htmlFor="improve-input" className="ka block text-sm font-bold text-[#6B1E3E]">
                     ✍️ შეასწორე ეს ნაწილი და დაწერე გაუმჯობესებული ვერსია
                   </label>
-                  <p className="ka text-xs text-[#5B6473] mt-1">
+                  <p className="ka text-xs text-[#6B6B6B] mt-1">
                     გადაწერე ზემოთ მოცემული ფრაზა შენი სიტყვებით — გავხადოთ უფრო ნათელი და პროფესიული.
                   </p>
                   <textarea
@@ -649,7 +649,7 @@ export default function EmailsModule() {
                     value={improveText}
                     onChange={(e) => setImproveText(e.target.value)}
                     placeholder="Write your improved version here..."
-                    className="mt-3 w-full min-h-[180px] p-4 rounded-lg border-2 border-[#C9A227]/50 bg-white text-base text-[#1E2A44] outline-none focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/20 resize-y"
+                    className="mt-3 w-full min-h-[180px] p-4 rounded-lg border-2 border-[#A84060]/50 bg-white text-base text-[#6B1E3E] outline-none focus:border-[#A84060] focus:ring-2 focus:ring-[#A84060]/20 resize-y"
                     disabled={locked}
                   />
                   {!locked && (
@@ -670,14 +670,14 @@ export default function EmailsModule() {
                       <p className={`ka text-sm ${tone.text} mt-1 opacity-90`}>{improveAck.detailsKa}</p>
                     )}
                     {improveAck.polishedEn && v === "better" && (
-                      <p className="text-sm text-[#1E2A44] mt-2 italic">"{improveAck.polishedEn}"</p>
+                      <p className="text-sm text-[#6B1E3E] mt-2 italic">"{improveAck.polishedEn}"</p>
                     )}
                     {improveAck.tipKa && (
-                      <p className="ka text-[11px] text-[#5B6473] mt-2">💡 {improveAck.tipKa}</p>
+                      <p className="ka text-[11px] text-[#6B6B6B] mt-2">💡 {improveAck.tipKa}</p>
                     )}
                   </div>
                 )}
-                {error && <p className="ka text-xs text-[#B91C1C] mt-2">{error}</p>}
+                {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
 
                 {locked ? (
                   <NavRow
@@ -696,18 +696,18 @@ export default function EmailsModule() {
       )}
 
       {step === "bonus" && session.bonusScenario && (
-        <BizCard className="border-l-4 border-l-[#1E2A44]">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+        <BizCard className="border-l-4 border-l-[#6B1E3E]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
             დამატებითი ვარჯიში · ბონუს
           </p>
-          <div className="mt-2 p-3 rounded-lg bg-[#FFFBEA] border border-[#F2E6B0]">
-            <p className="ka text-sm text-[#1E2A44] leading-relaxed">{session.bonusScenario.scenarioKa}</p>
+          <div className="mt-2 p-3 rounded-lg bg-[#FAF6F7] border border-[#F5DDE3]">
+            <p className="ka text-sm text-[#6B1E3E] leading-relaxed">{session.bonusScenario.scenarioKa}</p>
           </div>
-          <p className="ka text-sm font-semibold text-[#1E2A44] mt-3">{session.bonusScenario.promptKa}</p>
+          <p className="ka text-sm font-semibold text-[#6B1E3E] mt-3">{session.bonusScenario.promptKa}</p>
           {session.bonusScenario.hintsKa?.length > 0 && (
             <ul className="mt-2 space-y-0.5">
               {session.bonusScenario.hintsKa.map((h, i) => (
-                <li key={i} className="ka text-xs text-[#5B6473]">• {h}</li>
+                <li key={i} className="ka text-xs text-[#6B6B6B]">• {h}</li>
               ))}
             </ul>
           )}
@@ -715,11 +715,11 @@ export default function EmailsModule() {
             value={bonusText}
             onChange={(e) => setBonusText(e.target.value)}
             placeholder="Write your email here in English..."
-            className="mt-3 w-full min-h-[140px] p-3 rounded-lg border border-[#E7E2D5] text-sm text-[#1E2A44] outline-none focus:border-[#1E2A44] resize-y"
+            className="mt-3 w-full min-h-[140px] p-3 rounded-lg border border-[#E8D5DA] text-sm text-[#6B1E3E] outline-none focus:border-[#6B1E3E] resize-y"
             disabled={bonusDone}
           />
           {bonusDone && (
-            <p className="ka text-xs text-[#065F46] mt-2">✓ შენახულია — კარგი მუშაობა!</p>
+            <p className="ka text-xs text-[#3F6649] mt-2">✓ შენახულია — კარგი მუშაობა!</p>
           )}
           <NavRow
             onBack={() => setStep("improve")}
@@ -735,16 +735,16 @@ export default function EmailsModule() {
 
       {step === "vocab" && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
             დღევანდელი ფრაზები · ავტომატურად ინახება შენს ლექსიკაში
           </p>
           <div className="mt-3 space-y-2">
             {session.vocabulary.map((v, i) => (
-              <div key={i} className="p-3 rounded-lg bg-[#FAF7F0] border border-[#E7E2D5]">
-                <p className="text-sm font-bold text-[#1E2A44]">{v.en}</p>
-                <p className="ka text-xs text-[#5B6473]">{v.ka}</p>
-                <p className="text-xs text-[#374151] mt-2 italic">"{v.exampleEn}"</p>
-                <p className="ka text-[11px] text-[#5B6473]">{v.exampleKa}</p>
+              <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
+                <p className="text-sm font-bold text-[#6B1E3E]">{v.en}</p>
+                <p className="ka text-xs text-[#6B6B6B]">{v.ka}</p>
+                <p className="text-xs text-[#1A1A1A] mt-2 italic">"{v.exampleEn}"</p>
+                <p className="ka text-[11px] text-[#6B6B6B]">{v.exampleKa}</p>
               </div>
             ))}
           </div>
@@ -754,33 +754,33 @@ export default function EmailsModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E2A44] via-[#1A2540] to-[#15203A] text-[#F7F1E3] p-7 shadow-[0_20px_50px_-20px_rgba(30,42,68,0.6)]">
-            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#C9A227]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
-            <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#0F766E]/15 blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-7 shadow-[0_20px_50px_-20px_rgba(107,30,62,0.6)]">
+            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#A84060]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
+            <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#5A8A6A]/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
               <div className="mx-auto relative w-20 h-20">
-                <div className="absolute inset-0 rounded-full bg-[#C9A227]/15 animate-[ping_1.6s_ease-out_1]" />
-                <div className="absolute inset-0 rounded-full border border-[#C9A227]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#C9A227] to-[#A8861E] grid place-items-center shadow-[0_8px_24px_-6px_rgba(201,162,39,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
-                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#1E2A44]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="absolute inset-0 rounded-full bg-[#A84060]/15 animate-[ping_1.6s_ease-out_1]" />
+                <div className="absolute inset-0 rounded-full border border-[#A84060]/40" />
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#6B1E3E]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>
                 </div>
               </div>
-              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#F2D680] font-semibold mt-5">
+              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E8C2CC] font-semibold mt-5">
                 შესრულებულია
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
                 დღევანდელი გაკვეთილი დასრულებულია
               </h2>
-              <p className="ka text-sm text-[#F7F1E3]/75 mt-2">
+              <p className="ka text-sm text-[#F5EDEF]/75 mt-2">
                 {labelFor(session.emailType)} · {session.dailyFocusKa}
               </p>
             </div>
           </div>
 
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
               დღევანდელი შედეგი
             </p>
             <ul className="mt-3 space-y-2">
@@ -794,37 +794,37 @@ export default function EmailsModule() {
           <BizCard className="mt-3">
             <div className="flex items-end justify-between">
               <div>
-                <p className="ka text-[11px] uppercase tracking-wider text-[#5B6473] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                   საერთო პროგრესი
                 </p>
-                <p className="ka text-sm text-[#1E2A44] mt-1">
+                <p className="ka text-sm text-[#6B1E3E] mt-1">
                   <b className="text-lg">{stats.total + 1}</b> სესია დასრულებული
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-[#1E2A44]">
+                <div className="text-2xl font-bold text-[#6B1E3E]">
                   {stats.vocab + (savedCount || session.vocabulary.length)}
                 </div>
-                <div className="ka text-[10px] text-[#5B6473]">სულ ფრაზა</div>
+                <div className="ka text-[10px] text-[#6B6B6B]">სულ ფრაზა</div>
               </div>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#F0EBDD] overflow-hidden">
+            <div className="mt-3 h-2 rounded-full bg-[#F0E5E9] overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#C9A227] to-[#D8B547] transition-all duration-700"
+                className="h-full bg-gradient-to-r from-[#A84060] to-[#C97A90] transition-all duration-700"
                 style={{ width: `${Math.min(100, (stats.total + 1) * 5)}%` }}
               />
             </div>
-            <p className="ka text-[10px] text-[#5B6473] mt-2">20 სესია = 1 ეტაპის ნიშანი</p>
+            <p className="ka text-[10px] text-[#6B6B6B] mt-2">20 სესია = 1 ეტაპის ნიშანი</p>
           </BizCard>
 
-          <BizCard className="mt-3 bg-[#FFFBEA] border-[#F2E6B0]">
+          <BizCard className="mt-3 bg-[#FAF6F7] border-[#F5DDE3]">
             <div className="flex items-start gap-3">
               <div className="text-xl">🌅</div>
               <div className="min-w-0">
-                <p className="ka text-[11px] uppercase tracking-wider text-[#C9A227] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
                   ხვალინდელი სესია
                 </p>
-                <p className="ka text-sm text-[#1E2A44] mt-1 leading-relaxed">
+                <p className="ka text-sm text-[#6B1E3E] mt-1 leading-relaxed">
                   {session.tomorrowTeaseKa}
                 </p>
               </div>
@@ -874,14 +874,14 @@ function Header({
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="ka text-xl font-bold text-[#1A2744] inline-flex items-center gap-2"><Mail size={18} strokeWidth={2.25} /> იმეილები</h1>
-        <span className="ka text-[11px] text-[#5B6473]">
+        <h1 className="ka text-xl font-bold text-[#6B1E3E] inline-flex items-center gap-2"><Mail size={18} strokeWidth={2.25} /> იმეილები</h1>
+        <span className="ka text-[11px] text-[#6B6B6B]">
           {curriculum ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}` : labelFor(session.emailType)}
         </span>
       </div>
-      <div className="h-1.5 w-full bg-[#E7E2D5] rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-[#E8D5DA] rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#1E2A44] transition-all duration-500"
+          className="h-full bg-[#6B1E3E] transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -912,9 +912,9 @@ function NavRow({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[#FAF7F0] border border-[#E7E2D5] rounded-xl px-3 py-3">
-      <div className="text-xl font-bold text-[#1E2A44]">{value}</div>
-      <div className="ka text-[11px] text-[#5B6473] mt-0.5">{label}</div>
+    <div className="bg-[#FAF6F7] border border-[#E8D5DA] rounded-xl px-3 py-3">
+      <div className="text-xl font-bold text-[#6B1E3E]">{value}</div>
+      <div className="ka text-[11px] text-[#6B6B6B] mt-0.5">{label}</div>
     </div>
   );
 }
@@ -924,12 +924,12 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`shrink-0 mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[11px] font-bold ${
-          ok ? "bg-[#0F766E]/15 text-[#0F766E]" : "bg-[#E7E2D5] text-[#5B6473]"
+          ok ? "bg-[#5A8A6A]/15 text-[#5A8A6A]" : "bg-[#E8D5DA] text-[#6B6B6B]"
         }`}
       >
         {ok ? "✓" : "–"}
       </span>
-      <span className="ka text-sm text-[#1E2A44] leading-snug">{label}</span>
+      <span className="ka text-sm text-[#6B1E3E] leading-snug">{label}</span>
     </li>
   );
 }

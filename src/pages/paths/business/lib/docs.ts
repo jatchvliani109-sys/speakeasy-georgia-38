@@ -162,7 +162,7 @@ export function highlightText(content: string, highlights: Highlight[]): string 
     const re = new RegExp(safe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     html = html.replace(
       re,
-      `<mark class="bg-[#FFF6D1] text-[#1E2A44] rounded px-0.5 cursor-help" title="${escapeHtml(h.whyKa)}" data-hl="${idx}">${safe}</mark>`,
+      `<mark class="bg-[#FCEEF1] text-[#6B1E3E] rounded px-0.5 cursor-help" title="${escapeHtml(h.whyKa)}" data-hl="${idx}">${safe}</mark>`,
     );
   });
   return html.replace(/\n/g, "<br/>");

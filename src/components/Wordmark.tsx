@@ -25,9 +25,9 @@ export default function Wordmark({ size = "md", className = "", tone = "auto" }:
 
   const colorCls =
     tone === "navy"
-      ? "text-[#0F2748]"
+      ? "text-[#5A1834]"
       : tone === "cream"
-      ? "text-[#F7F1E3]"
+      ? "text-[#F5EDEF]"
       : "";
 
   return (
