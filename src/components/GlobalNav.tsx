@@ -12,7 +12,6 @@ const GROUPS: NavGroup[] = [
     title: "მთავარი",
     items: [
       { to: "/dashboard", label: "მთავარი დაშბორდი" },
-      { to: "/learning-path", label: "მიმართულების არჩევა" },
     ],
   },
   {
