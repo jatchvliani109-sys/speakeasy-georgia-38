@@ -4,6 +4,7 @@ import { ArrowRight, Briefcase, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
+  {
     icon: Briefcase,
     eyebrow: "Business English",
     title: "ბიზნეს ინგლისური",
