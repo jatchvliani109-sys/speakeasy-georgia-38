@@ -5,7 +5,7 @@ import { BUSINESS_MODULES } from "./lib/state";
 
 export default function BusinessModulesList() {
   return (
-    <BusinessShell>
+    <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ელ-ფოსტები, გასაუბრება, შეხვედრები და პროფესიული ლექსიკა.", path: "/path/business/modules" }}>
       <header className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
           ბიზნეს ინგლისური

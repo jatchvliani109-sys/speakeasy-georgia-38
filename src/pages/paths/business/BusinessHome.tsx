@@ -264,7 +264,7 @@ export default function BusinessHome() {
     : "ჯერ არ გაგივლია";
 
   return (
-    <BusinessShell>
+    <BusinessShell seo={{ title: "ჩემი სწავლება — SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა — დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>

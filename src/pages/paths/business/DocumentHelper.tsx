@@ -66,7 +66,7 @@ export default function DocumentHelper() {
 
   if (!user || !profile) {
     return (
-      <BusinessShell>
+      <BusinessShell seo={{ title: "დოკუმენტების ასისტენტი — SpeakBusy", description: "შექმენი და გააუმჯობესე პროფესიული დოკუმენტები AI-ის დახმარებით.", path: "/path/business/documents" }}>
         <div className="ka text-[#4A4A4A]">იტვირთება...</div>
       </BusinessShell>
     );
