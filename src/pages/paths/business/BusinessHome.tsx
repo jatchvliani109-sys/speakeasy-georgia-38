@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import PathSwitcher from "@/components/PathSwitcher";
+
 import {
   BUSINESS_MODULES,
   BusinessIntensity,
