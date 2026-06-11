@@ -1,5 +1,4 @@
 export type LearningPathId =
-  | "speaking"
   | "business_english"
   | "national_exam";
 
