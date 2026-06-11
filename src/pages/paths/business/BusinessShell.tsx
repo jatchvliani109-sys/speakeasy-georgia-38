@@ -2,19 +2,23 @@ import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
+import SEO from "@/components/SEO";
 
 // Shared shell for the Business English path.
 
 export default function BusinessShell({
   children,
   back,
+  seo,
 }: {
   children: ReactNode;
   back?: { to: string; label: string };
+  seo?: { title: string; description?: string; path: string };
 }) {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#F0EBE3]">
+      {seo && <SEO {...seo} />}
       <header className="border-b border-[#E0D8D0] bg-[#F0EBE3]/85 backdrop-blur sticky top-0 z-20">
         <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link to="/path/business/home" className="flex items-center gap-2 text-[#5C1A2E]">
