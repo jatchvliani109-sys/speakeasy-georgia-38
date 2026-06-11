@@ -61,7 +61,6 @@ const App = () => (
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
 
             
-            <Route path="/path/exam" element={<RequireAuth><NationalExamDashboard /></RequireAuth>} />
             <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
             <Route path="/summary/:id" element={<RequireAuth><Summary /></RequireAuth>} />
             <Route path="/vocabulary" element={<RequireAuth><Vocabulary /></RequireAuth>} />
