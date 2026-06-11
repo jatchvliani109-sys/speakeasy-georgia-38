@@ -78,7 +78,7 @@ export default function MyLexicon() {
           ბიზნეს ლექსიკონი
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ჩემი ლექსიკონი</h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-1">
+        <p className="ka text-sm text-[#4A4A4A] mt-1">
           ფრაზები სესიებიდან და სიტყვები, რომლებიც შენ უკვე ისწავლე — ერთ ადგილას.
         </p>
       </header>
@@ -113,7 +113,7 @@ function TabBtn({
       className={`ka text-sm font-semibold py-2 rounded-lg transition ${
         active
           ? "bg-[#5C1A2E] text-[#F0EBE3] shadow-sm"
-          : "text-[#6B6B6B] hover:text-[#5C1A2E]"
+          : "text-[#4A4A4A] hover:text-[#5C1A2E]"
       }`}
     >
       {children}
@@ -225,12 +225,12 @@ function PhrasesTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა ფრაზებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#6B6B6B]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
           <div className="mx-auto w-12 h-12 rounded-md bg-[#F0EBE3] border border-[#E0D8D0] grid place-items-center text-[#5C1A2E]"><Library size={22} strokeWidth={2} /></div>
           <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-3">ფრაზები ცარიელია</h3>
-          <p className="ka text-sm text-[#6B6B6B] mt-2 max-w-sm mx-auto">
+          <p className="ka text-sm text-[#4A4A4A] mt-2 max-w-sm mx-auto">
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -241,7 +241,7 @@ function PhrasesTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#6B6B6B]">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-[#4A4A4A]">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -271,32 +271,32 @@ function PhrasesTab() {
                     <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">
                       {sectionLabel} — {title}
                     </p>
-                    <p className="ka text-[11px] text-[#6B6B6B] mt-0.5">
+                    <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
                       {date} · {vocab.length} ფრაზა
                     </p>
                   </div>
                   <ChevronDown
                     size={16}
                     strokeWidth={2.25}
-                    className={`shrink-0 text-[#6B6B6B] transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-[#4A4A4A] transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 pt-1 space-y-2 border-t border-[#F0EBE3]">
                     {vocab.length === 0 ? (
-                      <p className="ka text-xs text-[#6B6B6B] py-2">ფრაზები ვერ მოიძებნა.</p>
+                      <p className="ka text-xs text-[#4A4A4A] py-2">ფრაზები ვერ მოიძებნა.</p>
                     ) : (
                       vocab.map((v, i) => (
                         <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
                           <div className="flex items-baseline justify-between gap-3">
                             <p className="text-sm font-bold text-[#5C1A2E]">{v.en}</p>
                           </div>
-                          <p className="ka text-xs text-[#6B6B6B] mt-0.5">{v.ka}</p>
+                          <p className="ka text-xs text-[#4A4A4A] mt-0.5">{v.ka}</p>
                           {v.exampleEn && (
                             <p className="text-xs text-[#1C1C1E] mt-2 italic">"{v.exampleEn}"</p>
                           )}
                           {v.exampleKa && (
-                            <p className="ka text-[11px] text-[#6B6B6B]">{v.exampleKa}</p>
+                            <p className="ka text-[11px] text-[#4A4A4A]">{v.exampleKa}</p>
                           )}
                         </div>
                       ))
@@ -414,12 +414,12 @@ function WordsTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა სიტყვებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#6B6B6B]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
           <div className="mx-auto w-12 h-12 rounded-md bg-[#F0EBE3] border border-[#E0D8D0] grid place-items-center text-[#5C1A2E]"><BookOpen size={22} strokeWidth={2} /></div>
           <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
-          <p className="ka text-sm text-[#6B6B6B] mt-2 max-w-sm mx-auto">
+          <p className="ka text-sm text-[#4A4A4A] mt-2 max-w-sm mx-auto">
             დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -430,7 +430,7 @@ function WordsTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#6B6B6B]">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-[#4A4A4A]">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -445,7 +445,7 @@ function WordsTab() {
                       <h3 className="text-base font-bold text-[#5C1A2E]">{w.en}</h3>
                       <ReadAloudButton text={w.en} size="sm" />
                     </div>
-                    <p className="ka text-xs text-[#6B6B6B] mt-0.5">{w.ka}</p>
+                    <p className="ka text-xs text-[#4A4A4A] mt-0.5">{w.ka}</p>
                     {w.pronunciation && (
                       <p className="ka text-[10px] text-[#1C1C1E] font-mono mt-0.5">[{w.pronunciation}]</p>
                     )}
@@ -459,7 +459,7 @@ function WordsTab() {
                   <p className="text-xs text-[#5C1A2E] italic mt-2">"{w.exampleEn}"</p>
                 )}
                 <div className="mt-3 pt-3 border-t border-[#F0EBE3] flex items-center justify-between gap-2">
-                  <p className="ka text-[10px] text-[#6B6B6B]">
+                  <p className="ka text-[10px] text-[#4A4A4A]">
                     წყარო: {sourceLabelKa(r.source)}
                   </p>
                   <div className="flex gap-1">
@@ -503,10 +503,10 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-[#E0D8D0] text-sm text-[#5C1A2E] placeholder:text-[#A8A8A8] outline-none focus:border-[#5C1A2E] transition"
+        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-[#E0D8D0] text-sm text-[#5C1A2E] placeholder:text-[#6B6B6B] outline-none focus:border-[#5C1A2E] transition"
       />
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B6B6B]"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4A4A]"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
       >
         <circle cx="11" cy="11" r="7" />
@@ -521,7 +521,7 @@ function ConfidenceDot({ c }: { c: number }) {
   return (
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="w-2 h-2 rounded-full" style={{ background: colors[Math.min(5, c)] }} />
-      <span className="text-[10px] text-[#6B6B6B] font-mono">{c}/5</span>
+      <span className="text-[10px] text-[#4A4A4A] font-mono">{c}/5</span>
     </div>
   );
 }

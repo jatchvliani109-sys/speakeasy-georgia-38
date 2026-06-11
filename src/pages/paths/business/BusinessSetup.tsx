@@ -104,7 +104,7 @@ export default function BusinessSetup() {
           ნაბიჯი {step + 1} / 4
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
-        <p className="ka text-sm text-[#6B6B6B] mt-1">
+        <p className="ka text-sm text-[#4A4A4A] mt-1">
           მითხარი რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
       </div>
@@ -113,7 +113,7 @@ export default function BusinessSetup() {
         {step === 0 && (
           <div>
             <h2 className="ka font-semibold text-[#5C1A2E]">რისთვის გჭირდება ბიზნეს ინგლისური?</h2>
-            <p className="ka text-xs text-[#6B6B6B] mt-1 mb-4">შეგიძლია რამდენიმე პასუხი აირჩიო.</p>
+            <p className="ka text-xs text-[#4A4A4A] mt-1 mb-4">შეგიძლია რამდენიმე პასუხი აირჩიო.</p>
             <div className="space-y-2">
               {GOAL_KEYS.map((g) => {
                 const on = goals.includes(g);
@@ -250,7 +250,7 @@ function MultiSelect<T extends string>({
   return (
     <div>
       <h2 className="ka font-semibold text-[#5C1A2E]">{title}</h2>
-      {hint && <p className="ka text-xs text-[#6B6B6B] mt-1 mb-4">{hint}</p>}
+      {hint && <p className="ka text-xs text-[#4A4A4A] mt-1 mb-4">{hint}</p>}
       <div className="space-y-2">
         {options.map((o) => {
           const on = values.includes(o.value);

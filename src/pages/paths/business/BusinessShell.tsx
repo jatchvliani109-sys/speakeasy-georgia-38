@@ -5,7 +5,7 @@ import GlobalNav from "@/components/GlobalNav";
 
 // Shared shell for the Business English path.
 // Premium professional theme: deep navy (#5C1A2E), warm cream (#F0EBE3),
-// slate (#6B6B6B). Gold (#1C1C1E) reserved for key CTAs only.
+// slate (#4A4A4A). Gold (#1C1C1E) reserved for key CTAs only.
 // Sharp corners, subtle 1px borders, minimal shadows.
 
 export default function BusinessShell({
@@ -31,13 +31,13 @@ export default function BusinessShell({
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
         {back ? (
-          <Link to={back.to} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3">
+          <Link to={back.to} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3">
             <ArrowLeft size={13} strokeWidth={2.25} /> {back.label}
           </Link>
         ) : (
           <button
             onClick={() => navigate(-1)}
-            className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3"
+            className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3"
             aria-label="უკან"
           >
             <ArrowLeft size={13} strokeWidth={2.25} /> უკან

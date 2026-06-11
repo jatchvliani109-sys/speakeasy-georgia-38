@@ -224,7 +224,7 @@ export default function BusinessHome() {
   if (!s) {
     return (
       <BusinessShell>
-        <div className="ka text-[#6B6B6B]">იტვირთება...</div>
+        <div className="ka text-[#4A4A4A]">იტვირთება...</div>
       </BusinessShell>
     );
   }
@@ -268,7 +268,7 @@ export default function BusinessHome() {
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
             ბიზნეს ინგლისური
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1 leading-tight">
@@ -295,7 +295,7 @@ export default function BusinessHome() {
               resetBusiness(user.id);
               window.location.reload();
             }}
-            className="font-mono text-[10px] uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E0D8D0] text-[#6B6B6B] hover:bg-white hover:text-[#5C1A2E] transition"
+            className="font-mono text-[10px] uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E0D8D0] text-[#4A4A4A] hover:bg-white hover:text-[#5C1A2E] transition"
           >
             <RotateCcw size={11} strokeWidth={2.25} /> reset
           </button>
@@ -328,13 +328,13 @@ export default function BusinessHome() {
                   <Award size={18} strokeWidth={2} />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                     შენი მიმდინარე დონე
                   </p>
                   <p className="ka font-bold text-[#5C1A2E] text-base mt-0.5">
                     {LEVEL_LABELS[plan.level]}
                   </p>
-                  <p className="ka text-[11px] text-[#6B6B6B] mt-0.5">
+                  <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
                     ბოლო შეფასება: {lastReassessmentLabel}
                   </p>
                 </div>
@@ -410,7 +410,7 @@ export default function BusinessHome() {
 
           {/* 2. Today's Focus */}
           <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <Target size={12} strokeWidth={2.25} /> დღევანდელი ფოკუსი
             </p>
             <div className="relative overflow-hidden rounded-lg bg-[#5C1A2E] text-[#F0EBE3] p-6 border border-[#5C1A2E]">
@@ -486,7 +486,7 @@ export default function BusinessHome() {
 
           {/* 2a. Document Helper */}
           <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <FileText size={12} strokeWidth={2.25} /> დოკუმენტების ასისტენტი
             </p>
             <button
@@ -501,7 +501,7 @@ export default function BusinessHome() {
                   <p className="ka font-bold text-[#5C1A2E] text-base">
                     შექმენი ან გაასწორე რეალური დოკუმენტი
                   </p>
-                  <p className="ka text-xs text-[#6B6B6B] mt-1 leading-relaxed">
+                  <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
                     იმეილი, სამოტივაციო წერილი, რეზიუმე, ბიო — შენი მონაცემებით, წამიერად. ან ჩასვი იმეილი და მიიღე გაუმჯობესებული ვერსია.
                   </p>
                   <span className="ka inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#5C1A2E]">
@@ -522,14 +522,14 @@ export default function BusinessHome() {
                     <SugIcon size={16} strokeWidth={2} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+                    <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                       კიდევ გრძნობ ენერგიას?
                     </p>
                     <p className="ka text-sm font-semibold text-[#5C1A2E] mt-1">
                       კარგად გააკეთე! თუ კიდევ გრძნობ ენერგიას, შეგიძლია სცადო{" "}
                       {suggestionMod.title.toLowerCase()}.
                     </p>
-                    <p className="ka text-[11px] text-[#6B6B6B] mt-1">{suggestionCopy.subtitle}</p>
+                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{suggestionCopy.subtitle}</p>
                     <button
                       onClick={() => navigate(`/path/business/module/${suggestionMod.slug}`)}
                       className="ka mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#5C1A2E] underline underline-offset-2"
@@ -544,7 +544,7 @@ export default function BusinessHome() {
 
           {/* 3. Your Plan */}
           <section className="mb-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
               შენი გეგმა
             </p>
             <BizCard>
@@ -570,13 +570,13 @@ export default function BusinessHome() {
             <BizCard className="mb-5 border-dashed">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                     რეკომენდაცია
                   </p>
                   <p className="ka text-sm font-semibold text-[#5C1A2E] mt-1">
                     შექმენი შენი პროფესიული წარდგენა
                   </p>
-                  <p className="ka text-xs text-[#6B6B6B] mt-1">
+                  <p className="ka text-xs text-[#4A4A4A] mt-1">
                     სასარგებლოა გასაუბრებებზე, networking-ზე და LinkedIn-ზე.
                   </p>
                 </div>
@@ -594,13 +594,13 @@ export default function BusinessHome() {
             <BizCard className="mb-5 border-dashed">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+                  <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                     პერსონალიზაცია
                   </p>
                   <p className="ka text-sm font-semibold text-[#5C1A2E] mt-1">
                     ატვირთე რეზიუმე
                   </p>
-                  <p className="ka text-xs text-[#6B6B6B] mt-1">
+                  <p className="ka text-xs text-[#4A4A4A] mt-1">
                     გაკვეთილები მოერგება შენს პროფესიულ გამოცდილებას.
                   </p>
                 </div>
@@ -616,7 +616,7 @@ export default function BusinessHome() {
 
           {/* 4. Modules */}
           <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
               მოდულები
             </p>
             <div className="grid gap-2 md:grid-cols-2">
@@ -652,13 +652,13 @@ export default function BusinessHome() {
                             className={`ka text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${
                               started
                                 ? "bg-[#5C1A2E]/8 text-[#5C1A2E]"
-                                : "text-[#6B6B6B] border border-[#E0D8D0]"
+                                : "text-[#4A4A4A] border border-[#E0D8D0]"
                             }`}
                           >
                             {started ? `${count} სესია` : "ჯერ არ დაწყებულა"}
                           </span>
                         </div>
-                        <p className="ka text-[11px] text-[#6B6B6B] mt-1 line-clamp-2">
+                        <p className="ka text-[11px] text-[#4A4A4A] mt-1 line-clamp-2">
                           {m.description}
                         </p>
                         {cur && (
@@ -682,7 +682,7 @@ export default function BusinessHome() {
 
           {/* 5. Progress */}
           <section>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <BarChart2 size={12} strokeWidth={2.25} /> პროგრესი
             </p>
             <BizCard>
@@ -713,7 +713,7 @@ export default function BusinessHome() {
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-[#F0EBE3] border border-[#E0D8D0] rounded-md px-3 py-2">
-      <div className="ka text-[10px] text-[#6B6B6B]">{label}</div>
+      <div className="ka text-[10px] text-[#4A4A4A]">{label}</div>
       <div className="ka text-xs font-semibold text-[#5C1A2E] mt-0.5">{value}</div>
     </div>
   );
@@ -723,7 +723,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-[#F0EBE3] border border-[#E0D8D0] rounded-md px-3 py-3">
       <div className="text-xl font-bold text-[#5C1A2E]">{value}</div>
-      <div className="ka text-[11px] text-[#6B6B6B] mt-0.5">{label}</div>
+      <div className="ka text-[11px] text-[#4A4A4A] mt-0.5">{label}</div>
     </div>
   );
 }

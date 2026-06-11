@@ -396,7 +396,7 @@ export default function MeetingsModule() {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
         <BizCard>
-          <p className="ka text-[#6B6B6B]">შეხვედრა მზადდება შენი პროფილისთვის...</p>
+          <p className="ka text-[#4A4A4A]">შეხვედრა მზადდება შენი პროფილისთვის...</p>
           <div className="mt-3 h-2 w-full bg-[#E0D8D0] rounded-full overflow-hidden">
             <div className="h-full bg-[#5C1A2E] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
           </div>
@@ -417,15 +417,15 @@ export default function MeetingsModule() {
         <div className="space-y-3">
           {previouslyLearned && (
             <BizCard className="bg-[#F8F5F0] border-dashed">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                 წინა შეხვედრიდან
               </p>
-              <p className="ka text-xs text-[#6B6B6B] mt-1">{previouslyLearned.topicKa}</p>
+              <p className="ka text-xs text-[#4A4A4A] mt-1">{previouslyLearned.topicKa}</p>
               <div className="mt-2 space-y-1.5">
                 {previouslyLearned.phrases.map((p, i) => (
                   <div key={i} className="p-2 rounded-lg bg-white border border-[#E0D8D0]">
                     <p className="text-sm text-[#5C1A2E] font-medium">"{p.en}"</p>
-                    <p className="ka text-[11px] text-[#6B6B6B]">{p.ka}</p>
+                    <p className="ka text-[11px] text-[#4A4A4A]">{p.ka}</p>
                   </div>
                 ))}
               </div>
@@ -434,7 +434,7 @@ export default function MeetingsModule() {
           )}
           <BizCard className="border-l-4 border-l-[#5A8A6A]">
             {curriculum && (
-              <p className="ka text-[10px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">
+              <p className="ka text-[10px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-1">
                 ეტაპი {curriculum.step} / {curriculum.total}
                 {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
               </p>
@@ -443,7 +443,7 @@ export default function MeetingsModule() {
               შეხვედრის ბრიფინგი · ~{session.estimatedMinutes} წუთი
             </p>
             <h2 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{b.meetingTypeKa}</h2>
-            <p className="text-sm text-[#6B6B6B] mt-0.5">{b.meetingTypeEn}</p>
+            <p className="text-sm text-[#4A4A4A] mt-0.5">{b.meetingTypeEn}</p>
 
             <div className="mt-4 grid grid-cols-1 gap-2">
               <BriefRow label="კომპანია" valueKa={b.companyName} sub={b.companyType} />
@@ -468,7 +468,7 @@ export default function MeetingsModule() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-[#5C1A2E] truncate">{a.name}</p>
-                      <p className="ka text-[10px] text-[#6B6B6B] truncate">
+                      <p className="ka text-[10px] text-[#4A4A4A] truncate">
                         {a.titleKa || a.titleEn}{a.personalityKa ? ` · ${a.personalityKa}` : ""}
                       </p>
                     </div>
@@ -493,10 +493,10 @@ export default function MeetingsModule() {
 
       {step === "warmup" && session.warmUp[warmupIdx] && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
             გახურება · {warmupIdx + 1} / {session.warmUp.length}
           </p>
-          <p className="text-xs text-[#6B6B6B] mt-2 italic">"{session.warmUp[warmupIdx].contextEn}"</p>
+          <p className="text-xs text-[#4A4A4A] mt-2 italic">"{session.warmUp[warmupIdx].contextEn}"</p>
           <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">
             {session.warmUp[warmupIdx].promptKa}
           </p>
@@ -518,9 +518,9 @@ export default function MeetingsModule() {
                   onClick={() => setWarmupChoice(i)}
                   className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                 >
-                  <p className="text-xs font-semibold text-[#6B6B6B]">Option {o.label}</p>
+                  <p className="text-xs font-semibold text-[#4A4A4A]">Option {o.label}</p>
                   <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
-                  {reveal && <p className="ka text-[11px] text-[#6B6B6B] mt-2">💡 {o.whyKa}</p>}
+                  {reveal && <p className="ka text-[11px] text-[#4A4A4A] mt-2">💡 {o.whyKa}</p>}
                 </button>
               );
             })}
@@ -595,7 +595,7 @@ export default function MeetingsModule() {
                     {initials(t.speaker || "")}
                   </div>
                   <div>
-                    <p className="ka text-[10px] text-[#6B6B6B] font-semibold ml-1 mb-0.5">{t.speaker}</p>
+                    <p className="ka text-[10px] text-[#4A4A4A] font-semibold ml-1 mb-0.5">{t.speaker}</p>
                     <div className="p-3 rounded-2xl rounded-tl-sm bg-[#F8F5F0] border border-[#E0D8D0] text-sm text-[#5C1A2E] whitespace-pre-wrap leading-relaxed">
                       {t.text}
                     </div>
@@ -603,7 +603,7 @@ export default function MeetingsModule() {
                 </div>
               ) : (
                 <div key={i} className="max-w-[88%] ml-auto">
-                  <p className="ka text-[10px] text-[#6B6B6B] font-semibold mr-1 mb-0.5 text-right">შენ</p>
+                  <p className="ka text-[10px] text-[#4A4A4A] font-semibold mr-1 mb-0.5 text-right">შენ</p>
                   <div className="p-3 rounded-2xl rounded-tr-sm bg-[#5C1A2E] text-[#F0EBE3] text-sm whitespace-pre-wrap leading-relaxed">
                     {t.text}
                   </div>
@@ -626,7 +626,7 @@ export default function MeetingsModule() {
                 ✨ ძლიერი წვლილი
               </p>
               <p className="text-sm font-bold text-[#5C1A2E] mt-1">"{activeHighlight.phraseEn}"</p>
-              <p className="ka text-[11px] text-[#6B6B6B]">{activeHighlight.ka}</p>
+              <p className="ka text-[11px] text-[#4A4A4A]">{activeHighlight.ka}</p>
               <p className="ka text-xs text-[#3F6649] mt-1">{activeHighlight.praiseKa}</p>
             </div>
           )}
@@ -656,9 +656,9 @@ export default function MeetingsModule() {
                       onClick={() => setQuizChoice(i)}
                       className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                     >
-                      <p className="text-xs font-semibold text-[#6B6B6B]">Option {o.label}</p>
+                      <p className="text-xs font-semibold text-[#4A4A4A]">Option {o.label}</p>
                       <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
-                      {reveal && <p className="ka text-[11px] text-[#6B6B6B] mt-2">💡 {o.whyKa}</p>}
+                      {reveal && <p className="ka text-[11px] text-[#4A4A4A] mt-2">💡 {o.whyKa}</p>}
                     </button>
                   );
                 })}
@@ -676,7 +676,7 @@ export default function MeetingsModule() {
           {/* Input */}
           {step === "meeting" && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                 შენი წვლილი
               </p>
               <textarea
@@ -688,7 +688,7 @@ export default function MeetingsModule() {
               />
               {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
               <div className="mt-3 flex items-center justify-between">
-                <span className="ka text-[11px] text-[#6B6B6B]">
+                <span className="ka text-[11px] text-[#4A4A4A]">
                   ეტაპი {stageIdx + 1} / {stages.length}
                 </span>
                 <BizButton onClick={submitTurn} disabled={!userText.trim() || thinking}>
@@ -707,7 +707,7 @@ export default function MeetingsModule() {
                   ? "border-l-4 border-l-[#1C1C1E] bg-[#F8F5F0]"
                   : "border-l-4 border-l-[#C0392B] bg-[#F8F5F0]"
             }>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                 კოლეგების შეფასება
               </p>
               <h3 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{verdict.headlineKa}</h3>
@@ -739,7 +739,7 @@ export default function MeetingsModule() {
                   <div key={i} className="p-3 rounded-lg bg-[#F0F7F2] border border-[#C8DCCF]">
                     <p className="ka text-sm font-semibold text-[#3F6649]">{w.momentKa}</p>
                     <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-[#6B6B6B] mt-1">{w.whyKa}</p>
+                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{w.whyKa}</p>
                   </div>
                 ))}
               </div>
@@ -754,7 +754,7 @@ export default function MeetingsModule() {
                   <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#F5C9C3]">
                     <p className="ka text-sm font-semibold text-[#A52A1B]">{w.momentKa}</p>
                     <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-[#6B6B6B] mt-1">{w.whyKa}</p>
+                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{w.whyKa}</p>
                   </div>
                 ))}
               </div>
@@ -768,7 +768,7 @@ export default function MeetingsModule() {
                 {debrief.keyPhrases.map((p, i) => (
                   <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
                     <p className="text-sm font-bold text-[#5C1A2E]">{p.en}</p>
-                    <p className="ka text-xs text-[#6B6B6B]">{p.ka}</p>
+                    <p className="ka text-xs text-[#4A4A4A]">{p.ka}</p>
                     <p className="ka text-[11px] text-[#5A8A6A] mt-1">📍 {p.whenKa}</p>
                   </div>
                 ))}
@@ -815,7 +815,7 @@ export default function MeetingsModule() {
           </div>
 
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
               დღევანდელი შედეგი
             </p>
             <ul className="mt-3 space-y-2">
@@ -829,7 +829,7 @@ export default function MeetingsModule() {
           <BizCard className="mt-3">
             <div className="flex items-end justify-between">
               <div>
-                <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
                   შეხვედრების პროგრესი
                 </p>
                 <p className="ka text-sm text-[#5C1A2E] mt-1">
@@ -838,7 +838,7 @@ export default function MeetingsModule() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-[#5A8A6A]">{score >= 0 ? `+${score}` : score}</div>
-                <div className="ka text-[10px] text-[#6B6B6B]">საერთო ქულა</div>
+                <div className="ka text-[10px] text-[#4A4A4A]">საერთო ქულა</div>
               </div>
             </div>
             <div className="mt-3 h-2 rounded-full bg-[#F0EBE3] overflow-hidden">
@@ -902,7 +902,7 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
         <h1 className="ka text-xl font-bold text-[#5C1A2E] inline-flex items-center gap-2"><Users size={18} strokeWidth={2.25} /> შეხვედრები</h1>
-        <span className="ka text-[11px] text-[#6B6B6B]">
+        <span className="ka text-[11px] text-[#4A4A4A]">
           {curriculum
             ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}`
             : step === "meeting" && session.stages[stageIdx]
@@ -929,10 +929,10 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
 function BriefRow({ label, valueKa, sub }: { label: string; valueKa: string; sub?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E0D8D0] last:border-0">
-      <span className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B]">{label}</span>
+      <span className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A]">{label}</span>
       <div className="text-right min-w-0">
         <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{valueKa}</p>
-        {sub && <p className="text-[11px] text-[#6B6B6B] truncate">{sub}</p>}
+        {sub && <p className="text-[11px] text-[#4A4A4A] truncate">{sub}</p>}
       </div>
     </div>
   );
@@ -943,7 +943,7 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`mt-0.5 shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] ${
-          ok ? "bg-[#5A8A6A] text-white" : "bg-[#E0D8D0] text-[#6B6B6B]"
+          ok ? "bg-[#5A8A6A] text-white" : "bg-[#E0D8D0] text-[#4A4A4A]"
         }`}
       >
         {ok ? "✓" : "—"}

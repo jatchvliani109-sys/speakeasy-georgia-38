@@ -29,7 +29,7 @@ const Index = () => {
           ისწავლე ინგლისური{" "}
           <span className="block sm:inline text-[#4A1525]">თავდაჯერებულად</span>
         </h1>
-        <p className="text-base sm:text-lg text-[#6B6B6B] mb-9 max-w-md mx-auto ka leading-relaxed">
+        <p className="text-base sm:text-lg text-[#4A4A4A] mb-9 max-w-md mx-auto ka leading-relaxed">
           AI მასწავლებელი, რომელიც გესაუბრება ქართულად და ინგლისურად — შენი ტემპით.
         </p>
         <div className="flex flex-col gap-3 max-w-xs mx-auto">
@@ -52,7 +52,7 @@ const Index = () => {
       <div className="h-px bg-[#E0D8D0] my-2" />
 
       <section className="mt-10 mb-10">
-        <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B6B6B] ka mb-5 text-center">
+        <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#4A4A4A] ka mb-5 text-center">
           ბიზნეს ინგლისური — შენი მიზნისთვის
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
@@ -65,7 +65,7 @@ const Index = () => {
                 <div className="w-11 h-11 rounded-xl bg-[#3D1220] flex items-center justify-center text-[#1C1C1E]">
                   <f.icon className="w-5 h-5" strokeWidth={1.5} />
                 </div>
-                <div className="mt-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-[#A8A8A8] tabular-nums">
+                <div className="mt-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-[#6B6B6B] tabular-nums">
                   0{i + 1}
                 </div>
               </div>
@@ -76,7 +76,7 @@ const Index = () => {
                 <h3 className="font-bold text-[#3D1220] text-base sm:text-lg mt-1.5 tracking-tight">
                   {f.title}
                 </h3>
-                <p className="text-[13px] sm:text-sm text-[#6B6B6B] leading-relaxed mt-2">
+                <p className="text-[13px] sm:text-sm text-[#4A4A4A] leading-relaxed mt-2">
                   {f.desc}
                 </p>
               </div>

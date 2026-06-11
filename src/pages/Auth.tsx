@@ -64,7 +64,7 @@ export default function Auth() {
           <h1 className="text-3xl font-extrabold ka text-[#3D1220] mt-3 tracking-tight">
             {mode === "signup" ? "შექმენი ანგარიში" : "შესვლა"}
           </h1>
-          <p className="text-sm text-[#6B6B6B] mt-2 ka">
+          <p className="text-sm text-[#4A4A4A] mt-2 ka">
             {mode === "signup" ? "ელ-ფოსტა და პაროლი — ეს არის ყველაფერი." : "კეთილი იყოს თქვენი მობრძანება."}
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function Auth() {
           className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
         >
           <div>
-            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B6B6B]">
+            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
               ელ-ფოსტა
             </Label>
             <Input
@@ -87,7 +87,7 @@ export default function Auth() {
             />
           </div>
           <div>
-            <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B6B6B]">
+            <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
               პაროლი
             </Label>
             <Input
@@ -117,13 +117,13 @@ export default function Auth() {
 
         <button
           onClick={() => setMode(mode === "signup" ? "login" : "signup")}
-          className="w-full text-center mt-6 text-sm text-[#6B6B6B] hover:text-[#3D1220] transition-colors ka"
+          className="w-full text-center mt-6 text-sm text-[#4A4A4A] hover:text-[#3D1220] transition-colors ka"
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
 
         <div className="mt-8 pt-6 border-t border-dashed border-[#E0D8D0]">
-          <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#A8A8A8] text-center mb-3">
+          <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#6B6B6B] text-center mb-3">
             Dev only
           </div>
           <button
