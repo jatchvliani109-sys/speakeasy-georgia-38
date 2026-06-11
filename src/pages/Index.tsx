@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Wordmark from "@/components/Wordmark";
+import SEO from "@/components/SEO";
 
 /* ─────────────── decorative shapes ─────────────── */
 const Dots = ({ className = "" }: { className?: string }) => (
@@ -126,6 +127,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F5F0] text-[#1C1C1E]">
+      <SEO
+        title="SpeakBusy — ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
+        description="ისწავლე ბიზნეს ინგლისური AI-powered პლატფორმით. პერსონალიზებული მოდულები ელ-ფოსტებში, გასაუბრებებში, შეხვედრებსა და ლექსიკაში. დაიწყე უფასოდ."
+        path="/"
+      />
       {/* ═══════════════ NAV ═══════════════ */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[#F8F5F0]/85 border-b border-[#E0D8D0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
