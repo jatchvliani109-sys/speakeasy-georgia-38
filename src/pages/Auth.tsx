@@ -34,11 +34,11 @@ export default function Auth() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/learning-path` },
+          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) throw error;
         toast.success("მოგესალმებით");
-        navigate("/learning-path");
+        navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -139,14 +139,14 @@ export default function Auth() {
                   const { error: sErr } = await supabase.auth.signUp({
                     email: devEmail,
                     password: devPass,
-                    options: { emailRedirectTo: `${window.location.origin}/learning-path` },
+                    options: { emailRedirectTo: `${window.location.origin}/dashboard` },
                   });
                   if (sErr) throw sErr;
                   const retry = await supabase.auth.signInWithPassword({ email: devEmail, password: devPass });
                   if (retry.error) throw retry.error;
                 }
                 toast.success("Dev preview mode");
-                navigate("/learning-path");
+                navigate("/dashboard");
               } catch (err: any) {
                 toast.error(err.message ?? "Dev login failed");
               } finally {
