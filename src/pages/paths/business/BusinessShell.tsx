@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
+import UserMenu from "@/components/UserMenu";
 
 // Shared shell for the Business English path.
 // Premium professional theme: deep navy (#5C1A2E), warm cream (#F0EBE3),
@@ -26,7 +27,10 @@ export default function BusinessShell({
             </span>
             <span className="ka font-semibold text-sm tracking-tight">ბიზნეს ინგლისური</span>
           </Link>
-          <GlobalNav />
+          <div className="flex items-center gap-1">
+            <GlobalNav />
+            <UserMenu />
+          </div>
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
