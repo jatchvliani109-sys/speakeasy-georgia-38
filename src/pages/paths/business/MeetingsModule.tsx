@@ -796,7 +796,7 @@ export default function MeetingsModule() {
               <div className="mx-auto relative w-20 h-20">
                 <div className="absolute inset-0 rounded-full bg-[#C8DCCF]/20 animate-[ping_1.6s_ease-out_1]" />
                 <div className="absolute inset-0 rounded-full border border-[#C8DCCF]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#6E2038] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#6E2038] grid place-items-center shadow-[0_8px_24px_-6px_rgba(28,28,30,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
                   <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#3F6649]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>

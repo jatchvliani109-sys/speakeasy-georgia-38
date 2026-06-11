@@ -465,7 +465,7 @@ function IntroCard({
   onStart,
 }: { newWords: VocabWord[]; reviewCount: number; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(107,30,62,0.45)]">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
         <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
@@ -495,7 +495,7 @@ function IntroCard({
 
 function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(107,30,62,0.45)]">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
         <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
@@ -553,7 +553,7 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
 
 function WordCard({ word }: { word: VocabWord }) {
   return (
-    <div key={word.key} className="biz-card-flip bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-[0_2px_4px_rgba(107,30,62,0.04),0_12px_32px_-12px_rgba(107,30,62,0.15)]">
+    <div key={word.key} className="biz-card-flip bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-3xl font-bold text-[#5C1A2E] tracking-tight">{word.en}</h2>

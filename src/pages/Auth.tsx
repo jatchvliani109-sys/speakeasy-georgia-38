@@ -71,7 +71,7 @@ export default function Auth() {
 
         <form
           onSubmit={submit}
-          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_10px_-4px_rgba(74,20,41,0.08)]"
+          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
         >
           <div>
             <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B6B6B]">

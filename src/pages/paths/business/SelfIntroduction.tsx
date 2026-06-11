@@ -551,7 +551,7 @@ export default function SelfIntroduction() {
                 style={{ animation: "siRingPulse 1.6s ease-out 0.3s infinite" }}
               />
               <span
-                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] shadow-[0_8px_24px_-8px_rgba(107,30,62,0.5)] ring-2 ring-[#1C1C1E]/40"
+                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] shadow-[0_8px_24px_-8px_rgba(92,26,46,0.5)] ring-2 ring-[#1C1C1E]/40"
                 style={{ animation: "siCircleIn 0.5s cubic-bezier(.2,.8,.2,1) both" }}
               >
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -579,7 +579,7 @@ export default function SelfIntroduction() {
               {/* Premium document card */}
               <div className="relative si-rise-3">
                 <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#1C1C1E]/40 via-transparent to-[#5C1A2E]/20 blur-[2px]" aria-hidden />
-                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_4px_rgba(107,30,62,0.04),0_20px_50px_-20px_rgba(107,30,62,0.25)] overflow-hidden">
+                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_4px_rgba(92,26,46,0.04),0_20px_50px_-20px_rgba(92,26,46,0.25)] overflow-hidden">
                   <div className="h-[3px] bg-gradient-to-r from-[#1C1C1E] via-[#C9A84C] to-[#1C1C1E]" />
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
@@ -603,7 +603,7 @@ export default function SelfIntroduction() {
               {/* Phrases bonus reward */}
               {saved[0].phrases?.length > 0 && (
                 <div className="mt-5 si-rise-4">
-                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#F8F5F0] via-[#FAF5E8] to-[#FAF5E8] border border-[#C9A84C]/50 shadow-[0_8px_24px_-12px_rgba(168,64,96,0.35)]">
+                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#F8F5F0] via-[#FAF5E8] to-[#FAF5E8] border border-[#C9A84C]/50 shadow-[0_8px_24px_-12px_rgba(28,28,30,0.35)]">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-base" style={{ animation: "siGoldShimmer 2s ease-in-out infinite" }}>✦</span>
                       <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#8A6A0F] font-bold">ბონუსი · ნასწავლი ფრაზები</p>
@@ -628,7 +628,7 @@ export default function SelfIntroduction() {
             <div className="grid gap-2.5">
               <button
                 onClick={() => navigate("/path/business/home")}
-                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(107,30,62,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(107,30,62,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(92,26,46,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(92,26,46,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
                 <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#C9A84C] to-[#1C1C1E]" />
                 <span className="flex items-center justify-between pl-2">

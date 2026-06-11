@@ -59,7 +59,7 @@ const Index = () => {
           {features.map((f, i) => (
             <article
               key={f.title}
-              className="group relative flex gap-5 p-5 sm:p-6 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] ka transition-all hover:border-[#1C1C1E]/50 hover:shadow-[0_8px_24px_-16px_rgba(74,20,41,0.18)]"
+              className="group relative flex gap-5 p-5 sm:p-6 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] ka transition-all hover:border-[#1C1C1E]/50 hover:shadow-[0_8px_24px_-16px_rgba(61,18,32,0.18)]"
             >
               <div className="flex flex-col items-center shrink-0">
                 <div className="w-11 h-11 rounded-xl bg-[#3D1220] flex items-center justify-center text-[#1C1C1E]">
