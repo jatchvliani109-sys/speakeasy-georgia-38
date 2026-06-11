@@ -1,15 +1,12 @@
 import { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
 import GlobalNav from "@/components/GlobalNav";
+import UserMenu from "@/components/UserMenu";
 import Wordmark from "@/components/Wordmark";
 
 export default function Layout({ children, showLogout = true, fullWidth = false }: { children: ReactNode; showLogout?: boolean; fullWidth?: boolean }) {
   const { user } = useAuth();
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border">
@@ -21,9 +18,7 @@ export default function Layout({ children, showLogout = true, fullWidth = false 
           {user && showLogout && (
             <div className="flex items-center gap-1">
               <GlobalNav />
-              <Button variant="ghost" size="sm" onClick={async () => { await supabase.auth.signOut(); navigate("/"); }}>
-                <LogOut className="w-4 h-4" />
-              </Button>
+              <UserMenu />
             </div>
           )}
         </div>
