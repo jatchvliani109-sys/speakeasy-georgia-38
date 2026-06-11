@@ -208,8 +208,8 @@
 .biz-question-slide { animation: bizQuestionSlide 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
 @keyframes bizProgressPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
-  50%      { box-shadow: 0 0 0 6px rgba(201, 162, 39, 0.4); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 64, 96, 0); }
+  50%      { box-shadow: 0 0 0 6px rgba(168, 64, 96, 0.4); }
 }
 .biz-progress-pulse { animation: bizProgressPulse 900ms ease-out 2; }
 
@@ -243,16 +243,16 @@
 .biz-mega-pop { animation: bizMegaPop 2500ms ease-out forwards; }
 
 @keyframes bizGoldFlash {
-  0%, 100% { background-color: rgba(201, 162, 39, 0); }
-  40%      { background-color: rgba(201, 162, 39, 0.22); }
+  0%, 100% { background-color: rgba(168, 64, 96, 0); }
+  40%      { background-color: rgba(168, 64, 96, 0.22); }
 }
 .biz-gold-flash { animation: bizGoldFlash 1500ms ease-out; }
 
 @keyframes bizMegaFlash {
-  0%   { background-color: rgba(30, 42, 68, 0); }
-  20%  { background-color: rgba(201, 162, 39, 0.35); }
-  60%  { background-color: rgba(30, 42, 68, 0.55); }
-  100% { background-color: rgba(30, 42, 68, 0); }
+  0%   { background-color: rgba(74, 20, 41, 0); }
+  20%  { background-color: rgba(168, 64, 96, 0.35); }
+  60%  { background-color: rgba(74, 20, 41, 0.55); }
+  100% { background-color: rgba(74, 20, 41, 0); }
 }
 .biz-mega-flash { animation: bizMegaFlash 2500ms ease-out; }
 
