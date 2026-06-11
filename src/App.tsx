@@ -9,7 +9,7 @@ import DevNav from "@/components/DevNav";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import LearningPathSelection from "./pages/LearningPathSelection";
+
 import BusinessGate from "./pages/paths/business/BusinessGate";
 import BusinessSetup from "./pages/paths/business/BusinessSetup";
 import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest";
