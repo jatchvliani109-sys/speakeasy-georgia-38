@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, RotateCcw } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import GlobalNav from "@/components/GlobalNav";
@@ -21,22 +21,6 @@ export default function Layout({ children, showLogout = true }: { children: Reac
           {user && showLogout && (
             <div className="flex items-center gap-1">
               <GlobalNav />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-muted-foreground h-8 px-2"
-                title="Reset path selection for testing"
-                onClick={async () => {
-                  if (!confirm("Reset path selection for testing?")) return;
-                  await supabase.from("profiles").update({
-                    selected_learning_path: null,
-                  }).eq("id", user.id);
-                  navigate("/learning-path", { replace: true });
-                }}
-              >
-                <RotateCcw className="w-3.5 h-3.5 mr-1" />
-                Reset
-              </Button>
               <Button variant="ghost" size="sm" onClick={async () => { await supabase.auth.signOut(); navigate("/"); }}>
                 <LogOut className="w-4 h-4" />
               </Button>
@@ -48,3 +32,4 @@ export default function Layout({ children, showLogout = true }: { children: Reac
     </div>
   );
 }
+
