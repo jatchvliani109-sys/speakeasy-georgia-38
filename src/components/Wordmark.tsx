@@ -34,14 +34,14 @@ export default function Wordmark({ size = "md", className = "", tone = "auto" }:
     <span
       className={`inline-flex items-baseline leading-none tracking-tight select-none ${sizeCls} ${colorCls} ${className}`}
       style={{ fontFamily: '"Fraunces", "Instrument Serif", Georgia, serif' }}
-      aria-label="SpeakEasy"
+      aria-label="SpeakBusy"
     >
       <span style={{ fontWeight: 300, fontVariationSettings: '"SOFT" 30' }}>Speak</span>
       <span
         className="relative"
         style={{ fontWeight: 500, fontStyle: "italic", fontVariationSettings: '"SOFT" 50' }}
       >
-        Easy
+        Busy
         <span
           aria-hidden
           className="absolute left-0 right-[12%] -bottom-[0.18em] block"
