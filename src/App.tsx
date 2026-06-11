@@ -45,14 +45,6 @@ const App = () => (
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/learning-path" element={<RequireAuth><LearningPathSelection /></RequireAuth>} />
             
-            <Route path="/path/speaking" element={<RequireAuth><SpeakingDashboard /></RequireAuth>} />
-            <Route path="/path/speaking/call" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
-            <Route path="/path/speaking/daily" element={<RequireAuth><AISpeakingCall /></RequireAuth>} />
-            <Route path="/path/speaking/daily-legacy" element={<RequireAuth><SpeakingDailyLesson /></RequireAuth>} />
-            <Route path="/path/speaking/pronunciation" element={<RequireAuth><SpeakingPronunciation /></RequireAuth>} />
-            <Route path="/path/speaking/roleplay" element={<RequireAuth><SpeakingRoleplayList /></RequireAuth>} />
-            <Route path="/path/speaking/roleplay/:scenarioId" element={<RequireAuth><SpeakingRoleplaySession /></RequireAuth>} />
-            <Route path="/path/speaking/progress" element={<RequireAuth><SpeakingProgress /></RequireAuth>} />
             
             <Route path="/path/business" element={<RequireAuth><BusinessGate /></RequireAuth>} />
             <Route path="/path/business/setup" element={<RequireAuth><BusinessSetup /></RequireAuth>} />
