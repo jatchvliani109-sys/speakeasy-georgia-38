@@ -82,7 +82,7 @@ export default function GlobalNav() {
 }
 
 export const TESTING_SHORTCUTS: NavItem[] = [
-  { to: "/learning-path", label: "Path Selection" },
+  
   { to: "/path/business/home", label: "Business" },
   
   { to: "/path/business/setup", label: "Biz Setup" },
