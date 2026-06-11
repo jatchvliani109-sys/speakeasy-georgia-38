@@ -475,7 +475,7 @@ export default function BusinessHome() {
                 )}
                 <button
                   onClick={() => navigate(`/path/business/module/${focusModuleSlug}`)}
-                  className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#6E2038] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                  className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#6E2038] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                 >
                   {focusDoneToday ? "კიდევ ერთი სესია" : "დაწყება"}
                   <ArrowRight size={14} strokeWidth={2.25} />
