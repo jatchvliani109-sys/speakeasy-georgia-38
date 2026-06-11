@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LEARNING_PATHS, LearningPathId } from "@/lib/learningPaths";
 import { toast } from "sonner";
-import { Briefcase, GraduationCap, ArrowRight, LucideIcon } from "lucide-react";
+import { Briefcase, ArrowRight, LucideIcon } from "lucide-react";
 import { TestingShortcuts } from "@/components/GlobalNav";
 
 type Theme = {
