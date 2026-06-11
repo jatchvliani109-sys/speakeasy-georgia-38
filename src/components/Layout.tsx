@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import GlobalNav from "@/components/GlobalNav";
 import Wordmark from "@/components/Wordmark";
 
-export default function Layout({ children, showLogout = true }: { children: ReactNode; showLogout?: boolean }) {
+export default function Layout({ children, showLogout = true, fullWidth = false }: { children: ReactNode; showLogout?: boolean; fullWidth?: boolean }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   return (
@@ -28,7 +28,7 @@ export default function Layout({ children, showLogout = true }: { children: Reac
           )}
         </div>
       </header>
-      <main className="flex-1 max-w-2xl lg:max-w-5xl xl:max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</main>
+      <main className={`flex-1 w-full ${fullWidth ? "" : "max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6"}`}>{children}</main>
     </div>
   );
 }
