@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
+import UserMenu from "@/components/UserMenu";
 
 // Shared shell for the Business English path.
 // Premium professional theme: deep navy (#5C1A2E), warm cream (#F0EBE3),
