@@ -46,10 +46,10 @@ export default function BusinessPlan() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           შენი გეგმა
         </p>
-        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">შენი ბიზნეს ინგლისურის გეგმა</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი ბიზნეს ინგლისურის გეგმა</h1>
       </div>
 
       <BizCard className="mb-4">
@@ -63,7 +63,7 @@ export default function BusinessPlan() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
           რეკომენდებული პირველი მოდული
         </p>
-        <h3 className="ka text-lg font-bold text-[#6B1E3E] mt-1">{plan.recommendedModuleTitle}</h3>
+        <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-1">{plan.recommendedModuleTitle}</h3>
         <p className="ka text-xs text-[#6B6B6B] mt-1">შენი მიზნის შესაბამისად დავიწყოთ აქედან.</p>
       </BizCard>
 
@@ -73,8 +73,8 @@ export default function BusinessPlan() {
         </p>
         <ul className="space-y-2">
           {plan.weeklyFocus.map((f, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-[#6B1E3E]">
-              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#A84060] shrink-0" />
+            <li key={i} className="flex items-start gap-2 text-sm text-[#5C1A2E]">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1C1C1E] shrink-0" />
               <span className="ka">{f}</span>
             </li>
           ))}
@@ -90,9 +90,9 @@ export default function BusinessPlan() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-[#E8D5DA] last:border-0">
+    <div className="flex items-center justify-between py-2 border-b border-[#E0D8D0] last:border-0">
       <span className="ka text-xs text-[#6B6B6B]">{label}</span>
-      <span className="ka text-sm font-semibold text-[#6B1E3E]">{value}</span>
+      <span className="ka text-sm font-semibold text-[#5C1A2E]">{value}</span>
     </div>
   );
 }

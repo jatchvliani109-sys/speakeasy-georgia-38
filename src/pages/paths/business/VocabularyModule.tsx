@@ -316,10 +316,10 @@ export default function VocabularyModule() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
       <header className="mb-5">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ლექსიკა
         </p>
-        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           {stage === "results"
             ? "სესია დასრულდა"
             : stage === "reviewIntro"
@@ -327,14 +327,14 @@ export default function VocabularyModule() {
             : "დღევანდელი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
-          <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#6B1E3E] underline underline-offset-2 inline-flex items-center gap-1">
+          <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#5C1A2E] underline underline-offset-2 inline-flex items-center gap-1">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეული
           </Link>
           <button
             type="button"
             onClick={toggleSound}
             title={soundOn ? "ხმის გამორთვა" : "ხმის ჩართვა"}
-            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#E8D5DA] text-[#6B6B6B] hover:text-[#6B1E3E] hover:bg-white transition"
+            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#E0D8D0] text-[#6B6B6B] hover:text-[#5C1A2E] hover:bg-white transition"
           >
             {soundOn ? <Volume2 size={13} strokeWidth={2.25} /> : <VolumeX size={13} strokeWidth={2.25} />}
             <span>{soundOn ? "ხმა ჩართულია" : "ხმა გამორთულია"}</span>
@@ -344,7 +344,7 @@ export default function VocabularyModule() {
 
       {stage === "quiz" && combo >= 2 && (
         <div className="mb-3 flex items-center justify-end">
-          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#A84060] to-[#C97A90] text-[#6B1E3E] text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
+          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#1C1C1E] to-[#C9A84C] text-[#5C1A2E] text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
             <span className="biz-flame">🔥</span>
             {combo} სწორი ზედიზედ
           </div>
@@ -363,7 +363,7 @@ export default function VocabularyModule() {
       {streakOverlay === "mid" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-streak-pop">
-            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#A84060] to-[#C97A90] text-[#6B1E3E] text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
+            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#1C1C1E] to-[#C9A84C] text-[#5C1A2E] text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
               🔥 5 სწორი პასუხი!
             </div>
           </div>
@@ -372,9 +372,9 @@ export default function VocabularyModule() {
       {streakOverlay === "mega" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-mega-pop">
-            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#A84060] via-[#C97A90] to-[#E8C2CC] text-[#6B1E3E] text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
+            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#1C1C1E] via-[#C9A84C] to-[#E5D4A8] text-[#5C1A2E] text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
               <div className="text-4xl">⚡ 10 სწორი პასუხი!</div>
-              <div className="text-xl mt-1 text-[#6B1E3E]/85">გაუჩერებელი ხარ!</div>
+              <div className="text-xl mt-1 text-[#5C1A2E]/85">გაუჩერებელი ხარ!</div>
             </div>
           </div>
         </div>
@@ -396,10 +396,10 @@ export default function VocabularyModule() {
 
       {stage === "empty" && (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-14 h-14 rounded-full bg-[#FAF6F7] border border-[#E8D5DA] grid place-items-center text-2xl">
+          <div className="mx-auto w-14 h-14 rounded-full bg-[#F8F5F0] border border-[#E0D8D0] grid place-items-center text-2xl">
             🎉
           </div>
-          <h3 className="ka text-lg font-bold text-[#6B1E3E] mt-3">დღევანდელი სიტყვები მზად არ არის</h3>
+          <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-3">დღევანდელი სიტყვები მზად არ არის</h3>
           <p className="ka text-sm text-[#6B6B6B] mt-2 max-w-sm mx-auto">
             ყველა მიმდინარე სიტყვა შესწავლილია. შემოამოწმე ხვალ ან გადახედე რვეულს.
           </p>
@@ -465,16 +465,16 @@ function IntroCard({
   onStart,
 }: { newWords: VocabWord[]; reviewCount: number; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-6 shadow-[0_12px_32px_-12px_rgba(107,30,62,0.45)]">
-      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#A84060]/15 blur-2xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
+      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
-        <p className="ka text-[10px] uppercase tracking-wider bg-[#A84060]/20 text-[#E8C2CC] px-2 py-1 rounded-md font-semibold inline-block">
+        <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
           დღევანდელი სესია
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {newWords.length} ახალი სიტყვა · {reviewCount} გასამეორებელი
         </h2>
-        <p className="ka text-sm text-[#F5EDEF]/80 mt-2 leading-relaxed">
+        <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
           ჯერ ვისწავლი ახალ სიტყვებს ბარათების სახით. შემდეგ — მოკლე ქვიზი ნასწავლის შესამოწმებლად.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
@@ -484,7 +484,7 @@ function IntroCard({
         </div>
         <button
           onClick={onStart}
-          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#A84060] text-[#6B1E3E] hover:bg-[#C97A90] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#C9A84C] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
         >
           დაწყება →
         </button>
@@ -495,16 +495,16 @@ function IntroCard({
 
 function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-6 shadow-[0_12px_32px_-12px_rgba(107,30,62,0.45)]">
-      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#A84060]/15 blur-2xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
+      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
-        <p className="ka text-[10px] uppercase tracking-wider bg-[#A84060]/20 text-[#E8C2CC] px-2 py-1 rounded-md font-semibold inline-block">
+        <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
           გამეორების დღე
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {words.length} სიტყვის გამეორება
         </h2>
-        <p className="ka text-sm text-[#F5EDEF]/80 mt-2 leading-relaxed">
+        <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
           ახალი სიტყვები ხვალ გემატება. დღეს გაიმეორე ის სიტყვები, რომლებიც ყველაზე მეტ გამეორებას საჭიროებს.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
@@ -514,7 +514,7 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
         </div>
         <button
           onClick={onStart}
-          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#A84060] text-[#6B1E3E] hover:bg-[#C97A90] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#C9A84C] transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
         >
           გამეორების დაწყება →
         </button>
@@ -525,9 +525,9 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
 
 function Mini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[#F5EDEF]/10 rounded-lg px-3 py-2">
-      <p className="ka text-[10px] text-[#F5EDEF]/70 uppercase tracking-wider">{label}</p>
-      <p className="text-base font-bold text-[#F5EDEF] mt-0.5">{value}</p>
+    <div className="bg-[#F0EBE3]/10 rounded-lg px-3 py-2">
+      <p className="ka text-[10px] text-[#F0EBE3]/70 uppercase tracking-wider">{label}</p>
+      <p className="text-base font-bold text-[#F0EBE3] mt-0.5">{value}</p>
     </div>
   );
 }
@@ -540,10 +540,10 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
         <p className="ka text-[11px] text-[#6B6B6B] font-semibold uppercase tracking-wider">{label}</p>
         <p className="text-[11px] text-[#6B6B6B] font-mono">{pct}%</p>
       </div>
-      <div className={`h-2 bg-[#E8D5DA] rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
+      <div className={`h-2 bg-[#E0D8D0] rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
         <div
           key={pulse}
-          className="h-full bg-gradient-to-r from-[#6B1E3E] to-[#A84060] rounded-full"
+          className="h-full bg-gradient-to-r from-[#5C1A2E] to-[#1C1C1E] rounded-full"
           style={{ width: `${pct}%`, transition: "width 700ms cubic-bezier(0.2,0.8,0.2,1)" }}
         />
       </div>
@@ -553,25 +553,25 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
 
 function WordCard({ word }: { word: VocabWord }) {
   return (
-    <div key={word.key} className="biz-card-flip bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-[0_2px_4px_rgba(107,30,62,0.04),0_12px_32px_-12px_rgba(107,30,62,0.15)]">
+    <div key={word.key} className="biz-card-flip bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-3xl font-bold text-[#6B1E3E] tracking-tight">{word.en}</h2>
+          <h2 className="text-3xl font-bold text-[#5C1A2E] tracking-tight">{word.en}</h2>
           <p className="ka text-base text-[#6B6B6B] mt-1">{word.ka}</p>
           {word.pronunciation && (
-            <p className="ka text-xs text-[#A84060] font-mono mt-1">[{word.pronunciation}]</p>
+            <p className="ka text-xs text-[#1C1C1E] font-mono mt-1">[{word.pronunciation}]</p>
           )}
         </div>
         <ReadAloudButton text={word.en} size="md" />
       </div>
 
       {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
-        <p className="ka text-sm text-[#1A1A1A] mt-4 leading-relaxed">{word.explanationKa}</p>
+        <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{word.explanationKa}</p>
       )}
 
       <div className="mt-4">
-        <div className="p-3 rounded-xl bg-[#FAF6F7] border border-[#E8D5DA]">
-          <p className="text-sm text-[#6B1E3E]">"{word.exampleEn}"</p>
+        <div className="p-3 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+          <p className="text-sm text-[#5C1A2E]">"{word.exampleEn}"</p>
           <p className="ka text-xs text-[#6B6B6B] mt-1">{word.exampleKa}</p>
         </div>
       </div>
@@ -628,9 +628,9 @@ function QuestionCard({
             className={`relative overflow-visible text-left px-4 py-3 rounded-xl border text-sm transition-all
               ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
               ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
-              ${!revealed && isSelected ? "border-[#6B1E3E] bg-[#FAF6F7] text-[#6B1E3E]" : ""}
-              ${!revealed && !isSelected ? "border-[#E8D5DA] bg-white text-[#6B1E3E] hover:bg-[#FAF6F7]" : ""}
-              ${revealed && !isCorrect && !isWrongPick ? "border-[#E8D5DA] bg-white text-[#6B6B6B] opacity-60" : ""}
+              ${!revealed && isSelected ? "border-[#5C1A2E] bg-[#F8F5F0] text-[#5C1A2E]" : ""}
+              ${!revealed && !isSelected ? "border-[#E0D8D0] bg-white text-[#5C1A2E] hover:bg-[#F8F5F0]" : ""}
+              ${revealed && !isCorrect && !isWrongPick ? "border-[#E0D8D0] bg-white text-[#6B6B6B] opacity-60" : ""}
             `}
           >
             <span className={typeof label === "string" && label.match(/[ა-ჰ]/) ? "ka" : ""}>{label}</span>
@@ -644,10 +644,10 @@ function QuestionCard({
   switch (q.type) {
     case "mc_meaning":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#6B6B6B] uppercase tracking-wider font-semibold">აირჩიე სწორი თარგმანი</p>
           <div className="mt-3 flex items-center gap-2">
-            <h3 className="text-2xl font-bold text-[#6B1E3E]">{q.en}</h3>
+            <h3 className="text-2xl font-bold text-[#5C1A2E]">{q.en}</h3>
             <ReadAloudButton text={q.en} size="sm" />
           </div>
           {renderChoices(q.choices, q.correctKa)}
@@ -655,35 +655,35 @@ function QuestionCard({
       );
     case "tr_en_to_ka":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#6B6B6B] uppercase tracking-wider font-semibold">English → ქართული</p>
-          <h3 className="text-2xl font-bold text-[#6B1E3E] mt-3">{q.en}</h3>
+          <h3 className="text-2xl font-bold text-[#5C1A2E] mt-3">{q.en}</h3>
           {renderChoices(q.choices, q.correct)}
         </div>
       );
     case "tr_ka_to_en":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#6B6B6B] uppercase tracking-wider font-semibold">ქართული → English</p>
-          <h3 className="ka text-2xl font-bold text-[#6B1E3E] mt-3">{q.ka}</h3>
+          <h3 className="ka text-2xl font-bold text-[#5C1A2E] mt-3">{q.ka}</h3>
           {renderChoices(q.choices, q.correct)}
         </div>
       );
     case "fill_blank":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#6B6B6B] uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი</p>
-          <p className="text-lg text-[#6B1E3E] mt-3 leading-relaxed">{q.sentence}</p>
+          <p className="text-lg text-[#5C1A2E] mt-3 leading-relaxed">{q.sentence}</p>
           <p className="ka text-xs text-[#6B6B6B] mt-1">{q.ka}</p>
           {renderChoices(q.choices, q.correct)}
         </div>
       );
     case "true_false":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#6B6B6B] uppercase tracking-wider font-semibold">სწორი თუ არასწორი თარგმანი?</p>
-          <div className="mt-3 p-4 rounded-xl bg-[#FAF6F7] border border-[#E8D5DA]">
-            <p className="text-xl font-bold text-[#6B1E3E]">{q.en}</p>
+          <div className="mt-3 p-4 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+            <p className="text-xl font-bold text-[#5C1A2E]">{q.en}</p>
             <p className="ka text-base text-[#6B6B6B] mt-1">= {q.ka}</p>
           </div>
           {renderChoices(
@@ -697,8 +697,8 @@ function QuestionCard({
       );
     case "sentence_correct":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
-          <p className="ka text-sm text-[#6B1E3E]">{q.promptKa}</p>
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-sm text-[#5C1A2E]">{q.promptKa}</p>
           {renderChoices(
             q.choices.map((c, i) => ({ label: c, value: i })),
             q.correctIndex,
@@ -707,9 +707,9 @@ function QuestionCard({
       );
     case "georgian_mistake":
       return (
-        <div className="bg-white border border-[#E8D5DA] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">გავრცელებული შეცდომა</p>
-          <p className="ka text-sm text-[#6B1E3E] mt-2">{q.promptKa}</p>
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">გავრცელებული შეცდომა</p>
+          <p className="ka text-sm text-[#5C1A2E] mt-2">{q.promptKa}</p>
           {renderChoices(
             q.choices.map((c, i) => ({ label: c, value: i })),
             q.correctIndex,
@@ -769,13 +769,13 @@ function Results({
 
   return (
     <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-6 text-center">
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#A84060]/15 blur-2xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 text-center">
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
         <div className="relative">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#E8C2CC] font-semibold">დღევანდელი შედეგი</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#E5D4A8] font-semibold">დღევანდელი შედეგი</p>
           <p className="text-6xl font-bold mt-2 tabular-nums"><CountUp to={pct} duration={1200} />%</p>
-          <p className="ka text-sm text-[#F5EDEF]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
-          <p className="ka text-sm text-[#E8C2CC] mt-3 font-semibold">{message}</p>
+          <p className="ka text-sm text-[#F0EBE3]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
+          <p className="ka text-sm text-[#E5D4A8] mt-3 font-semibold">{message}</p>
         </div>
       </div>
 
@@ -793,7 +793,7 @@ function Results({
           <ul className="mt-2 space-y-1.5">
             {mastered.map((w) => (
               <li key={w.key} className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold text-[#6B1E3E]">{w.en}</span>
+                <span className="text-sm font-semibold text-[#5C1A2E]">{w.en}</span>
                 <span className="ka text-xs text-[#6B6B6B]">{w.ka}</span>
               </li>
             ))}
@@ -809,7 +809,7 @@ function Results({
           <ul className="mt-2 space-y-1.5">
             {needsReview.map((w) => (
               <li key={w.key} className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold text-[#6B1E3E]">{w.en}</span>
+                <span className="text-sm font-semibold text-[#5C1A2E]">{w.en}</span>
                 <span className="ka text-xs text-[#6B6B6B]">{w.ka}</span>
               </li>
             ))}
@@ -829,7 +829,7 @@ function Results({
           </BizButton>
         </Link>
         <Link to="/path/business/lexicon?tab=words" className="block">
-          <p className="ka text-center text-xs text-[#6B1E3E] underline underline-offset-2 mt-2 inline-flex items-center gap-1 justify-center w-full">
+          <p className="ka text-center text-xs text-[#5C1A2E] underline underline-offset-2 mt-2 inline-flex items-center gap-1 justify-center w-full">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეულის ნახვა
           </p>
         </Link>
@@ -840,8 +840,8 @@ function Results({
 
 function SummaryStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white border border-[#E8D5DA] rounded-xl p-3 text-center">
-      <p className="text-xl font-bold text-[#6B1E3E]">{value}</p>
+    <div className="bg-white border border-[#E0D8D0] rounded-xl p-3 text-center">
+      <p className="text-xl font-bold text-[#5C1A2E]">{value}</p>
       <p className="ka text-[10px] text-[#6B6B6B] uppercase tracking-wider mt-0.5">{label}</p>
     </div>
   );
@@ -849,7 +849,7 @@ function SummaryStat({ label, value }: { label: string; value: number }) {
 
 function Confetti({ seed }: { seed: number }): JSX.Element {
   const pieces = useMemo(() => {
-    const colors = ["#A84060", "#6B1E3E", "#C97A90", "#5A8A6A", "#C0392B", "#E8C2CC"];
+    const colors = ["#1C1C1E", "#5C1A2E", "#C9A84C", "#5A8A6A", "#C0392B", "#E5D4A8"];
     return Array.from({ length: 36 }).map((_, i) => ({
       id: `${seed}-${i}`,
       left: Math.random() * 100,
@@ -882,7 +882,7 @@ function Confetti({ seed }: { seed: number }): JSX.Element {
 
 function ParticleBurst(): JSX.Element {
   const particles = useMemo(() => {
-    const colors = ["#5A8A6A", "#7AA88A", "#A84060", "#C97A90", "#E8C2CC"];
+    const colors = ["#5A8A6A", "#7AA88A", "#1C1C1E", "#C9A84C", "#E5D4A8"];
     return Array.from({ length: 10 }).map((_, i) => {
       const angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.3;
       const dist = 32 + Math.random() * 24;

@@ -19,7 +19,7 @@ export default function BusinessModule() {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "უკან დაბრუნება" }}>
         <BizCard>
-          <p className="ka text-[#6B1E3E]">მოდული ვერ მოიძებნა.</p>
+          <p className="ka text-[#5C1A2E]">მოდული ვერ მოიძებნა.</p>
         </BizCard>
       </BusinessShell>
     );
@@ -29,19 +29,19 @@ export default function BusinessModule() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
       <div className="mb-5 flex items-start gap-3">
-        <span className="w-10 h-10 rounded-md bg-[#6B1E3E] text-[#F5EDEF] grid place-items-center shrink-0">
+        <span className="w-10 h-10 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0">
           <Icon size={18} strokeWidth={2} />
         </span>
         <div>
-          <h1 className="ka text-2xl font-bold text-[#6B1E3E]">{mod.title}</h1>
+          <h1 className="ka text-2xl font-bold text-[#5C1A2E]">{mod.title}</h1>
           <p className="ka text-sm text-[#6B6B6B] mt-1">{mod.description}</p>
         </div>
       </div>
       <BizCard>
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           მალე დაემატება
         </p>
-        <h3 className="ka text-base font-bold text-[#6B1E3E] mt-1">Coming next</h3>
+        <h3 className="ka text-base font-bold text-[#5C1A2E] mt-1">Coming next</h3>
         <p className="ka text-sm text-[#6B6B6B] mt-2">
           ეს მოდული ამჟამად მზადდება.
         </p>

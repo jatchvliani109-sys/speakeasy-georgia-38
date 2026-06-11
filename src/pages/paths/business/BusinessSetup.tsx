@@ -100,10 +100,10 @@ export default function BusinessSetup() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ნაბიჯი {step + 1} / 4
         </p>
-        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
         <p className="ka text-sm text-[#6B6B6B] mt-1">
           მითხარი რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
@@ -112,7 +112,7 @@ export default function BusinessSetup() {
       <BizCard>
         {step === 0 && (
           <div>
-            <h2 className="ka font-semibold text-[#6B1E3E]">რისთვის გჭირდება ბიზნეს ინგლისური?</h2>
+            <h2 className="ka font-semibold text-[#5C1A2E]">რისთვის გჭირდება ბიზნეს ინგლისური?</h2>
             <p className="ka text-xs text-[#6B6B6B] mt-1 mb-4">შეგიძლია რამდენიმე პასუხი აირჩიო.</p>
             <div className="space-y-2">
               {GOAL_KEYS.map((g) => {
@@ -123,12 +123,12 @@ export default function BusinessSetup() {
                     onClick={() => toggleGoal(g)}
                     className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                       on
-                        ? "border-[#6B1E3E] bg-[#6B1E3E]/5 text-[#6B1E3E]"
-                        : "border-[#E8D5DA] hover:border-[#6B1E3E]/40 text-[#1A1A1A]"
+                        ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
+                        : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                     }`}
                   >
                     <span className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                      style={{ background: on ? "#6B1E3E" : "transparent", borderColor: on ? "#6B1E3E" : "#E8D5DA" }} />
+                      style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E0D8D0" }} />
                     {GOAL_LABELS[g]}
                   </button>
                 );
@@ -159,7 +159,7 @@ export default function BusinessSetup() {
               }}
             />
             {intensity === "deadline" && (
-              <div className="mt-5 pt-5 border-t border-[#E8D5DA]">
+              <div className="mt-5 pt-5 border-t border-[#E0D8D0]">
                 <SingleSelect
                   title="როდის გჭირდება შედეგი?"
                   options={DEADLINE_KEYS.map((k) => ({ value: k, label: DEADLINE_LABELS[k] }))}
@@ -207,7 +207,7 @@ function SingleSelect<T extends string>({
 }) {
   return (
     <div>
-      <h2 className="ka font-semibold text-[#6B1E3E] mb-3">{title}</h2>
+      <h2 className="ka font-semibold text-[#5C1A2E] mb-3">{title}</h2>
       <div className="space-y-2">
         {options.map((o) => {
           const on = value === o.value;
@@ -217,13 +217,13 @@ function SingleSelect<T extends string>({
               onClick={() => onChange(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-[#6B1E3E] bg-[#6B1E3E]/5 text-[#6B1E3E]"
-                  : "border-[#E8D5DA] hover:border-[#6B1E3E]/40 text-[#1A1A1A]"
+                  ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
+                  : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
               }`}
             >
               <span
                 className="inline-block w-3.5 h-3.5 mr-2 rounded-full border align-middle"
-                style={{ background: on ? "#A84060" : "transparent", borderColor: on ? "#A84060" : "#E8D5DA" }}
+                style={{ background: on ? "#1C1C1E" : "transparent", borderColor: on ? "#1C1C1E" : "#E0D8D0" }}
               />
               {o.label}
             </button>
@@ -249,7 +249,7 @@ function MultiSelect<T extends string>({
 }) {
   return (
     <div>
-      <h2 className="ka font-semibold text-[#6B1E3E]">{title}</h2>
+      <h2 className="ka font-semibold text-[#5C1A2E]">{title}</h2>
       {hint && <p className="ka text-xs text-[#6B6B6B] mt-1 mb-4">{hint}</p>}
       <div className="space-y-2">
         {options.map((o) => {
@@ -260,13 +260,13 @@ function MultiSelect<T extends string>({
               onClick={() => onToggle(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-[#6B1E3E] bg-[#6B1E3E]/5 text-[#6B1E3E]"
-                  : "border-[#E8D5DA] hover:border-[#6B1E3E]/40 text-[#1A1A1A]"
+                  ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
+                  : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
               }`}
             >
               <span
                 className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                style={{ background: on ? "#6B1E3E" : "transparent", borderColor: on ? "#6B1E3E" : "#E8D5DA" }}
+                style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E0D8D0" }}
               />
               {o.label}
             </button>

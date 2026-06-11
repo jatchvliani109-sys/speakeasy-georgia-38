@@ -180,19 +180,19 @@ export default function BusinessReassessment() {
     return (
       <BusinessShell>
         <BizCard className={changed && went > 0 ? "border-l-4 border-l-[#5A8A6A] bg-[#F0F7F2]" : ""}>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
             შედეგი · ტესტი #{test.version}
           </p>
-          <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">{title}</h1>
+          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">{title}</h1>
           <p className="text-sm text-[#6B6B6B] mt-1">Score: {resultPct}%</p>
-          <p className="ka text-sm text-[#1A1A1A] mt-4 leading-relaxed">{blurb}</p>
+          <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{blurb}</p>
 
           {weakAreas.length > 0 && went <= 0 && (
-            <div className="mt-4 p-3 rounded-xl bg-[#FAF6F7] border border-[#F5DDE3]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+            <div className="mt-4 p-3 rounded-xl bg-[#F8F5F0] border border-[#F0E8D8]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                 სფეროები სამუშაოდ
               </p>
-              <p className="ka text-sm text-[#6B1E3E] mt-1">{weakAreas.join(" · ")}</p>
+              <p className="ka text-sm text-[#5C1A2E] mt-1">{weakAreas.join(" · ")}</p>
               <p className="ka text-[11px] text-[#6B6B6B] mt-1">
                 გირჩევთ შესაბამის მოდულში დამატებითი სესიების გაკეთებას.
               </p>
@@ -212,7 +212,7 @@ export default function BusinessReassessment() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           კითხვა {idx + 1} / {total}
           {q?.type === "mcq" && (
             <span className="ml-2 text-[#6B6B6B] normal-case tracking-normal">
@@ -220,7 +220,7 @@ export default function BusinessReassessment() {
             </span>
           )}
         </p>
-        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">დონის შეფასება</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დონის შეფასება</h1>
         <p className="ka text-sm text-[#6B6B6B] mt-1">
           12 კითხვა + არასავალდებულო წერითი დავალება. შენი წინა პროგრესი დაცულია.
         </p>
@@ -228,7 +228,7 @@ export default function BusinessReassessment() {
 
       <BizCard>
         {q?.promptKa && <p className="ka text-xs text-[#6B6B6B] mb-1">{q.promptKa}</p>}
-        <p className="text-[#6B1E3E] font-semibold">{q?.prompt}</p>
+        <p className="text-[#5C1A2E] font-semibold">{q?.prompt}</p>
 
         {q?.type === "mcq" ? (
           <div className="space-y-2 mt-4">
@@ -242,8 +242,8 @@ export default function BusinessReassessment() {
                   }
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
-                      ? "border-[#6B1E3E] bg-[#6B1E3E]/5 text-[#6B1E3E]"
-                      : "border-[#E8D5DA] hover:border-[#6B1E3E]/40 text-[#1A1A1A]"
+                      ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
+                      : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                   }`}
                 >
                   {opt}
@@ -260,7 +260,7 @@ export default function BusinessReassessment() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E8D5DA] focus:border-[#6B1E3E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
             <p className="ka text-xs text-[#6B6B6B] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.

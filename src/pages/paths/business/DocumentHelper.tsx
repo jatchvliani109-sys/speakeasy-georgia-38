@@ -75,10 +75,10 @@ export default function DocumentHelper() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "უკან Business-ზე" }}>
       <header className="mb-5">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ინგლისური
         </p>
-        <h1 className="ka text-2xl font-bold text-[#6B1E3E] mt-1">დოკუმენტების ასისტენტი</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დოკუმენტების ასისტენტი</h1>
         <p className="ka text-sm text-[#6B6B6B] mt-1">
           რეალური პროფესიული დოკუმენტები — შენი მონაცემებით, წამიერად.
         </p>
@@ -163,12 +163,12 @@ function HomeView({
             <button
               key={t.id}
               onClick={() => onTool(t.id)}
-              className="text-left bg-white border border-[#E8D5DA] rounded-lg p-4 hover:border-[#6B1E3E]/50 transition-colors"
+              className="text-left bg-white border border-[#E0D8D0] rounded-lg p-4 hover:border-[#5C1A2E]/50 transition-colors"
             >
-              <span className="w-9 h-9 rounded-md bg-[#6B1E3E] text-[#F5EDEF] grid place-items-center mb-3">
+              <span className="w-9 h-9 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center mb-3">
                 <Icon size={16} strokeWidth={2} />
               </span>
-              <p className="ka font-semibold text-sm text-[#6B1E3E]">{t.title}</p>
+              <p className="ka font-semibold text-sm text-[#5C1A2E]">{t.title}</p>
               <p className="ka text-[11px] text-[#6B6B6B] mt-1 leading-relaxed">{t.subtitle}</p>
             </button>
           );
@@ -181,13 +181,13 @@ function HomeView({
             ჩემი დოკუმენტები
           </p>
           {docs.length > 3 && (
-            <button onClick={onLibrary} className="ka text-[11px] text-[#6B1E3E] underline underline-offset-2">
+            <button onClick={onLibrary} className="ka text-[11px] text-[#5C1A2E] underline underline-offset-2">
               ყველა ({docs.length}) →
             </button>
           )}
         </div>
         {docs.length === 0 ? (
-          <BizCard className="bg-[#FAF6F7] border-dashed">
+          <BizCard className="bg-[#F8F5F0] border-dashed">
             <p className="ka text-xs text-[#6B6B6B]">
               ჯერ არ შეგიქმნია დოკუმენტი. აირჩიე ერთ-ერთი ხელსაწყო ზემოთ.
             </p>
@@ -209,13 +209,13 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-[#E8D5DA] rounded-md p-3 hover:border-[#6B1E3E]/50 transition-colors flex items-center gap-3"
+      className="w-full text-left bg-white border border-[#E0D8D0] rounded-md p-3 hover:border-[#5C1A2E]/50 transition-colors flex items-center gap-3"
     >
-      <span className="w-9 h-9 rounded-md bg-[#6B1E3E]/5 border border-[#E8D5DA] text-[#6B1E3E] grid place-items-center shrink-0">
+      <span className="w-9 h-9 rounded-md bg-[#5C1A2E]/5 border border-[#E0D8D0] text-[#5C1A2E] grid place-items-center shrink-0">
         <Icon size={16} strokeWidth={2} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="ka text-sm font-semibold text-[#6B1E3E] truncate">{doc.title}</p>
+        <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{doc.title}</p>
         <p className="ka text-[11px] text-[#6B6B6B] mt-0.5">
           {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleDateString("ka-GE")}
         </p>
@@ -254,10 +254,10 @@ function LibraryView({
 
   return (
     <>
-      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] mb-3">
+      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
         ← უკან
       </button>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-3">ჩემი დოკუმენტები</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-3">ჩემი დოკუმენტები</h2>
       <div className="flex flex-wrap gap-2 mb-4">
         {(["all", "email", "email_fix", "cover_letter", "resume_improve", "bio"] as const).map((f) => (
           <button
@@ -265,8 +265,8 @@ function LibraryView({
             onClick={() => setFilter(f)}
             className={`ka text-xs px-3 py-1.5 rounded-full border ${
               filter === f
-                ? "bg-[#6B1E3E] text-[#F5EDEF] border-[#6B1E3E]"
-                : "bg-white text-[#6B1E3E] border-[#E8D5DA] hover:border-[#6B1E3E]/40"
+                ? "bg-[#5C1A2E] text-[#F0EBE3] border-[#5C1A2E]"
+                : "bg-white text-[#5C1A2E] border-[#E0D8D0] hover:border-[#5C1A2E]/40"
             }`}
           >
             {f === "all" ? "ყველა" : DOC_TYPE_LABELS[f]}
@@ -275,7 +275,7 @@ function LibraryView({
       </div>
 
       {filtered.length === 0 ? (
-        <BizCard className="bg-[#FAF6F7] border-dashed">
+        <BizCard className="bg-[#F8F5F0] border-dashed">
           <p className="ka text-xs text-[#6B6B6B]">დოკუმენტი არ მოიძებნა.</p>
         </BizCard>
       ) : filter === "all" ? (
@@ -346,7 +346,7 @@ function ToolView({
   onUploadResume: () => void;
 }) {
   const Common = (
-    <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] mb-3">
+    <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
       ← უკან
     </button>
   );
@@ -429,7 +429,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-1">პროფესიული იმეილი</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული იმეილი</h2>
       <p className="ka text-xs text-[#6B6B6B] mb-4">3 მოკლე კითხვა → დასრულებული იმეილი.</p>
 
       <ProgressDots total={4} current={step} />
@@ -442,7 +442,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             onChange={(e) => setIntent(e.target.value)}
             rows={4}
             placeholder="მაგ. მინდა მენეჯერს ვუთხრა რომ პროექტი ერთი კვირით გადადება..."
-            className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+            className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
           />
           <div className="flex justify-end mt-3">
             <BizButton onClick={() => setStep(1)} disabled={!intent.trim()}>
@@ -459,7 +459,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             placeholder="მაგ. ჩემს მენეჯერს, კლიენტს, HR-ს..."
-            className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+            className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
           />
           <Label className="mt-4">ურთიერთობა</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
@@ -490,7 +490,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             onChange={(e) => setOutcome(e.target.value)}
             rows={3}
             placeholder="მაგ. დასტური ან თანხმობა გადადებაზე, შეხვედრის დანიშვნა..."
-            className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+            className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
           />
           <Label className="mt-4">ტონი</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
@@ -511,7 +511,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
 
       {step === 3 && (
         <BizCard className="mt-4">
-          <p className="ka text-sm text-[#6B1E3E] font-semibold">მზად ხართ?</p>
+          <p className="ka text-sm text-[#5C1A2E] font-semibold">მზად ხართ?</p>
           <p className="ka text-xs text-[#6B6B6B] mt-1">
             AI გენერირებს იმეილს თქვენი მონაცემებითა და კონტექსტით.
           </p>
@@ -573,7 +573,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
       <p className="ka text-xs text-[#6B6B6B] mb-4">
         ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
       </p>
@@ -584,14 +584,14 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
           onChange={(e) => setOriginal(e.target.value)}
           rows={10}
           placeholder="ჩასვი აქ შენი არსებული იმეილი..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <Label className="mt-4">ვის ეგზავნება? (არასავალდებულო)</Label>
         <input
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
           placeholder="მაგ. მენეჯერი, კლიენტი, HR..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <Label className="mt-4">რა არის მიზანი? (არასავალდებულო)</Label>
         <textarea
@@ -599,7 +599,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
           onChange={(e) => setPurpose(e.target.value)}
           rows={2}
           placeholder="რის გადაცემა გინდა ან რა შედეგი გინდა მიიღო..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <Label className="mt-4">ტონი</Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
@@ -643,8 +643,8 @@ function CoverLetterFlow({
 
   if (!resumeReady) {
     return (
-      <BizCard className="bg-[#FAF6F7] border-[#F5DDE3]">
-        <p className="ka text-sm font-semibold text-[#6B1E3E]">ჯერ ატვირთე რეზიუმე</p>
+      <BizCard className="bg-[#F8F5F0] border-[#F0E8D8]">
+        <p className="ka text-sm font-semibold text-[#5C1A2E]">ჯერ ატვირთე რეზიუმე</p>
         <p className="ka text-xs text-[#6B6B6B] mt-1">
           სამოტივაციო წერილს ვამზადებთ შენი გამოცდილების მიხედვით.
         </p>
@@ -683,7 +683,7 @@ function CoverLetterFlow({
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-1">სამოტივაციო წერილი</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">სამოტივაციო წერილი</h2>
       <p className="ka text-xs text-[#6B6B6B] mb-4">შენი რეზიუმე უკვე გვაქვს. შეიყვანე პოზიცია.</p>
       <BizCard>
         <Label>სამუშაო პოზიცია *</Label>
@@ -691,7 +691,7 @@ function CoverLetterFlow({
           value={jobTitle}
           onChange={(e) => setJobTitle(e.target.value)}
           placeholder="Product Manager"
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <Label className="mt-4">სამუშაოს აღწერა (არასავალდებულო)</Label>
         <textarea
@@ -699,7 +699,7 @@ function CoverLetterFlow({
           onChange={(e) => setJobDescription(e.target.value)}
           rows={6}
           placeholder="ჩასვი ვაკანსიის ტექსტი — წერილი უფრო კარგად მოერგება..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <div className="flex justify-end mt-4">
           <BizButton onClick={generate} disabled={loading || !jobTitle.trim()}>
@@ -764,7 +764,7 @@ function ResumeImproveFlow({
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-1">რეზიუმეს გაუმჯობესება</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">რეზიუმეს გაუმჯობესება</h2>
       <p className="ka text-xs text-[#6B6B6B] mb-4">კონკრეტული რჩევები და "before/after" მაგალითები.</p>
       <BizCard>
         {resumeReady ? (
@@ -774,7 +774,7 @@ function ResumeImproveFlow({
         ) : (
           <button
             onClick={onUploadResume}
-            className="ka text-xs text-[#6B1E3E] underline underline-offset-2 mb-3"
+            className="ka text-xs text-[#5C1A2E] underline underline-offset-2 mb-3"
           >
             ან ატვირთე რეზიუმე →
           </button>
@@ -785,7 +785,7 @@ function ResumeImproveFlow({
           onChange={(e) => setResumeText(e.target.value)}
           rows={8}
           placeholder="ჩასვი რეზიუმეს ტექსტი..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#5C1A2E]"
         />
         <Label className="mt-4">სამიზნე პოზიცია (არასავალდებულო)</Label>
         <textarea
@@ -793,7 +793,7 @@ function ResumeImproveFlow({
           onChange={(e) => setJobDescription(e.target.value)}
           rows={4}
           placeholder="ვაკანსიის აღწერა — keywords უფრო ზუსტი იქნება..."
-          className="w-full mt-2 rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#6B1E3E]"
+          className="w-full mt-2 rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#5C1A2E]"
         />
         <div className="flex justify-end mt-4">
           <BizButton onClick={generate} disabled={loading || !resumeText.trim()}>
@@ -858,7 +858,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#6B1E3E] mb-1">პროფესიული ბიო</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული ბიო</h2>
       <p className="ka text-xs text-[#6B6B6B] mb-4">სამი ვერსია: short, medium, full.</p>
       <BizCard>
         <Label>სად გამოიყენებ?</Label>
@@ -947,7 +947,7 @@ function DocView({
 
   return (
     <>
-      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#6B1E3E] mb-3">
+      <button onClick={onBack} className="ka text-xs text-[#6B6B6B] hover:text-[#5C1A2E] mb-3">
         ← ჩემი დოკუმენტები
       </button>
 
@@ -957,10 +957,10 @@ function DocView({
             <input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full text-xl font-bold text-[#6B1E3E] bg-transparent border-b border-[#E8D5DA] focus:outline-none focus:border-[#6B1E3E]"
+              className="w-full text-xl font-bold text-[#5C1A2E] bg-transparent border-b border-[#E0D8D0] focus:outline-none focus:border-[#5C1A2E]"
             />
           ) : (
-            <h2 className="ka text-xl font-bold text-[#6B1E3E] truncate">{doc.title}</h2>
+            <h2 className="ka text-xl font-bold text-[#5C1A2E] truncate">{doc.title}</h2>
           )}
           <p className="ka text-[11px] text-[#6B6B6B] mt-1">
             {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleString("ka-GE")}
@@ -968,7 +968,7 @@ function DocView({
         </div>
         <button
           onClick={copy}
-          className="ka shrink-0 text-xs font-semibold bg-[#6B1E3E] text-[#F5EDEF] px-3 py-2 rounded-xl hover:bg-[#5A1834]"
+          className="ka shrink-0 text-xs font-semibold bg-[#5C1A2E] text-[#F0EBE3] px-3 py-2 rounded-xl hover:bg-[#4A1525]"
         >
           📋 კოპირება
         </button>
@@ -976,7 +976,7 @@ function DocView({
 
       {subject && !editing && (
         <p className="ka text-xs text-[#6B6B6B] mb-2">
-          <span className="font-semibold text-[#6B1E3E]">Subject:</span> {subject}
+          <span className="font-semibold text-[#5C1A2E]">Subject:</span> {subject}
         </p>
       )}
 
@@ -989,13 +989,13 @@ function DocView({
           {resumeMeta.summaryKa && (
             <BizCard className="bg-[#F0F7F2] border-[#D5E5DA]">
               <p className="ka text-[11px] uppercase tracking-wider text-[#5A8A6A] font-semibold mb-1">შეჯამება</p>
-              <p className="ka text-xs text-[#6B1E3E] leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
+              <p className="ka text-xs text-[#5C1A2E] leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
             </BizCard>
           )}
           {resumeMeta.toneAssessmentKa && (
             <BizCard>
               <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">ტონი</p>
-              <p className="ka text-xs text-[#6B1E3E] leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
+              <p className="ka text-xs text-[#5C1A2E] leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
             </BizCard>
           )}
           {Array.isArray(resumeMeta.missingKeywords) && resumeMeta.missingKeywords.length > 0 && (
@@ -1003,7 +1003,7 @@ function DocView({
               <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">Keywords რომელიც აკლია</p>
               <div className="flex flex-wrap gap-1.5">
                 {resumeMeta.missingKeywords.map((k: string, i: number) => (
-                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-[#FCEEF1] text-[#6B1E3E] border border-[#F5DDE3]">
+                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-[#FAF5E8] text-[#5C1A2E] border border-[#F0E8D8]">
                     {k}
                   </span>
                 ))}
@@ -1015,20 +1015,20 @@ function DocView({
               <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">Before / After</p>
               <ul className="space-y-3">
                 {resumeMeta.suggestions.map((s: any, i: number) => (
-                  <li key={i} className="border-t border-[#E8D5DA] first:border-t-0 pt-3 first:pt-0">
-                    {s.sectionKa && <p className="ka text-xs font-semibold text-[#6B1E3E]">{s.sectionKa}</p>}
+                  <li key={i} className="border-t border-[#E0D8D0] first:border-t-0 pt-3 first:pt-0">
+                    {s.sectionKa && <p className="ka text-xs font-semibold text-[#5C1A2E]">{s.sectionKa}</p>}
                     {s.issueKa && <p className="ka text-[11px] text-[#6B6B6B] mt-1">{s.issueKa}</p>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                       {s.before && (
                         <div className="bg-[#FDF0EE] rounded-md px-2 py-1.5 text-[11px]">
                           <span className="ka font-semibold text-[#C0392B]">Before: </span>
-                          <span className="text-[#6B1E3E]">{s.before}</span>
+                          <span className="text-[#5C1A2E]">{s.before}</span>
                         </div>
                       )}
                       {s.after && (
                         <div className="bg-[#F0F7F2] rounded-md px-2 py-1.5 text-[11px]">
                           <span className="ka font-semibold text-[#5A8A6A]">After: </span>
-                          <span className="text-[#6B1E3E]">{s.after}</span>
+                          <span className="text-[#5C1A2E]">{s.after}</span>
                         </div>
                       )}
                     </div>
@@ -1049,17 +1049,17 @@ function DocView({
 
       {/* Document — hidden for bio (BioVersions covers all three) */}
       {!(doc.doc_type === "bio" && !editing) && (
-        <article className="bg-white border border-[#E8D5DA] rounded-2xl p-6 shadow-[0_1px_2px_rgba(107,30,62,0.04),0_8px_24px_-12px_rgba(107,30,62,0.12)]">
+        <article className="bg-white border border-[#E0D8D0] rounded-2xl p-6 shadow-[0_1px_2px_rgba(92,26,46,0.04),0_8px_24px_-12px_rgba(92,26,46,0.12)]">
           {editing ? (
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               rows={isResumeImprove ? 30 : 20}
-              className={`w-full text-sm leading-relaxed text-[#6B1E3E] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
+              className={`w-full text-sm leading-relaxed text-[#5C1A2E] bg-transparent focus:outline-none resize-none ${isResumeImprove ? "font-mono text-xs" : "font-serif"}`}
             />
           ) : (
             <div
-              className={`text-sm leading-relaxed text-[#6B1E3E] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
+              className={`text-sm leading-relaxed text-[#5C1A2E] ${isResumeImprove ? "whitespace-pre-wrap font-mono text-xs" : "font-serif whitespace-pre-wrap"}`}
               dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
             />
           )}
@@ -1078,7 +1078,7 @@ function DocView({
             {meta.summaryKa && (
               <BizCard className="mt-4 bg-[#F0F7F2] border-[#D5E5DA]">
                 <p className="ka text-[11px] uppercase tracking-wider text-[#5A8A6A] font-semibold mb-1">შეჯამება</p>
-                <p className="ka text-xs text-[#6B1E3E] leading-relaxed">{meta.summaryKa}</p>
+                <p className="ka text-xs text-[#5C1A2E] leading-relaxed">{meta.summaryKa}</p>
               </BizCard>
             )}
             <section className="mt-4">
@@ -1086,13 +1086,13 @@ function DocView({
                 შედარება — ორიგინალი / გაუმჯობესებული
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-white border border-[#E8D5DA] rounded-2xl p-4">
+                <div className="bg-white border border-[#E0D8D0] rounded-2xl p-4">
                   <p className="ka text-[10px] uppercase tracking-wider text-[#C0392B] font-semibold mb-2">ორიგინალი</p>
-                  <p className="text-xs whitespace-pre-wrap font-serif text-[#6B1E3E] leading-relaxed">{original}</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#5C1A2E] leading-relaxed">{original}</p>
                 </div>
                 <div className="bg-white border border-[#D5E5DA] rounded-2xl p-4">
                   <p className="ka text-[10px] uppercase tracking-wider text-[#5A8A6A] font-semibold mb-2">გაუმჯობესებული</p>
-                  <p className="text-xs whitespace-pre-wrap font-serif text-[#6B1E3E] leading-relaxed">{doc.content}</p>
+                  <p className="text-xs whitespace-pre-wrap font-serif text-[#5C1A2E] leading-relaxed">{doc.content}</p>
                 </div>
               </div>
             </section>
@@ -1103,15 +1103,15 @@ function DocView({
                 </p>
                 <ul className="space-y-2">
                   {changes.map((c, i) => (
-                    <li key={i} className="bg-white border border-[#E8D5DA] rounded-xl p-3">
+                    <li key={i} className="bg-white border border-[#E0D8D0] rounded-xl p-3">
                       <div className="text-[11px] grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div className="bg-[#FDF0EE] rounded-md px-2 py-1.5">
                           <span className="ka font-semibold text-[#C0392B]">Before: </span>
-                          <span className="text-[#6B1E3E]">{c.before}</span>
+                          <span className="text-[#5C1A2E]">{c.before}</span>
                         </div>
                         <div className="bg-[#F0F7F2] rounded-md px-2 py-1.5">
                           <span className="ka font-semibold text-[#5A8A6A]">After: </span>
-                          <span className="text-[#6B1E3E]">{c.after}</span>
+                          <span className="text-[#5C1A2E]">{c.after}</span>
                         </div>
                       </div>
                       {c.whyKa && (
@@ -1135,14 +1135,14 @@ function DocView({
 
       {/* Highlights legend */}
       {doc.highlights?.length > 0 && !editing && (
-        <BizCard className="mt-4 bg-[#FAF6F7]">
+        <BizCard className="mt-4 bg-[#F8F5F0]">
           <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-2">
             ✨ მონიშნული ფრაზები
           </p>
           <ul className="space-y-2">
             {doc.highlights.map((h, i) => (
               <li key={i} className="text-xs">
-                <span className="font-semibold text-[#6B1E3E]">"{h.phrase}"</span>
+                <span className="font-semibold text-[#5C1A2E]">"{h.phrase}"</span>
                 <span className="ka text-[#6B6B6B]"> — {h.whyKa}</span>
               </li>
             ))}
@@ -1168,7 +1168,7 @@ function DocView({
                 key={o.id}
                 disabled={adjusting}
                 onClick={() => adjust(o.id)}
-                className="ka text-xs px-3 py-1.5 rounded-full border border-[#E8D5DA] bg-white hover:border-[#6B1E3E]/40 text-[#6B1E3E] disabled:opacity-50"
+                className="ka text-xs px-3 py-1.5 rounded-full border border-[#E0D8D0] bg-white hover:border-[#5C1A2E]/40 text-[#5C1A2E] disabled:opacity-50"
               >
                 {o.label}
               </button>
@@ -1223,8 +1223,8 @@ function Chip({
       onClick={onClick}
       className={`ka text-xs px-3 py-2 rounded-xl border text-left ${
         active
-          ? "bg-[#6B1E3E] text-[#F5EDEF] border-[#6B1E3E]"
-          : "bg-white text-[#6B1E3E] border-[#E8D5DA] hover:border-[#6B1E3E]/40"
+          ? "bg-[#5C1A2E] text-[#F0EBE3] border-[#5C1A2E]"
+          : "bg-white text-[#5C1A2E] border-[#E0D8D0] hover:border-[#5C1A2E]/40"
       }`}
     >
       {children}
@@ -1238,7 +1238,7 @@ function ProgressDots({ total, current }: { total: number; current: number }) {
       {Array.from({ length: total }).map((_, i) => (
         <div
           key={i}
-          className={`h-1 flex-1 rounded-full ${i <= current ? "bg-[#6B1E3E]" : "bg-[#E8D5DA]"}`}
+          className={`h-1 flex-1 rounded-full ${i <= current ? "bg-[#5C1A2E]" : "bg-[#E0D8D0]"}`}
         />
       ))}
     </div>
@@ -1303,7 +1303,7 @@ function BioVersions({
         return (
           <BizCard key={k}>
             <div className="flex items-center justify-between gap-2 mb-2">
-              <p className="ka text-xs font-semibold text-[#6B1E3E]">{labels[k]}</p>
+              <p className="ka text-xs font-semibold text-[#5C1A2E]">{labels[k]}</p>
               <div className="flex gap-2">
                 {!isEditing && (
                   <>
@@ -1312,13 +1312,13 @@ function BioVersions({
                         navigator.clipboard.writeText(text);
                         toast({ title: `${labels[k]} ვერსია კოპირებულია` });
                       }}
-                      className="ka text-[11px] font-semibold bg-[#6B1E3E] text-[#F5EDEF] px-2.5 py-1.5 rounded-lg hover:bg-[#5A1834]"
+                      className="ka text-[11px] font-semibold bg-[#5C1A2E] text-[#F0EBE3] px-2.5 py-1.5 rounded-lg hover:bg-[#4A1525]"
                     >
                       📋 კოპირება
                     </button>
                     <button
                       onClick={() => startEdit(k)}
-                      className="ka text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E8D5DA] hover:border-[#6B1E3E]/40 text-[#6B1E3E]"
+                      className="ka text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#5C1A2E]"
                     >
                       ✏️ რედაქტირება
                     </button>
@@ -1332,7 +1332,7 @@ function BioVersions({
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={k === "full" ? 10 : k === "medium" ? 6 : 4}
-                  className="w-full rounded-xl border border-[#E8D5DA] bg-white px-3 py-2 text-sm font-serif text-[#6B1E3E] focus:outline-none focus:border-[#6B1E3E]"
+                  className="w-full rounded-xl border border-[#E0D8D0] bg-white px-3 py-2 text-sm font-serif text-[#5C1A2E] focus:outline-none focus:border-[#5C1A2E]"
                 />
                 <div className="flex justify-end gap-2 mt-2">
                   <BizButton variant="ghost" onClick={() => setEditingKey(null)}>გაუქმება</BizButton>
@@ -1342,14 +1342,14 @@ function BioVersions({
                       navigator.clipboard.writeText(draft);
                       toast({ title: "კოპირებულია" });
                     }}
-                    className="ka text-xs font-semibold bg-[#6B1E3E] text-[#F5EDEF] px-3 py-2 rounded-xl hover:bg-[#5A1834]"
+                    className="ka text-xs font-semibold bg-[#5C1A2E] text-[#F0EBE3] px-3 py-2 rounded-xl hover:bg-[#4A1525]"
                   >
                     📋 კოპირება
                   </button>
                 </div>
               </>
             ) : (
-              <p className="text-sm font-serif text-[#6B1E3E] whitespace-pre-wrap leading-relaxed">{text}</p>
+              <p className="text-sm font-serif text-[#5C1A2E] whitespace-pre-wrap leading-relaxed">{text}</p>
             )}
           </BizCard>
         );

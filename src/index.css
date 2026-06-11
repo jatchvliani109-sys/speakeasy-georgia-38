@@ -6,39 +6,39 @@
 
 @layer base {
   :root {
-    /* SpeakBusy — Premium burgundy & rose palette
-       Primary    deep burgundy #6B1E3E → hsl(338 56% 27%)
-       Secondary  rich rose     #A84060 → hsl(341 45% 46%)
-       Accent     dusty rose    #C97A90 → hsl(346 41% 64%)
-       Background warm off-wht  #FAF6F7 → hsl(340 25% 97%)
+    /* SpeakBusy — Executive burgundy, charcoal & gold
+       Primary    wine burgundy #5C1A2E → hsl(343 56% 23%)
+       Secondary  dark charcoal #1C1C1E → hsl(240 3% 12%)
+       Accent     warm gold     #C9A84C → hsl(43 54% 54%)
+       Background warm off-wht  #F8F5F0 → hsl(36 36% 96%)
        Card                     #FFFFFF → hsl(0 0% 100%)
-       Text       charcoal      #1A1A1A → hsl(0 0% 10%)
-       Muted text warm gray     #6B6B6B → hsl(0 0% 42%)
-       Border     soft rose gry #E8D5DA → hsl(345 27% 87%)
+       Text       charcoal      #1C1C1E → hsl(240 3% 12%)
+       Muted text medium gray   #6B6B6B → hsl(0 0% 42%)
+       Border     warm gray     #E0D8D0 → hsl(30 19% 84%)
        Success    sage          #5A8A6A → hsl(135 21% 45%)
        Error      soft red      #C0392B → hsl(6 63% 46%) */
-    --background: 340 25% 97%;
-    --foreground: 0 0% 10%;
+    --background: 36 36% 96%;
+    --foreground: 240 3% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 240 3% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 240 3% 12%;
 
-    --primary: 338 56% 27%;
+    --primary: 343 56% 23%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 341 45% 46%;
-    --primary-hover: 338 56% 32%;
+    --primary-glow: 43 54% 54%;
+    --primary-hover: 343 56% 28%;
 
-    --secondary: 341 45% 46%;
+    --secondary: 240 3% 12%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 345 27% 94%;
+    --muted: 30 19% 92%;
     --muted-foreground: 0 0% 42%;
 
-    --accent: 346 41% 64%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 43 54% 54%;
+    --accent-foreground: 240 3% 12%;
 
     --success: 135 21% 45%;
     --success-foreground: 0 0% 100%;
@@ -46,44 +46,44 @@
     --destructive: 6 63% 46%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 345 27% 87%;
-    --input: 345 27% 87%;
-    --ring: 338 56% 27%;
+    --border: 30 19% 84%;
+    --input: 30 19% 84%;
+    --ring: 343 56% 23%;
 
     --radius: 1.25rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(338 56% 27%) 0%, hsl(341 45% 46%) 60%, hsl(346 41% 64%) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(340 25% 97%) 0%, hsl(345 27% 94%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(341 45% 46%), hsl(346 41% 64%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(340 25% 98%));
+    --gradient-hero: linear-gradient(135deg, hsl(343 56% 23%) 0%, hsl(240 3% 12%) 70%, hsl(43 54% 54%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(36 36% 96%) 0%, hsl(30 19% 92%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(343 56% 23%), hsl(43 54% 54%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(36 36% 98%));
 
-    --shadow-soft: 0 4px 20px -4px hsl(338 56% 27% / 0.18);
-    --shadow-warm: 0 8px 30px -6px hsl(341 45% 46% / 0.22);
-    --shadow-card: 0 2px 12px -2px hsl(338 30% 20% / 0.08);
+    --shadow-soft: 0 4px 20px -4px hsl(343 56% 23% / 0.18);
+    --shadow-warm: 0 8px 30px -6px hsl(43 54% 54% / 0.22);
+    --shadow-card: 0 2px 12px -2px hsl(240 3% 12% / 0.08);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 338 30% 8%;
-    --foreground: 340 25% 96%;
-    --card: 338 25% 12%;
-    --card-foreground: 340 25% 96%;
-    --popover: 338 25% 12%;
-    --popover-foreground: 340 25% 96%;
-    --primary: 346 41% 64%;
-    --primary-foreground: 338 30% 8%;
-    --secondary: 338 25% 20%;
-    --secondary-foreground: 340 25% 96%;
-    --muted: 338 20% 18%;
-    --muted-foreground: 345 15% 70%;
-    --accent: 341 45% 46%;
-    --accent-foreground: 340 25% 96%;
+    --background: 240 5% 8%;
+    --foreground: 36 36% 96%;
+    --card: 240 4% 12%;
+    --card-foreground: 36 36% 96%;
+    --popover: 240 4% 12%;
+    --popover-foreground: 36 36% 96%;
+    --primary: 43 54% 54%;
+    --primary-foreground: 240 5% 8%;
+    --secondary: 240 4% 20%;
+    --secondary-foreground: 36 36% 96%;
+    --muted: 240 4% 18%;
+    --muted-foreground: 30 10% 70%;
+    --accent: 343 56% 35%;
+    --accent-foreground: 36 36% 96%;
     --destructive: 6 63% 46%;
     --destructive-foreground: 0 0% 100%;
-    --border: 338 20% 22%;
-    --input: 338 20% 22%;
-    --ring: 346 41% 64%;
+    --border: 240 4% 22%;
+    --input: 240 4% 22%;
+    --ring: 43 54% 54%;
   }
 }
 
@@ -208,8 +208,8 @@
 .biz-question-slide { animation: bizQuestionSlide 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
 @keyframes bizProgressPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 64, 96, 0); }
-  50%      { box-shadow: 0 0 0 6px rgba(168, 64, 96, 0.4); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(28, 28, 30, 0); }
+  50%      { box-shadow: 0 0 0 6px rgba(28, 28, 30, 0.4); }
 }
 .biz-progress-pulse { animation: bizProgressPulse 900ms ease-out 2; }
 
@@ -243,16 +243,16 @@
 .biz-mega-pop { animation: bizMegaPop 2500ms ease-out forwards; }
 
 @keyframes bizGoldFlash {
-  0%, 100% { background-color: rgba(168, 64, 96, 0); }
-  40%      { background-color: rgba(168, 64, 96, 0.22); }
+  0%, 100% { background-color: rgba(28, 28, 30, 0); }
+  40%      { background-color: rgba(28, 28, 30, 0.22); }
 }
 .biz-gold-flash { animation: bizGoldFlash 1500ms ease-out; }
 
 @keyframes bizMegaFlash {
-  0%   { background-color: rgba(74, 20, 41, 0); }
-  20%  { background-color: rgba(168, 64, 96, 0.35); }
-  60%  { background-color: rgba(74, 20, 41, 0.55); }
-  100% { background-color: rgba(74, 20, 41, 0); }
+  0%   { background-color: rgba(61, 18, 32, 0); }
+  20%  { background-color: rgba(28, 28, 30, 0.35); }
+  60%  { background-color: rgba(61, 18, 32, 0.55); }
+  100% { background-color: rgba(61, 18, 32, 0); }
 }
 .biz-mega-flash { animation: bizMegaFlash 2500ms ease-out; }
 
