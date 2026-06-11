@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import PathSwitcher from "@/components/PathSwitcher";
+
 import {
   BUSINESS_MODULES,
   BusinessIntensity,
@@ -299,7 +299,7 @@ export default function BusinessHome() {
           >
             <RotateCcw size={11} strokeWidth={2.25} /> reset
           </button>
-          <PathSwitcher />
+          
         </div>
       </header>
 

@@ -12,7 +12,6 @@ const GROUPS: NavGroup[] = [
     title: "მთავარი",
     items: [
       { to: "/dashboard", label: "მთავარი დაშბორდი" },
-      { to: "/learning-path", label: "მიმართულების არჩევა" },
     ],
   },
   {
@@ -83,7 +82,7 @@ export default function GlobalNav() {
 }
 
 export const TESTING_SHORTCUTS: NavItem[] = [
-  { to: "/learning-path", label: "Path Selection" },
+  
   { to: "/path/business/home", label: "Business" },
   
   { to: "/path/business/setup", label: "Biz Setup" },

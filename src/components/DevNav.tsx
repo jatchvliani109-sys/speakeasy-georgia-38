@@ -26,7 +26,7 @@ async function ensureDevSession() {
     const s = await supabase.auth.signUp({
       email: DEV_EMAIL,
       password: DEV_PASS,
-      options: { emailRedirectTo: `${window.location.origin}/learning-path` },
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
     });
     if (s.error) throw s.error;
     r = await supabase.auth.signInWithPassword({ email: DEV_EMAIL, password: DEV_PASS });
@@ -44,7 +44,7 @@ const GROUPS: Group[] = [
       { to: "/", label: "Landing / Home", public: true },
       { to: "/auth", label: "Login / Register", public: true },
       { to: "/auth?mode=login", label: "Login screen", public: true },
-      { to: "/learning-path", label: "Path selection" },
+      
       { to: "/dashboard", label: "Dashboard router" },
     ],
   },
