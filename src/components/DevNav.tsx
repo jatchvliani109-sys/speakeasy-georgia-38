@@ -69,12 +69,6 @@ const GROUPS: Group[] = [
       { to: "/path/business/module/vocabulary", label: "Business vocabulary" },
     ],
   },
-  {
-    title: "აბიტურიენტი",
-    items: [
-      { to: "/path/exam", label: "Exam main page" },
-    ],
-  },
 ];
 
 export default function DevNav() {
