@@ -22,7 +22,7 @@ import { Navigate } from "react-router-dom";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
-import NationalExamDashboard from "./pages/paths/NationalExam";
+
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
 import Vocabulary from "./pages/Vocabulary";
