@@ -1,6 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { ArrowRight, Briefcase, GraduationCap } from "lucide-react";
+import { ArrowRight, Briefcase } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const features = [
@@ -9,12 +9,6 @@ const features = [
     eyebrow: "Business English",
     title: "ბიზნეს ინგლისური",
     desc: "პერსონალიზებული ბიზნეს ინგლისურის გზა შენი პროფესიისა და მიზნების მიხედვით — დონის ტესტი, სტრუქტურირებული მოდულები, იმეილები, გასაუბრებები, შეხვედრები და პრეზენტაციები.",
-  },
-  {
-    icon: GraduationCap,
-    eyebrow: "აბიტურიენტი",
-    title: "ეროვნული გამოცდებისთვის",
-    desc: "სტრუქტურირებული მომზადება მე-11 და მე-12 კლასელებისთვის — გრამატიკა, ლექსიკა, კითხვა და სავარჯიშო გამოცდები ეროვნული ფორმატით.",
   },
 ];
 

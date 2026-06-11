@@ -1,6 +1,5 @@
 export type LearningPathId =
-  | "business_english"
-  | "national_exam";
+  | "business_english";
 
 export type LearningPath = {
   id: LearningPathId;
@@ -17,13 +16,6 @@ export const LEARNING_PATHS: LearningPath[] = [
     description: "გასაუბრება, სამუშაო იმეილები, შეხვედრები და პროფესიული კომუნიკაცია.",
     icon: "💼",
     route: "/path/business",
-  },
-  {
-    id: "national_exam",
-    title: "ეროვნული გამოცდები / აბიტურიენტები",
-    description: "მოემზადე ინგლისურის გამოცდისთვის გრამატიკით, ტექსტებით და ტესტებით.",
-    icon: "🎓",
-    route: "/path/exam",
   },
 ];
 

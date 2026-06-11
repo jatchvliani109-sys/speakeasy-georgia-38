@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LEARNING_PATHS, LearningPathId } from "@/lib/learningPaths";
 import { toast } from "sonner";
-import { Briefcase, GraduationCap, ArrowRight, LucideIcon } from "lucide-react";
+import { Briefcase, ArrowRight, LucideIcon } from "lucide-react";
 import { TestingShortcuts } from "@/components/GlobalNav";
 
 type Theme = {
@@ -35,19 +35,6 @@ const THEMES: Record<LearningPathId, Theme> = {
     ctaText: "text-[#E6ECF4]",
     ctaHover: "hover:bg-[#16345E]",
     eyebrow: "text-[#1E3A5F]",
-  },
-  national_exam: {
-    icon: GraduationCap,
-    accentLine: "bg-[#7A2240]",
-    iconBg: "bg-[#5C1A30]",
-    iconColor: "text-[#F4D9DE]",
-    badge: "Exam Prep",
-    cardBg: "bg-[#FAEFF2]",
-    cardBorder: "border-[#E8C8D2]",
-    ctaBg: "bg-[#5C1A30]",
-    ctaText: "text-[#F4D9DE]",
-    ctaHover: "hover:bg-[#7A2240]",
-    eyebrow: "text-[#7A2240]",
   },
 };
 
