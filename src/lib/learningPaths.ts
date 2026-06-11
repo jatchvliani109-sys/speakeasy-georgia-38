@@ -17,13 +17,6 @@ export const LEARNING_PATHS: LearningPath[] = [
     icon: "💼",
     route: "/path/business",
   },
-  {
-    id: "national_exam",
-    title: "ეროვნული გამოცდები / აბიტურიენტები",
-    description: "მოემზადე ინგლისურის გამოცდისთვის გრამატიკით, ტექსტებით და ტესტებით.",
-    icon: "🎓",
-    route: "/path/exam",
-  },
 ];
 
 export const VALID_PATH_IDS: LearningPathId[] = LEARNING_PATHS.map((p) => p.id);
