@@ -2,12 +2,8 @@ import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
-import UserMenu from "@/components/UserMenu";
 
 // Shared shell for the Business English path.
-// Premium professional theme: deep navy (#5C1A2E), warm cream (#F0EBE3),
-// slate (#4A4A4A). Gold (#1C1C1E) reserved for key CTAs only.
-// Sharp corners, subtle 1px borders, minimal shadows.
 
 export default function BusinessShell({
   children,
@@ -20,17 +16,14 @@ export default function BusinessShell({
   return (
     <div className="min-h-screen bg-[#F0EBE3]">
       <header className="border-b border-[#E0D8D0] bg-[#F0EBE3]/85 backdrop-blur sticky top-0 z-20">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/path/business" className="flex items-center gap-2 text-[#5C1A2E]">
+        <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <Link to="/path/business/home" className="flex items-center gap-2 text-[#5C1A2E]">
             <span className="w-7 h-7 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center">
               <Briefcase size={14} strokeWidth={2.25} />
             </span>
             <span className="ka font-semibold text-sm tracking-tight">ბიზნეს ინგლისური</span>
           </Link>
-          <div className="flex items-center gap-1">
-            <GlobalNav />
-            <UserMenu />
-          </div>
+          <GlobalNav />
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
