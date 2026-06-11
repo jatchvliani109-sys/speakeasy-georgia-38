@@ -7,14 +7,14 @@
 @layer base {
   :root {
     /* SpeakBusy — Premium burgundy & rose palette
-       Primary    deep burgundy #6B1E3E → hsl(338 56% 27%)
-       Secondary  rich rose     #A84060 → hsl(341 45% 46%)
-       Accent     dusty rose    #C97A90 → hsl(346 41% 64%)
-       Background warm off-wht  #FAF6F7 → hsl(340 25% 97%)
+       Primary    deep burgundy #5C1A2E → hsl(338 56% 27%)
+       Secondary  rich rose     #1C1C1E → hsl(341 45% 46%)
+       Accent     dusty rose    #C9A84C → hsl(346 41% 64%)
+       Background warm off-wht  #F8F5F0 → hsl(340 25% 97%)
        Card                     #FFFFFF → hsl(0 0% 100%)
-       Text       charcoal      #1A1A1A → hsl(0 0% 10%)
+       Text       charcoal      #1C1C1E → hsl(0 0% 10%)
        Muted text warm gray     #6B6B6B → hsl(0 0% 42%)
-       Border     soft rose gry #E8D5DA → hsl(345 27% 87%)
+       Border     soft rose gry #E0D8D0 → hsl(345 27% 87%)
        Success    sage          #5A8A6A → hsl(135 21% 45%)
        Error      soft red      #C0392B → hsl(6 63% 46%) */
     --background: 340 25% 97%;

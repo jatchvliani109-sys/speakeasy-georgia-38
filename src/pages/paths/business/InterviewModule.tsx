@@ -362,8 +362,8 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
         <BizCard>
           <p className="ka text-[#6B6B6B]">გასაუბრება მზადდება შენი პროფილისთვის...</p>
-          <div className="mt-3 h-2 w-full bg-[#E8D5DA] rounded-full overflow-hidden">
-            <div className="h-full bg-[#6B1E3E] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
+          <div className="mt-3 h-2 w-full bg-[#E0D8D0] rounded-full overflow-hidden">
+            <div className="h-full bg-[#5C1A2E] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
           </div>
           {error && <p className="ka text-xs text-[#C0392B] mt-3">{error}</p>}
         </BizCard>
@@ -381,33 +381,33 @@ export default function InterviewModule() {
       {step === "briefing" && (
         <div className="space-y-3">
           {previouslyLearned && (
-            <BizCard className="bg-[#FAF6F7] border-dashed">
+            <BizCard className="bg-[#F8F5F0] border-dashed">
               <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                 წინა გასაუბრებიდან
               </p>
               <p className="ka text-xs text-[#6B6B6B] mt-1">{previouslyLearned.topicKa}</p>
               <div className="mt-2 space-y-1.5">
                 {previouslyLearned.phrases.map((p, i) => (
-                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E8D5DA]">
-                    <p className="text-sm text-[#6B1E3E] font-medium">"{p.en}"</p>
+                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E0D8D0]">
+                    <p className="text-sm text-[#5C1A2E] font-medium">"{p.en}"</p>
                     <p className="ka text-[11px] text-[#6B6B6B]">{p.ka}</p>
                   </div>
                 ))}
               </div>
-              <p className="ka text-[11px] text-[#A84060] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+              <p className="ka text-[11px] text-[#1C1C1E] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
             </BizCard>
           )}
-          <BizCard className="border-l-4 border-l-[#A84060]">
+          <BizCard className="border-l-4 border-l-[#1C1C1E]">
             {curriculum && (
               <p className="ka text-[10px] uppercase tracking-wider text-[#6B6B6B] font-semibold mb-1">
                 ეტაპი {curriculum.step} / {curriculum.total}
                 {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
               </p>
             )}
-            <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
               გასაუბრების ბრიფინგი · ~{session.estimatedMinutes} წუთი
             </p>
-            <h2 className="ka text-xl font-bold text-[#6B1E3E] mt-2">{b.roleTitleKa}</h2>
+            <h2 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{b.roleTitleKa}</h2>
             <p className="text-sm text-[#6B6B6B] mt-0.5">{b.roleTitle}</p>
 
             <div className="mt-4 grid grid-cols-1 gap-2">
@@ -416,13 +416,13 @@ export default function InterviewModule() {
               <BriefRow label="ინტერვიუერი" valueKa={b.interviewerName} sub={b.interviewerTitle} />
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
-              <p className="ka text-xs font-semibold text-[#6B1E3E]">კომპანიის შესახებ</p>
-              <p className="ka text-sm text-[#1A1A1A] mt-1">{b.aboutCompanyKa}</p>
+            <div className="mt-4 p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+              <p className="ka text-xs font-semibold text-[#5C1A2E]">კომპანიის შესახებ</p>
+              <p className="ka text-sm text-[#1C1C1E] mt-1">{b.aboutCompanyKa}</p>
             </div>
-            <div className="mt-2 p-3 rounded-lg bg-[#FAF6F7] border border-[#F5DDE3]">
-              <p className="ka text-xs font-semibold text-[#A84060]">რას უნდა ელოდე</p>
-              <p className="ka text-sm text-[#1A1A1A] mt-1">{b.whatToExpectKa}</p>
+            <div className="mt-2 p-3 rounded-lg bg-[#F8F5F0] border border-[#F0E8D8]">
+              <p className="ka text-xs font-semibold text-[#1C1C1E]">რას უნდა ელოდე</p>
+              <p className="ka text-sm text-[#1C1C1E] mt-1">{b.whatToExpectKa}</p>
             </div>
 
             <div className="mt-5 flex justify-end">
@@ -440,7 +440,7 @@ export default function InterviewModule() {
             გახურება · {warmupIdx + 1} / {session.warmUp.length}
           </p>
           <p className="text-xs text-[#6B6B6B] mt-2 italic">"{session.warmUp[warmupIdx].contextEn}"</p>
-          <p className="ka text-sm font-semibold text-[#6B1E3E] mt-2">
+          <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">
             {session.warmUp[warmupIdx].promptKa}
           </p>
           <div className="mt-3 space-y-2">
@@ -448,12 +448,12 @@ export default function InterviewModule() {
               const reveal = warmupChoice !== null;
               const isPicked = warmupChoice === i;
               const cls = !reveal
-                ? "border-[#E8D5DA] hover:border-[#6B1E3E]"
+                ? "border-[#E0D8D0] hover:border-[#5C1A2E]"
                 : o.isBetter
                   ? "border-[#5A8A6A] bg-[#F0F7F2]"
                   : isPicked
-                    ? "border-[#C0392B] bg-[#FAF6F7]"
-                    : "border-[#E8D5DA] opacity-60";
+                    ? "border-[#C0392B] bg-[#F8F5F0]"
+                    : "border-[#E0D8D0] opacity-60";
               return (
                 <button
                   key={i}
@@ -462,7 +462,7 @@ export default function InterviewModule() {
                   className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                 >
                   <p className="text-xs font-semibold text-[#6B6B6B]">Option {o.label}</p>
-                  <p className="text-sm text-[#6B1E3E] mt-1">{o.text}</p>
+                  <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
                   {reveal && <p className="ka text-[11px] text-[#6B6B6B] mt-2">💡 {o.whyKa}</p>}
                 </button>
               );
@@ -490,18 +490,18 @@ export default function InterviewModule() {
       {(step === "interview" || step === "verdict") && (
         <div className="space-y-3">
           {/* Interview "set" card */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-4 shadow-[0_12px_30px_-15px_rgba(107,30,62,0.5)]">
+          <div className="rounded-2xl bg-gradient-to-br from-[#5C1A2E] via-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-4 shadow-[0_12px_30px_-15px_rgba(107,30,62,0.5)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#A84060] text-[#6B1E3E] grid place-items-center font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] text-[#5C1A2E] grid place-items-center font-bold text-sm">
                 {initials(b.interviewerName)}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-semibold truncate">{b.interviewerName}</p>
-                <p className="ka text-[11px] text-[#F5EDEF]/70 truncate">
+                <p className="ka text-[11px] text-[#F0EBE3]/70 truncate">
                   {b.interviewerTitle} · {b.companyName}
                 </p>
               </div>
-              <div className="ml-auto ka text-[10px] uppercase tracking-wider text-[#E8C2CC]">
+              <div className="ml-auto ka text-[10px] uppercase tracking-wider text-[#E5D4A8]">
                 {currentStage && session.stageLabelsKa[currentStage]
                   ? session.stageLabelsKa[currentStage]
                   : "ინტერვიუ"}
@@ -512,25 +512,25 @@ export default function InterviewModule() {
           {/* Conversation */}
           <div
             ref={chatRef}
-            className="bg-white border border-[#E8D5DA] rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
+            className="bg-white border border-[#E0D8D0] rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
           >
             {history.map((t, i) => (
               <div
                 key={i}
                 className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                   t.role === "interviewer"
-                    ? "bg-[#FAF6F7] border border-[#E8D5DA] text-[#6B1E3E] mr-auto rounded-bl-sm"
-                    : "bg-[#6B1E3E] text-[#F5EDEF] ml-auto rounded-br-sm"
+                    ? "bg-[#F8F5F0] border border-[#E0D8D0] text-[#5C1A2E] mr-auto rounded-bl-sm"
+                    : "bg-[#5C1A2E] text-[#F0EBE3] ml-auto rounded-br-sm"
                 }`}
               >
                 {t.text}
               </div>
             ))}
             {thinking && (
-              <div className="max-w-[85%] p-3 rounded-2xl bg-[#FAF6F7] border border-[#E8D5DA] mr-auto inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6B1E3E] animate-[blink_1s_infinite]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6B1E3E] animate-[blink_1s_.15s_infinite]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6B1E3E] animate-[blink_1s_.3s_infinite]" />
+              <div className="max-w-[85%] p-3 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] mr-auto inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5C1A2E] animate-[blink_1s_infinite]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5C1A2E] animate-[blink_1s_.15s_infinite]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5C1A2E] animate-[blink_1s_.3s_infinite]" />
               </div>
             )}
           </div>
@@ -541,7 +541,7 @@ export default function InterviewModule() {
               <p className="ka text-[11px] uppercase tracking-wider text-[#3F6649] font-semibold">
                 ✨ კარგად გამოიყენე ეს ფრაზა
               </p>
-              <p className="text-sm font-bold text-[#6B1E3E] mt-1">"{activeHighlight.phraseEn}"</p>
+              <p className="text-sm font-bold text-[#5C1A2E] mt-1">"{activeHighlight.phraseEn}"</p>
               <p className="ka text-[11px] text-[#6B6B6B]">{activeHighlight.ka}</p>
               <p className="ka text-xs text-[#3F6649] mt-1">{activeHighlight.praiseKa}</p>
             </div>
@@ -549,22 +549,22 @@ export default function InterviewModule() {
 
           {/* Mini quiz */}
           {activeQuiz && step === "interview" && (
-            <BizCard className="border-l-4 border-l-[#A84060]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+            <BizCard className="border-l-4 border-l-[#1C1C1E]">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                 სწრაფი კითხვა
               </p>
-              <p className="ka text-sm font-semibold text-[#6B1E3E] mt-2">{activeQuiz.promptKa}</p>
+              <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">{activeQuiz.promptKa}</p>
               <div className="mt-2 space-y-2">
                 {activeQuiz.options.map((o, i) => {
                   const reveal = quizChoice !== null;
                   const isPicked = quizChoice === i;
                   const cls = !reveal
-                    ? "border-[#E8D5DA] hover:border-[#6B1E3E]"
+                    ? "border-[#E0D8D0] hover:border-[#5C1A2E]"
                     : o.isBetter
                       ? "border-[#5A8A6A] bg-[#F0F7F2]"
                       : isPicked
-                        ? "border-[#C0392B] bg-[#FAF6F7]"
-                        : "border-[#E8D5DA] opacity-60";
+                        ? "border-[#C0392B] bg-[#F8F5F0]"
+                        : "border-[#E0D8D0] opacity-60";
                   return (
                     <button
                       key={i}
@@ -573,7 +573,7 @@ export default function InterviewModule() {
                       className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                     >
                       <p className="text-xs font-semibold text-[#6B6B6B]">Option {o.label}</p>
-                      <p className="text-sm text-[#6B1E3E] mt-1">{o.text}</p>
+                      <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
                       {reveal && <p className="ka text-[11px] text-[#6B6B6B] mt-2">💡 {o.whyKa}</p>}
                     </button>
                   );
@@ -599,7 +599,7 @@ export default function InterviewModule() {
                 value={candidateText}
                 onChange={(e) => setCandidateText(e.target.value)}
                 placeholder="Type your answer in English..."
-                className="mt-2 w-full min-h-[110px] p-3 rounded-lg border border-[#E8D5DA] text-sm text-[#6B1E3E] outline-none focus:border-[#6B1E3E] resize-y"
+                className="mt-2 w-full min-h-[110px] p-3 rounded-lg border border-[#E0D8D0] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] resize-y"
                 disabled={thinking}
               />
               {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
@@ -620,14 +620,14 @@ export default function InterviewModule() {
               verdict.verdict === "strong"
                 ? "border-l-4 border-l-[#5A8A6A] bg-[#F0F7F2]"
                 : verdict.verdict === "average"
-                  ? "border-l-4 border-l-[#A84060] bg-[#FAF6F7]"
-                  : "border-l-4 border-l-[#C0392B] bg-[#FAF6F7]"
+                  ? "border-l-4 border-l-[#1C1C1E] bg-[#F8F5F0]"
+                  : "border-l-4 border-l-[#C0392B] bg-[#F8F5F0]"
             }>
               <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                 გასაუბრების შედეგი
               </p>
-              <h3 className="ka text-xl font-bold text-[#6B1E3E] mt-2">{verdict.headlineKa}</h3>
-              <p className="text-sm text-[#1A1A1A] mt-2 italic">"{verdict.messageEn}"</p>
+              <h3 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{verdict.headlineKa}</h3>
+              <p className="text-sm text-[#1C1C1E] mt-2 italic">"{verdict.messageEn}"</p>
               <div className="mt-4 text-right">
                 <BizButton onClick={loadDebrief} disabled={thinking}>
                   {thinking ? "Debrief მზადდება..." : "სრული Debrief →"}
@@ -641,10 +641,10 @@ export default function InterviewModule() {
       {step === "debrief" && debrief && (
         <div className="space-y-3">
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
               Debrief · მწვრთნელის შეფასება
             </p>
-            <p className="ka text-sm text-[#6B1E3E] mt-2 leading-relaxed">{debrief.summaryKa}</p>
+            <p className="ka text-sm text-[#5C1A2E] mt-2 leading-relaxed">{debrief.summaryKa}</p>
           </BizCard>
 
           {debrief.wentWell?.length > 0 && (
@@ -654,7 +654,7 @@ export default function InterviewModule() {
                 {debrief.wentWell.map((w, i) => (
                   <div key={i} className="p-3 rounded-lg bg-[#F0F7F2] border border-[#C8DCCF]">
                     <p className="ka text-sm font-semibold text-[#3F6649]">{w.momentKa}</p>
-                    <p className="text-xs text-[#6B1E3E] mt-1 italic">"{w.phraseEn}"</p>
+                    <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
                     <p className="ka text-[11px] text-[#6B6B6B] mt-1">{w.whyKa}</p>
                   </div>
                 ))}
@@ -667,9 +667,9 @@ export default function InterviewModule() {
               <p className="ka text-xs font-semibold text-[#C0392B]">↗ რამ დააზიანა შენი შანსები</p>
               <div className="mt-2 space-y-2">
                 {debrief.hurtChances.map((w, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#F5C9C3]">
+                  <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#F5C9C3]">
                     <p className="ka text-sm font-semibold text-[#A52A1B]">{w.momentKa}</p>
-                    <p className="text-xs text-[#6B1E3E] mt-1 italic">"{w.phraseEn}"</p>
+                    <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
                     <p className="ka text-[11px] text-[#6B6B6B] mt-1">{w.whyKa}</p>
                   </div>
                 ))}
@@ -679,22 +679,22 @@ export default function InterviewModule() {
 
           {debrief.keyPhrases?.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-[#6B1E3E]">3 ფრაზა შემდეგისთვის</p>
+              <p className="ka text-xs font-semibold text-[#5C1A2E]">3 ფრაზა შემდეგისთვის</p>
               <div className="mt-2 space-y-2">
                 {debrief.keyPhrases.map((p, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#FAF6F7] border border-[#E8D5DA]">
-                    <p className="text-sm font-bold text-[#6B1E3E]">{p.en}</p>
+                  <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+                    <p className="text-sm font-bold text-[#5C1A2E]">{p.en}</p>
                     <p className="ka text-xs text-[#6B6B6B]">{p.ka}</p>
-                    <p className="ka text-[11px] text-[#A84060] mt-1">📍 {p.whenKa}</p>
+                    <p className="ka text-[11px] text-[#1C1C1E] mt-1">📍 {p.whenKa}</p>
                   </div>
                 ))}
               </div>
             </BizCard>
           )}
 
-          <BizCard className="bg-[#FAF6F7] border-[#F5DDE3]">
-            <p className="ka text-xs font-semibold text-[#A84060]">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
-            <p className="ka text-sm text-[#6B1E3E] mt-1">{debrief.practiceNextKa}</p>
+          <BizCard className="bg-[#F8F5F0] border-[#F0E8D8]">
+            <p className="ka text-xs font-semibold text-[#1C1C1E]">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
+            <p className="ka text-sm text-[#5C1A2E] mt-1">{debrief.practiceNextKa}</p>
           </BizCard>
 
           <div className="text-right">
@@ -705,26 +705,26 @@ export default function InterviewModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B1E3E] via-[#6B1E3E] to-[#5A1834] text-[#F5EDEF] p-7 shadow-[0_20px_50px_-20px_rgba(107,30,62,0.6)]">
-            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#A84060]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] via-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-7 shadow-[0_20px_50px_-20px_rgba(107,30,62,0.6)]">
+            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#1C1C1E]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
             <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#5A8A6A]/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
               <div className="mx-auto relative w-20 h-20">
-                <div className="absolute inset-0 rounded-full bg-[#A84060]/15 animate-[ping_1.6s_ease-out_1]" />
-                <div className="absolute inset-0 rounded-full border border-[#A84060]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#A84060] to-[#7D2347] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
-                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#6B1E3E]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="absolute inset-0 rounded-full bg-[#1C1C1E]/15 animate-[ping_1.6s_ease-out_1]" />
+                <div className="absolute inset-0 rounded-full border border-[#1C1C1E]/40" />
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#6E2038] grid place-items-center shadow-[0_8px_24px_-6px_rgba(168,64,96,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#5C1A2E]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>
                 </div>
               </div>
-              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E8C2CC] font-semibold mt-5">
+              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E5D4A8] font-semibold mt-5">
                 შესრულებულია
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
                 {verdict?.headlineKa || "გასაუბრება დასრულდა"}
               </h2>
-              <p className="ka text-sm text-[#F5EDEF]/75 mt-2">
+              <p className="ka text-sm text-[#F0EBE3]/75 mt-2">
                 {b.roleTitleKa} · {b.companyName}
               </p>
             </div>
@@ -748,31 +748,31 @@ export default function InterviewModule() {
                 <p className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B] font-semibold">
                   გასაუბრებების პროგრესი
                 </p>
-                <p className="ka text-sm text-[#6B1E3E] mt-1">
+                <p className="ka text-sm text-[#5C1A2E] mt-1">
                   <b className="text-lg">{stats.total + 1}</b> გასაუბრება გავიარე
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-[#6B1E3E]">{score >= 0 ? `+${score}` : score}</div>
+                <div className="text-2xl font-bold text-[#5C1A2E]">{score >= 0 ? `+${score}` : score}</div>
                 <div className="ka text-[10px] text-[#6B6B6B]">საერთო ქულა</div>
               </div>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#F0E5E9] overflow-hidden">
+            <div className="mt-3 h-2 rounded-full bg-[#F0EBE3] overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#A84060] to-[#C97A90] transition-all duration-700"
+                className="h-full bg-gradient-to-r from-[#1C1C1E] to-[#C9A84C] transition-all duration-700"
                 style={{ width: `${Math.min(100, (stats.total + 1) * 10)}%` }}
               />
             </div>
           </BizCard>
 
-          <BizCard className="mt-3 bg-[#FAF6F7] border-[#F5DDE3]">
+          <BizCard className="mt-3 bg-[#F8F5F0] border-[#F0E8D8]">
             <div className="flex items-start gap-3">
               <div className="text-xl">🌅</div>
               <div className="min-w-0">
-                <p className="ka text-[11px] uppercase tracking-wider text-[#A84060] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                   შემდეგი სესია
                 </p>
-                <p className="ka text-sm text-[#6B1E3E] mt-1 leading-relaxed">
+                <p className="ka text-sm text-[#5C1A2E] mt-1 leading-relaxed">
                   {session.tomorrowTeaseKa}
                 </p>
               </div>
@@ -817,7 +817,7 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="ka text-xl font-bold text-[#6B1E3E] inline-flex items-center gap-2"><Briefcase size={18} strokeWidth={2.25} /> გასაუბრება</h1>
+        <h1 className="ka text-xl font-bold text-[#5C1A2E] inline-flex items-center gap-2"><Briefcase size={18} strokeWidth={2.25} /> გასაუბრება</h1>
         <span className="ka text-[11px] text-[#6B6B6B]">
           {curriculum
             ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}`
@@ -832,9 +832,9 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
                     : "Debrief"}
         </span>
       </div>
-      <div className="h-1.5 w-full bg-[#E8D5DA] rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-[#E0D8D0] rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#6B1E3E] transition-all duration-500"
+          className="h-full bg-[#5C1A2E] transition-all duration-500"
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
@@ -844,10 +844,10 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
 
 function BriefRow({ label, valueKa, sub }: { label: string; valueKa: string; sub?: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E8D5DA] last:border-0">
+    <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E0D8D0] last:border-0">
       <span className="ka text-[11px] uppercase tracking-wider text-[#6B6B6B]">{label}</span>
       <div className="text-right min-w-0">
-        <p className="ka text-sm font-semibold text-[#6B1E3E] truncate">{valueKa}</p>
+        <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{valueKa}</p>
         {sub && <p className="text-[11px] text-[#6B6B6B] truncate">{sub}</p>}
       </div>
     </div>
@@ -859,12 +859,12 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`mt-0.5 shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] ${
-          ok ? "bg-[#5A8A6A] text-white" : "bg-[#E8D5DA] text-[#6B6B6B]"
+          ok ? "bg-[#5A8A6A] text-white" : "bg-[#E0D8D0] text-[#6B6B6B]"
         }`}
       >
         {ok ? "✓" : "—"}
       </span>
-      <span className="ka text-xs text-[#1A1A1A]">{label}</span>
+      <span className="ka text-xs text-[#1C1C1E]">{label}</span>
     </li>
   );
 }

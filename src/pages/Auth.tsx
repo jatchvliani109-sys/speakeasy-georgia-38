@@ -56,12 +56,12 @@ export default function Auth() {
     <Layout showLogout={false}>
       <div className="max-w-sm mx-auto py-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#A84060]">
-            <span className="h-px w-6 bg-[#A84060]" />
+          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
+            <span className="h-px w-6 bg-[#1C1C1E]" />
             {mode === "signup" ? "Welcome" : "Sign in"}
-            <span className="h-px w-6 bg-[#A84060]" />
+            <span className="h-px w-6 bg-[#1C1C1E]" />
           </div>
-          <h1 className="text-3xl font-extrabold ka text-[#4A1429] mt-3 tracking-tight">
+          <h1 className="text-3xl font-extrabold ka text-[#3D1220] mt-3 tracking-tight">
             {mode === "signup" ? "შექმენი ანგარიში" : "შესვლა"}
           </h1>
           <p className="text-sm text-[#6B6B6B] mt-2 ka">
@@ -71,7 +71,7 @@ export default function Auth() {
 
         <form
           onSubmit={submit}
-          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#FAF6F7] border border-[#E8D5DA] shadow-[0_2px_10px_-4px_rgba(74,20,41,0.08)]"
+          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_10px_-4px_rgba(74,20,41,0.08)]"
         >
           <div>
             <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#6B6B6B]">
@@ -83,7 +83,7 @@ export default function Auth() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-[#E8D5DA] focus-visible:ring-[#A84060]"
+              className="h-11 mt-1.5 rounded-lg bg-white border-[#E0D8D0] focus-visible:ring-[#1C1C1E]"
             />
           </div>
           <div>
@@ -96,13 +96,13 @@ export default function Auth() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-[#E8D5DA] focus-visible:ring-[#A84060]"
+              className="h-11 mt-1.5 rounded-lg bg-white border-[#E0D8D0] focus-visible:ring-[#1C1C1E]"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#4A1429] text-[#FAF6F7] text-sm font-semibold tracking-wide ka hover:bg-[#5A1834] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#3D1220] text-[#F8F5F0] text-sm font-semibold tracking-wide ka hover:bg-[#4A1525] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -117,12 +117,12 @@ export default function Auth() {
 
         <button
           onClick={() => setMode(mode === "signup" ? "login" : "signup")}
-          className="w-full text-center mt-6 text-sm text-[#6B6B6B] hover:text-[#4A1429] transition-colors ka"
+          className="w-full text-center mt-6 text-sm text-[#6B6B6B] hover:text-[#3D1220] transition-colors ka"
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
 
-        <div className="mt-8 pt-6 border-t border-dashed border-[#E8D5DA]">
+        <div className="mt-8 pt-6 border-t border-dashed border-[#E0D8D0]">
           <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#A8A8A8] text-center mb-3">
             Dev only
           </div>
@@ -153,7 +153,7 @@ export default function Auth() {
                 setLoading(false);
               }
             }}
-            className="w-full h-11 rounded-xl bg-white border-2 border-dashed border-[#A84060]/60 text-sm font-semibold text-[#4A1429] hover:bg-[#FAF6F7] transition-colors disabled:opacity-60 ka"
+            className="w-full h-11 rounded-xl bg-white border-2 border-dashed border-[#1C1C1E]/60 text-sm font-semibold text-[#3D1220] hover:bg-[#F8F5F0] transition-colors disabled:opacity-60 ka"
           >
             Continue as Guest (Dev Preview)
           </button>
