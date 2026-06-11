@@ -16,16 +16,6 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "საუბრის გაუმჯობესება",
-    items: [
-      { to: "/path/speaking", label: "Speaking Dashboard" },
-      { to: "/path/speaking/call", label: "AI Speaking Session" },
-      { to: "/path/speaking/pronunciation", label: "Pronunciation Practice" },
-      { to: "/path/speaking/roleplay", label: "Roleplay Practice" },
-      { to: "/path/speaking/progress", label: "Speaking Progress" },
-    ],
-  },
-  {
     title: "ბიზნეს ინგლისური",
     items: [
       { to: "/path/business/home", label: "Business Dashboard" },
