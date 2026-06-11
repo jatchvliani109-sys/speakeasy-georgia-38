@@ -36,19 +36,6 @@ const THEMES: Record<LearningPathId, Theme> = {
     ctaHover: "hover:bg-[#16345E]",
     eyebrow: "text-[#1E3A5F]",
   },
-  national_exam: {
-    icon: GraduationCap,
-    accentLine: "bg-[#7A2240]",
-    iconBg: "bg-[#5C1A30]",
-    iconColor: "text-[#F4D9DE]",
-    badge: "Exam Prep",
-    cardBg: "bg-[#FAEFF2]",
-    cardBorder: "border-[#E8C8D2]",
-    ctaBg: "bg-[#5C1A30]",
-    ctaText: "text-[#F4D9DE]",
-    ctaHover: "hover:bg-[#7A2240]",
-    eyebrow: "text-[#7A2240]",
-  },
 };
 
 
