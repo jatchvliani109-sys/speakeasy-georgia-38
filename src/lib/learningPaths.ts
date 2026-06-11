@@ -12,13 +12,6 @@ export type LearningPath = {
 
 export const LEARNING_PATHS: LearningPath[] = [
   {
-    id: "speaking",
-    title: "საუბრის გაუმჯობესება",
-    description: "ივარჯიშე ინგლისურად საუბარში AI მასწავლებელთან.",
-    icon: "🎙️",
-    route: "/path/speaking",
-  },
-  {
     id: "business_english",
     title: "ბიზნეს ინგლისური",
     description: "გასაუბრება, სამუშაო იმეილები, შეხვედრები და პროფესიული კომუნიკაცია.",
