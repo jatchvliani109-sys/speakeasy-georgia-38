@@ -23,19 +23,6 @@ type Theme = {
 };
 
 const THEMES: Record<LearningPathId, Theme> = {
-  speaking: {
-    icon: Mic,
-    accentLine: "bg-[#C9A227]",
-    iconBg: "bg-[#0F2748]",
-    iconColor: "text-[#E8C461]",
-    badge: "AI Speaking",
-    cardBg: "bg-[#FBF6EA]",
-    cardBorder: "border-[#E8D9A8]",
-    ctaBg: "bg-[#0F2748]",
-    ctaText: "text-[#F4E5B8]",
-    ctaHover: "hover:bg-[#16345E]",
-    eyebrow: "text-[#9A7A1E]",
-  },
   business_english: {
     icon: Briefcase,
     accentLine: "bg-[#1E3A5F]",
