@@ -5,10 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
-import DevNav from "@/components/DevNav";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import BusinessModulesList from "./pages/paths/business/BusinessModulesList";
 
 import BusinessGate from "./pages/paths/business/BusinessGate";
 import BusinessSetup from "./pages/paths/business/BusinessSetup";
@@ -43,6 +44,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+            <Route path="/path/business/modules" element={<RequireAuth><BusinessModulesList /></RequireAuth>} />
             
             
             
@@ -68,7 +71,6 @@ const App = () => (
             <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <DevNav />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
