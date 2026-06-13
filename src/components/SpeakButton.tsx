@@ -66,27 +66,14 @@ async function fetchRealisticAudio(text: string): Promise<string | null> {
   if (Date.now() < retryAfter) return null;
   if (audioCache.has(text)) return audioCache.get(text)!;
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ text }),
+    const { data, error } = await supabase.functions.invoke("openai-text-to-speech", {
+      body: { text },
     });
-    if (!res.ok) {
+    if (error || !data) {
       retryAfter = Date.now() + 15_000;
       return null;
     }
-    const contentType = res.headers.get("Content-Type") || "";
-    if (!contentType.startsWith("audio/")) {
-      retryAfter = Date.now() + 15_000;
-      return null;
-    }
-    const blob = await res.blob();
+    const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
     if (!blob.type.startsWith("audio/")) {
       retryAfter = Date.now() + 15_000;
       return null;
