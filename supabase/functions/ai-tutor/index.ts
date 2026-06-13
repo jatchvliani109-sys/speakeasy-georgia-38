@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -93,6 +94,8 @@ STAY IN CHARACTER. NO META. NO TEACHING. JUST BE THE PERSON.`,
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const { messages = [], level = "Beginner", mode = "chat", stage, lessonContext, recentTopics = [], suggestedTopic, coachMode } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");

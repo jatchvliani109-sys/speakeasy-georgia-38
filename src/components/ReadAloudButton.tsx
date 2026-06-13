@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, Square, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Shared cache + single-playback controller across the app
 const cache = new Map<string, string>();
@@ -62,19 +63,11 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
     try {
       let url = cache.get(text);
       if (!url) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: anonKey,
-            Authorization: `Bearer ${anonKey}`,
-          },
-          body: JSON.stringify({ text }),
+        const { data, error } = await supabase.functions.invoke("openai-text-to-speech", {
+          body: { text },
         });
-        if (!res.ok) throw new Error("tts");
-        const blob = await res.blob();
+        if (error) throw error;
+        const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
         if (!blob.type.startsWith("audio/")) throw new Error("notaudio");
         url = URL.createObjectURL(blob);
         cache.set(text, url);

@@ -1,6 +1,7 @@
 // Text-to-Speech edge function. Uses ElevenLabs if ELEVENLABS_API_KEY is set,
 // otherwise returns 503 so the client can fall back to the browser voice.
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { requireUser } from "../_shared/auth.ts";
 
 const DEFAULT_VOICE = "EXAVITQu4vr4xnSDxMaL"; // Sarah – warm, clear English
 const MODEL = "eleven_multilingual_v2";
@@ -8,6 +9,8 @@ const MODEL = "eleven_multilingual_v2";
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const { text, voiceId } = await req.json().catch(() => ({}));
     if (!text || typeof text !== "string") {
       return new Response(JSON.stringify({ error: "Missing text" }), {

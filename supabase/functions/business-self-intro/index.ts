@@ -1,4 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireUser } from "../_shared/auth.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
@@ -78,6 +79,8 @@ Return JSON:
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const body = (await req.json()) as Body;
     const isRewrite = body.variant && body.variant !== "all" && body.baseText;
     const userPrompt = isRewrite ? rewritePrompt(body) : buildPrompt(body);

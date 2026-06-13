@@ -220,18 +220,14 @@ export default function SelfIntroduction() {
     try {
       let url = audioCache.get(text);
       if (!url) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        const res = await fetch(`${supabaseUrl}/functions/v1/openai-text-to-speech`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", apikey: anonKey, Authorization: `Bearer ${anonKey}` },
-          body: JSON.stringify({ text }),
+        const { data, error } = await supabase.functions.invoke("openai-text-to-speech", {
+          body: { text },
         });
-        if (!res.ok) {
-          if (res.status === 400) { toast.message("No English audio available"); return; }
-          throw new Error("tts");
+        if (error || !data) {
+          toast.message("No English audio available");
+          return;
         }
-        const blob = await res.blob();
+        const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
         if (!blob.type.startsWith("audio/")) { toast.message("No English audio available"); return; }
         url = URL.createObjectURL(blob);
         audioCache.set(text, url);
