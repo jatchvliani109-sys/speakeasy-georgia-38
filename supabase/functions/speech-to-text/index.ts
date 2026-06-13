@@ -18,9 +18,15 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const audioBase64: string | undefined = body?.audioBase64;
     const mimeType: string = body?.mimeType || "audio/webm";
+    const MAX_AUDIO_BASE64 = 8 * 1024 * 1024; // ~6 MB decoded
     if (!audioBase64 || typeof audioBase64 !== "string") {
       return new Response(JSON.stringify({ error: "MISSING_AUDIO" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (audioBase64.length > MAX_AUDIO_BASE64) {
+      return new Response(JSON.stringify({ error: "AUDIO_TOO_LARGE" }), {
+        status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
