@@ -25,6 +25,7 @@ import {
   INTENSITY_LABELS,
   LEVEL_LABELS,
   PRIORITY_LABELS,
+  PRIORITY_TO_MODULES,
   pullBusinessFromSupabase,
   resetBusiness,
   saveBusiness,
