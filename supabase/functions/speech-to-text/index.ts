@@ -2,10 +2,13 @@
 // Accepts JSON: { audioBase64: string, mimeType?: string }
 // Returns: { text: string } or 503/4xx with { error }
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireUser } from "../_shared/auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const apiKey = Deno.env.get("ELEVENLABS_API_KEY");
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "STT_NOT_CONFIGURED" }), {

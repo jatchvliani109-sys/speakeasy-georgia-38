@@ -1,6 +1,7 @@
 // Inworld AI Text-to-Speech for the read-aloud speaker buttons.
 // Uses INWORLD_API_KEY from Supabase secrets — never exposed to the frontend.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireUser } from "../_shared/auth.ts";
 
 function cleanForTTS(text: string): string {
   let s = text;
@@ -41,6 +42,8 @@ function b64ToBytes(b64: string): Uint8Array {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const { text, voice } = await req.json().catch(() => ({}));
     if (!text || typeof text !== "string") {
       return new Response(JSON.stringify({ error: "Missing text" }), {

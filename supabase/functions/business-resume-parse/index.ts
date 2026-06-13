@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 // @ts-ignore - jszip via npm
 import JSZip from "npm:jszip@3.10.1";
+import { requireUser } from "../_shared/auth.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -165,6 +166,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
       throw new Error("No AI provider configured");
     }

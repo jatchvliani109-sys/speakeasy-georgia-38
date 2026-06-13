@@ -1,4 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireUser } from "../_shared/auth.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
@@ -228,6 +229,8 @@ async function callAI(system: string, user: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const _auth = await requireUser(req);
+    if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action; profile?: Profile } & Record<string, any>;
     const profile = body.profile || {};
     let r;
