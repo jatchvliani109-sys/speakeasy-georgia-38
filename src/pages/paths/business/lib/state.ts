@@ -96,7 +96,24 @@ export function saveBusiness(uid: string, patch: Partial<BusinessState>) {
   const cur = loadBusiness(uid);
   const next = { ...cur, ...patch };
   localStorage.setItem(KEY(uid), JSON.stringify(next));
-  pushBusinessRemote(uid, next).catch(() => {});
+  pushBusinessRemote(uid, next).catch((e) => {
+    console.warn("[business] remote push failed (will retry on next save)", e);
+  });
+  return next;
+}
+
+// Same as saveBusiness, but awaits the remote write. Use this before
+// navigating to a page whose guard reads from Supabase, to avoid the
+// guard seeing stale remote state and bouncing the user back.
+export async function saveBusinessAsync(uid: string, patch: Partial<BusinessState>) {
+  const cur = loadBusiness(uid);
+  const next = { ...cur, ...patch };
+  localStorage.setItem(KEY(uid), JSON.stringify(next));
+  try {
+    await pushBusinessRemote(uid, next);
+  } catch (e) {
+    console.warn("[business] remote push failed (continuing with local state)", e);
+  }
   return next;
 }
 
