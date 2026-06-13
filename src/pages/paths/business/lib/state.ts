@@ -96,7 +96,24 @@ export function saveBusiness(uid: string, patch: Partial<BusinessState>) {
   const cur = loadBusiness(uid);
   const next = { ...cur, ...patch };
   localStorage.setItem(KEY(uid), JSON.stringify(next));
-  pushBusinessRemote(uid, next).catch(() => {});
+  pushBusinessRemote(uid, next).catch((e) => {
+    console.warn("[business] remote push failed (will retry on next save)", e);
+  });
+  return next;
+}
+
+// Same as saveBusiness, but awaits the remote write. Use this before
+// navigating to a page whose guard reads from Supabase, to avoid the
+// guard seeing stale remote state and bouncing the user back.
+export async function saveBusinessAsync(uid: string, patch: Partial<BusinessState>) {
+  const cur = loadBusiness(uid);
+  const next = { ...cur, ...patch };
+  localStorage.setItem(KEY(uid), JSON.stringify(next));
+  try {
+    await pushBusinessRemote(uid, next);
+  } catch (e) {
+    console.warn("[business] remote push failed (continuing with local state)", e);
+  }
   return next;
 }
 
@@ -131,6 +148,7 @@ async function pushSelfIntrosRemote(uid: string, list: SavedSelfIntro[]) {
  * localStorage. Remote is the source of truth across devices; local is a cache.
  */
 export async function pullBusinessFromSupabase(uid: string): Promise<BusinessState> {
+  const local = loadBusiness(uid);
   try {
     const { supabase } = await import("@/integrations/supabase/client");
     const { data, error } = await supabase
@@ -141,7 +159,30 @@ export async function pullBusinessFromSupabase(uid: string): Promise<BusinessSta
     if (error) throw error;
     if (data) {
       const remoteState = ((data.state as any) || {}) as Partial<BusinessState>;
+      // Remote is source of truth, but never let a slow/empty remote
+      // erase progress flags that have already been set locally.
       const merged: BusinessState = { ...empty(), ...remoteState };
+      const keepLocalTrue: (keyof BusinessState)[] = [
+        "setupCompleted",
+        "testCompleted",
+        "businessSelfIntroductionCompleted",
+        "businessSelfIntroductionSkipped",
+        "businessResumeUploaded",
+        "businessResumeSkipped",
+        "firstMilestoneAcknowledged",
+      ];
+      for (const k of keepLocalTrue) {
+        if ((local as any)[k] && !(merged as any)[k]) (merged as any)[k] = true;
+      }
+      // Preserve locally-built plan / level / answers if remote is missing them.
+      if (!merged.plan && local.plan) merged.plan = local.plan;
+      if (!merged.level && local.level) merged.level = local.level;
+      if ((!merged.goals || merged.goals.length === 0) && local.goals?.length) merged.goals = local.goals;
+      if ((!merged.mainPriority || merged.mainPriority.length === 0) && local.mainPriority?.length) merged.mainPriority = local.mainPriority;
+      if ((!merged.field || merged.field.length === 0) && local.field?.length) merged.field = local.field;
+      if (!merged.intensity && local.intensity) merged.intensity = local.intensity;
+      if (!merged.deadline && local.deadline) merged.deadline = local.deadline;
+
       localStorage.setItem(KEY(uid), JSON.stringify(merged));
       const intros = Array.isArray(data.self_intros)
         ? (data.self_intros as unknown as SavedSelfIntro[])
@@ -149,10 +190,10 @@ export async function pullBusinessFromSupabase(uid: string): Promise<BusinessSta
       localStorage.setItem(SI_KEY(uid), JSON.stringify(intros));
       return merged;
     }
-  } catch {
-    // fall through to local cache
+  } catch (e) {
+    console.warn("[business] pull failed, using local cache", e);
   }
-  return loadBusiness(uid);
+  return local;
 }
 
 // --- Labels (Georgian) ---

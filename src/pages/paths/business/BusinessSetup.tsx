@@ -16,6 +16,7 @@ import {
   buildPlan,
   pullBusinessFromSupabase,
   saveBusiness,
+  saveBusinessAsync,
 } from "./lib/state";
 
 type Step = 0 | 1 | 2 | 3;
@@ -79,10 +80,28 @@ export default function BusinessSetup() {
     (step === 3 && field.length > 0);
 
 
-  const next = () => {
-    if (step < 3) setStep((s) => (s + 1) as Step);
-    else if (user) {
-      const saved = saveBusiness(user.id, {
+  const next = async () => {
+    if (step < 3) {
+      setStep((s) => (s + 1) as Step);
+      return;
+    }
+    if (!user) {
+      console.warn("[setup] no user — navigating to plan anyway");
+      navigate("/path/business/plan", { replace: true });
+      return;
+    }
+
+    console.log("[setup] completing setup", { goals, priority, intensity, deadline, field });
+
+    // Safety net: never let the user stay stuck on this screen.
+    const failsafe = setTimeout(() => {
+      console.warn("[setup] failsafe fired — forcing navigation to plan");
+      navigate("/path/business/plan", { replace: true });
+    }, 6000);
+
+    try {
+      // Save + await remote write so the plan page guard sees the latest state.
+      const saved = await saveBusinessAsync(user.id, {
         goals,
         mainPriority: priority,
         intensity,
@@ -90,8 +109,21 @@ export default function BusinessSetup() {
         field,
         setupCompleted: true,
       });
+      console.log("[setup] saved setup", { setupCompleted: saved.setupCompleted });
+
       const plan = buildPlan(saved);
-      if (plan) saveBusiness(user.id, { plan });
+      if (plan) {
+        await saveBusinessAsync(user.id, { plan });
+        console.log("[setup] plan saved");
+      } else {
+        console.log("[setup] buildPlan returned null (missing level/field) — plan will be built later");
+      }
+    } catch (e) {
+      // Local state was already written by saveBusinessAsync; keep going.
+      console.error("[setup] save error — continuing to plan", e);
+    } finally {
+      clearTimeout(failsafe);
+      console.log("[setup] navigating to /path/business/plan");
       navigate("/path/business/plan", { replace: true });
     }
   };
