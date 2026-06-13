@@ -21,22 +21,45 @@ export default function BusinessPlan() {
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    (async () => {
-      const cur = await pullBusinessFromSupabase(user.id);
+
+    // Hard timeout: never let the user be stuck. After 10s, fall through to dashboard.
+    const timeout = setTimeout(() => {
       if (cancelled) return;
-      if (!cur.testCompleted) return navigate("/path/business/test", { replace: true });
-      if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
-      if (!cur.plan) {
-        const plan = buildPlan(cur);
-        if (plan) {
-          const next = saveBusiness(user.id, { plan });
-          setS(next);
+      navigate("/path/business/home", { replace: true });
+    }, 10000);
+
+    (async () => {
+      try {
+        const cur = await Promise.race([
+          pullBusinessFromSupabase(user.id),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+        ]);
+        if (cancelled) return;
+        if (!cur) {
+          navigate("/path/business/home", { replace: true });
           return;
         }
+        if (!cur.testCompleted) return navigate("/path/business/test", { replace: true });
+        if (!cur.setupCompleted) return navigate("/path/business/setup", { replace: true });
+        let state = cur;
+        if (!state.plan) {
+          const plan = buildPlan(state);
+          if (plan) {
+            state = saveBusiness(user.id, { plan });
+          } else {
+            // Missing inputs to build a plan — skip past gracefully.
+            navigate("/path/business/home", { replace: true });
+            return;
+          }
+        }
+        setS(state);
+      } catch {
+        if (!cancelled) navigate("/path/business/home", { replace: true });
+      } finally {
+        clearTimeout(timeout);
       }
-      setS(cur);
     })();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; clearTimeout(timeout); };
   }, [user, navigate]);
 
 
