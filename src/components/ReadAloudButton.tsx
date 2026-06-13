@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, Square, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Shared cache + single-playback controller across the app
 const cache = new Map<string, string>();
