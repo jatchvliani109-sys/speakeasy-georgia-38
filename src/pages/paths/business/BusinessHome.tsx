@@ -25,6 +25,7 @@ import {
   INTENSITY_LABELS,
   LEVEL_LABELS,
   PRIORITY_LABELS,
+  PRIORITY_TO_MODULES,
   pullBusinessFromSupabase,
   resetBusiness,
   saveBusiness,
@@ -70,7 +71,7 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 // Modules that are fully built today
 const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "vocabulary"]);
 
-// Map a learner priority to a module slug — used for goal-weighted rotation.
+// Local single-slug map kept for backward compat; multi-module map drives rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
@@ -189,19 +190,21 @@ export default function BusinessHome() {
   }, [user]);
 
   // Build goal-weighted rotation queue across active modules.
+  // Each goal contributes all its mapped modules; primary goal gets extra weight.
   const rotationQueue = useMemo<string[]>(() => {
     const plan = s?.plan;
     const goals = plan?.mainGoals || s?.mainPriority || [];
     const weighted: string[] = [];
-    // Map goals to active modules with double weight on first goal
     goals.forEach((g, idx) => {
-      const slug = PRIORITY_TO_MODULE[g];
-      if (slug && ACTIVE_MODULES.has(slug)) {
-        const reps = idx === 0 ? 2 : 1;
-        for (let i = 0; i < reps; i++) weighted.push(slug);
-      }
+      const slugs = PRIORITY_TO_MODULES[g] || [];
+      slugs.forEach((slug, i) => {
+        if (!ACTIVE_MODULES.has(slug)) return;
+        // Primary goal repeats twice; primary module within a goal repeats more.
+        const reps = (idx === 0 ? 2 : 1) * (i === 0 ? 2 : 1);
+        for (let n = 0; n < reps; n++) weighted.push(slug);
+      });
     });
-    // Ensure both active modules appear at least once
+    // Ensure every active module appears at least once (balanced exposure).
     Array.from(ACTIVE_MODULES).forEach((m) => {
       if (!weighted.includes(m)) weighted.push(m);
     });

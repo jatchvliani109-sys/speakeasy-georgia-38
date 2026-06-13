@@ -1,9 +1,43 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import BusinessShell, { BizCard } from "./BusinessShell";
-import { BUSINESS_MODULES } from "./lib/state";
+import {
+  BUSINESS_MODULES,
+  pullBusinessFromSupabase,
+  rankedModuleSlugs,
+  recommendedModuleSlugs,
+  type BusinessPriority,
+} from "./lib/state";
+import { useAuth } from "@/lib/auth";
 
 export default function BusinessModulesList() {
+  const { user } = useAuth();
+  const [goals, setGoals] = useState<BusinessPriority[] | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const s = await pullBusinessFromSupabase(user.id);
+      if (cancelled) return;
+      setGoals((s.plan?.mainGoals?.length ? s.plan.mainGoals : s.mainPriority) || []);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const orderedModules = useMemo(() => {
+    const ranking = rankedModuleSlugs(goals);
+    if (!ranking) return BUSINESS_MODULES;
+    return [...BUSINESS_MODULES].sort(
+      (a, b) => ranking.indexOf(a.slug) - ranking.indexOf(b.slug),
+    );
+  }, [goals]);
+
+  const recommended = useMemo(() => recommendedModuleSlugs(goals), [goals]);
+
   return (
     <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ელ-ფოსტები, გასაუბრება, შეხვედრები და პროფესიული ლექსიკა.", path: "/path/business/modules" }}>
       <header className="mb-6">
@@ -17,8 +51,9 @@ export default function BusinessModulesList() {
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {BUSINESS_MODULES.map((m) => {
+        {orderedModules.map((m) => {
           const Icon = m.icon;
+          const isRecommended = recommended.has(m.slug);
           return (
             <Link key={m.slug} to={`/path/business/module/${m.slug}`} className="group">
               <BizCard className="h-full hover:border-[#5C1A2E]/50 transition-colors">
@@ -27,6 +62,12 @@ export default function BusinessModulesList() {
                     <Icon size={18} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
+                    {isRecommended && (
+                      <span className="ka inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#5C1A2E] bg-[#5C1A2E]/8 border border-[#5C1A2E]/20 rounded-full px-2 py-0.5 mb-1.5">
+                        <Sparkles size={10} strokeWidth={2.5} />
+                        შენთვის რეკომენდებული
+                      </span>
+                    )}
                     <h2 className="ka font-bold text-[#5C1A2E] text-base leading-snug">
                       {m.title}
                     </h2>

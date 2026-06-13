@@ -253,7 +253,7 @@ export const BUSINESS_MODULES: BusinessModule[] = [
   },
 ];
 
-// Map main priority -> recommended module
+// Map main priority -> recommended module (single primary)
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
@@ -263,6 +263,44 @@ const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   business_vocab: "vocabulary",
   general_business: "interview",
 };
+
+// Map a priority -> one or more relevant modules (used for ordering & rotation).
+export const PRIORITY_TO_MODULES: Record<BusinessPriority, string[]> = {
+  university: ["interview", "vocabulary"],
+  job_interview: ["interview", "vocabulary"],
+  work_communication: ["meetings", "emails"],
+  remote_work: ["emails", "vocabulary"],
+  emails_writing: ["emails"],
+  business_vocab: ["vocabulary"],
+  general_business: ["vocabulary", "interview", "emails", "meetings"],
+};
+
+/**
+ * Returns an ordered list of module slugs ranked by user goals.
+ * Goals earlier in the list (higher priority) push their modules higher.
+ * Every module in BUSINESS_MODULES is included — nothing is hidden.
+ * Returns `null` when the user has no goals (caller should show default order).
+ */
+export function rankedModuleSlugs(goals: BusinessPriority[] | undefined | null): string[] | null {
+  if (!goals || goals.length === 0) return null;
+  const score = new Map<string, number>();
+  goals.forEach((g, idx) => {
+    const weight = goals.length - idx; // first goal = highest weight
+    (PRIORITY_TO_MODULES[g] || []).forEach((slug, i) => {
+      score.set(slug, (score.get(slug) || 0) + weight * (i === 0 ? 2 : 1));
+    });
+  });
+  const all = BUSINESS_MODULES.map((m) => m.slug);
+  return [...all].sort((a, b) => (score.get(b) || 0) - (score.get(a) || 0));
+}
+
+/** Slugs that should display the "recommended for you" badge. */
+export function recommendedModuleSlugs(goals: BusinessPriority[] | undefined | null): Set<string> {
+  const set = new Set<string>();
+  if (!goals) return set;
+  goals.forEach((g) => (PRIORITY_TO_MODULES[g] || []).forEach((s) => set.add(s)));
+  return set;
+}
 
 
 const WEEKLY_FOCUS: Record<BusinessPriority, string[]> = {
