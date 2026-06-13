@@ -177,9 +177,16 @@ Deno.serve(async (req) => {
     const mimeType: string = body?.mimeType || "";
     const fileName: string = body?.fileName || "";
 
+    const MAX_FILE_BASE64 = 7 * 1024 * 1024; // ~5 MB decoded
     if (!fileBase64 || typeof fileBase64 !== "string") {
       return new Response(JSON.stringify({ error: "Missing fileBase64" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (fileBase64.length > MAX_FILE_BASE64) {
+      return new Response(JSON.stringify({ error: "File too large (max ~5 MB)" }), {
+        status: 413,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
