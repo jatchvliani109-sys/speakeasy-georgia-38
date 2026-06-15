@@ -117,7 +117,7 @@ export default function GlobalNav() {
                 ნავიგაცია
               </SheetTitle>
               {user?.email && (
-                <p className="ka text-xs text-[#4A4A4A] text-left truncate">
+                <p className="ka text-xs text-[#4A4A4A] text-left break-all">
                   {user.email}
                 </p>
               )}
