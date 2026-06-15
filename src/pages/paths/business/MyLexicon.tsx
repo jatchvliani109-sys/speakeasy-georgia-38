@@ -268,7 +268,7 @@ function PhrasesTab() {
                     <KindIcon size={16} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">
+                    <p className="ka text-sm font-semibold text-[#5C1A2E] break-words line-clamp-2">
                       {sectionLabel} — {title}
                     </p>
                     <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
