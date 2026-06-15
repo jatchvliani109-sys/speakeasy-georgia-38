@@ -69,7 +69,7 @@ export default function ProgressPage() {
               <Link key={l.id} to={`/summary/${l.id}`} className="block">
                 <div className="p-4 rounded-2xl bg-card border border-border shadow-card flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-semibold ka truncate">{title}</div>
+                    <div className="font-semibold ka break-words line-clamp-2">{title}</div>
                     <div className="text-xs text-muted-foreground mt-0.5 ka">
                       {new Date(l.created_at).toLocaleDateString("ka-GE")} · {wordsCount} სიტყვა
                     </div>
