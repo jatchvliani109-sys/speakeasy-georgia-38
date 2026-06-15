@@ -553,8 +553,8 @@ export default function MeetingsModule() {
                 <p className="ka text-[10px] uppercase tracking-wider text-[#C8DCCF] font-semibold">
                   🎙️ შეხვედრა მიმდინარეობს
                 </p>
-                <p className="text-sm font-semibold truncate mt-0.5">{b.meetingTypeEn}</p>
-                <p className="ka text-[11px] text-[#F0F7F2]/70 truncate">{b.companyName}</p>
+                <p className="text-sm font-semibold break-words line-clamp-2 mt-0.5">{b.meetingTypeEn}</p>
+                <p className="ka text-[11px] text-[#F0F7F2]/70 break-words line-clamp-2">{b.companyName}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="ka text-[10px] uppercase tracking-wider text-[#C8DCCF]">
