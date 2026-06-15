@@ -111,11 +111,11 @@ export default function Profile() {
           <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center gap-2 text-[#1C1C1E]">
               <UserIcon size={14} strokeWidth={2.25} className="text-[#4A4A4A]" />
-              <span className="ka font-bold text-base truncate">{displayName || "—"}</span>
+              <span className="ka font-bold text-base break-words min-w-0">{displayName || "—"}</span>
             </div>
             <div className="flex items-center gap-2 text-[#4A4A4A]">
-              <Mail size={13} strokeWidth={2.25} />
-              <span className="text-sm truncate">{email}</span>
+              <Mail size={13} strokeWidth={2.25} className="shrink-0" />
+              <span className="text-sm break-all min-w-0">{email}</span>
             </div>
           </div>
         </div>
