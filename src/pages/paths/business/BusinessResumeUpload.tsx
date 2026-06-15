@@ -273,11 +273,11 @@ export default function BusinessResumeUpload() {
                 PDF
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#5C1A2E] truncate">
+                <p className="text-sm font-semibold text-[#5C1A2E] break-all line-clamp-2">
                   {existing.file_name || "resume"}
                 </p>
                 {(existing.full_name || existing.job_title) && (
-                  <p className="text-xs text-[#1C1C1E] mt-0.5 truncate">
+                  <p className="text-xs text-[#1C1C1E] mt-0.5 break-words line-clamp-2">
                     {[existing.full_name, existing.job_title].filter(Boolean).join(" — ")}
                   </p>
                 )}
