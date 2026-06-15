@@ -152,7 +152,7 @@ export default function Profile() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
               რეზიუმე
             </p>
-            <p className="ka text-sm text-[#1C1C1E] mt-0.5 truncate">
+            <p className="ka text-sm text-[#1C1C1E] mt-0.5 break-words line-clamp-2">
               {hasResume ? resumeName || "ატვირთულია" : "ჯერ არ ატვირთულა"}
             </p>
           </div>
