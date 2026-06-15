@@ -496,8 +496,8 @@ export default function InterviewModule() {
                 {initials(b.interviewerName)}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold truncate">{b.interviewerName}</p>
-                <p className="ka text-[11px] text-[#F0EBE3]/70 truncate">
+                <p className="text-sm font-semibold break-words line-clamp-2">{b.interviewerName}</p>
+                <p className="ka text-[11px] text-[#F0EBE3]/70 break-words line-clamp-2">
                   {b.interviewerTitle} · {b.companyName}
                 </p>
               </div>
