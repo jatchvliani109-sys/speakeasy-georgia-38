@@ -648,7 +648,7 @@ export default function BusinessHome() {
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="ka font-semibold text-sm text-[#5C1A2E] truncate">
+                          <p className="ka font-semibold text-sm text-[#5C1A2E] break-words leading-snug">
                             {m.title}
                           </p>
                           <span

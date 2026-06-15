@@ -467,8 +467,8 @@ export default function MeetingsModule() {
                       {initials(a.name)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[#5C1A2E] truncate">{a.name}</p>
-                      <p className="ka text-[10px] text-[#4A4A4A] truncate">
+                      <p className="text-xs font-semibold text-[#5C1A2E] break-words">{a.name}</p>
+                      <p className="ka text-[10px] text-[#4A4A4A] break-words">
                         {a.titleKa || a.titleEn}{a.personalityKa ? ` · ${a.personalityKa}` : ""}
                       </p>
                     </div>
@@ -553,8 +553,8 @@ export default function MeetingsModule() {
                 <p className="ka text-[10px] uppercase tracking-wider text-[#C8DCCF] font-semibold">
                   🎙️ შეხვედრა მიმდინარეობს
                 </p>
-                <p className="text-sm font-semibold truncate mt-0.5">{b.meetingTypeEn}</p>
-                <p className="ka text-[11px] text-[#F0F7F2]/70 truncate">{b.companyName}</p>
+                <p className="text-sm font-semibold break-words line-clamp-2 mt-0.5">{b.meetingTypeEn}</p>
+                <p className="ka text-[11px] text-[#F0F7F2]/70 break-words line-clamp-2">{b.companyName}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="ka text-[10px] uppercase tracking-wider text-[#C8DCCF]">
@@ -931,8 +931,8 @@ function BriefRow({ label, valueKa, sub }: { label: string; valueKa: string; sub
     <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E0D8D0] last:border-0">
       <span className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A]">{label}</span>
       <div className="text-right min-w-0">
-        <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{valueKa}</p>
-        {sub && <p className="text-[11px] text-[#4A4A4A] truncate">{sub}</p>}
+        <p className="ka text-sm font-semibold text-[#5C1A2E] break-words">{valueKa}</p>
+        {sub && <p className="text-[11px] text-[#4A4A4A] break-words">{sub}</p>}
       </div>
     </div>
   );

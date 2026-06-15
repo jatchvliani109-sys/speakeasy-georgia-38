@@ -215,7 +215,7 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
         <Icon size={16} strokeWidth={2} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{doc.title}</p>
+        <p className="ka text-sm font-semibold text-[#5C1A2E] break-words line-clamp-2">{doc.title}</p>
         <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
           {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleDateString("ka-GE")}
         </p>
@@ -960,7 +960,7 @@ function DocView({
               className="w-full text-xl font-bold text-[#5C1A2E] bg-transparent border-b border-[#E0D8D0] focus:outline-none focus:border-[#5C1A2E]"
             />
           ) : (
-            <h2 className="ka text-xl font-bold text-[#5C1A2E] truncate">{doc.title}</h2>
+            <h2 className="ka text-lg sm:text-xl font-bold text-[#5C1A2E] break-words line-clamp-3 leading-snug">{doc.title}</h2>
           )}
           <p className="ka text-[11px] text-[#4A4A4A] mt-1">
             {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleString("ka-GE")}

@@ -15,7 +15,7 @@ export default function PageHeader({ title, backTo }: { title: string; backTo?: 
       >
         <ArrowLeft className="w-5 h-5" />
       </Button>
-      <h1 className="text-xl font-extrabold ka flex-1 truncate text-center">{title}</h1>
+      <h1 className="text-lg sm:text-xl font-extrabold ka flex-1 text-center min-w-0 break-words leading-snug line-clamp-2">{title}</h1>
       <Button
         variant="soft"
         size="icon"

@@ -496,8 +496,8 @@ export default function InterviewModule() {
                 {initials(b.interviewerName)}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold truncate">{b.interviewerName}</p>
-                <p className="ka text-[11px] text-[#F0EBE3]/70 truncate">
+                <p className="text-sm font-semibold break-words line-clamp-2">{b.interviewerName}</p>
+                <p className="ka text-[11px] text-[#F0EBE3]/70 break-words line-clamp-2">
                   {b.interviewerTitle} · {b.companyName}
                 </p>
               </div>
@@ -847,8 +847,8 @@ function BriefRow({ label, valueKa, sub }: { label: string; valueKa: string; sub
     <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E0D8D0] last:border-0">
       <span className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A]">{label}</span>
       <div className="text-right min-w-0">
-        <p className="ka text-sm font-semibold text-[#5C1A2E] truncate">{valueKa}</p>
-        {sub && <p className="text-[11px] text-[#4A4A4A] truncate">{sub}</p>}
+        <p className="ka text-sm font-semibold text-[#5C1A2E] break-words">{valueKa}</p>
+        {sub && <p className="text-[11px] text-[#4A4A4A] break-words">{sub}</p>}
       </div>
     </div>
   );
