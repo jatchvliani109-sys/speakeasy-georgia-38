@@ -467,8 +467,8 @@ export default function MeetingsModule() {
                       {initials(a.name)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[#5C1A2E] truncate">{a.name}</p>
-                      <p className="ka text-[10px] text-[#4A4A4A] truncate">
+                      <p className="text-xs font-semibold text-[#5C1A2E] break-words">{a.name}</p>
+                      <p className="ka text-[10px] text-[#4A4A4A] break-words">
                         {a.titleKa || a.titleEn}{a.personalityKa ? ` · ${a.personalityKa}` : ""}
                       </p>
                     </div>
