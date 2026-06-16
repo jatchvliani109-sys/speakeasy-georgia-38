@@ -82,7 +82,7 @@ async function callOpenAI(userParts: any[]): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userParts },
@@ -106,7 +106,7 @@ async function callLovableFallback(userParts: any[]): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "gpt-4.1-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userParts },

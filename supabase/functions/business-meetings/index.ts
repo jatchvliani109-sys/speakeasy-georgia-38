@@ -262,7 +262,7 @@ async function callAI(system: string, user: string) {
       Authorization: `Bearer ${LOVABLE_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "gpt-4.1-mini",
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
