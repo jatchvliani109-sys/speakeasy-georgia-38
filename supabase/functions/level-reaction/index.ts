@@ -19,10 +19,10 @@ serve(async (req) => {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const { writingSample = "", level = "" } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     const fallback = FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
 
-    if (!LOVABLE_API_KEY || !writingSample.trim()) {
+    if (!OPENAI_API_KEY || !writingSample.trim()) {
       return new Response(JSON.stringify({ reaction: fallback }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -37,11 +37,11 @@ Rules:
 - Tie the reaction to a topic from the sample if possible (e.g. football, school, family, music).
 - One emoji max.`;
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: sys },
           { role: "user", content: `Student wrote:\n"""${writingSample}"""\nWrite the friendly Georgian reaction now.` },
