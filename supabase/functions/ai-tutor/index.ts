@@ -97,8 +97,8 @@ serve(async (req) => {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const { messages = [], level = "Beginner", mode = "chat", stage, lessonContext, recentTopics = [], suggestedTopic, coachMode } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not configured");
 
     const baseTutor = `You are a warm, patient English TYPING tutor for Georgian (ქართველი) speakers. The student types their answers — they do NOT speak. Never use the word "say"; use "type" or "write" instead.
 Level: ${level}. ${LEVEL_GUIDE[level] ?? LEVEL_GUIDE.Beginner}
@@ -106,7 +106,7 @@ Always: ask ONE question at a time. Be encouraging. Never shame. Use 😊 occasi
 Gently correct: "Good try! Type: '...'". Use Georgian script (ქართული) when adding Georgian help.`;
 
     let body: any = {
-      model: "openai/gpt-5-mini",
+      model: "gpt-5-mini",
       messages: [],
     };
 
@@ -240,9 +240,9 @@ Gently correct: "Good try! Type: '...'". Use Georgian script (ქართულ
       body.messages = [{ role: "system", content: sys.trim() }, ...messages];
     }
 
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
