@@ -63,14 +63,44 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
     try {
       let url = cache.get(text);
       if (!url) {
-        const { data, error } = await supabase.functions.invoke("openai-text-to-speech", {
-          body: { text },
+        console.log("[ReadAloud] Requesting TTS for text length:", text.length);
+
+        // Use direct fetch instead of supabase.functions.invoke — invoke mishandles binary responses
+        const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY =
+          (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+          (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
+        const functionUrl = `${SUPABASE_URL}/functions/v1/openai-text-to-speech`;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        const authToken = session?.access_token || SUPABASE_ANON_KEY;
+
+        const response = await fetch(functionUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ text }),
         });
-        if (error) throw error;
-        const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
-        if (!blob.type.startsWith("audio/")) throw new Error("notaudio");
+
+        console.log("[ReadAloud] Response status:", response.status, "content-type:", response.headers.get("content-type"));
+
+        if (!response.ok) {
+          const errText = await response.text().catch(() => "");
+          console.error("[ReadAloud] Edge function error:", response.status, errText);
+          throw new Error(`TTS function failed: ${response.status} ${errText}`);
+        }
+
+        const blob = await response.blob();
+        console.log("[ReadAloud] Blob received — size:", blob.size, "type:", blob.type);
+
+        if (blob.size === 0) throw new Error("Empty audio blob");
+
         url = URL.createObjectURL(blob);
         cache.set(text, url);
+        console.log("[ReadAloud] Blob URL created:", url);
       }
 
       if (myToken !== currentToken) return; // user clicked another button while we were loading
@@ -80,17 +110,22 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
       audioRef.current = audio;
       currentAudio = audio;
       audio.onended = () => {
+        console.log("[ReadAloud] Audio ended");
         if (currentAudio === audio) { currentAudio = null; notify(); }
         setState("idle");
       };
-      audio.onerror = () => {
+      audio.onerror = (e) => {
+        console.error("[ReadAloud] Audio element error:", e, audio.error);
         if (currentAudio === audio) currentAudio = null;
         setState("idle");
       };
+      console.log("[ReadAloud] Calling audio.play()");
       await audio.play();
+      console.log("[ReadAloud] Playback started");
       notify();
       setState("playing");
-    } catch {
+    } catch (err) {
+      console.error("[ReadAloud] Failed, falling back to SpeechSynthesis:", err);
       // Browser SpeechSynthesis fallback
       try {
         const u = new SpeechSynthesisUtterance(text);
@@ -100,7 +135,8 @@ export function ReadAloudButton({ text, className = "", size = "sm", label }: Pr
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(u);
         setState("playing");
-      } catch {
+      } catch (fallbackErr) {
+        console.error("[ReadAloud] Fallback also failed:", fallbackErr);
         setState("idle");
       }
     }
