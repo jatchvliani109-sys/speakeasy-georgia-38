@@ -82,7 +82,7 @@ async function callOpenAI(userParts: any[]): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "openai/gpt-5-mini",
+      model: "gpt-5-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userParts },
