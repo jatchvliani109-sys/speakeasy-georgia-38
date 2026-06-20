@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
         "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-5-mini",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: userPrompt },

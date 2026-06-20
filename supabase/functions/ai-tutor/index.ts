@@ -106,7 +106,7 @@ Always: ask ONE question at a time. Be encouraging. Never shame. Use 😊 occasi
 Gently correct: "Good try! Type: '...'". Use Georgian script (ქართული) when adding Georgian help.`;
 
     let body: any = {
-      model: "gpt-5-mini",
+      model: "gpt-4o",
       messages: [],
     };
 
