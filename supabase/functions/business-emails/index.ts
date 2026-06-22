@@ -57,63 +57,54 @@ Rules:
 - Georgian translations are required where specified.
 - Encouraging, warm, human tone in Georgian intro/explanations.`;
 
-const SYSTEM_FEEDBACK = `You evaluate a Business English learner's email. The learner is a Georgian speaker, but you must output almost NO Georgian — only English content and category tags. Georgian framing is added later by the app.
+const SYSTEM_FEEDBACK = `You are a warm, expert Business English coach giving feedback to a Georgian-speaking learner on an email they wrote. Your Georgian must be natural, correct, and professional (write like an educated native Georgian speaker).
 
 Return STRICT JSON only:
 {
   "verdict": "strong" | "okay" | "weak",
-  "inCharacter": { "subject": "Re: ...", "body": "A realistic 2-5 sentence reply FROM the recipient role, in natural English. No meta, no 'as a colleague'." },
-  "strengthKeys": ["1-3 keys from the STRENGTH list below describing what the learner did well"],
-  "corrections": [
+  "inCharacter": { "subject": "Re: ...", "body": "A realistic 2-5 sentence reply FROM the recipient role, in natural English. No meta commentary." },
+  "summaryKa": "1-2 warm, SPECIFIC Georgian sentences about THIS email — mention what they actually did, not generic praise.",
+  "worked": ["1-3 short Georgian bullets naming specific good things in their email"],
+  "improve": ["2-3 short Georgian bullets naming specific things to improve in their email"],
+  "suggestions": [
     {
-      "before": "exact phrase from the learner's email (English)",
-      "after": "improved English version of that phrase",
-      "categoryKey": "ONE key from the CATEGORY list below"
+      "before": "exact phrase from their email (English)",
+      "after": "improved English version",
+      "whyKa": "1 specific Georgian sentence explaining why the change is better — reference their actual wording"
     }
   ],
-  "rewriteEn": "the learner's full email rewritten cleanly in professional English"
+  "rewriteEn": "their full email rewritten cleanly in professional English",
+  "improveFocus": {
+    "instructionKa": "1 Georgian sentence telling them which ONE part to rewrite next",
+    "originalSnippet": "the exact phrase from their email to rewrite",
+    "hintKa": "1 short Georgian hint for rewriting it"
+  }
 }
 
-Pick verdict honestly:
-- "strong": clear, professional, minor polish only.
-- "okay": understandable but several real issues with tone/clarity/grammar.
-- "weak": significant problems in clarity, grammar, or professionalism.
-
-STRENGTH keys (use only these): clear_structure, polite_tone, good_greeting, clear_ask, good_closing, concise, specific_detail, good_subject
-
-CATEGORY keys for corrections (use only these): too_casual, too_direct, vague_ask, wrong_tense, missing_article, word_order, preposition, cliche, too_long, unclear_subject, greeting_issue, closing_issue, word_choice, redundant, tone_mismatch, spelling, general
-
-Rules:
-- Provide 2-4 corrections (fewer if the email is genuinely strong).
-- "before" MUST be an exact snippet from the learner's email.
-- Each correction gets exactly ONE categoryKey from the list.
-- Output English only in before/after/rewriteEn/inCharacter. NO Georgian sentences anywhere.`;
-
+Verdict honestly: "strong" = minor polish only; "okay" = understandable but real issues; "weak" = significant problems.
+Provide 2-4 suggestions. Every "before" must be an exact snippet from their email.
+Georgian must be specific to THEIR email — never generic. Use correct, natural Georgian (e.g. "პროფესიონალური" not "პროფესიული").
+English stays in before/after/rewriteEn/inCharacter; explanations (summaryKa, worked, improve, whyKa, hints) in natural Georgian.`;
 
 const SYSTEM_IMPROVE = `You honestly assess whether a learner's targeted rewrite is actually better than the original snippet.
-Be warm and encouraging, but ALWAYS honest. Never falsely praise weak or unchanged attempts.
+The app supplies its own Georgian messages to the user, so you output ONLY a verdict and an optional polished English version — NO Georgian.
 
 Compare userRewrite against:
 - originalSnippet (what they were asked to improve)
 - targetAfter (the suggested direction — for reference only, not a required answer)
-- whyKa (the reason the original needed improvement)
+- whyKa (the reason the original needed improvement, given in Georgian for your understanding)
 
 Choose ONE verdict:
-- "better": genuinely improved — clearer, more professional, better tone, addresses the issue in whyKa.
-- "similar": only superficially changed (synonyms, reordering) without real improvement, OR essentially the same as original.
+- "better": genuinely improved — clearer, more professional, better tone, addresses the issue.
+- "similar": only superficially changed (synonyms, reordering) without real improvement, OR essentially the same.
 - "worse": grammatically broken, less clear, wrong tone, or further from the suggested direction.
 - "empty": userRewrite is empty, whitespace only, or one or two random characters.
 
 Output STRICT JSON only:
 {
   "verdict": "better" | "similar" | "worse" | "empty",
-  "headlineKa": "1 short warm Georgian sentence reflecting the verdict (e.g. 'მართლა გაუმჯობესდა!' or 'ეს ვერსია ცოტა უფრო სუსტია — ვცადოთ ისევ.')",
-  "detailsKa": "1-2 specific Georgian sentences — for 'better' name exactly what improved and why it works; for 'similar' point out what stayed the same; for 'worse' honestly say what made it weaker (grammar, tone, clarity); never harsh.",
-  "tipKa": "1 short Georgian hint focusing on what to try next (concrete, actionable)",
-  "polishedEn": "for 'better' only: a slightly polished version of their rewrite (1-2 sentences). For other verdicts return empty string.",
-  "canRetry": true | false
-}
-canRetry: true when verdict is 'similar' or 'worse' (encourage another try), false when 'better' (move on).`;
+  "polishedEn": "for 'better' only: a slightly polished version of their rewrite (1-2 sentences). For other verdicts return empty string."
+}`;
 
 function sessionPrompt(b: SessionBody) {
   const wantsBonus = b.intensity === "intensive" || b.intensity === "deadline";
@@ -151,7 +142,7 @@ Return JSON exactly in this shape:
   "estimatedMinutes": 10,
   "warmUp": {
     "kind": "spot_mistakes | compare",
-    "promptKa": "1 short Georgian instruction (e.g. 'შენი აზრით რომელია უფრო პროფესიული?' or 'რა არასწორია ამ იმეილში?')",
+    "promptKa": "1 short Georgian instruction (e.g. 'შენი აზრით რომელია უფრო პროფესიონალური?' or 'რა არასწორია ამ იმეილში?')",
     "options": [
       { "label": "A", "text": "short email or sentence in English", "isBetter": true, "issuesKa": ["if spot_mistakes: 1-3 Georgian bullets explaining problems; if compare and this is worse, list weaknesses; if better, leave empty array"] },
       { "label": "B", "text": "short email or sentence in English", "isBetter": false, "issuesKa": ["..."] }
@@ -199,15 +190,14 @@ For "light" intensity: include only 2 structure parts and 2 vocab items.`;
 function feedbackPrompt(b: FeedbackBody) {
   return `Learner level: ${b.level || "business_intermediate"}
 Email type: ${b.emailType}
-Scenario (Georgian, for your understanding only): ${b.scenario}
+Scenario (Georgian): ${b.scenario}
 Recipient role: ${b.recipientRole}
 
 Learner's email:
 """${b.userEmail}"""
 
-Evaluate it and return the JSON exactly as specified. Remember: English and category keys only, no Georgian sentences.`;
+Give specific, warm, expert feedback on THIS email. Return the JSON exactly as specified.`;
 }
-
 
 function improvePrompt(b: ImproveBody) {
   return `Learner level: ${b.level || "business_intermediate"}
@@ -219,18 +209,17 @@ ORIGINAL SNIPPET (what they were asked to improve):
 SUGGESTED DIRECTION (reference only, not required):
 """${b.targetAfter}"""
 
-WHY THE ORIGINAL NEEDED IMPROVING (Georgian):
+WHY THE ORIGINAL NEEDED IMPROVING (Georgian, for your understanding):
 ${b.whyKa}
 
 LEARNER'S REWRITE:
 """${b.userRewrite}"""
 
 Honestly judge whether the rewrite is genuinely better than the ORIGINAL SNIPPET.
-Do NOT default to praise. If it is similar or worse, say so kindly and explain specifically why, then give a concrete hint.
-Return the JSON schema exactly.`;
+Return ONLY the verdict JSON (and polishedEn for 'better'). No Georgian.`;
 }
 
-async function callAI(system: string, user: string) {
+async function callAI(system: string, user: string, model = "gpt-5-mini") {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -238,7 +227,7 @@ async function callAI(system: string, user: string) {
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o",
+      model,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -270,7 +259,7 @@ Deno.serve(async (req) => {
     if (body.action === "session") {
       r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
     } else if (body.action === "feedback") {
-      r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody));
+      r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody), "gpt-5.4");
     } else if (body.action === "improve") {
       r = await callAI(SYSTEM_IMPROVE, improvePrompt(body as unknown as ImproveBody));
     } else {
