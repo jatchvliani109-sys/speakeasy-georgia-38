@@ -57,24 +57,38 @@ Rules:
 - Georgian translations are required where specified.
 - Encouraging, warm, human tone in Georgian intro/explanations.`;
 
-const SYSTEM_FEEDBACK = `You give feedback on a Business English learner's email.
-Two-part response:
-1) "inCharacter": a realistic reply email FROM the recipient role (colleague/client/manager). 2-5 sentences. Natural, contextual, NOT meta. No greetings like "as a colleague".
-2) "feedback": structured feedback in Georgian (encouraging, human, never harsh):
-   - "summaryKa": one warm sentence acknowledging effort
-   - "worked": array of 1-3 short Georgian bullets about what worked well
-   - "improve": array of 2-3 short Georgian bullets on what to refine
-   - "suggestions": array of 2-3 concrete English rewrite suggestions, each with { "before": "...", "after": "...", "whyKa": "..." }
-   - "rewriteEn": full polished version of the user's email in English
-   - "improveFocus": ONE single targeted improvement the learner should rewrite next, with:
-       { "instructionKa": "1 short Georgian sentence telling them what to rewrite",
-         "originalSnippet": "the exact sentence/phrase from their email to rewrite",
-         "hintKa": "1-line Georgian hint" }
-Level guidance:
-- beginner/elementary: gentle, simple Georgian; rewrite uses simple words.
-- intermediate/advanced: more nuanced critique; rewrite uses polished professional tone.
+const SYSTEM_FEEDBACK = `You evaluate a Business English learner's email. The learner is a Georgian speaker, but you must output almost NO Georgian — only English content and category tags. Georgian framing is added later by the app.
 
-Output STRICT JSON only.`;
+Return STRICT JSON only:
+{
+  "verdict": "strong" | "okay" | "weak",
+  "inCharacter": { "subject": "Re: ...", "body": "A realistic 2-5 sentence reply FROM the recipient role, in natural English. No meta, no 'as a colleague'." },
+  "strengthKeys": ["1-3 keys from the STRENGTH list below describing what the learner did well"],
+  "corrections": [
+    {
+      "before": "exact phrase from the learner's email (English)",
+      "after": "improved English version of that phrase",
+      "categoryKey": "ONE key from the CATEGORY list below"
+    }
+  ],
+  "rewriteEn": "the learner's full email rewritten cleanly in professional English"
+}
+
+Pick verdict honestly:
+- "strong": clear, professional, minor polish only.
+- "okay": understandable but several real issues with tone/clarity/grammar.
+- "weak": significant problems in clarity, grammar, or professionalism.
+
+STRENGTH keys (use only these): clear_structure, polite_tone, good_greeting, clear_ask, good_closing, concise, specific_detail, good_subject
+
+CATEGORY keys for corrections (use only these): too_casual, too_direct, vague_ask, wrong_tense, missing_article, word_order, preposition, cliche, too_long, unclear_subject, greeting_issue, closing_issue, word_choice, redundant, tone_mismatch, spelling, general
+
+Rules:
+- Provide 2-4 corrections (fewer if the email is genuinely strong).
+- "before" MUST be an exact snippet from the learner's email.
+- Each correction gets exactly ONE categoryKey from the list.
+- Output English only in before/after/rewriteEn/inCharacter. NO Georgian sentences anywhere.`;
+
 
 const SYSTEM_IMPROVE = `You honestly assess whether a learner's targeted rewrite is actually better than the original snippet.
 Be warm and encouraging, but ALWAYS honest. Never falsely praise weak or unchanged attempts.
@@ -185,25 +199,15 @@ For "light" intensity: include only 2 structure parts and 2 vocab items.`;
 function feedbackPrompt(b: FeedbackBody) {
   return `Learner level: ${b.level || "business_intermediate"}
 Email type: ${b.emailType}
-Scenario (Georgian): ${b.scenario}
+Scenario (Georgian, for your understanding only): ${b.scenario}
 Recipient role: ${b.recipientRole}
 
 Learner's email:
 """${b.userEmail}"""
 
-Return JSON:
-{
-  "inCharacter": { "subject": "Re: ...", "body": "..." },
-  "feedback": {
-    "summaryKa": "...",
-    "worked": ["..."],
-    "improve": ["..."],
-    "suggestions": [{ "before": "...", "after": "...", "whyKa": "..." }],
-    "rewriteEn": "...",
-    "improveFocus": { "instructionKa": "...", "originalSnippet": "...", "hintKa": "..." }
-  }
-}`;
+Evaluate it and return the JSON exactly as specified. Remember: English and category keys only, no Georgian sentences.`;
 }
+
 
 function improvePrompt(b: ImproveBody) {
   return `Learner level: ${b.level || "business_intermediate"}
