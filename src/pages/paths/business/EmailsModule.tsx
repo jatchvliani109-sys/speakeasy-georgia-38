@@ -11,6 +11,7 @@ import {
   pullBusinessFromSupabase,
 } from "./lib/state";
 import { emailStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
+import { getEmailLesson, type Level } from "./lib/emailLessons";
 
 type Example = { en: string; ka: string; noteKa?: string };
 type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
@@ -157,32 +158,53 @@ export default function EmailsModule() {
         const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
         setPreviouslyLearned(prev);
 
-        const plan = cur.plan;
-        const { data, error } = await supabase.functions.invoke("business-emails", {
-          body: {
-            action: "session",
-            level: plan?.level || cur.level || "business_intermediate",
-            intensity: plan?.intensity || cur.intensity || "standard",
-            fields: (plan?.fields || cur.field || []).map((f) => FIELD_LABELS[f as keyof typeof FIELD_LABELS] || String(f)),
-            goals: (plan?.mainGoals || cur.mainPriority || []).map(
-              (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
-            ),
-            recentEmailTypes,
-            recentScenarios,
-            curriculumTopicKey: curStep.key,
-            curriculumTopicTitleKa: curStep.titleKa,
-            curriculumGuidance: curStep.guidanceEn,
-            curriculumStep: curStep.step,
-            curriculumTotal: curStep.total,
-            curriculumCycle: curStep.cycle,
-            previouslyLearned: prev,
-          },
-        });
+            const plan = cur.plan;
+        const level = (plan?.level || cur.level || "business_intermediate") as Level;
+
+        // Try pre-made lesson first (free, perfect Georgian). Falls back to AI
+        // generation for topics not yet written.
+        const premade = getEmailLesson(curStep.key, level);
+
+        let s: SessionData;
+        if (premade) {
+          // Pre-made lesson — attach a unique scenarioKey + tomorrowTease so the
+          // rest of the module (which expects those) keeps working unchanged.
+          s = {
+            ...premade,
+            scenarioKey: `${premade.emailType}-${level}-c${curStep.cycle}`,
+            tomorrowTeaseKa: "ხვალ შემდეგ თემაზე გადავალთ და კიდევ უფრო დავიხვეწებით.",
+            bonusScenario: null,
+          } as unknown as SessionData;
+        } else {
+          const { data, error } = await supabase.functions.invoke("business-emails", {
+            body: {
+              action: "session",
+              level,
+              intensity: plan?.intensity || cur.intensity || "standard",
+              fields: (plan?.fields || cur.field || []).map((f) => FIELD_LABELS[f as keyof typeof FIELD_LABELS] || String(f)),
+              goals: (plan?.mainGoals || cur.mainPriority || []).map(
+                (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
+              ),
+              recentEmailTypes,
+              recentScenarios,
+              curriculumTopicKey: curStep.key,
+              curriculumTopicTitleKa: curStep.titleKa,
+              curriculumGuidance: curStep.guidanceEn,
+              curriculumStep: curStep.step,
+              curriculumTotal: curStep.total,
+              curriculumCycle: curStep.cycle,
+              previouslyLearned: prev,
+            },
+          });
+          if (cancelled) return;
+          if (error) throw error;
+          s = data as SessionData;
+        }
+
         if (cancelled) return;
-        if (error) throw error;
-        const s = data as SessionData;
         if (!s?.emailType) throw new Error("Invalid session");
         setSession(s);
+
 
         const { data: inserted, error: insErr } = await supabase
           .from("business_email_sessions")
