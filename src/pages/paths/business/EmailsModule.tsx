@@ -12,6 +12,8 @@ import {
 } from "./lib/state";
 import { emailStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 import { getEmailLesson, type Level } from "./lib/emailLessons";
+import { verdictSummary, strengthMessage, correctionFor, improveHeadline, improveTip, type Verdict, type ImproveVerdict } from "./lib/feedbackMessages";
+
 
 type Example = { en: string; ka: string; noteKa?: string };
 type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
@@ -248,10 +250,42 @@ export default function EmailsModule() {
           userEmail: userEmail.trim(),
         },
       });
-      if (error) throw error;
-      const fb = data as Feedback;
-      if (!fb?.feedback) throw new Error("Invalid feedback");
+            if (error) throw error;
+      const raw = data as any;
+      if (!raw?.corrections && !raw?.feedback) throw new Error("Invalid feedback");
+
+      // New compact AI shape (verdict + English corrections + category tags).
+      // We stitch in our pre-written correct Georgian here.
+      const verdict: Verdict = (raw.verdict as Verdict) || "okay";
+      const corrections = Array.isArray(raw.corrections) ? raw.corrections : [];
+      const strengthKeys = Array.isArray(raw.strengthKeys) ? raw.strengthKeys : [];
+
+      const fb: Feedback = {
+        inCharacter: {
+          subject: raw.inCharacter?.subject || "Re:",
+          body: raw.inCharacter?.body || "",
+        },
+        feedback: {
+          summaryKa: verdictSummary(verdict),
+          worked: strengthKeys.map((k: string) => strengthMessage(k)),
+          improve: corrections.map((c: any) => correctionFor(c.categoryKey).labelKa),
+          suggestions: corrections.map((c: any) => ({
+            before: c.before || "",
+            after: c.after || "",
+            whyKa: correctionFor(c.categoryKey).whyKa,
+          })),
+          rewriteEn: raw.rewriteEn || "",
+          improveFocus: corrections[0]
+            ? {
+                instructionKa: "გადაწერე ეს ნაწილი უკეთეს ვერსიად:",
+                originalSnippet: corrections[0].before || "",
+                hintKa: correctionFor(corrections[0].categoryKey).whyKa,
+              }
+            : undefined,
+        },
+      };
       setFeedback(fb);
+
       // seed improve text with the snippet they need to rewrite
       const snip = fb.feedback.improveFocus?.originalSnippet || fb.feedback.suggestions?.[0]?.before || "";
       setImproveText(snip);
@@ -295,8 +329,18 @@ export default function EmailsModule() {
           userRewrite: improveText.trim(),
         },
       });
-      if (error) throw error;
-      setImproveAck(data as ImproveAck);
+          if (error) throw error;
+      const raw = data as any;
+      const v = (raw?.verdict as ImproveVerdict) || "similar";
+      setImproveAck({
+        verdict: v,
+        headlineKa: improveHeadline(v),
+        detailsKa: "",
+        tipKa: improveTip(v),
+        polishedEn: raw?.polishedEn || "",
+        canRetry: v === "similar" || v === "worse",
+      });
+
     } catch (e: any) {
       setError(e?.message || "ვერ მოვიდა პასუხი. სცადე ისევ.");
     } finally {
