@@ -259,8 +259,11 @@ Deno.serve(async (req) => {
     if (body.action === "session") {
       r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
     } else if (body.action === "feedback") {
+      // First feedback is the key teaching moment — use the higher-quality model
+      // for genuinely good, specific Georgian.
       r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody), "gpt-5.4");
     } else if (body.action === "improve") {
+      // Retry loop — cheap model, English-only output, Georgian supplied by the app.
       r = await callAI(SYSTEM_IMPROVE, improvePrompt(body as unknown as ImproveBody));
     } else {
       return new Response(JSON.stringify({ error: "unknown action" }), {

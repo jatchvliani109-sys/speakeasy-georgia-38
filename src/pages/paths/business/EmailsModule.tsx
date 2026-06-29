@@ -12,8 +12,7 @@ import {
 } from "./lib/state";
 import { emailStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 import { getEmailLesson, type Level } from "./lib/emailLessons";
-import { verdictSummary, strengthMessage, correctionFor, improveHeadline, improveTip, type Verdict, type ImproveVerdict } from "./lib/feedbackMessages";
-
+import { improveHeadline, improveTip, type ImproveVerdict } from "./lib/feedbackMessages";
 
 type Example = { en: string; ka: string; noteKa?: string };
 type StructurePart = { partKa: string; purposeKa: string; exampleEn: string };
@@ -68,7 +67,6 @@ type Feedback = {
   };
 };
 
-type ImproveVerdict = "better" | "similar" | "worse" | "empty";
 type ImproveAck = {
   verdict: ImproveVerdict;
   headlineKa: string;
@@ -160,7 +158,7 @@ export default function EmailsModule() {
         const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
         setPreviouslyLearned(prev);
 
-            const plan = cur.plan;
+        const plan = cur.plan;
         const level = (plan?.level || cur.level || "business_intermediate") as Level;
 
         // Try pre-made lesson first (free, perfect Georgian). Falls back to AI
@@ -169,8 +167,6 @@ export default function EmailsModule() {
 
         let s: SessionData;
         if (premade) {
-          // Pre-made lesson — attach a unique scenarioKey + tomorrowTease so the
-          // rest of the module (which expects those) keeps working unchanged.
           s = {
             ...premade,
             scenarioKey: `${premade.emailType}-${level}-c${curStep.cycle}`,
@@ -206,7 +202,6 @@ export default function EmailsModule() {
         if (cancelled) return;
         if (!s?.emailType) throw new Error("Invalid session");
         setSession(s);
-
 
         const { data: inserted, error: insErr } = await supabase
           .from("business_email_sessions")
@@ -250,42 +245,10 @@ export default function EmailsModule() {
           userEmail: userEmail.trim(),
         },
       });
-            if (error) throw error;
-      const raw = data as any;
-      if (!raw?.corrections && !raw?.feedback) throw new Error("Invalid feedback");
-
-      // New compact AI shape (verdict + English corrections + category tags).
-      // We stitch in our pre-written correct Georgian here.
-      const verdict: Verdict = (raw.verdict as Verdict) || "okay";
-      const corrections = Array.isArray(raw.corrections) ? raw.corrections : [];
-      const strengthKeys = Array.isArray(raw.strengthKeys) ? raw.strengthKeys : [];
-
-      const fb: Feedback = {
-        inCharacter: {
-          subject: raw.inCharacter?.subject || "Re:",
-          body: raw.inCharacter?.body || "",
-        },
-        feedback: {
-          summaryKa: verdictSummary(verdict),
-          worked: strengthKeys.map((k: string) => strengthMessage(k)),
-          improve: corrections.map((c: any) => correctionFor(c.categoryKey).labelKa),
-          suggestions: corrections.map((c: any) => ({
-            before: c.before || "",
-            after: c.after || "",
-            whyKa: correctionFor(c.categoryKey).whyKa,
-          })),
-          rewriteEn: raw.rewriteEn || "",
-          improveFocus: corrections[0]
-            ? {
-                instructionKa: "გადაწერე ეს ნაწილი უკეთეს ვერსიად:",
-                originalSnippet: corrections[0].before || "",
-                hintKa: correctionFor(corrections[0].categoryKey).whyKa,
-              }
-            : undefined,
-        },
-      };
+      if (error) throw error;
+      const fb = data as Feedback;
+      if (!fb?.feedback) throw new Error("Invalid feedback");
       setFeedback(fb);
-
       // seed improve text with the snippet they need to rewrite
       const snip = fb.feedback.improveFocus?.originalSnippet || fb.feedback.suggestions?.[0]?.before || "";
       setImproveText(snip);
@@ -329,18 +292,17 @@ export default function EmailsModule() {
           userRewrite: improveText.trim(),
         },
       });
-          if (error) throw error;
-      const raw = data as any;
-      const v = (raw?.verdict as ImproveVerdict) || "similar";
+      if (error) throw error;
+      // AI returns only verdict (+ polishedEn). We supply all Georgian.
+      const v = ((data as any)?.verdict as ImproveVerdict) || "similar";
       setImproveAck({
         verdict: v,
         headlineKa: improveHeadline(v),
         detailsKa: "",
         tipKa: improveTip(v),
-        polishedEn: raw?.polishedEn || "",
+        polishedEn: (data as any)?.polishedEn || "",
         canRetry: v === "similar" || v === "worse",
       });
-
     } catch (e: any) {
       setError(e?.message || "ვერ მოვიდა პასუხი. სცადე ისევ.");
     } finally {
@@ -676,7 +638,17 @@ export default function EmailsModule() {
       {step === "improve" && feedback && (
         <BizCard className="border-l-4 border-l-[#1C1C1E]">
           <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">გავაუმჯობესოთ ერთი ნაწილი</p>
-          <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">
+
+          {/* Reminder of what they're writing — in case they forgot the scenario */}
+          <div className="mt-2 p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">გახსოვდეს — რას წერ</p>
+            <p className="ka text-xs text-[#5C1A2E] mt-1 leading-relaxed">{session.practice.scenarioKa}</p>
+            <p className="ka text-[11px] text-[#4A4A4A] mt-1">
+              მიმღები: <span className="text-[#5C1A2E]">{session.practice.recipientRole}</span>
+            </p>
+          </div>
+
+          <p className="ka text-sm font-semibold text-[#5C1A2E] mt-3">
             {feedback.feedback.improveFocus?.instructionKa || "გადაწერე ეს ნაწილი უკეთეს ვერსიად:"}
           </p>
           {(feedback.feedback.improveFocus?.originalSnippet || feedback.feedback.suggestions?.[0]?.before) && (
@@ -708,7 +680,7 @@ export default function EmailsModule() {
                     ✍️ შეასწორე ეს ნაწილი და დაწერე გაუმჯობესებული ვერსია
                   </label>
                   <p className="ka text-xs text-[#4A4A4A] mt-1">
-                    გადაწერე ზემოთ მოცემული ფრაზა შენი სიტყვებით — გავხადოთ უფრო ნათელი და პროფესიული.
+                    გადაწერე ზემოთ მოცემული ფრაზა შენი სიტყვებით — გავხადოთ უფრო ნათელი და პროფესიონალური.
                   </p>
                   <textarea
                     id="improve-input"
@@ -732,9 +704,6 @@ export default function EmailsModule() {
                     <p className={`ka text-sm font-semibold ${tone.text}`}>
                       {tone.icon} {improveAck.headlineKa}
                     </p>
-                    {improveAck.detailsKa && (
-                      <p className={`ka text-sm ${tone.text} mt-1 opacity-90`}>{improveAck.detailsKa}</p>
-                    )}
                     {improveAck.polishedEn && v === "better" && (
                       <p className="text-sm text-[#5C1A2E] mt-2 italic">"{improveAck.polishedEn}"</p>
                     )}
@@ -751,8 +720,11 @@ export default function EmailsModule() {
                     nextLabel={hasBonus ? "დამატებითი სცენარი →" : "დღევანდელი ფრაზები →"}
                   />
                 ) : (
-                  <div className="mt-5">
+                  <div className="mt-5 flex items-center justify-between">
                     <BizButton variant="ghost" onClick={() => setStep("feedback")}>← უკან</BizButton>
+                    <BizButton variant="outline" onClick={() => setStep(hasBonus ? "bonus" : "vocab")}>
+                      გამოტოვება →
+                    </BizButton>
                   </div>
                 )}
               </>
