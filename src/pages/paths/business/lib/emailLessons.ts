@@ -604,13 +604,533 @@ const introduction: Record<Level, EmailLesson> = {
 };
 
 // ============================================================
+// TOPIC 2: FOLLOW-UP (Follow-up წერილი)
+// ============================================================
+
+const followUp: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "follow_up",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით მარტივი follow-up წერილის დაწერას — თავაზიანად შევახსენოთ წინა იმეილი ან შეხვედრა.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი follow-up არის უფრო თავაზიანი?",
+      options: [
+        {
+          label: "A",
+          text: "Hello, I am just following up on my last email. Thank you.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Why did you not answer my email???",
+          isBetter: false,
+          issuesKa: [
+            "ტონი ბრაზიანი და უხეშია.",
+            "სამი კითხვის ნიშანი აგრესიულად ჟღერს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "Follow-up ყოველთვის თავაზიანი უნდა იყოს. 'just following up' რბილი და პროფესიონალური გზაა შესახსენებლად.",
+    },
+    learn: {
+      titleKa: "მარტივი follow-up სამ ნაბიჯში",
+      explanationKa:
+        "Follow-up წერილი თავაზიანად ახსენებს ხალხს წინა იმეილს ან თხოვნას. იყავი მოკლე და მეგობრული.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "დაიწყე თბილად.",
+          exampleEn: "Hello,",
+        },
+        {
+          partKa: "შეხსენება",
+          purposeKa: "ახსენე წინა იმეილი.",
+          exampleEn: "I am following up on my last email.",
+        },
+        {
+          partKa: "თავაზიანი თხოვნა",
+          purposeKa: "სთხოვე პასუხი მშვიდად.",
+          exampleEn: "Please let me know. Thank you.",
+        },
+      ],
+      examples: [
+        {
+          en: "I am following up on my email.",
+          ka: "ვამოწმებ ჩემს იმეილს.",
+          noteKa: "მარტივი გზა შესახსენებლად.",
+        },
+        {
+          en: "Did you have time to look at it?",
+          ka: "მოასწარით მისი ნახვა?",
+        },
+        {
+          en: "Thank you for your time.",
+          ka: "გმადლობთ თქვენი დროისთვის.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინომ კვირის წინ იმეილი გააგზავნა. პასუხი არ მიუღია. ის თავაზიანად ამოწმებს.",
+      subject: "Following up",
+      body: "Hello,\n\nI am following up on my last email from last week. Did you have time to look at it?\n\nPlease let me know. Thank you.\n\nBest,\nNino",
+      annotationsKa: [
+        "ნინო თავაზიანად ახსენებს, არ ბრაზობს.",
+        "მოკლე და მკაფიო კითხვა სვამს.",
+        "მადლობით ამთავრებს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ კოლეგას იმეილი გაუგზავნე რამდენიმე დღის წინ, მაგრამ პასუხი ჯერ არ მიგიღია. დაწერე მოკლე, თავაზიანი follow-up წერილი და სთხოვე პასუხი.",
+      recipientRole: "a colleague",
+      promptKa: "დაწერე 3-4 მოკლე წინადადება. იყავი თავაზიანი და მშვიდი.",
+      hintsKa: [
+        "გამოიყენე 'I am following up on...'.",
+        "სთხოვე თავაზიანად — 'Please let me know'.",
+        "დაამატე 'Thank you' ბოლოს.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "follow up",
+        ka: "გადამოწმება / შეხსენება",
+        exampleEn: "I am following up on my email.",
+        exampleKa: "ვამოწმებ ჩემს იმეილს.",
+      },
+      {
+        en: "reply",
+        ka: "პასუხი",
+        exampleEn: "Please reply when you can.",
+        exampleKa: "გთხოვ უპასუხე, როცა შეგიძლია.",
+      },
+      {
+        en: "remind",
+        ka: "შეხსენება",
+        exampleEn: "I want to remind you about the meeting.",
+        exampleKa: "მინდა შეგახსენო შეხვედრის შესახებ.",
+      },
+    ],
+    readAloudPhrases: [
+      "I am following up on my last email.",
+      "Did you have time to look at it?",
+      "Please let me know.",
+      "Thank you for your time.",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "follow_up",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით follow-up წერილს, რომელიც ახსენებს კონტექსტს და სთავაზობს მკაფიო შემდეგ ნაბიჯს.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი follow-up არის უფრო ეფექტური?",
+      options: [
+        {
+          label: "A",
+          text: "Hi, just following up on the proposal I sent on Monday. Would Thursday work for a quick call?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi, any news?",
+          isBetter: false,
+          issuesKa: [
+            "ძალიან ბუნდოვანია — არ ახსენებს რაზეა საუბარი.",
+            "არ სთავაზობს კონკრეტულ შემდეგ ნაბიჯს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი follow-up ახსენებს კონტექსტს ('the proposal I sent on Monday') და სთავაზობს კონკრეტიკას ('Thursday for a call').",
+    },
+    learn: {
+      titleKa: "Follow-up კონტექსტითა და შემდეგი ნაბიჯით",
+      explanationKa:
+        "ძლიერი follow-up ახსენებს ზუსტად რაზე წერ (კონტექსტი), თავაზიანად ამოწმებს და სთავაზობს მკაფიო შემდეგ ნაბიჯს — მაგ. ზარს ან ვადას.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "თბილი დასაწყისი.",
+          exampleEn: "Hi Mariam,",
+        },
+        {
+          partKa: "კონტექსტი",
+          purposeKa: "ახსენე რას ეხება.",
+          exampleEn: "I'm following up on the proposal I sent on Monday.",
+        },
+        {
+          partKa: "თავაზიანი შემოწმება",
+          purposeKa: "ჰკითხე სტატუსი.",
+          exampleEn: "I wanted to check if you had any questions.",
+        },
+        {
+          partKa: "მკაფიო შემდეგი ნაბიჯი",
+          purposeKa: "შესთავაზე კონკრეტული მოქმედება.",
+          exampleEn: "Would Thursday work for a quick call?",
+        },
+      ],
+      examples: [
+        {
+          en: "I'm following up on the proposal I sent on Monday.",
+          ka: "ვამოწმებ წინადადებას, რომელიც ორშაბათს გამოგიგზავნე.",
+          noteKa: "კონტექსტი ეხმარება მკითხველს გაიხსენოს.",
+        },
+        {
+          en: "I wanted to check if you had any questions.",
+          ka: "მინდოდა გადამემოწმებინა, თუ გქონდათ შეკითხვები.",
+        },
+        {
+          en: "Would Thursday work for a quick call?",
+          ka: "ხუთშაბათი მოგწონთ მოკლე ზარისთვის?",
+          noteKa: "კონკრეტული შემდეგი ნაბიჯი.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითმა წინადადება გაუგზავნა კლიენტს ორშაბათს. სამი დღე გავიდა. ის თავაზიანად ამოწმებს.",
+      subject: "Following up on Monday's proposal",
+      body: "Hi Mariam,\n\nI'm following up on the proposal I sent on Monday. I wanted to check if you had any questions or needed more details.\n\nWould Thursday work for a quick 15-minute call to discuss it?\n\nThanks,\nDavit",
+      annotationsKa: [
+        "subject line ახსენებს ზუსტად რას ეხება.",
+        "დავითი ახსენებს კონტექსტს და სთავაზობს დახმარებას.",
+        "სთავაზობს კონკრეტულ შემდეგ ნაბიჯს — ხუთშაბათის ზარს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ კლიენტს ან კოლეგას რამდენიმე დღის წინ გაუგზავნე მნიშვნელოვანი იმეილი (წინადადება, დოკუმენტი ან თხოვნა). პასუხი არ მიგიღია. დაწერე follow-up: ახსენე კონტექსტი, თავაზიანად შეამოწმე და შესთავაზე შემდეგი ნაბიჯი.",
+      recipientRole: "a client",
+      promptKa: "დაწერე 4-6 წინადადება. ახსენე კონტექსტი და შესთავაზე კონკრეტული შემდეგი ნაბიჯი.",
+      hintsKa: [
+        "ახსენე ზუსტად რას ეხება — 'the proposal I sent on Monday'.",
+        "თავაზიანად შეამოწმე — 'I wanted to check...'.",
+        "შესთავაზე შემდეგი ნაბიჯი — ზარი ან ვადა.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "proposal",
+        ka: "წინადადება",
+        exampleEn: "I'm following up on the proposal.",
+        exampleKa: "ვამოწმებ წინადადებას.",
+      },
+      {
+        en: "check",
+        ka: "შემოწმება",
+        exampleEn: "I wanted to check if you had questions.",
+        exampleKa: "მინდოდა შემემოწმებინა, თუ გქონდათ შეკითხვები.",
+      },
+      {
+        en: "details",
+        ka: "დეტალები",
+        exampleEn: "Let me know if you need more details.",
+        exampleKa: "მაცნობეთ, თუ მეტი დეტალი გჭირდებათ.",
+      },
+      {
+        en: "discuss",
+        ka: "განხილვა",
+        exampleEn: "Let's discuss it on a call.",
+        exampleKa: "მოდი ზარზე განვიხილოთ.",
+      },
+    ],
+    readAloudPhrases: [
+      "I'm following up on the proposal I sent on Monday.",
+      "I wanted to check if you had any questions.",
+      "Would Thursday work for a quick fifteen-minute call?",
+      "Let me know if you need more details.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "follow_up",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ follow-up-ს, რომელიც თავაზიანად დაჟინებულია — ახსენებს ღირებულებას და ინარჩუნებს მომენტუმს.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს follow-up სუსტია — რა აკლია?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Tom,\n\nFollowing up on our conversation last Tuesday about the Q3 campaign. You mentioned the timeline was your main concern, so I've put together a revised schedule that should address it.\n\nCould we find 20 minutes this week to walk through it?\n\nBest,\nElene",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Tom,\n\nJust checking in again. Still waiting to hear back from you. Please respond when you get a chance.\n\nThanks,\nElene",
+          isBetter: false,
+          issuesKa: [
+            "არ ახსენებს კონკრეტულ კონტექსტს — რაზე იყო საუბარი.",
+            "არ მოაქვს ახალი ღირებულება — უბრალოდ პასუხს ითხოვს.",
+            "'still waiting' ოდნავ უკმაყოფილოდ ჟღერს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "ძლიერი follow-up მოაქვს ახალ ღირებულებას — A ახსენებს კონკრეტულ საზრუნავს (timeline) და სთავაზობს გადაწყვეტას, არა მხოლოდ შეხსენებას.",
+    },
+    learn: {
+      titleKa: "Follow-up, რომელიც ღირებულებას მატებს",
+      explanationKa:
+        "კარგი პროფესიონალური follow-up არ არის უბრალო შეხსენება — ის ამატებს ღირებულებას. ახსენე კონკრეტული კონტექსტი, მიაბი ის მათ საზრუნავს ან ინტერესს, და შესთავაზე მკაფიო, მცირე შემდეგი ნაბიჯი. ეს ინარჩუნებს მომენტუმს ზეწოლის გარეშე.",
+      structure: [
+        {
+          partKa: "კონტექსტის შეხსენება",
+          purposeKa: "ზუსტად ახსენე რას ეხება.",
+          exampleEn: "Following up on our conversation last Tuesday about the Q3 campaign.",
+        },
+        {
+          partKa: "ღირებულების დამატება",
+          purposeKa: "მიაბი მათ საზრუნავს.",
+          exampleEn: "You mentioned the timeline was your concern, so I've revised the schedule.",
+        },
+        {
+          partKa: "მცირე, მკაფიო ნაბიჯი",
+          purposeKa: "გააადვილე დათანხმება.",
+          exampleEn: "Could we find 20 minutes this week to walk through it?",
+        },
+        {
+          partKa: "თავდაჯერებული დასასრული",
+          purposeKa: "დაასრულე პროფესიონალურად.",
+          exampleEn: "Best, Elene",
+        },
+      ],
+      examples: [
+        {
+          en: "You mentioned the timeline was your main concern.",
+          ka: "თქვენ აღნიშნეთ, რომ ვადები იყო თქვენი მთავარი საზრუნავი.",
+          noteKa: "მათი სიტყვების ხსენება აჩვენებს, რომ უსმენდი.",
+        },
+        {
+          en: "I've put together a revised schedule that should address it.",
+          ka: "მოვამზადე გადახედილი გრაფიკი, რომელიც ამას მოაგვარებს.",
+          noteKa: "ღირებულების დამატება — არა მხოლოდ შეხსენება.",
+        },
+        {
+          en: "Could we find 20 minutes this week to walk through it?",
+          ka: "შეგვიძლია ამ კვირაში 20 წუთი მოვძებნოთ მის განსახილველად?",
+          noteKa: "მცირე, კონკრეტული ნაბიჯი — ადვილი დასათანხმებელი.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ელენემ კოლეგას ერთი კვირის წინ ესაუბრა Q3 კამპანიაზე. პასუხი არ მიუღია, ამიტომ ის გზავნის follow-up-ს, რომელშიც ახალ გადაწყვეტას სთავაზობს.",
+      subject: "Revised timeline for the Q3 campaign",
+      body: "Hi Tom,\n\nFollowing up on our conversation last Tuesday about the Q3 campaign. You mentioned the timeline was your main concern, so I've put together a revised schedule that pulls the launch forward by a week without overloading the team.\n\nCould we find 20 minutes this week to walk through it? I'm happy to work around your calendar.\n\nBest,\nElene",
+      annotationsKa: [
+        "subject line მაშინვე აჩვენებს ახალ ღირებულებას — 'revised timeline'.",
+        "ახსენებს კონკრეტულ საუბარს და მათ ნათქვამ საზრუნავს.",
+        "მოაქვს გადაწყვეტა და სთავაზობს მცირე, მოქნილ შემდეგ ნაბიჯს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ ერთი კვირის წინ ესაუბრე ან მიწერე ვინმეს მნიშვნელოვან საკითხზე (პროექტი, წინადადება, თანამშრომლობა) და პასუხი არ მიგიღია. დაწერე follow-up, რომელიც ახსენებს კონტექსტს, ამატებს ღირებულებას (ახალი ინფორმაცია ან გადაწყვეტა) და სთავაზობს მცირე შემდეგ ნაბიჯს.",
+      recipientRole: "a colleague or client",
+      promptKa: "დაწერე 5-7 წინადადება. დაამატე ღირებულება — არა მხოლოდ შეხსენება.",
+      hintsKa: [
+        "ახსენე კონკრეტული საუბარი ან იმეილი.",
+        "მიაბი ის მათ საზრუნავს ან ინტერესს.",
+        "შესთავაზე მცირე, ადვილად დასათანხმებელი ნაბიჯი.",
+        "მოერიდე 'still waiting' ტიპის უკმაყოფილო ტონს.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "concern",
+        ka: "საზრუნავი / შეშფოთება",
+        exampleEn: "You mentioned the timeline was your concern.",
+        exampleKa: "თქვენ აღნიშნეთ, რომ ვადები იყო თქვენი საზრუნავი.",
+      },
+      {
+        en: "revised",
+        ka: "გადახედილი / შესწორებული",
+        exampleEn: "Here is the revised schedule.",
+        exampleKa: "აი გადახედილი გრაფიკი.",
+      },
+      {
+        en: "address",
+        ka: "მოგვარება / პასუხის გაცემა",
+        exampleEn: "This should address your concern.",
+        exampleKa: "ეს თქვენს საზრუნავს მოაგვარებს.",
+      },
+      {
+        en: "walk through",
+        ka: "დეტალურად განხილვა",
+        exampleEn: "Let's walk through it together.",
+        exampleKa: "მოდი ერთად დეტალურად განვიხილოთ.",
+      },
+      {
+        en: "work around",
+        ka: "მორგება",
+        exampleEn: "I'm happy to work around your calendar.",
+        exampleKa: "სიამოვნებით მოვერგები თქვენს გრაფიკს.",
+      },
+    ],
+    readAloudPhrases: [
+      "Following up on our conversation last Tuesday about the Q3 campaign.",
+      "You mentioned the timeline was your main concern.",
+      "I've put together a revised schedule that should address it.",
+      "Could we find twenty minutes this week to walk through it?",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "follow_up",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ follow-up-ს, რომელიც ინარჩუნებს მომენტუმს, კითხავს სიჩუმეს დაუშვებლად და სტრატეგიულად ხსნის გზას წინ.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს follow-up კარგია, მაგრამ რა შეიძლება უფრო სტრატეგიული გავხადოთ?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Sarah,\n\nI know things get busy, so I'll keep this brief. We're still keen to move forward on the partnership, but I also don't want to keep something on your plate if priorities have shifted.\n\nIf it's still of interest, I'm happy to send a short scope to make the next step easy. If the timing isn't right, just let me know and I'll follow up next quarter.\n\nBest,\nGiorgi",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Sarah,\n\nI've emailed a few times now about the partnership and haven't heard back. I'd really appreciate a response so I know where we stand.\n\nBest,\nGiorgi",
+          isBetter: false,
+          issuesKa: [
+            "ხაზს უსვამს საკუთარ იმედგაცრუებას ('emailed a few times').",
+            "აყენებს მათ თავდაცვით პოზიციაში, ნაცვლად გზის გახსნისა.",
+            "არ სთავაზობს მარტივ გამოსავალს ან გრაცეფულ alternative-ს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "მაღალი დონის follow-up აძლევს მიმღებს ღირსეულ გამოსავალს. A სთავაზობს ორ მკაფიო გზას ('still interested' ან 'not the right time') და ხსნის ზეწოლას, რაც პასუხის ალბათობას ზრდის.",
+    },
+    learn: {
+      titleKa: "სტრატეგიული follow-up: მომენტუმი ზეწოლის გარეშე",
+      explanationKa:
+        "მაღალ დონეზე follow-up დახვეწილი ბალანსია — ინარჩუნებ მომენტუმს, მაგრამ არ ახდენ ზეწოლას. საუკეთესო ტექნიკაა მიეცი მიმღებს ღირსეული გამოსავალი: გახსენი ორი გზა (კვლავ დაინტერესება ან თავაზიანი გადადება), რათა პასუხის გაცემა ადვილი გახდეს. სიჩუმე ხშირად ნიშნავს დაკავებულობას, არა უარს — ენა შესაბამისად მოარგე.",
+      structure: [
+        {
+          partKa: "მოკლე, თავდაჯერებული გახსნა",
+          purposeKa: "აჩვენე პატივისცემა მათი დროისადმი.",
+          exampleEn: "I know things get busy, so I'll keep this brief.",
+        },
+        {
+          partKa: "ინტერესის დადასტურება + ზეწოლის მოხსნა",
+          purposeKa: "აჩვენე მოქნილობა.",
+          exampleEn: "We're still keen to move forward, but I don't want to keep something on your plate if priorities have shifted.",
+        },
+        {
+          partKa: "ორი ღირსეული გზა",
+          purposeKa: "გააადვილე ნებისმიერი პასუხი.",
+          exampleEn: "If it's still of interest, I'll send a short scope. If not, just let me know.",
+        },
+        {
+          partKa: "მსუბუქი დასასრული",
+          purposeKa: "დატოვე კარი ღია.",
+          exampleEn: "Either way, I'll follow up next quarter.",
+        },
+      ],
+      examples: [
+        {
+          en: "I'll keep this brief.",
+          ka: "მოკლედ ვიქნები.",
+          noteKa: "პატივისცემა მათი დროისადმი — აყალიბებს კარგ ტონს.",
+        },
+        {
+          en: "I don't want to keep something on your plate if priorities have shifted.",
+          ka: "არ მინდა რამე დაგრჩეთ გასაკეთებელი, თუ პრიორიტეტები შეიცვალა.",
+          noteKa: "ზეწოლის მოხსნა — აძლევს მათ თავისუფლებას.",
+        },
+        {
+          en: "If the timing isn't right, just let me know.",
+          ka: "თუ დრო არ არის შესაფერისი, უბრალოდ მაცნობეთ.",
+          noteKa: "ღირსეული გამოსავალი — პასუხი ადვილი ხდება.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "გიორგიმ რამდენჯერმე მისწერა პოტენციურ პარტნიორს, მაგრამ პასუხი არ მიუღია. ის გზავნის სტრატეგიულ follow-up-ს, რომელიც ინარჩუნებს ურთიერთობას ზეწოლის გარეშე.",
+      subject: "Quick check on the partnership — no pressure",
+      body: "Hi Sarah,\n\nI know things get busy, so I'll keep this brief. We're still genuinely keen to move forward on the partnership, but I also don't want to keep something on your plate if priorities have shifted on your end.\n\nIf it's still of interest, I'm happy to send over a short one-page scope so the next step is easy to say yes to. If the timing isn't right just now, no problem at all — let me know and I'll check back next quarter.\n\nEither way, thanks for considering it.\n\nBest,\nGiorgi",
+      annotationsKa: [
+        "subject line თავადვე ხსნის ზეწოლას — 'no pressure'.",
+        "აღიარებს მათ დაკავებულობას და სთავაზობს მოქნილობას.",
+        "ხსნის ორ ღირსეულ გზას, რაც პასუხს ბუნებრივსა და ადვილს ხდის.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ რამდენჯერმე დაუკავშირდი მნიშვნელოვან კონტაქტს (პოტენციური პარტნიორი, კლიენტი ან დამსაქმებელი), მაგრამ პასუხი არ მიგიღია. დაწერე სტრატეგიული follow-up, რომელიც ინარჩუნებს ურთიერთობას, ხსნის ზეწოლას და სთავაზობს ღირსეულ გამოსავალს ორივე მხარისთვის.",
+      recipientRole: "an unresponsive prospect or partner",
+      promptKa: "დაწერე 6-9 წინადადება. შეინარჩუნე ღირსება და მოქნილობა — გახსენი მკაფიო გზები წინ.",
+      hintsKa: [
+        "აღიარე მათი დაკავებულობა და პატივი ეცი მათ დროს.",
+        "დაადასტურე ინტერესი, მაგრამ მოხსენი ზეწოლა.",
+        "გახსენი ორი ღირსეული გზა — დაინტერესება ან თავაზიანი გადადება.",
+        "მოერიდე საკუთარი იმედგაცრუების ხაზგასმას.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "keen",
+        ka: "დაინტერესებული / მსურველი",
+        exampleEn: "We're still keen to move forward.",
+        exampleKa: "კვლავ გვსურს წინ წავიდეთ.",
+      },
+      {
+        en: "priorities have shifted",
+        ka: "პრიორიტეტები შეიცვალა",
+        exampleEn: "I understand if priorities have shifted.",
+        exampleKa: "მესმის, თუ პრიორიტეტები შეიცვალა.",
+      },
+      {
+        en: "scope",
+        ka: "სამუშაოს ფარგლები / აღწერა",
+        exampleEn: "I'll send a short scope.",
+        exampleKa: "მოკლე აღწერას გამოგიგზავნით.",
+      },
+      {
+        en: "on your plate",
+        ka: "გასაკეთებელი / დატვირთვა",
+        exampleEn: "I don't want to keep this on your plate.",
+        exampleKa: "არ მინდა ეს თქვენთვის ტვირთად დარჩეს.",
+      },
+      {
+        en: "check back",
+        ka: "ხელახლა დაკავშირება",
+        exampleEn: "I'll check back next quarter.",
+        exampleKa: "მომავალ კვარტალში ხელახლა დაგიკავშირდებით.",
+      },
+    ],
+    readAloudPhrases: [
+      "I know things get busy, so I'll keep this brief.",
+      "We're still genuinely keen to move forward on the partnership.",
+      "I don't want to keep something on your plate if priorities have shifted.",
+      "If the timing isn't right just now, no problem at all.",
+    ],
+  },
+};
+
+// ============================================================
 // MASTER REGISTRY
 // ============================================================
 // As more topics are added, register them here keyed by curriculum key.
 
 export const EMAIL_LESSONS: Record<string, Record<Level, EmailLesson>> = {
   introduction,
-  // follow_up,    (coming next)
+  follow_up: followUp,
   // request,
   // update,
   // complaint,
