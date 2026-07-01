@@ -1124,6 +1124,1042 @@ const followUp: Record<Level, EmailLesson> = {
 };
 
 // ============================================================
+// TOPIC 3: REQUEST (მოთხოვნის წერილი)
+// ============================================================
+
+const request: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "request",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით მარტივი, თავაზიანი მოთხოვნის დაწერას — რას ვთხოვთ და თავაზიანად.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი მოთხოვნა უფრო თავაზიანია?",
+      options: [
+        {
+          label: "A",
+          text: "Could you please send me the file?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Send me the file.",
+          isBetter: false,
+          issuesKa: [
+            "ჟღერს როგორც ბრძანება, არა თხოვნა.",
+            "აკლია თავაზიანი სიტყვები — 'could you', 'please'.",
+          ],
+        },
+      ],
+      explanationKa:
+        "'Could you please...' თხოვნას თავაზიანს ხდის. სამუშაო იმეილში ყოველთვის ვამბობთ 'please'.",
+    },
+    learn: {
+      titleKa: "თავაზიანი მოთხოვნის სამი ნაბიჯი",
+      explanationKa:
+        "მარტივი მოთხოვნა ამბობს რა გჭირდება თავაზიანად. გამოიყენე 'Could you' და 'please' და თქვი მადლობა.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "დაიწყე თბილად.",
+          exampleEn: "Hello,",
+        },
+        {
+          partKa: "თავაზიანი მოთხოვნა",
+          purposeKa: "თქვი რა გჭირდება.",
+          exampleEn: "Could you please send me the report?",
+        },
+        {
+          partKa: "მადლობა",
+          purposeKa: "დაასრულე თავაზიანად.",
+          exampleEn: "Thank you very much.",
+        },
+      ],
+      examples: [
+        {
+          en: "Could you please help me?",
+          ka: "შეგიძლიათ დამეხმაროთ?",
+          noteKa: "'Could you please' — თავაზიანი დასაწყისი.",
+        },
+        {
+          en: "Can you send it today?",
+          ka: "შეგიძლიათ დღეს გამომიგზავნოთ?",
+        },
+        {
+          en: "Thank you for your help.",
+          ka: "გმადლობთ დახმარებისთვის.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინოს სჭირდება ანგარიში კოლეგისგან. ის თავაზიანად ითხოვს.",
+      subject: "Request for the report",
+      body: "Hello,\n\nCould you please send me the sales report? I need it for the meeting tomorrow.\n\nThank you very much.\n\nBest,\nNino",
+      annotationsKa: [
+        "ნინო იყენებს 'Could you please' — თავაზიანია.",
+        "ამბობს რატომ სჭირდება (შეხვედრისთვის).",
+        "ამთავრებს მადლობით.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ გჭირდება რაღაც კოლეგისგან — მაგალითად დოკუმენტი, ინფორმაცია ან დახმარება. დაწერე მოკლე, თავაზიანი მოთხოვნის წერილი.",
+      recipientRole: "a colleague",
+      promptKa: "დაწერე 3-4 წინადადება. გამოიყენე 'Could you please' და თქვი მადლობა.",
+      hintsKa: [
+        "დაიწყე 'Hello,'-თი.",
+        "გამოიყენე 'Could you please...'.",
+        "დაასრულე 'Thank you'-თი.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "request",
+        ka: "მოთხოვნა / თხოვნა",
+        exampleEn: "I have a small request.",
+        exampleKa: "მე მაქვს პატარა თხოვნა.",
+      },
+      {
+        en: "could you",
+        ka: "შეგიძლიათ (თავაზიანი)",
+        exampleEn: "Could you help me, please?",
+        exampleKa: "შეგიძლიათ დამეხმაროთ?",
+      },
+      {
+        en: "send",
+        ka: "გაგზავნა",
+        exampleEn: "Could you send me the file?",
+        exampleKa: "შეგიძლიათ ფაილი გამომიგზავნოთ?",
+      },
+    ],
+    readAloudPhrases: [
+      "Could you please send me the sales report?",
+      "I need it for the meeting tomorrow.",
+      "Thank you very much.",
+      "Could you help me, please?",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "request",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით მკაფიო მოთხოვნას — რა გვჭირდება, რატომ და როდის, თავაზიანი ტონით.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი მოთხოვნა უფრო მკაფიოა?",
+      options: [
+        {
+          label: "A",
+          text: "Could you send me the budget file by Friday? I need it to finish the report.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "I need the file soon please.",
+          isBetter: false,
+          issuesKa: [
+            "'the file' ბუნდოვანია — რომელი ფაილი?",
+            "'soon' არ არის კონკრეტული ვადა.",
+          ],
+        },
+      ],
+      explanationKa:
+        "მკაფიო მოთხოვნა ამბობს ზუსტად რა (budget file), როდის (by Friday) და რატომ (to finish the report).",
+    },
+    learn: {
+      titleKa: "მკაფიო მოთხოვნა: რა, როდის, რატომ",
+      explanationKa:
+        "კარგი მოთხოვნა კონკრეტულია. თქვი ზუსტად რა გჭირდება, როდის (ვადა) და მოკლედ რატომ. ეს ეხმარება მიმღებს სწრაფად და სწორად დაგეხმაროს.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "თბილი დასაწყისი.",
+          exampleEn: "Hi Nika,",
+        },
+        {
+          partKa: "მკაფიო მოთხოვნა",
+          purposeKa: "თქვი ზუსტად რა გჭირდება.",
+          exampleEn: "Could you send me the budget file?",
+        },
+        {
+          partKa: "ვადა და მიზეზი",
+          purposeKa: "დაამატე როდის და რატომ.",
+          exampleEn: "I need it by Friday to finish the report.",
+        },
+        {
+          partKa: "თავაზიანი დასასრული",
+          purposeKa: "თქვი მადლობა.",
+          exampleEn: "Thanks so much for your help.",
+        },
+      ],
+      examples: [
+        {
+          en: "Could you send me the budget file by Friday?",
+          ka: "შეგიძლიათ ბიუჯეტის ფაილი პარასკევამდე გამომიგზავნოთ?",
+          noteKa: "კონკრეტული ფაილი + კონკრეტული ვადა.",
+        },
+        {
+          en: "I need it to finish the report.",
+          ka: "მჭირდება ანგარიშის დასასრულებლად.",
+          noteKa: "მიზეზი ეხმარება მიმღებს პრიორიტეტის დადგენაში.",
+        },
+        {
+          en: "Please let me know if that works.",
+          ka: "გთხოვთ მაცნობოთ, თუ ეს მოგწონთ.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითს ანგარიშის დასასრულებლად ბიუჯეტის ფაილი სჭირდება კოლეგისგან პარასკევამდე.",
+      subject: "Budget file needed by Friday",
+      body: "Hi Nika,\n\nCould you send me the budget file for Q2? I need it by Friday to finish the quarterly report.\n\nIf you need anything from me to speed it up, just let me know.\n\nThanks so much,\nDavit",
+      annotationsKa: [
+        "subject line ამბობს ზუსტად რა და როდის.",
+        "მოთხოვნა კონკრეტულია — რომელი ფაილი, რა ვადა, რა მიზეზი.",
+        "სთავაზობს დახმარებას, რაც თანამშრომლობით ტონს ქმნის.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ გჭირდება კონკრეტული რამ კოლეგისგან ან სხვა განყოფილებისგან გარკვეული ვადით. დაწერე მკაფიო მოთხოვნა: რა გჭირდება, როდის და რატომ.",
+      recipientRole: "a colleague in another team",
+      promptKa: "დაწერე 4-6 წინადადება. იყავი კონკრეტული რასთან, ვადასთან და მიზეზთან დაკავშირებით.",
+      hintsKa: [
+        "თქვი ზუსტად რა გჭირდება — არა 'the file', არამედ 'the Q2 budget file'.",
+        "დაამატე კონკრეტული ვადა — 'by Friday'.",
+        "მოკლედ ახსენი რატომ.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "by (a deadline)",
+        ka: "(ვადამდე) — მაგ. პარასკევამდე",
+        exampleEn: "Could you send it by Friday?",
+        exampleKa: "შეგიძლიათ პარასკევამდე გამოგზავნოთ?",
+      },
+      {
+        en: "budget",
+        ka: "ბიუჯეტი",
+        exampleEn: "I need the budget file.",
+        exampleKa: "მჭირდება ბიუჯეტის ფაილი.",
+      },
+      {
+        en: "finish",
+        ka: "დასრულება",
+        exampleEn: "I need it to finish the report.",
+        exampleKa: "მჭირდება ანგარიშის დასასრულებლად.",
+      },
+      {
+        en: "speed up",
+        ka: "დაჩქარება",
+        exampleEn: "Let me know how I can speed it up.",
+        exampleKa: "მაცნობეთ, როგორ დავაჩქარო.",
+      },
+    ],
+    readAloudPhrases: [
+      "Could you send me the budget file for Q2?",
+      "I need it by Friday to finish the quarterly report.",
+      "If you need anything from me to speed it up, just let me know.",
+      "Please let me know if that works.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "request",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ მოთხოვნას, რომელიც აბალანსებს სიცხადეს, თავაზიანობასა და მიმღების პატივისცემას.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს მოთხოვნა სუსტია — რა შეიძლება გავაუმჯობესოთ?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Lisa,\n\nI'm putting together the client deck for Thursday and I'd really value your input on the pricing section. Would you have 15 minutes before Wednesday to review it? Happy to work around your schedule.\n\nThanks,\nAna",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Lisa,\n\nI need you to review the pricing section of the deck. Please do it before Wednesday.\n\nThanks,\nAna",
+          isBetter: false,
+          issuesKa: [
+            "'I need you to' + 'Please do it' ჟღერს როგორც ბრძანება.",
+            "არ სთავაზობს მოქნილობას ან პატივს არ სცემს მათ დროს.",
+            "არ ხსნის რატომ არის მათი წვლილი ღირებული.",
+          ],
+        },
+      ],
+      explanationKa:
+        "პროფესიონალური მოთხოვნა თხოვს, არ ბრძანებს. A იყენებს 'Would you have...' და სთავაზობს მოქნილობას, რაც პატივს სცემს მიმღების ავტონომიას.",
+    },
+    learn: {
+      titleKa: "მოთხოვნა, რომელსაც ხალხი სიამოვნებით ასრულებს",
+      explanationKa:
+        "ძლიერი მოთხოვნა აბალანსებს სამ რამეს: სიცხადეს (ზუსტად რა გჭირდება), თავაზიანობას (თხოვნა ბრძანების ნაცვლად) და მიმღების პატივისცემას (მოქნილობა, მათი დროის აღიარება). გამოიყენე 'Would you' და 'I'd value your...' და შესთავაზე მოქნილობა.",
+      structure: [
+        {
+          partKa: "კონტექსტი",
+          purposeKa: "ახსენე რატომ წერ.",
+          exampleEn: "I'm putting together the client deck for Thursday.",
+        },
+        {
+          partKa: "ღირებულებაზე დაფუძნებული მოთხოვნა",
+          purposeKa: "აჩვენე რატომ ღირს მათი წვლილი.",
+          exampleEn: "I'd really value your input on the pricing section.",
+        },
+        {
+          partKa: "თავაზიანი, კონკრეტული თხოვნა",
+          purposeKa: "მკაფიოდ, მაგრამ რბილად.",
+          exampleEn: "Would you have 15 minutes before Wednesday to review it?",
+        },
+        {
+          partKa: "მოქნილობის შეთავაზება",
+          purposeKa: "პატივი ეცი მათ დროს.",
+          exampleEn: "Happy to work around your schedule.",
+        },
+      ],
+      examples: [
+        {
+          en: "I'd really value your input on the pricing section.",
+          ka: "ნამდვილად დამეხმარებოდა თქვენი აზრი ფასების ნაწილზე.",
+          noteKa: "აჩვენებს, რომ მათი წვლილი ღირებულია.",
+        },
+        {
+          en: "Would you have 15 minutes before Wednesday?",
+          ka: "ხომ არ დაგეთმობოდათ 15 წუთი ოთხშაბათამდე?",
+          noteKa: "თავაზიანი და კონკრეტული — რბილი, მაგრამ მკაფიო.",
+        },
+        {
+          en: "Happy to work around your schedule.",
+          ka: "სიამოვნებით მოვერგები თქვენს გრაფიკს.",
+          noteKa: "მოქნილობა პატივს სცემს მათ ავტონომიას.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ანა ამზადებს კლიენტის პრეზენტაციას და სჭირდება კოლეგის ექსპერტიზა ფასების ნაწილზე. ის თავაზიანად, მაგრამ მკაფიოდ ითხოვს.",
+      subject: "Quick input on the pricing section?",
+      body: "Hi Lisa,\n\nI'm putting together the client deck for Thursday's meeting, and I'd really value your input on the pricing section — you know that account better than anyone.\n\nWould you have about 15 minutes before Wednesday to look it over? I'm happy to work around your schedule, or send it in whatever format is easiest for you.\n\nThanks so much,\nAna",
+      annotationsKa: [
+        "subject line მოკლე, მკაფიო და თავაზიანია.",
+        "აღიარებს მიმღების ექსპერტიზას — 'you know that account better than anyone'.",
+        "სთავაზობს მოქნილობას ორ ადგილას, რაც პატივს სცემს მათ დროს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ გჭირდება კოლეგის ან სხვა გუნდის წევრის დახმარება, დრო ან ექსპერტიზა კონკრეტული პროექტისთვის. დაწერე პროფესიონალური მოთხოვნა, რომელიც არის მკაფიო, თავაზიანი და პატივს სცემს მათ დროს.",
+      recipientRole: "a busy colleague whose expertise you need",
+      promptKa: "დაწერე 5-7 წინადადება. თხოვე, ნუ ბრძანებ. აღიარე მათი ღირებულება და შესთავაზე მოქნილობა.",
+      hintsKa: [
+        "დაიწყე მოკლე კონტექსტით — რატომ წერ.",
+        "აჩვენე რატომ არის მათი წვლილი ღირებული.",
+        "გამოიყენე 'Would you have...' ან 'I'd value...'.",
+        "შესთავაზე მოქნილობა — მათი გრაფიკი, ფორმატი.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "input",
+        ka: "წვლილი / აზრი",
+        exampleEn: "I'd value your input on this.",
+        exampleKa: "დამეხმარებოდა თქვენი აზრი ამაზე.",
+      },
+      {
+        en: "review",
+        ka: "გადახედვა / შემოწმება",
+        exampleEn: "Could you review the pricing section?",
+        exampleKa: "შეგიძლიათ ფასების ნაწილს გადახედოთ?",
+      },
+      {
+        en: "work around",
+        ka: "მორგება",
+        exampleEn: "I'm happy to work around your schedule.",
+        exampleKa: "სიამოვნებით მოვერგები თქვენს გრაფიკს.",
+      },
+      {
+        en: "look over",
+        ka: "თვალის გადავლება",
+        exampleEn: "Would you look it over before Friday?",
+        exampleKa: "ხომ არ გადახედავდით პარასკევამდე?",
+      },
+      {
+        en: "value",
+        ka: "დაფასება",
+        exampleEn: "I really value your opinion.",
+        exampleKa: "ნამდვილად ვაფასებ თქვენს აზრს.",
+      },
+    ],
+    readAloudPhrases: [
+      "I'd really value your input on the pricing section.",
+      "Would you have about fifteen minutes before Wednesday to look it over?",
+      "I'm happy to work around your schedule.",
+      "You know that account better than anyone.",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "request",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ მოთხოვნას, რომელიც რთულ ან დელიკატურ სიტუაციაშიც კი ინარჩუნებს ავტორიტეტს, თავაზიანობასა და მკაფიოობას.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს მოთხოვნა დელიკატურ სიტუაციაშია — რა შეიძლება უფრო სტრატეგიული გავხადოთ?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Mark,\n\nI know your team is stretched right now, so I want to be upfront: I'm asking for something that isn't small. We need engineering support to hit the client's revised deadline, and without a few days of your team's time, we risk slipping.\n\nCould we talk through what's realistic? I'd rather find a version that works for both teams than drop this on you as a demand.\n\nBest,\nDato",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Mark,\n\nWe need engineering support to hit the client deadline. Can your team allocate a few days this week? It's quite urgent.\n\nBest,\nDato",
+          isBetter: false,
+          issuesKa: [
+            "არ აღიარებს, რომ მეორე გუნდი უკვე გადატვირთულია.",
+            "'It's quite urgent' ზეწოლას ქმნის დიალოგის ნაცვლად.",
+            "აყენებს მოთხოვნას როგორც მოცემულობას, არა როგორც სამუშაო საკითხს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "დელიკატური მოთხოვნა აღიარებს ხარჯს მიმღებისთვის და იწვევს დიალოგს. A ღიად ამბობს 'this isn't small' და სთავაზობს ერთობლივ გადაწყვეტას, რაც ნდობას ინარჩუნებს.",
+    },
+    learn: {
+      titleKa: "მაღალი ფსონის მოთხოვნა: ავტორიტეტი და თანამშრომლობა",
+      explanationKa:
+        "ზოგი მოთხოვნა დელიკატურია — დიდი თხოვნა, დაძაბული ურთიერთობა, ან შეზღუდული რესურსი. აქ საუკეთესო მიდგომაა გამჭვირვალობა: აღიარე ხარჯი მიმღებისთვის, ჩამოაყალიბე მოთხოვნა ერთობლივ პრობლემად და მოიწვიე დიალოგზე ულტიმატუმის ნაცვლად. ეს ინარჩუნებს როგორც ავტორიტეტს, ისე ურთიერთობას.",
+      structure: [
+        {
+          partKa: "ხარჯის აღიარება",
+          purposeKa: "აჩვენე, რომ გესმის მათი მდგომარეობა.",
+          exampleEn: "I know your team is stretched right now.",
+        },
+        {
+          partKa: "გამჭვირვალე ჩამოყალიბება",
+          purposeKa: "იყავი პირდაპირი მოთხოვნის მასშტაბზე.",
+          exampleEn: "I'm asking for something that isn't small.",
+        },
+        {
+          partKa: "მოთხოვნა როგორც ერთობლივი პრობლემა",
+          purposeKa: "ჩართე ისინი გადაწყვეტაში.",
+          exampleEn: "Could we talk through what's realistic?",
+        },
+        {
+          partKa: "თანამშრომლობითი დასასრული",
+          purposeKa: "აჩვენე, რომ ორივე მხარეს ითვალისწინებ.",
+          exampleEn: "I'd rather find a version that works for both teams.",
+        },
+      ],
+      examples: [
+        {
+          en: "I know your team is stretched right now.",
+          ka: "ვიცი, რომ თქვენი გუნდი ახლა გადატვირთულია.",
+          noteKa: "ხარჯის აღიარება აშენებს ნდობას.",
+        },
+        {
+          en: "I'm asking for something that isn't small.",
+          ka: "ვთხოვ რაღაცას, რაც მცირე ნამდვილად არ არის.",
+          noteKa: "გამჭვირვალობა — არ ცდილობ თხოვნის შენიღბვას.",
+        },
+        {
+          en: "I'd rather find a version that works for both teams than drop this on you.",
+          ka: "მირჩევნია ვიპოვოთ ვარიანტი, რომელიც ორივე გუნდს მოერგება, ვიდრე უბრალოდ დაგაკისროთ ეს.",
+          noteKa: "თანამშრომლობა ულტიმატუმის ნაცვლად.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დათოს სჭირდება სხვა გუნდის რესურსი კლიენტის ვადის დასაცავად, მაგრამ ის გუნდი უკვე გადატვირთულია. ის თხოვს გამჭვირვალედ და თანამშრომლობით.",
+      subject: "A big ask on the client deadline — let's find what's realistic",
+      body: "Hi Mark,\n\nI know your team is stretched thin right now, so I want to be upfront rather than dress this up: I'm asking for something that isn't small.\n\nThe client moved their deadline forward, and to hit it we'd need a few days of engineering support this sprint. Without it, we're likely to slip — and I'd rather solve that with you than around you.\n\nCould we find time to talk through what's actually realistic? If a few days isn't possible, even a lighter version of support might be enough, and I'm open to trading priorities elsewhere to make room.\n\nBest,\nDato",
+      annotationsKa: [
+        "subject line თავადვე აყენებს ტონს — გულწრფელი და თანამშრომლობითი.",
+        "აღიარებს მეორე გუნდის დატვირთვას და არ ნიღბავს მოთხოვნის მასშტაბს.",
+        "სთავაზობს მოქნილობას და გაცვლას, რაც მოთხოვნას ერთობლივ პრობლემად აქცევს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ გჭირდება მნიშვნელოვანი რესურსი, დრო ან დათმობა ვინმესგან დელიკატურ სიტუაციაში — მაგ. გადატვირთული გუნდი, დაძაბული ურთიერთობა, ან დიდი თხოვნა. დაწერე მოთხოვნა, რომელიც აღიარებს ხარჯს, არის გამჭვირვალე და იწვევს თანამშრომლობაზე.",
+      recipientRole: "someone under pressure whose help you critically need",
+      promptKa: "დაწერე 6-9 წინადადება. დააბალანსე ავტორიტეტი და თანამშრომლობა. აღიარე ხარჯი და მოიწვიე დიალოგზე.",
+      hintsKa: [
+        "აღიარე მიმღების მდგომარეობა ან დატვირთვა.",
+        "იყავი გამჭვირვალე მოთხოვნის მასშტაბზე.",
+        "ჩამოაყალიბე ის ერთობლივ პრობლემად, არა ბრძანებად.",
+        "შესთავაზე მოქნილობა ან გაცვლა.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "stretched (thin)",
+        ka: "გადატვირთული",
+        exampleEn: "I know your team is stretched thin.",
+        exampleKa: "ვიცი, თქვენი გუნდი გადატვირთულია.",
+      },
+      {
+        en: "upfront",
+        ka: "გულწრფელი / პირდაპირი",
+        exampleEn: "I want to be upfront with you.",
+        exampleKa: "მინდა გულწრფელი ვიყო თქვენთან.",
+      },
+      {
+        en: "slip (a deadline)",
+        ka: "ვადის გადაცდენა",
+        exampleEn: "Without help, we might slip.",
+        exampleKa: "დახმარების გარეშე შეიძლება ვადას გადავცდეთ.",
+      },
+      {
+        en: "realistic",
+        ka: "რეალისტური",
+        exampleEn: "Let's talk about what's realistic.",
+        exampleKa: "მოდი ვისაუბროთ იმაზე, რაც რეალისტურია.",
+      },
+      {
+        en: "trade priorities",
+        ka: "პრიორიტეტების გაცვლა",
+        exampleEn: "I'm open to trading priorities to make room.",
+        exampleKa: "მზად ვარ პრიორიტეტები გავცვალო ადგილის გასათავისუფლებლად.",
+      },
+    ],
+    readAloudPhrases: [
+      "I know your team is stretched thin right now, so I want to be upfront.",
+      "I'm asking for something that isn't small.",
+      "I'd rather solve that with you than around you.",
+      "Could we find time to talk through what's actually realistic?",
+    ],
+  },
+};
+
+// ============================================================
+// TOPIC 4: UPDATE (სტატუსი და მოხსენება)
+// ============================================================
+
+const update: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "update",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით მარტივი სტატუს-განახლების დაწერას — რა გავაკეთეთ და რა არის შემდეგი.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი განახლება უფრო ნათელია?",
+      options: [
+        {
+          label: "A",
+          text: "The report is done. I will send it tomorrow.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Things are going, almost there I think.",
+          isBetter: false,
+          issuesKa: [
+            "'things are going' ბუნდოვანია — არ ჩანს რა მდგომარეობაა.",
+            "'I think' გაურკვევლობას ამატებს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი განახლება მკაფიოა. 'The report is done' ბევრად უკეთესია ვიდრე ბუნდოვანი 'almost there'.",
+    },
+    learn: {
+      titleKa: "მარტივი განახლების სამი ნაწილი",
+      explanationKa:
+        "მარტივი სტატუს-განახლება ამბობს: რა გავაკეთე, სად ვარ ახლა და რა არის შემდეგი. იყავი მოკლე და მკაფიო.",
+      structure: [
+        {
+          partKa: "რა გაკეთდა",
+          purposeKa: "თქვი დასრულებული ნაწილი.",
+          exampleEn: "I finished the first part.",
+        },
+        {
+          partKa: "ახლანდელი მდგომარეობა",
+          purposeKa: "თქვი სად ხარ.",
+          exampleEn: "I am now working on the second part.",
+        },
+        {
+          partKa: "შემდეგი ნაბიჯი",
+          purposeKa: "თქვი რა იქნება შემდეგ.",
+          exampleEn: "I will finish it by Friday.",
+        },
+      ],
+      examples: [
+        {
+          en: "I finished the report.",
+          ka: "დავასრულე ანგარიში.",
+          noteKa: "მკაფიოდ ამბობს რა გაკეთდა.",
+        },
+        {
+          en: "I am working on it now.",
+          ka: "ახლა ვმუშაობ მასზე.",
+        },
+        {
+          en: "It will be ready by Friday.",
+          ka: "მზად იქნება პარასკევამდე.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინო მუშაობს ანგარიშზე. ის უგზავნის მოკლე განახლებას მენეჯერს.",
+      subject: "Report update",
+      body: "Hello,\n\nHere is a quick update. I finished the first part of the report. I am now working on the numbers.\n\nIt will be ready by Friday.\n\nBest,\nNino",
+      annotationsKa: [
+        "ნინო ამბობს რა დაასრულა.",
+        "ამბობს რაზე მუშაობს ახლა.",
+        "აძლევს მკაფიო ვადას.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ მუშაობ დავალებაზე და მენეჯერს სჭირდება იცოდეს სად ხარ. დაწერე მოკლე სტატუს-განახლება: რა გააკეთე, რაზე მუშაობ ახლა და როდის დაასრულებ.",
+      recipientRole: "your manager",
+      promptKa: "დაწერე 3-4 წინადადება. იყავი მკაფიო რა გააკეთე და რა არის შემდეგი.",
+      hintsKa: [
+        "თქვი რა დაასრულე — 'I finished...'.",
+        "თქვი რაზე მუშაობ — 'I am now working on...'.",
+        "დაამატე ვადა — 'by Friday'.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "update",
+        ka: "განახლება / სტატუსი",
+        exampleEn: "Here is a quick update.",
+        exampleKa: "აი მოკლე განახლება.",
+      },
+      {
+        en: "finish",
+        ka: "დასრულება",
+        exampleEn: "I finished the first part.",
+        exampleKa: "დავასრულე პირველი ნაწილი.",
+      },
+      {
+        en: "ready",
+        ka: "მზად",
+        exampleEn: "It will be ready by Friday.",
+        exampleKa: "მზად იქნება პარასკევამდე.",
+      },
+    ],
+    readAloudPhrases: [
+      "Here is a quick update.",
+      "I finished the first part of the report.",
+      "I am now working on the numbers.",
+      "It will be ready by Friday.",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "update",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით სტატუს-განახლებას, რომელიც იყენებს მკაფიო სტრუქტურას — შესრულებული, მიმდინარე და შემდეგი ნაბიჯები.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი განახლება უფრო ადვილი წასაკითხია?",
+      options: [
+        {
+          label: "A",
+          text: "Done: design finished. In progress: testing. Next: launch on Monday.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "We finished the design and now we are testing and then we will launch on Monday hopefully.",
+          isBetter: false,
+          issuesKa: [
+            "ერთი გრძელი წინადადება — ძნელი წასაკითხია.",
+            "'hopefully' გაურკვევლობას ამატებს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "მოკლე, სტრუქტურირებული განახლება (Done / In progress / Next) ბევრად ადვილი წასაკითხია, ვიდრე ერთი გრძელი წინადადება.",
+    },
+    learn: {
+      titleKa: "სტრუქტურირებული განახლება",
+      explanationKa:
+        "კარგი განახლება იყენებს მკაფიო სტრუქტურას, რომ მკითხველმა სწრაფად გაიგოს მდგომარეობა. სამი მარტივი ნაწილი: რა შესრულდა, რა მიმდინარეობს და რა არის შემდეგი. მოკლე პუნქტები კარგად მუშაობს.",
+      structure: [
+        {
+          partKa: "მოკლე შესავალი",
+          purposeKa: "თქვი რაზეა განახლება.",
+          exampleEn: "Here's a quick update on the website project.",
+        },
+        {
+          partKa: "შესრულებული",
+          purposeKa: "რა დასრულდა.",
+          exampleEn: "Done: the homepage design is finished.",
+        },
+        {
+          partKa: "მიმდინარე",
+          purposeKa: "რაზე მუშაობ ახლა.",
+          exampleEn: "In progress: we are testing the pages.",
+        },
+        {
+          partKa: "შემდეგი",
+          purposeKa: "რა იქნება შემდეგ.",
+          exampleEn: "Next: launch is planned for Monday.",
+        },
+      ],
+      examples: [
+        {
+          en: "Here's a quick update on the project.",
+          ka: "აი მოკლე განახლება პროექტზე.",
+          noteKa: "კარგი დასაწყისი განახლებისთვის.",
+        },
+        {
+          en: "The homepage design is finished.",
+          ka: "მთავარი გვერდის დიზაინი დასრულებულია.",
+        },
+        {
+          en: "Launch is planned for Monday.",
+          ka: "გაშვება ორშაბათისთვის იგეგმება.",
+          noteKa: "მკაფიო შემდეგი ნაბიჯი ვადით.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითი ხელმძღვანელობს ვებსაიტის პროექტს. ის უგზავნის კვირის განახლებას გუნდს.",
+      subject: "Website project — weekly update",
+      body: "Hi team,\n\nHere's a quick update on the website project.\n\nDone: the homepage and about page designs are finished.\nIn progress: we're testing all pages on mobile.\nNext: we plan to launch on Monday.\n\nLet me know if you have any questions.\n\nBest,\nDavit",
+      annotationsKa: [
+        "subject line აჩვენებს რაზეა და რომ ეს რეგულარული განახლებაა.",
+        "სამი მკაფიო ნაწილი (Done / In progress / Next) ადვილი წასაკითხია.",
+        "სთავაზობს კითხვების დასმას — ღია კომუნიკაცია.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ მუშაობ პროექტზე და გუნდს ან მენეჯერს სჭირდება კვირის განახლება. დაწერე სტრუქტურირებული სტატუს-განახლება: რა შესრულდა, რა მიმდინარეობს და რა არის შემდეგი.",
+      recipientRole: "your team or manager",
+      promptKa: "დაწერე 4-6 წინადადება. გამოიყენე მკაფიო სტრუქტურა (Done / In progress / Next).",
+      hintsKa: [
+        "დაიწყე მოკლე შესავლით — 'Here's a quick update on...'.",
+        "დაყავი სამ ნაწილად: შესრულებული, მიმდინარე, შემდეგი.",
+        "დაამატე ვადები სადაც შესაძლებელია.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "in progress",
+        ka: "მიმდინარე / მიმდინარეობს",
+        exampleEn: "Testing is in progress.",
+        exampleKa: "ტესტირება მიმდინარეობს.",
+      },
+      {
+        en: "launch",
+        ka: "გაშვება",
+        exampleEn: "Launch is planned for Monday.",
+        exampleKa: "გაშვება ორშაბათს იგეგმება.",
+      },
+      {
+        en: "plan to",
+        ka: "გეგმა / აპირებ",
+        exampleEn: "We plan to launch next week.",
+        exampleKa: "ვგეგმავთ გაშვებას მომავალ კვირას.",
+      },
+      {
+        en: "test",
+        ka: "ტესტირება / შემოწმება",
+        exampleEn: "We are testing the pages.",
+        exampleKa: "ვამოწმებთ გვერდებს.",
+      },
+    ],
+    readAloudPhrases: [
+      "Here's a quick update on the website project.",
+      "The homepage and about page designs are finished.",
+      "We're testing all pages on mobile.",
+      "We plan to launch on Monday.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "update",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ განახლებას, რომელიც იწყება მოკლე შეჯამებით (TL;DR) და შემდეგ აძლევს დეტალებს.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს განახლება სუსტია — რა აკლია?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Sarah,\n\nShort version: we're on track for the June 15 launch, with one risk on the payment integration.\n\nDetails: design and content are done. Payment integration is 80% complete but depends on the vendor's API, which has been slow. I've flagged it and have a backup plan if needed.\n\nBest,\nMari",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Sarah,\n\nThe design is done and content is done too. Payment integration is at 80 percent but the vendor API is slow so there might be a risk but I think we are still mostly on track for June 15 probably.\n\nBest,\nMari",
+          isBetter: false,
+          issuesKa: [
+            "არ იწყება მთავარი დასკვნით — მკითხველი უნდა ეძებოს მას.",
+            "ერთ აბზაცში ყველაფერი აურიეს — ძნელი გასაგებია.",
+            "'probably' და 'I think' გაურკვევლობას ამატებს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "პროფესიონალური განახლება იწყება მთავარი დასკვნით (TL;DR), შემდეგ აძლევს დეტალებს. დაკავებულ ადამიანს შეუძლია მხოლოდ პირველი ხაზი წაიკითხოს და მაინც გაიგოს მთავარი.",
+    },
+    learn: {
+      titleKa: "TL;DR + დეტალები: განახლება დაკავებული ხალხისთვის",
+      explanationKa:
+        "დაკავებული ადამიანები ჯერ მთავარ დასკვნას ეძებენ. ამიტომ კარგი განახლება იწყება მოკლე შეჯამებით ('Short version:') და შემდეგ აძლევს დეტალებს ვისაც სჭირდება. ასევე მნიშვნელოვანია რისკების ღიად აღნიშვნა — ეს ნდობას ზრდის.",
+      structure: [
+        {
+          partKa: "TL;DR (მოკლე ვერსია)",
+          purposeKa: "მთავარი დასკვნა ერთ წინადადებაში.",
+          exampleEn: "Short version: we're on track for the June 15 launch, with one risk.",
+        },
+        {
+          partKa: "დეტალები",
+          purposeKa: "ახსენი მდგომარეობა უფრო ვრცლად.",
+          exampleEn: "Details: design and content are done. Payment integration is 80% complete.",
+        },
+        {
+          partKa: "რისკები და გეგმა",
+          purposeKa: "ღიად აღნიშნე პრობლემები + გამოსავალი.",
+          exampleEn: "The vendor API has been slow. I have a backup plan if needed.",
+        },
+      ],
+      examples: [
+        {
+          en: "Short version: we're on track, with one risk.",
+          ka: "მოკლედ: გრაფიკში ვართ, ერთი რისკით.",
+          noteKa: "მთავარი დასკვნა პირველ ხაზში.",
+        },
+        {
+          en: "Payment integration is 80% complete.",
+          ka: "გადახდის ინტეგრაცია 80%-ით დასრულებულია.",
+          noteKa: "კონკრეტული რიცხვი > ბუნდოვანი 'almost done'.",
+        },
+        {
+          en: "I've flagged it and have a backup plan.",
+          ka: "აღვნიშნე ეს და მაქვს სარეზერვო გეგმა.",
+          noteKa: "რისკის აღიარება გამოსავალთან ერთად აშენებს ნდობას.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "მარი ხელმძღვანელობს პროდუქტის გაშვებას. ის უგზავნის განახლებას მენეჯერს, რომელსაც სწრაფად სჭირდება მთავარი სურათი.",
+      subject: "Launch update — on track, one risk flagged",
+      body: "Hi Sarah,\n\nShort version: we're on track for the June 15 launch, with one risk on the payment integration that I'm actively managing.\n\nDetails:\n- Design and content: done.\n- Payment integration: 80% complete, but it depends on the vendor's API, which has been slower than promised.\n- Everything else is on schedule.\n\nI've already flagged the API delay to the vendor and have a backup provider lined up if we don't see progress by Wednesday.\n\nHappy to discuss if useful.\n\nBest,\nMari",
+      annotationsKa: [
+        "subject line თავადვე აჩვენებს მთავარ დასკვნას — 'on track, one risk'.",
+        "'Short version' აძლევს დაკავებულ მკითხველს მთავარს მაშინვე.",
+        "რისკი აღიარებულია გამოსავალთან ერთად — პროფესიონალური და დამამშვიდებელი.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ ხელმძღვანელობ პროექტს ან ამოცანას და უნდა გაუგზავნო განახლება მენეჯერს, რომელსაც სწრაფად სჭირდება მთავარი სურათი. დაწერე განახლება, რომელიც იწყება მოკლე შეჯამებით და შემდეგ აძლევს დეტალებს, მათ შორის ნებისმიერ რისკს.",
+      recipientRole: "a busy manager",
+      promptKa: "დაწერე 5-7 წინადადება. დაიწყე TL;DR-ით, შემდეგ დეტალები. ღიად აღნიშნე რისკები გამოსავალთან ერთად.",
+      hintsKa: [
+        "პირველი ხაზი = მთავარი დასკვნა.",
+        "შემდეგ დაამატე დეტალები კონკრეტული ფაქტებით.",
+        "აღნიშნე ნებისმიერი რისკი და შენი გეგმა მის მოსაგვარებლად.",
+        "მოერიდე 'probably', 'I think' ტიპის გაურკვევლობას.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "on track",
+        ka: "გრაფიკში / სწორ გზაზე",
+        exampleEn: "We're on track for the launch.",
+        exampleKa: "გრაფიკში ვართ გაშვებისთვის.",
+      },
+      {
+        en: "risk",
+        ka: "რისკი",
+        exampleEn: "There's one risk I'm managing.",
+        exampleKa: "არის ერთი რისკი, რომელსაც ვმართავ.",
+      },
+      {
+        en: "flag",
+        ka: "აღნიშვნა / ყურადღების მიპყრობა",
+        exampleEn: "I've flagged the delay.",
+        exampleKa: "აღვნიშნე შეფერხება.",
+      },
+      {
+        en: "backup plan",
+        ka: "სარეზერვო გეგმა",
+        exampleEn: "I have a backup plan ready.",
+        exampleKa: "მაქვს მზად სარეზერვო გეგმა.",
+      },
+      {
+        en: "on schedule",
+        ka: "გრაფიკის მიხედვით",
+        exampleEn: "Everything else is on schedule.",
+        exampleKa: "დანარჩენი ყველაფერი გრაფიკშია.",
+      },
+    ],
+    readAloudPhrases: [
+      "Short version: we're on track for the June fifteenth launch, with one risk.",
+      "Payment integration is eighty percent complete.",
+      "I've already flagged the API delay to the vendor.",
+      "I have a backup provider lined up if needed.",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "update",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ განახლებას, რომელიც არა მხოლოდ ინფორმაციას აწვდის, არამედ მართავს მოლოდინებს და აჩვენებს კონტროლს რთულ სიტუაციაშიც.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ცუდი ამბის შემცველი განახლებაა — რომელი უკეთ მართავს სიტუაციას?",
+      options: [
+        {
+          label: "A",
+          text: "Hi all,\n\nHeadline: we're going to miss the original deadline by about a week, and I want to walk you through why and what I'm doing about it.\n\nThe delay comes from a scope change the client requested last week, which added two features. Rather than rush and ship something fragile, I've rebaselined to June 22. I've already adjusted the team's plan and notified the client, who is comfortable with the new date.\n\nHappy to discuss trade-offs if anyone wants to pull the date back in.\n\nBest,\nNika",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi all,\n\nUnfortunately we are going to be late. The client added some things and now we can't make the deadline. We are doing our best and hopefully it won't be too late.\n\nSorry about this.\n\nBest,\nNika",
+          isBetter: false,
+          issuesKa: [
+            "იწყება ბოდიშითა და თავდაცვით — არა კონტროლით.",
+            "არ აძლევს კონკრეტულ ახალ ვადას ან გეგმას.",
+            "'hopefully' და 'doing our best' სისუსტეს აჩვენებს, არა მართვას.",
+          ],
+        },
+      ],
+      explanationKa:
+        "მაღალი დონის განახლება ცუდ ამბავსაც კი მართვის პოზიციიდან აწვდის. A აძლევს კონკრეტულ ახალ ვადას, ხსნის მიზეზს და აჩვენებს, რომ უკვე მიიღო ზომები — ეს ნდობას ინარჩუნებს.",
+    },
+    learn: {
+      titleKa: "განახლება, რომელიც მართავს მოლოდინებს",
+      explanationKa:
+        "მაღალ დონეზე განახლება არა მხოლოდ ინფორმაციაა — ის მოლოდინების მართვის ინსტრუმენტია. განსაკუთრებით ცუდი ამბის დროს: დაიწყე მთავარი შეტყობინებით პირდაპირ, ახსენი მიზეზი დამნაშავის ძებნის გარეშე, მიეცი კონკრეტული ახალი გეგმა და აჩვენე, რომ უკვე მოქმედებ. ეს გადააქცევს პრობლემას მართული სიტუაციის დემონსტრირებად.",
+      structure: [
+        {
+          partKa: "პირდაპირი სათაური",
+          purposeKa: "თქვი მთავარი მაშინვე, ბოდიშის გარეშე.",
+          exampleEn: "Headline: we're going to miss the deadline by about a week.",
+        },
+        {
+          partKa: "მიზეზი კონტექსტით",
+          purposeKa: "ახსენი რატომ, ობიექტურად.",
+          exampleEn: "The delay comes from a scope change the client requested.",
+        },
+        {
+          partKa: "გადაწყვეტილება და ახალი გეგმა",
+          purposeKa: "აჩვენე კონტროლი კონკრეტიკით.",
+          exampleEn: "I've rebaselined to June 22 and adjusted the team's plan.",
+        },
+        {
+          partKa: "დიალოგის მოწვევა",
+          purposeKa: "შესთავაზე ალტერნატივების განხილვა.",
+          exampleEn: "Happy to discuss trade-offs if we want to pull the date back in.",
+        },
+      ],
+      examples: [
+        {
+          en: "Headline: we're going to miss the deadline by about a week.",
+          ka: "მთავარი: დაახლოებით ერთი კვირით ვაგვიანებთ ვადას.",
+          noteKa: "პირდაპირი, თავდაჯერებული გახსნა — არა ბოდიში.",
+        },
+        {
+          en: "Rather than rush and ship something fragile, I've rebaselined to June 22.",
+          ka: "იმის ნაცვლად, რომ ვიჩქაროთ და სუსტი პროდუქტი გამოვუშვათ, ვადა 22 ივნისზე გადავიტანე.",
+          noteKa: "აჩვენებს გააზრებულ გადაწყვეტილებას, არა უბრალო შეფერხებას.",
+        },
+        {
+          en: "I've already adjusted the plan and notified the client.",
+          ka: "უკვე შევასწორე გეგმა და ვაცნობე კლიენტს.",
+          noteKa: "მოქმედება უკვე შესრულებულია — აჩვენებს კონტროლს.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნიკა ხელმძღვანელობს პროექტს, რომელიც ვადას აცდენს კლიენტის მიერ მოთხოვნილი ცვლილების გამო. ის უგზავნის განახლებას, რომელიც მართავს სიტუაციას თავდაჯერებულად.",
+      subject: "Timeline change: rebaselined to June 22 (here's why)",
+      body: "Hi all,\n\nHeadline: we're going to move the launch from June 15 to June 22 — about a week — and I want to walk you through why and what I've already done about it.\n\nThe change comes from a scope request the client made last week, adding two features that touch the checkout flow. Rushing those in by the original date would mean shipping something fragile, which is a worse outcome for everyone.\n\nSo I've rebaselined to June 22. I've already reworked the team's sprint plan, and I've spoken with the client, who prefers the slightly later date over a rushed release.\n\nIf pulling the date back in matters more than scope, I'm happy to walk through the trade-offs — we could defer one feature to a fast follow. Just let me know.\n\nBest,\nNika",
+      annotationsKa: [
+        "subject line აძლევს ახალ ვადას და გვპირდება ახსნას — გამჭვირვალე და თავდაჯერებული.",
+        "ხსნის მიზეზს ობიექტურად, დამნაშავის ძებნის გარეშე.",
+        "აჩვენებს, რომ გადაწყვეტილება უკვე მიღებულია და ზომები მიღებულია — მართვის დემონსტრირება.",
+        "სთავაზობს კონკრეტულ ალტერნატივას (feature defer), რაც აჩვენებს მოქნილობას.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ უნდა გაუგზავნო განახლება რთული ამბით — ვადის აცილება, ბიუჯეტის გადაჭარბება, ან სერიოზული პრობლემა. დაწერე განახლება, რომელიც პირდაპირ ამბობს მთავარს, ხსნის მიზეზს, აძლევს კონკრეტულ ახალ გეგმას და აჩვენებს, რომ უკვე მოქმედებ.",
+      recipientRole: "leadership or an important client",
+      promptKa: "დაწერე 6-9 წინადადება. მართე სიტუაცია კონტროლის პოზიციიდან — არა ბოდიშით, არამედ მკაფიო გეგმით.",
+      hintsKa: [
+        "დაიწყე პირდაპირ მთავარი ამბით, არა ბოდიშით.",
+        "ახსენი მიზეზი ობიექტურად, დამნაშავის ძებნის გარეშე.",
+        "მიეცი კონკრეტული ახალი ვადა ან გეგმა.",
+        "აჩვენე, რომ უკვე მიიღე ზომები, და შესთავაზე ალტერნატივები.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "headline",
+        ka: "მთავარი / სათაური (მთავარი აზრი)",
+        exampleEn: "Headline: we're moving the date.",
+        exampleKa: "მთავარი: ვადას გადავიტანთ.",
+      },
+      {
+        en: "scope change",
+        ka: "სამუშაოს ფარგლების ცვლილება",
+        exampleEn: "The delay came from a scope change.",
+        exampleKa: "შეფერხება სამუშაოს ფარგლების ცვლილებამ გამოიწვია.",
+      },
+      {
+        en: "rebaseline",
+        ka: "ვადის/გეგმის ხელახლა განსაზღვრა",
+        exampleEn: "I've rebaselined to June 22.",
+        exampleKa: "ვადა 22 ივნისზე გადავსაზღვრე.",
+      },
+      {
+        en: "trade-off",
+        ka: "კომპრომისი / დათმობა",
+        exampleEn: "Let's discuss the trade-offs.",
+        exampleKa: "მოდი განვიხილოთ კომპრომისები.",
+      },
+      {
+        en: "fast follow",
+        ka: "სწრაფი მომდევნო გამოშვება",
+        exampleEn: "We could defer it to a fast follow.",
+        exampleKa: "შეგვიძლია გადავიტანოთ სწრაფ მომდევნო გამოშვებაზე.",
+      },
+    ],
+    readAloudPhrases: [
+      "Headline: we're going to move the launch from June fifteenth to June twenty-second.",
+      "Rushing those in by the original date would mean shipping something fragile.",
+      "I've already reworked the team's sprint plan and spoken with the client.",
+      "I'm happy to walk through the trade-offs.",
+    ],
+  },
+};
+
+// ============================================================
 // MASTER REGISTRY
 // ============================================================
 // As more topics are added, register them here keyed by curriculum key.
@@ -1131,8 +2167,8 @@ const followUp: Record<Level, EmailLesson> = {
 export const EMAIL_LESSONS: Record<string, Record<Level, EmailLesson>> = {
   introduction,
   follow_up: followUp,
-  // request,
-  // update,
+  request,
+  update,
   // complaint,
   // negotiation,
   // closing,
