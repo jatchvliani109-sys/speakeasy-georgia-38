@@ -95,7 +95,7 @@ const introduction: Record<Level, EmailLesson> = {
     estimatedMinutes: 10,
     warmUp: {
       kind: "compare",
-      promptKa: "რომელი მისალმება უფრო პროფესიულია იმეილში?",
+      promptKa: "რომელი მისალმება უფრო პროფესიონალურია იმეილში?",
       options: [
         {
           label: "A",
@@ -160,7 +160,7 @@ const introduction: Record<Level, EmailLesson> = {
       annotationsKa: [
         "მისალმება მარტივი და თავაზიანია.",
         "ნინო ამბობს სახელს და როლს ერთ მოკლე წინადადებაში.",
-        "დასასრული თბილი და პროფესიულია.",
+        "დასასრული თბილი და პროფესიონალურია.",
       ],
     },
     practice: {
@@ -179,7 +179,7 @@ const introduction: Record<Level, EmailLesson> = {
         en: "introduce",
         ka: "გაცნობა / წარდგენა",
         exampleEn: "Let me introduce myself.",
-        exampleKa: "ნება მომეცით წარმოგიდგინოთ ჩემი თავი.",
+        exampleKa: "ნება მომეცით, თავი წარმოგიდგინოთ.",
       },
       {
         en: "team",
@@ -238,7 +238,7 @@ const introduction: Record<Level, EmailLesson> = {
       structure: [
         {
           partKa: "მისალმება",
-          purposeKa: "თბილი, პროფესიული დასაწყისი.",
+          purposeKa: "თბილი, პროფესიონალური დასაწყისი.",
           exampleEn: "Hi everyone,",
         },
         {
@@ -281,7 +281,7 @@ const introduction: Record<Level, EmailLesson> = {
       annotationsKa: [
         "subject line მკაფიოა — მაშინვე ჩანს, რომ ეს გაცნობაა.",
         "დავითი ამბობს როლს, დაწყების დროს და რომელ გუნდთან იმუშავებს.",
-        "დასასრული ღიაა და თბილი, ხალხს ეპატიჟება დაკავშირებისკენ.",
+        "დასასრული ღიაა და თბილი, ხალხს იწვევს დასაკავშირებლად.",
       ],
     },
     practice: {
@@ -333,7 +333,7 @@ const introduction: Record<Level, EmailLesson> = {
   business_intermediate: {
     emailType: "introduction",
     level: "business_intermediate",
-    dailyFocusKa: "დღეს ვისწავლით პროფესიულ გაცნობის წერილს, რომელიც აჩვენებს ვინ ხარ, რას მოიტან გუნდში და ქმნის კარგ პირველ შთაბეჭდილებას.",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ გაცნობის წერილს, რომელიც აჩვენებს ვინ ხარ, რას მოიტან გუნდში და ქმნის კარგ პირველ შთაბეჭდილებას.",
     estimatedMinutes: 15,
     warmUp: {
       kind: "spot_mistakes",
@@ -360,7 +360,7 @@ const introduction: Record<Level, EmailLesson> = {
         "ძლიერი გაცნობა იყენებს კონკრეტიკას (სახელი, წლები, სფერო) კლიშეების ნაცვლად. 'six years in fintech' ბევრად უკეთესია ვიდრე 'very passionate'.",
     },
     learn: {
-      titleKa: "პროფესიული გაცნობა, რომელიც რჩება მახსოვრობაში",
+      titleKa: "პროფესიონალური გაცნობა, რომელიც მეხსიერებაში რჩება",
       explanationKa:
         "კარგი გაცნობა აკეთებს სამ რამეს: ნათლად გაგაცნობს, აჩვენებს რას მოიტან (კონკრეტული გამოცდილება, არა კლიშეები), და გვთავაზობს მკაფიო next step. მოერიდე ცარიელ ფრაზებს როგორიცაა 'hard-working' — ამის ნაცვლად აჩვენე ფაქტებით.",
       structure: [
@@ -415,7 +415,7 @@ const introduction: Record<Level, EmailLesson> = {
     },
     practice: {
       scenarioKa:
-        "შენ ახალ პოზიციაზე გადახვედი და გინდა გააცნო თავი გუნდს, რომელთანაც მჭიდროდ იმუშავებ. დაწერე პროფესიული გაცნობის წერილი: ვინ ხარ, რა კონკრეტული გამოცდილება მოგაქვს, როგორ დაეხმარები მათ და მკაფიო next step.",
+        "შენ ახალ პოზიციაზე გადახვედი და გინდა გააცნო თავი გუნდს, რომელთანაც მჭიდროდ იმუშავებ. დაწერე პროფესიონალური გაცნობის წერილი: ვინ ხარ, რა კონკრეტული გამოცდილება მოგაქვს, როგორ დაეხმარები მათ და მკაფიო next step.",
       recipientRole: "your new cross-functional team",
       promptKa: "დაწერე 5-7 წინადადება. გამოიყენე კონკრეტიკა კლიშეების ნაცვლად და დაასრულე მკაფიო next step-ით.",
       hintsKa: [
@@ -486,7 +486,7 @@ const introduction: Record<Level, EmailLesson> = {
           text: "Hi all,\n\nI'm Luka, the new Head of Operations. I have a lot of experience and I plan to make several improvements to how things currently work here. I look forward to implementing my ideas.\n\nBest,\nLuka",
           isBetter: false,
           issuesKa: [
-            "'make several improvements' გუნდამდე ნდობის აშენებამდე — შეიძლება თავდამსხმელად აღიქმებოდეს.",
+            "'make several improvements' ნდობის აშენებამდე შეიძლება აგრესიულად აღიქმებოდეს.",
             "ფოკუსი 'my ideas'-ზეა და არა გუნდის მოსმენაზე — სუსტი სტრატეგია ახალი ლიდერისთვის.",
             "არ აღიარებს, რომ კვარტლის შუაში მოსვლა კითხვებს ბადებს.",
           ],
@@ -552,7 +552,7 @@ const introduction: Record<Level, EmailLesson> = {
     },
     practice: {
       scenarioKa:
-        "შენ ხელმძღვანელ პოზიციაზე შემოდიხარ გუნდში არასტაბილურ ან გარდამავალ პერიოდში (მაგ. რეორგანიზაცია, წინა ლიდერის წასვლა). დაწერე გაცნობის წერილი, რომელიც აჩვენებს თავდაჯერებულობას, აღიარებს კონტექსტს და სტრატეგიულად გაშენებს ნდობას.",
+        "შენ ხელმძღვანელ პოზიციაზე შემოდიხარ გუნდში არასტაბილურ ან გარდამავალ პერიოდში (მაგ. რეორგანიზაცია, წინა ლიდერის წასვლა). დაწერე გაცნობის წერილი, რომელიც აჩვენებს თავდაჯერებულობას, აღიარებს კონტექსტს და სტრატეგიულად აშენებს ნდობას.",
       recipientRole: "the team you will now lead",
       promptKa: "დაწერე 6-9 წინადადება. დააბალანსე ავტორიტეტი და მოკრძალება. აჩვენე, რომ ჯერ მოუსმენ, შემდეგ იმოქმედებ.",
       hintsKa: [
@@ -661,7 +661,7 @@ const followUp: Record<Level, EmailLesson> = {
       examples: [
         {
           en: "I am following up on my email.",
-          ka: "ვამოწმებ ჩემს იმეილს.",
+          ka: "ვუბრუნდები ჩემს წინა იმეილს.",
           noteKa: "მარტივი გზა შესახსენებლად.",
         },
         {
@@ -680,7 +680,7 @@ const followUp: Record<Level, EmailLesson> = {
       body: "Hello,\n\nI am following up on my last email from last week. Did you have time to look at it?\n\nPlease let me know. Thank you.\n\nBest,\nNino",
       annotationsKa: [
         "ნინო თავაზიანად ახსენებს, არ ბრაზობს.",
-        "მოკლე და მკაფიო კითხვა სვამს.",
+        "მოკლე და მკაფიო კითხვას სვამს.",
         "მადლობით ამთავრებს.",
       ],
     },
@@ -700,7 +700,7 @@ const followUp: Record<Level, EmailLesson> = {
         en: "follow up",
         ka: "გადამოწმება / შეხსენება",
         exampleEn: "I am following up on my email.",
-        exampleKa: "ვამოწმებ ჩემს იმეილს.",
+        exampleKa: "ვუბრუნდები ჩემს წინა იმეილს.",
       },
       {
         en: "reply",
@@ -790,7 +790,7 @@ const followUp: Record<Level, EmailLesson> = {
         },
         {
           en: "Would Thursday work for a quick call?",
-          ka: "ხუთშაბათი მოგწონთ მოკლე ზარისთვის?",
+          ka: "ხუთშაბათი ხომ არ გაწყობთ მოკლე ზარისთვის?",
           noteKa: "კონკრეტული შემდეგი ნაბიჯი.",
         },
       ],
@@ -990,7 +990,7 @@ const followUp: Record<Level, EmailLesson> = {
   business_advanced: {
     emailType: "follow_up",
     level: "business_advanced",
-    dailyFocusKa: "დღეს დავხვეწავთ follow-up-ს, რომელიც ინარჩუნებს მომენტუმს, კითხავს სიჩუმეს დაუშვებლად და სტრატეგიულად ხსნის გზას წინ.",
+    dailyFocusKa: "დღეს დავხვეწავთ follow-up-ს, რომელიც ინარჩუნებს მომენტუმს, არღვევს სიჩუმეს ზეწოლის გარეშე და სტრატეგიულად ხსნის გზას წინ.",
     estimatedMinutes: 15,
     warmUp: {
       kind: "spot_mistakes",
@@ -1009,7 +1009,7 @@ const followUp: Record<Level, EmailLesson> = {
           issuesKa: [
             "ხაზს უსვამს საკუთარ იმედგაცრუებას ('emailed a few times').",
             "აყენებს მათ თავდაცვით პოზიციაში, ნაცვლად გზის გახსნისა.",
-            "არ სთავაზობს მარტივ გამოსავალს ან გრაცეფულ alternative-ს.",
+            "არ სთავაზობს მარტივ გამოსავალს ან ღირსეულ ალტერნატივას.",
           ],
         },
       ],
@@ -1311,7 +1311,7 @@ const request: Record<Level, EmailLesson> = {
         },
         {
           en: "Please let me know if that works.",
-          ka: "გთხოვთ მაცნობოთ, თუ ეს მოგწონთ.",
+          ka: "გთხოვთ მაცნობოთ, თუ ეს გაწყობთ.",
         },
       ],
     },
@@ -1434,7 +1434,7 @@ const request: Record<Level, EmailLesson> = {
         },
         {
           en: "Would you have 15 minutes before Wednesday?",
-          ka: "ხომ არ დაგეთმობოდათ 15 წუთი ოთხშაბათამდე?",
+          ka: "ხომ ვერ გამონახავდით 15 წუთს ოთხშაბათამდე?",
           noteKa: "თავაზიანი და კონკრეტული — რბილი, მაგრამ მკაფიო.",
         },
         {
@@ -1912,7 +1912,7 @@ const update: Record<Level, EmailLesson> = {
           isBetter: false,
           issuesKa: [
             "არ იწყება მთავარი დასკვნით — მკითხველი უნდა ეძებოს მას.",
-            "ერთ აბზაცში ყველაფერი აურიეს — ძნელი გასაგებია.",
+            "ერთ აბზაცში ყველაფერი არეულია — ძნელი გასაგებია.",
             "'probably' და 'I think' გაურკვევლობას ამატებს.",
           ],
         },
@@ -2135,7 +2135,7 @@ const update: Record<Level, EmailLesson> = {
         en: "rebaseline",
         ka: "ვადის/გეგმის ხელახლა განსაზღვრა",
         exampleEn: "I've rebaselined to June 22.",
-        exampleKa: "ვადა 22 ივნისზე გადავსაზღვრე.",
+        exampleKa: "ვადა ხელახლა განვსაზღვრე — 22 ივნისისთვის.",
       },
       {
         en: "trade-off",
@@ -2160,6 +2160,1572 @@ const update: Record<Level, EmailLesson> = {
 };
 
 // ============================================================
+// TOPIC 5: COMPLAINT (საჩივრის წერილი)
+// ============================================================
+
+const complaint: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "complaint",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით მარტივი, თავაზიანი საჩივრის დაწერას — რა პრობლემაა და რა გვინდა.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი საჩივარი უფრო თავაზიანია?",
+      options: [
+        {
+          label: "A",
+          text: "Hello, my order arrived late. Could you please help me?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Your service is terrible and you are always late!",
+          isBetter: false,
+          issuesKa: [
+            "ტონი ბრაზიანი და თავდამსხმელია.",
+            "'always' გადაჭარბებაა და პრობლემას ვერ აგვარებს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "თავაზიანი საჩივარი უფრო კარგ შედეგს იძლევა. თქვი პრობლემა მშვიდად და სთხოვე დახმარება.",
+    },
+    learn: {
+      titleKa: "თავაზიანი საჩივრის სამი ნაბიჯი",
+      explanationKa:
+        "მარტივი საჩივარი ამბობს: რა მოხდა, რატომ არის პრობლემა და რა გინდა. იყავი მშვიდი და თავაზიანი — ეს უფრო კარგ პასუხს იძლევა.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "დაიწყე თავაზიანად.",
+          exampleEn: "Hello,",
+        },
+        {
+          partKa: "პრობლემა",
+          purposeKa: "თქვი რა მოხდა მშვიდად.",
+          exampleEn: "My order arrived late.",
+        },
+        {
+          partKa: "თხოვნა",
+          purposeKa: "თქვი რა გინდა.",
+          exampleEn: "Could you please help me fix this?",
+        },
+      ],
+      examples: [
+        {
+          en: "My order arrived late.",
+          ka: "ჩემი შეკვეთა დაგვიანებით მოვიდა.",
+          noteKa: "თქვი პრობლემა მშვიდად, ბრაზის გარეშე.",
+        },
+        {
+          en: "The product does not work.",
+          ka: "პროდუქტი არ მუშაობს.",
+        },
+        {
+          en: "Could you please help me?",
+          ka: "შეგიძლიათ დამეხმაროთ?",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინოს შეკვეთა დაგვიანდა. ის თავაზიანად წერს კომპანიას.",
+      subject: "Late order",
+      body: "Hello,\n\nMy order number 123 arrived three days late. This was a problem for my work.\n\nCould you please help me? Thank you.\n\nBest,\nNino",
+      annotationsKa: [
+        "ნინო თავაზიანია, არ ბრაზობს.",
+        "ამბობს კონკრეტულ პრობლემას (შეკვეთა 123, სამი დღე).",
+        "სთხოვს დახმარებას მშვიდად.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ პრობლემა გქონდა პროდუქტთან ან სერვისთან (დაგვიანება, არასწორი ნივთი, არ მუშაობს). დაწერე მოკლე, თავაზიანი საჩივარი და სთხოვე დახმარება.",
+      recipientRole: "a company's support team",
+      promptKa: "დაწერე 3-4 წინადადება. თქვი პრობლემა მშვიდად და სთხოვე დახმარება.",
+      hintsKa: [
+        "დაიწყე 'Hello,'-თი.",
+        "თქვი პრობლემა მშვიდად — 'My order arrived late'.",
+        "სთხოვე დახმარება — 'Could you please help me?'.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "problem",
+        ka: "პრობლემა",
+        exampleEn: "I have a problem with my order.",
+        exampleKa: "პრობლემა მაქვს ჩემს შეკვეთასთან.",
+      },
+      {
+        en: "late",
+        ka: "დაგვიანებული",
+        exampleEn: "My order arrived late.",
+        exampleKa: "ჩემი შეკვეთა დაგვიანდა.",
+      },
+      {
+        en: "fix",
+        ka: "გამოსწორება",
+        exampleEn: "Could you help me fix this?",
+        exampleKa: "დამეხმარებით ამის გამოსწორებაში?",
+      },
+    ],
+    readAloudPhrases: [
+      "My order number 123 arrived three days late.",
+      "This was a problem for my work.",
+      "Could you please help me?",
+      "Thank you.",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "complaint",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით საჩივარს, რომელიც ნათლად აღწერს პრობლემას და ითხოვს კონკრეტულ გადაწყვეტას.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი საჩივარი უფრო ეფექტურია?",
+      options: [
+        {
+          label: "A",
+          text: "The invoice shows $500, but we agreed on $400. Could you please correct it and send a new one?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "The invoice is wrong. Please fix it.",
+          isBetter: false,
+          issuesKa: [
+            "არ ამბობს რა არის არასწორი კონკრეტულად.",
+            "არ ამბობს რა უნდა იყოს სწორი.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი საჩივარი კონკრეტულია — ამბობს ზუსტად რა არის არასწორი ($500 vs $400) და რა გადაწყვეტა გინდა.",
+    },
+    learn: {
+      titleKa: "მკაფიო საჩივარი გადაწყვეტით",
+      explanationKa:
+        "ეფექტური საჩივარი ნათლად აღწერს პრობლემას კონკრეტული დეტალებით და ითხოვს კონკრეტულ გადაწყვეტას. ინარჩუნებ თავაზიან ტონს, მაგრამ ხარ ზუსტი — ეს ეხმარება მეორე მხარეს სწრაფად მოაგვაროს.",
+      structure: [
+        {
+          partKa: "მისალმება",
+          purposeKa: "თბილი, ნეიტრალური დასაწყისი.",
+          exampleEn: "Hi Ana,",
+        },
+        {
+          partKa: "კონკრეტული პრობლემა",
+          purposeKa: "თქვი ზუსტად რა არის არასწორი.",
+          exampleEn: "The invoice shows $500, but we agreed on $400.",
+        },
+        {
+          partKa: "მოთხოვნილი გადაწყვეტა",
+          purposeKa: "თქვი რა უნდა მოხდეს.",
+          exampleEn: "Could you please correct it and send a new one?",
+        },
+        {
+          partKa: "თავაზიანი დასასრული",
+          purposeKa: "შეინარჩუნე კარგი ურთიერთობა.",
+          exampleEn: "Thanks for looking into it.",
+        },
+      ],
+      examples: [
+        {
+          en: "The invoice shows $500, but we agreed on $400.",
+          ka: "ინვოისში წერია $500, მაგრამ ჩვენ $400-ზე შევთანხმდით.",
+          noteKa: "კონკრეტული ფაქტები — ადვილი გადასამოწმებელი.",
+        },
+        {
+          en: "Could you please correct it?",
+          ka: "შეგიძლიათ გამოასწოროთ?",
+        },
+        {
+          en: "Thanks for looking into it.",
+          ka: "გმადლობთ, რომ ამას გადახედავთ.",
+          noteKa: "თავაზიანი დასასრული ინარჩუნებს ურთიერთობას.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითმა ინვოისში შეცდომა შენიშნა. ის თავაზიანად, მაგრამ კონკრეტულად წერს მომწოდებელს.",
+      subject: "Invoice #2024 — amount correction needed",
+      body: "Hi Ana,\n\nThanks for sending the invoice. I noticed a small issue: it shows $500, but we agreed on $400 in our email last week.\n\nCould you please correct it and send an updated version? I'll process the payment as soon as I have the right invoice.\n\nThanks for looking into it,\nDavit",
+      annotationsKa: [
+        "subject line აჩვენებს ზუსტად რაზეა და რა სჭირდება.",
+        "პრობლემა კონკრეტულია — თანხები და მითითება წინა შეთანხმებაზე.",
+        "სთავაზობს სწრაფ გადახდას — თანამშრომლობითი ტონი.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ შენიშნე პრობლემა ინვოისში, შეკვეთაში ან სერვისში (არასწორი თანხა, ნაკლული ნივთი, არასწორი დეტალი). დაწერე საჩივარი, რომელიც კონკრეტულად აღწერს პრობლემას და ითხოვს კონკრეტულ გადაწყვეტას.",
+      recipientRole: "a supplier or service provider",
+      promptKa: "დაწერე 4-6 წინადადება. იყავი კონკრეტული პრობლემასა და სასურველ გადაწყვეტაზე.",
+      hintsKa: [
+        "თქვი ზუსტად რა არის არასწორი კონკრეტული დეტალებით.",
+        "მიუთითე წინა შეთანხმებაზე თუ არსებობს.",
+        "ითხოვე კონკრეტული გადაწყვეტა.",
+        "შეინარჩუნე თავაზიანი ტონი.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "invoice",
+        ka: "ინვოისი / ანგარიშ-ფაქტურა",
+        exampleEn: "The invoice has an error.",
+        exampleKa: "ინვოისში შეცდომაა.",
+      },
+      {
+        en: "correct",
+        ka: "გამოსწორება",
+        exampleEn: "Could you correct the amount?",
+        exampleKa: "შეგიძლიათ თანხა გამოასწოროთ?",
+      },
+      {
+        en: "issue",
+        ka: "საკითხი / პრობლემა",
+        exampleEn: "I noticed a small issue.",
+        exampleKa: "პატარა პრობლემა შევნიშნე.",
+      },
+      {
+        en: "look into",
+        ka: "გადახედვა / შესწავლა",
+        exampleEn: "Thanks for looking into it.",
+        exampleKa: "გმადლობთ, რომ გადახედავთ.",
+      },
+    ],
+    readAloudPhrases: [
+      "I noticed a small issue with the invoice.",
+      "It shows $500, but we agreed on $400.",
+      "Could you please correct it and send an updated version?",
+      "Thanks for looking into it.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "complaint",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ საჩივარს, რომელიც ფოკუსირებულია პრობლემის გადაჭრაზე და არა ბრალდებაზე.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს საჩივარი სუსტია — რა ტონობრივი პრობლემა აქვს?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Mark,\n\nWe've hit a snag with the last delivery — about 15% of the units arrived damaged. I know these things happen, but it's affecting our production schedule, so I wanted to flag it early.\n\nCould we figure out a replacement plan this week? Happy to send photos of the damage.\n\nBest,\nLika",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Mark,\n\nYour delivery was damaged again. This is the second time your company has messed up and it's really unprofessional. We expected better.\n\nFix this.\n\nLika",
+          isBetter: false,
+          issuesKa: [
+            "პიროვნულ თავდასხმაზეა ფოკუსი ('your company messed up') — არა გადაჭრაზე.",
+            "'unprofessional' და 'Fix this' აღიზიანებს და თანამშრომლობას ხურავს.",
+            "არ სთავაზობს გზას წინ.",
+          ],
+        },
+      ],
+      explanationKa:
+        "პროფესიონალური საჩივარი გადაჭრაზეა ორიენტირებული, არა ბრალდებაზე. A აღწერს პრობლემას ნეიტრალურად და მაშინვე გადადის გადაწყვეტაზე.",
+    },
+    learn: {
+      titleKa: "საჩივარი, რომელიც აგვარებს და არ ანგრევს",
+      explanationKa:
+        "ძლიერი პროფესიონალური საჩივარი ინარჩუნებს ურთიერთობას სანამ პრობლემას აგვარებს. გამოიყენე ნეიტრალური ენა (აღწერე ფაქტები, არა ბრალი), აჩვენე ცოტა ემპათია და სწრაფად გადადი გადაწყვეტაზე. მიზანი პრობლემის მოგვარებაა, არა ბრაზის გამოხატვა.",
+      structure: [
+        {
+          partKa: "ნეიტრალური გახსნა",
+          purposeKa: "აღწერე პრობლემა ბრალის გარეშე.",
+          exampleEn: "We've hit a snag with the last delivery — 15% arrived damaged.",
+        },
+        {
+          partKa: "გავლენის ახსნა",
+          purposeKa: "თქვი რატომ არის მნიშვნელოვანი.",
+          exampleEn: "It's affecting our production schedule.",
+        },
+        {
+          partKa: "გადაწყვეტაზე გადასვლა",
+          purposeKa: "შესთავაზე გზა წინ.",
+          exampleEn: "Could we figure out a replacement plan this week?",
+        },
+        {
+          partKa: "თანამშრომლობითი დასასრული",
+          purposeKa: "აჩვენე მზაობა დახმარებისთვის.",
+          exampleEn: "Happy to send photos of the damage.",
+        },
+      ],
+      examples: [
+        {
+          en: "We've hit a snag with the last delivery.",
+          ka: "ბოლო მიწოდებასთან პრობლემა შეგვექმნა.",
+          noteKa: "ნეიტრალური ენა — 'snag' რბილია, არ ადანაშაულებს.",
+        },
+        {
+          en: "It's affecting our production schedule.",
+          ka: "ეს ჩვენს წარმოების გრაფიკზე ახდენს გავლენას.",
+          noteKa: "ხსნის რატომ არის მნიშვნელოვანი, ემოციის გარეშე.",
+        },
+        {
+          en: "Could we figure out a replacement plan this week?",
+          ka: "შეგვიძლია ამ კვირაში ჩანაცვლების გეგმა შევადგინოთ?",
+          noteKa: "სწრაფად გადადის გადაწყვეტაზე.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ლიკას კომპანიამ დაზიანებული საქონელი მიიღო მომწოდებლისგან. ის წერს საჩივარს, რომელიც პრობლემას აგვარებს ურთიერთობის შენარჩუნებით.",
+      subject: "Damaged units in last delivery — let's sort a fix",
+      body: "Hi Mark,\n\nWe've hit a snag with the last delivery: about 15% of the units arrived with damaged packaging, and some of the products inside were affected too.\n\nI know issues like this happen occasionally, but since it's holding up our production line, I wanted to flag it early rather than let it slide.\n\nCould we figure out a replacement plan this week? I'm happy to send photos and a count of the affected units to make it easy on your end.\n\nThanks,\nLika",
+      annotationsKa: [
+        "subject line ნეიტრალურია და გადაჭრაზე ორიენტირებული — 'let's sort a fix'.",
+        "აღწერს პრობლემას ფაქტებით, ბრალდების გარეშე.",
+        "აჩვენებს ცოტა ემპათიას ('issues like this happen') და გადადის გადაწყვეტაზე.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ პრობლემა შეგექმნა პარტნიორთან, მომწოდებელთან ან სერვისთან, რომელიც შენს მუშაობაზე ახდენს გავლენას. დაწერე პროფესიონალური საჩივარი, რომელიც აღწერს პრობლემას ნეიტრალურად, ხსნის გავლენას და გადადის გადაწყვეტაზე.",
+      recipientRole: "a business partner or supplier",
+      promptKa: "დაწერე 5-7 წინადადება. იყავი ნეიტრალური — გადაჭერი, ნუ ადანაშაულებ.",
+      hintsKa: [
+        "აღწერე პრობლემა ფაქტებით, ბრალის გარეშე.",
+        "ახსენი მოკლედ რატომ არის მნიშვნელოვანი.",
+        "სწრაფად გადადი გადაწყვეტაზე — 'Could we...'.",
+        "შესთავაზე დახმარება პრობლემის მოგვარებაში.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "hit a snag",
+        ka: "პრობლემას წააწყდი",
+        exampleEn: "We've hit a snag with the delivery.",
+        exampleKa: "მიწოდებასთან პრობლემას წავაწყდით.",
+      },
+      {
+        en: "affect",
+        ka: "გავლენის მოხდენა",
+        exampleEn: "It's affecting our schedule.",
+        exampleKa: "ეს ჩვენს გრაფიკზე ახდენს გავლენას.",
+      },
+      {
+        en: "replacement",
+        ka: "ჩანაცვლება",
+        exampleEn: "Could we arrange a replacement?",
+        exampleKa: "შეგვიძლია ჩანაცვლება მოვაწყოთ?",
+      },
+      {
+        en: "flag (early)",
+        ka: "ადრე აღნიშვნა",
+        exampleEn: "I wanted to flag it early.",
+        exampleKa: "მინდოდა ადრე აღმენიშნა.",
+      },
+      {
+        en: "hold up",
+        ka: "შეფერხება",
+        exampleEn: "It's holding up production.",
+        exampleKa: "ეს წარმოებას აფერხებს.",
+      },
+    ],
+    readAloudPhrases: [
+      "We've hit a snag with the last delivery.",
+      "About fifteen percent of the units arrived damaged.",
+      "Since it's holding up our production line, I wanted to flag it early.",
+      "Could we figure out a replacement plan this week?",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "complaint",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ საჩივარს სერიოზულ ან განმეორებით პრობლემაზე — მკაცრი, მაგრამ პროფესიონალური, რომელიც ინარჩუნებს ბერკეტს.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "სერიოზული, განმეორებადი პრობლემაა — რომელი უფრო ძლიერია პროფესიონალურად?",
+      options: [
+        {
+          label: "A",
+          text: "Hi David,\n\nI want to be direct: this is the third missed deadline this quarter, and it's now affecting our commitments to our own clients. I value our partnership, which is exactly why I'd rather solve this than escalate it.\n\nCan we set up a call this week to understand what's driving the delays and agree on concrete safeguards? I need to leave that conversation confident it won't happen a fourth time.\n\nBest,\nGiorgi",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi David,\n\nThis is completely unacceptable. Three missed deadlines is a joke and if this happens again we will have to reconsider the whole contract. I'm very disappointed in your team.\n\nGiorgi",
+          isBetter: false,
+          issuesKa: [
+            "ემოციური და მუქარით სავსე ('a joke', 'reconsider the whole contract').",
+            "თავს ესხმის გუნდს პრობლემის სტრუქტურული გადაჭრის ნაცვლად.",
+            "არ სთავაზობს კონკრეტულ გზას პრობლემის მოსაგვარებლად.",
+          ],
+        },
+      ],
+      explanationKa:
+        "მაღალი დონის საჩივარი მკაცრიცაა და პროფესიონალურიც. A არის პირდაპირი პრობლემაზე, აჩვენებს ბერკეტს ('rather solve this than escalate'), მაგრამ სთავაზობს კონსტრუქციულ გზას.",
+    },
+    learn: {
+      titleKa: "მკაცრი საჩივარი, რომელიც ინარჩუნებს პროფესიონალიზმს",
+      explanationKa:
+        "სერიოზული ან განმეორებადი პრობლემის დროს გჭირდება სიმტკიცე პროფესიონალიზმის დაკარგვის გარეშე. იყავი პირდაპირი პრობლემის სერიოზულობაზე, დაასახელე გავლენა ფაქტებით, აჩვენე რომ გაქვს ბერკეტი მაგრამ ამჯობინებ გადაჭრას, და მოითხოვე კონკრეტული ცვლილება ან უსაფრთხოების ზომები. ეს ინარჩუნებს როგორც ურთიერთობას, ისე შენს პოზიციას.",
+      structure: [
+        {
+          partKa: "პირდაპირი, მკაცრი გახსნა",
+          purposeKa: "თქვი პრობლემის სერიოზულობა გარკვევით.",
+          exampleEn: "I want to be direct: this is the third missed deadline this quarter.",
+        },
+        {
+          partKa: "გავლენა ფაქტებით",
+          purposeKa: "აჩვენე რეალური შედეგები.",
+          exampleEn: "It's now affecting our commitments to our own clients.",
+        },
+        {
+          partKa: "ბერკეტი + კონსტრუქციულობა",
+          purposeKa: "აჩვენე ძალა, მაგრამ ამჯობინე გადაჭრა.",
+          exampleEn: "I value our partnership, which is why I'd rather solve this than escalate.",
+        },
+        {
+          partKa: "კონკრეტული მოთხოვნა",
+          purposeKa: "მოითხოვე ცვლილება ან უსაფრთხოების ზომა.",
+          exampleEn: "Let's agree on concrete safeguards so it won't happen again.",
+        },
+      ],
+      examples: [
+        {
+          en: "I want to be direct: this is the third missed deadline this quarter.",
+          ka: "პირდაპირ ვიტყვი: ეს კვარტალში მესამე გაცდენილი ვადაა.",
+          noteKa: "სიმტკიცე ფაქტით — არა ემოციით.",
+        },
+        {
+          en: "I value our partnership, which is why I'd rather solve this than escalate it.",
+          ka: "ვაფასებ ჩვენს პარტნიორობას, ამიტომაც მირჩევნია ეს გადავჭრათ, ვიდრე ესკალაცია გავუკეთო.",
+          noteKa: "აჩვენებს ბერკეტს ('escalate') დიპლომატიურად.",
+        },
+        {
+          en: "I need to leave that conversation confident it won't happen a fourth time.",
+          ka: "მე უნდა გამოვიდე იმ საუბრიდან დარწმუნებული, რომ ეს მეოთხედ არ განმეორდება.",
+          noteKa: "მკაფიო მოთხოვნა შედეგზე, არა უბრალო იმედი.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "გიორგის კომპანიას მესამედ გაუცდა პარტნიორმა ვადა, რაც უკვე მის საკუთარ კლიენტებზე აისახება. ის წერს მკაცრ, მაგრამ პროფესიონალურ საჩივარს.",
+      subject: "Recurring delays — we need to address this directly",
+      body: "Hi David,\n\nI want to be direct with you, because I think our partnership is worth the honesty: this is the third missed deadline this quarter, and it's no longer just an internal inconvenience — it's now affecting the commitments we've made to our own clients.\n\nI value working with your team, and that's exactly why I'd rather solve this together than escalate it through other channels. But I do need this resolved.\n\nCan we set up a call this week to understand what's actually driving the delays and agree on concrete safeguards — earlier checkpoints, buffer time, whatever it takes? I want to come out of that conversation genuinely confident we won't be here a fourth time.\n\nBest,\nGiorgi",
+      annotationsKa: [
+        "subject line სერიოზულია და პირდაპირი, მაგრამ არა აგრესიული.",
+        "ასახელებს გავლენას ფაქტებით — საკუთარ კლიენტებზე ზეგავლენა.",
+        "აჩვენებს ბერკეტს ('escalate through other channels') დიპლომატიურად, ურთიერთობის შენარჩუნებით.",
+        "მოითხოვს კონკრეტულ უსაფრთხოების ზომებს, არა უბრალო ბოდიშს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ სერიოზული ან განმეორებადი პრობლემა გაქვს პარტნიორთან, მომწოდებელთან ან კონტრაქტორთან, რომელიც უკვე შენს ბიზნესზე ან კლიენტებზე აისახება. დაწერე მკაცრი, მაგრამ პროფესიონალური საჩივარი, რომელიც ინარჩუნებს ბერკეტს და ითხოვს კონკრეტულ ცვლილებას.",
+      recipientRole: "an underperforming partner or vendor",
+      promptKa: "დაწერე 6-9 წინადადება. იყავი მკაცრი და პირდაპირი, მაგრამ პროფესიონალური. აჩვენე ბერკეტი და მოითხოვე კონკრეტული გადაწყვეტა.",
+      hintsKa: [
+        "იყავი პირდაპირი პრობლემის სერიოზულობაზე.",
+        "დაასახელე რეალური გავლენა ფაქტებით.",
+        "აჩვენე ბერკეტი დიპლომატიურად ('rather solve than escalate').",
+        "მოითხოვე კონკრეტული უსაფრთხოების ზომები, არა უბრალო ბოდიში.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "be direct",
+        ka: "პირდაპირობა",
+        exampleEn: "I want to be direct with you.",
+        exampleKa: "მინდა პირდაპირი ვიყო თქვენთან.",
+      },
+      {
+        en: "escalate",
+        ka: "ესკალაცია / დონის აწევა",
+        exampleEn: "I'd rather not escalate this.",
+        exampleKa: "მირჩევნია ამის ესკალაცია არ გავაკეთო.",
+      },
+      {
+        en: "safeguard",
+        ka: "უსაფრთხოების ზომა / დაცვის მექანიზმი",
+        exampleEn: "Let's agree on concrete safeguards.",
+        exampleKa: "მოდი კონკრეტულ დაცვის ზომებზე შევთანხმდეთ.",
+      },
+      {
+        en: "commitment",
+        ka: "ვალდებულება",
+        exampleEn: "It affects our commitments to clients.",
+        exampleKa: "ეს ჩვენს ვალდებულებებზე აისახება კლიენტების წინაშე.",
+      },
+      {
+        en: "drive (a problem)",
+        ka: "გამომწვევი მიზეზი",
+        exampleEn: "Let's understand what's driving the delays.",
+        exampleKa: "მოდი გავიგოთ, რა იწვევს შეფერხებებს.",
+      },
+    ],
+    readAloudPhrases: [
+      "I want to be direct with you, because I think our partnership is worth the honesty.",
+      "This is the third missed deadline this quarter.",
+      "I'd rather solve this together than escalate it through other channels.",
+      "Let's agree on concrete safeguards so we won't be here a fourth time.",
+    ],
+  },
+};
+
+// ============================================================
+// TOPIC 6: NEGOTIATION (მოლაპარაკება და წინადადება)
+// ============================================================
+
+const negotiation: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "negotiation",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით მარტივი მოლაპარაკების დაწყებას — თავაზიანად ვთხოვოთ უკეთესი პირობა.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი თხოვნა უფრო კარგად ჟღერს მოლაპარაკებაში?",
+      options: [
+        {
+          label: "A",
+          text: "Is it possible to get a better price for a bigger order?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Your price is too high. Make it lower.",
+          isBetter: false,
+          issuesKa: [
+            "ჟღერს როგორც ბრძანება, არა შეთავაზება.",
+            "არაფერს სთავაზობს სანაცვლოდ.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი მოლაპარაკება თავაზიანია და რაღაცას სთავაზობს სანაცვლოდ — 'a bigger order' აძლევს მეორე მხარეს მიზეზს დათანხმდეს.",
+    },
+    learn: {
+      titleKa: "მარტივი მოლაპარაკების სამი ნაწილი",
+      explanationKa:
+        "მარტივი მოლაპარაკება ამბობს: რა მოგწონს, რა გინდა შეიცვალოს და რას სთავაზობ სანაცვლოდ. იყავი თავაზიანი — 'Is it possible...' კარგი დასაწყისია.",
+      structure: [
+        {
+          partKa: "დადებითი დასაწყისი",
+          purposeKa: "თქვი რა მოგწონს.",
+          exampleEn: "Thank you for your offer. The product looks great.",
+        },
+        {
+          partKa: "შენი თხოვნა",
+          purposeKa: "თქვი რა გინდა, თავაზიანად.",
+          exampleEn: "Is it possible to get a better price?",
+        },
+        {
+          partKa: "შენი შეთავაზება",
+          purposeKa: "თქვი რას იძლევი სანაცვლოდ.",
+          exampleEn: "We can order more units.",
+        },
+      ],
+      examples: [
+        {
+          en: "Is it possible to get a better price?",
+          ka: "შესაძლებელია უკეთესი ფასის მიღება?",
+          noteKa: "'Is it possible' — თავაზიანი გზა თხოვნისთვის.",
+        },
+        {
+          en: "We can order more units.",
+          ka: "შეგვიძლია მეტი ერთეული შევუკვეთოთ.",
+        },
+        {
+          en: "What do you think?",
+          ka: "რას ფიქრობთ?",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინოს მოსწონს მომწოდებლის პროდუქტი, მაგრამ ფასი მაღალია. ის თავაზიანად იწყებს მოლაპარაკებას.",
+      subject: "Question about the price",
+      body: "Hello,\n\nThank you for your offer. The product looks great.\n\nIs it possible to get a better price? We can order 50 units instead of 20.\n\nWhat do you think?\n\nBest,\nNino",
+      annotationsKa: [
+        "ნინო იწყებს დადებითად — მადლობით.",
+        "თხოვნა თავაზიანია — 'Is it possible...'.",
+        "სთავაზობს რაღაცას სანაცვლოდ — მეტ ერთეულს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ გინდა იყიდო პროდუქტი ან სერვისი, მაგრამ ფასი მაღალია. დაწერე მოკლე წერილი: მადლობა, თავაზიანი თხოვნა უკეთეს ფასზე და რას სთავაზობ სანაცვლოდ.",
+      recipientRole: "a supplier",
+      promptKa: "დაწერე 3-4 წინადადება. იყავი თავაზიანი და შესთავაზე რაღაც სანაცვლოდ.",
+      hintsKa: [
+        "დაიწყე მადლობით.",
+        "გამოიყენე 'Is it possible...'.",
+        "შესთავაზე რაღაც — მეტი შეკვეთა, გრძელი კონტრაქტი.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "offer",
+        ka: "შეთავაზება",
+        exampleEn: "Thank you for your offer.",
+        exampleKa: "გმადლობთ შეთავაზებისთვის.",
+      },
+      {
+        en: "price",
+        ka: "ფასი",
+        exampleEn: "Is it possible to get a better price?",
+        exampleKa: "შესაძლებელია უკეთესი ფასის მიღება?",
+      },
+      {
+        en: "instead of",
+        ka: "ნაცვლად",
+        exampleEn: "We can order 50 instead of 20.",
+        exampleKa: "შეგვიძლია 50 შევუკვეთოთ 20-ის ნაცვლად.",
+      },
+    ],
+    readAloudPhrases: [
+      "Thank you for your offer.",
+      "Is it possible to get a better price?",
+      "We can order fifty units instead of twenty.",
+      "What do you think?",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "negotiation",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით მოლაპარაკებას, სადაც ვიყენებთ რბილ ენას და ვთავაზობთ ალტერნატივებს.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი კონტრშეთავაზება უფრო კარგად მუშაობს?",
+      options: [
+        {
+          label: "A",
+          text: "The price works for us, but the delivery time is a challenge. Would a faster delivery be possible if we pay 5% more?",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "We don't like the delivery time. Change it.",
+          isBetter: false,
+          issuesKa: [
+            "ბრძანების ტონი მოლაპარაკებას ხურავს.",
+            "არ სთავაზობს ალტერნატივას ან კომპრომისს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი კონტრშეთავაზება ამბობს რა მუშაობს, რა არა, და სთავაზობს კონკრეტულ ალტერნატივას — 'faster delivery for 5% more'.",
+    },
+    learn: {
+      titleKa: "მოლაპარაკება ალტერნატივებით",
+      explanationKa:
+        "მოლაპარაკება გაცვლაა, არა ბრძოლა. თქვი რა მუშაობს შენთვის, რა არის რთული, და შესთავაზე ალტერნატივა. რბილი ენა ('Would it be possible...', 'a challenge') ინარჩუნებს კარგ ტონს.",
+      structure: [
+        {
+          partKa: "დადებითი — რა მუშაობს",
+          purposeKa: "დაიწყე შეთანხმებით.",
+          exampleEn: "The price works for us.",
+        },
+        {
+          partKa: "პრობლემა — რბილად",
+          purposeKa: "თქვი რა არის რთული.",
+          exampleEn: "The delivery time is a challenge for us.",
+        },
+        {
+          partKa: "ალტერნატივის შეთავაზება",
+          purposeKa: "შესთავაზე კონკრეტული გაცვლა.",
+          exampleEn: "Would faster delivery be possible if we pay 5% more?",
+        },
+        {
+          partKa: "ღია დასასრული",
+          purposeKa: "მოიწვიე პასუხი.",
+          exampleEn: "Open to other ideas too.",
+        },
+      ],
+      examples: [
+        {
+          en: "The price works for us, but the timeline is a challenge.",
+          ka: "ფასი გვაწყობს, მაგრამ ვადები რთულია ჩვენთვის.",
+          noteKa: "'a challenge' რბილია — არ ამბობს 'ცუდია'.",
+        },
+        {
+          en: "Would it be possible to deliver by Friday?",
+          ka: "შესაძლებელი იქნებოდა პარასკევამდე მოწოდება?",
+        },
+        {
+          en: "We're open to other options.",
+          ka: "ღია ვართ სხვა ვარიანტებისთვისაც.",
+          noteKa: "აჩვენებს მოქნილობას.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითს მოსწონს მომწოდებლის ფასი, მაგრამ მიწოდების ვადა ძალიან გვიანია. ის სთავაზობს გაცვლას.",
+      subject: "Your offer — one question on delivery",
+      body: "Hi Anna,\n\nThanks for the offer — the price works well for us.\n\nThe delivery time is the one challenge: four weeks is too late for our project. Would a two-week delivery be possible if we pay 5% more, or if we order a smaller first batch?\n\nWe're open to other ideas too. Looking forward to finding something that works for both of us.\n\nBest,\nDavit",
+      annotationsKa: [
+        "იწყება დადებითით — ფასი მუშაობს.",
+        "პრობლემა რბილად არის ნათქვამი — 'the one challenge'.",
+        "სთავაზობს ორ კონკრეტულ ალტერნატივას, არა მხოლოდ მოთხოვნას.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ მიიღე შეთავაზება (ფასი, ვადა ან პირობები), რომლის ერთი ნაწილი არ გაწყობს. დაწერე კონტრშეთავაზება: რა მუშაობს, რა არის რთული და 1-2 კონკრეტული ალტერნატივა.",
+      recipientRole: "a supplier or partner",
+      promptKa: "დაწერე 4-6 წინადადება. დაიწყე დადებითით და შესთავაზე კონკრეტული ალტერნატივები.",
+      hintsKa: [
+        "დაიწყე იმით რა მუშაობს — 'The price works for us'.",
+        "თქვი პრობლემა რბილად — 'is a challenge'.",
+        "შესთავაზე კონკრეტული გაცვლა ან ალტერნატივა.",
+        "დაასრულე ღიად — 'open to other ideas'.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "challenge",
+        ka: "გამოწვევა / სირთულე",
+        exampleEn: "The timeline is a challenge for us.",
+        exampleKa: "ვადები ჩვენთვის გამოწვევაა.",
+      },
+      {
+        en: "batch",
+        ka: "პარტია",
+        exampleEn: "We can order a smaller first batch.",
+        exampleKa: "შეგვიძლია პირველი მცირე პარტია შევუკვეთოთ.",
+      },
+      {
+        en: "option",
+        ka: "ვარიანტი",
+        exampleEn: "We're open to other options.",
+        exampleKa: "ღია ვართ სხვა ვარიანტებისთვის.",
+      },
+      {
+        en: "work for both of us",
+        ka: "ორივესთვის მისაღები",
+        exampleEn: "Let's find something that works for both of us.",
+        exampleKa: "მოდი ვიპოვოთ ის, რაც ორივეს გვაწყობს.",
+      },
+    ],
+    readAloudPhrases: [
+      "Thanks for the offer — the price works well for us.",
+      "The delivery time is the one challenge.",
+      "Would a two-week delivery be possible if we pay five percent more?",
+      "We're open to other ideas too.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "negotiation",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით მოლაპარაკებას ღირებულების ჩარჩოში — რატომ არის შენი შეთავაზება მომგებიანი ორივესთვის.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "ეს კონტრშეთავაზება სუსტია — რატომ?",
+      options: [
+        {
+          label: "A",
+          text: "Hi James,\n\nThanks for the proposal — we're excited about the partnership. On pricing: your rate is above our budget, but rather than just asking for a discount, here's what we can offer. If we commit to a 12-month contract instead of 6, could you meet us at $4,500/month? The longer commitment gives you predictable revenue, and it lets us plan properly.\n\nWould that work?\n\nBest,\nTeo",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi James,\n\nThanks for the proposal. Unfortunately your price is too expensive for us. Can you give us a discount? Our budget is limited.\n\nBest,\nTeo",
+          isBetter: false,
+          issuesKa: [
+            "ითხოვს ფასდაკლებას, მაგრამ არაფერს სთავაზობს სანაცვლოდ.",
+            "'our budget is limited' სისუსტის პოზიციაა — არა ღირებულების.",
+            "არ აჩვენებს რატომ არის მომგებიანი მეორე მხარისთვის დათანხმება.",
+          ],
+        },
+      ],
+      explanationKa:
+        "ძლიერი მოლაპარაკება აჩვენებს ღირებულებას ორივესთვის. A სთავაზობს გრძელ კონტრაქტს ('predictable revenue') — მიზეზს, რომ მეორე მხარემ თქვას კი.",
+    },
+    learn: {
+      titleKa: "ღირებულებაზე დაფუძნებული მოლაპარაკება",
+      explanationKa:
+        "საუკეთესო მოლაპარაკება არ არის ფასდაკლების თხოვნა — ის არის გაცვლის შეთავაზება, სადაც ორივე იგებს. კონკრეტული ციფრებით ისაუბრე, შესთავაზე რაღაც ღირებული სანაცვლოდ (გრძელი კონტრაქტი, მეტი მოცულობა, სწრაფი გადახდა) და ახსენი რატომ არის ეს მათთვისაც კარგი.",
+      structure: [
+        {
+          partKa: "დადებითი ჩარჩო",
+          purposeKa: "დაადასტურე ინტერესი.",
+          exampleEn: "We're excited about the partnership.",
+        },
+        {
+          partKa: "პრობლემა + კონკრეტული შეთავაზება",
+          purposeKa: "ციფრები, არა ბუნდოვანება.",
+          exampleEn: "If we commit to 12 months instead of 6, could you meet us at $4,500/month?",
+        },
+        {
+          partKa: "ღირებულება მათთვის",
+          purposeKa: "ახსენი რატომ იგებენ ისინიც.",
+          exampleEn: "The longer commitment gives you predictable revenue.",
+        },
+        {
+          partKa: "მარტივი დახურვის კითხვა",
+          purposeKa: "გააადვილე პასუხი.",
+          exampleEn: "Would that work?",
+        },
+      ],
+      examples: [
+        {
+          en: "Rather than just asking for a discount, here's what we can offer.",
+          ka: "იმის ნაცვლად, რომ უბრალოდ ფასდაკლება ვითხოვო, აი რას გთავაზობთ.",
+          noteKa: "აყალიბებს გაცვლას, არა თხოვნას.",
+        },
+        {
+          en: "The longer commitment gives you predictable revenue.",
+          ka: "გრძელვადიანი ვალდებულება თქვენ პროგნოზირებად შემოსავალს გაძლევთ.",
+          noteKa: "ღირებულება მეორე მხარისთვის — მიზეზი დათანხმებისთვის.",
+        },
+        {
+          en: "Could you meet us at $4,500 a month?",
+          ka: "შეძლებდით თვეში 4,500 დოლარზე შეთანხმებას?",
+          noteKa: "'meet us at' — თანამშრომლობითი ენა კონკრეტული ციფრით.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "თეოს კომპანიას მოსწონს პარტნიორის სერვისი, მაგრამ ფასი ბიუჯეტს აღემატება. ის სთავაზობს გაცვლას, რომელიც ორივესთვის მომგებიანია.",
+      subject: "Proposal — a structure that could work for both of us",
+      body: "Hi James,\n\nThanks for the detailed proposal — we're genuinely excited about the partnership, and your team clearly understands our needs.\n\nOn pricing: the $5,500/month rate is above what we've budgeted. But rather than just asking for a discount, here's a structure we can offer: if we commit to a 12-month contract instead of the proposed 6, could you meet us at $4,500/month?\n\nFrom your side, that's predictable revenue for a full year and no re-selling effort in Q3. From ours, it fits the budget and lets us plan the rollout properly.\n\nWould that work? Happy to jump on a call if easier.\n\nBest,\nTeo",
+      annotationsKa: [
+        "subject line თანამშრომლობით ტონს აყალიბებს — 'work for both of us'.",
+        "კონკრეტული ციფრები ($5,500 → $4,500, 6 → 12 თვე) — სერიოზული მოლაპარაკება.",
+        "ღიად ხსნის ღირებულებას ორივე მხარისთვის — ეს ზრდის დათანხმების შანსს.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ მიიღე შეთავაზება, რომლის ფასი ან პირობები არ გაწყობს. დაწერე მოლაპარაკების წერილი კონკრეტული კონტრშეთავაზებით: რას სთავაზობ სანაცვლოდ და რატომ არის ეს მეორე მხარისთვისაც მომგებიანი.",
+      recipientRole: "a vendor or potential partner",
+      promptKa: "დაწერე 5-7 წინადადება. გამოიყენე კონკრეტული ციფრები და ახსენი ღირებულება ორივე მხარისთვის.",
+      hintsKa: [
+        "დაიწყე დადებითი ჩარჩოთი — ინტერესის დადასტურებით.",
+        "შესთავაზე კონკრეტული გაცვლა ციფრებით.",
+        "ახსენი რატომ იგებს მეორე მხარეც.",
+        "დაასრულე მარტივი კითხვით — 'Would that work?'.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "commit to",
+        ka: "ვალდებულების აღება",
+        exampleEn: "We can commit to a 12-month contract.",
+        exampleKa: "შეგვიძლია 12-თვიანი კონტრაქტის ვალდებულება ავიღოთ.",
+      },
+      {
+        en: "meet (someone) at (a price)",
+        ka: "ფასზე შეთანხმება",
+        exampleEn: "Could you meet us at $4,500?",
+        exampleKa: "შეძლებდით 4,500 დოლარზე შეთანხმებას?",
+      },
+      {
+        en: "predictable revenue",
+        ka: "პროგნოზირებადი შემოსავალი",
+        exampleEn: "A long contract means predictable revenue.",
+        exampleKa: "გრძელი კონტრაქტი პროგნოზირებად შემოსავალს ნიშნავს.",
+      },
+      {
+        en: "budget",
+        ka: "ბიუჯეტი",
+        exampleEn: "The rate is above our budget.",
+        exampleKa: "ტარიფი ჩვენს ბიუჯეტს აღემატება.",
+      },
+      {
+        en: "structure (a deal)",
+        ka: "გარიგების სტრუქტურა",
+        exampleEn: "Here's a structure that could work.",
+        exampleKa: "აი სტრუქტურა, რომელიც შეიძლება იმუშაოს.",
+      },
+    ],
+    readAloudPhrases: [
+      "We're genuinely excited about the partnership.",
+      "Rather than just asking for a discount, here's what we can offer.",
+      "If we commit to a twelve-month contract, could you meet us at four thousand five hundred a month?",
+      "From your side, that's predictable revenue for a full year.",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "negotiation",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ რთულ მოლაპარაკებას — პოზიციის დაცვა წნეხის ქვეშ, ალტერნატივების ქონა და ურთიერთობის შენარჩუნება.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "მეორე მხარე აწვება ფასის შემცირებაზე. რომელი პასუხი ინარჩუნებს პოზიციასაც და ურთიერთობასაც?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Karen,\n\nI hear you on the budget pressure, and I want to find a way to work together. What I can't do is drop the rate itself — it reflects the senior team this project needs, and cutting it would mean quietly cutting quality.\n\nWhat I can do: we could phase the project so the first payment lands next quarter, or trim the scope of phase one to fit the current budget. Both keep the quality intact.\n\nWhich direction is more useful to explore?\n\nBest,\nSandro",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Karen,\n\nOK, since you're pushing hard on this, we can do 15% off. I hope this works because we really can't go lower than that. This is already below our normal rate.\n\nBest,\nSandro",
+          isBetter: false,
+          issuesKa: [
+            "მაშინვე დათმო წნეხის ქვეშ — ასწავლის მეორე მხარეს, რომ ზეწოლა მუშაობს.",
+            "'I hope this works' სისუსტეს აჩვენებს.",
+            "ფასდაკლების მიზეზი არ ახსნა — ახლა ღირებულება საეჭვო ჩანს.",
+          ],
+        },
+      ],
+      explanationKa:
+        "ძლიერი მომლაპარაკებელი იცავს ღირებულებას და გვთავაზობს კრეატიულ ალტერნატივებს ფასის ჭრის ნაცვლად. A ამბობს მკაფიო 'no'-ს ფასზე, მაგრამ ხსნის ორ 'yes' გზას — ეს ინარჩუნებს ღირებულებასაც და გარიგებასაც.",
+    },
+    learn: {
+      titleKa: "პოზიციის დაცვა: მკაფიო 'არა', კრეატიული 'კი'",
+      explanationKa:
+        "რთულ მოლაპარაკებაში ყველაზე ძლიერი ტექნიკაა: დაიცავი ის, რაც არ იცვლება (შენი ღირებულება), მაგრამ იყავი მოქნილი სტრუქტურაში (ვადები, ფაზები, მოცულობა). ახსენი რატომ იცავ ფასს — ღირებულების ლოგიკით, არა სიჯიუტით. და ყოველთვის შესთავაზე ორი გზა წინ, რომ საუბარი გაგრძელდეს შენს პირობებზე.",
+      structure: [
+        {
+          partKa: "ემპათია პოზიციის დათმობის გარეშე",
+          purposeKa: "აღიარე მათი წნეხი.",
+          exampleEn: "I hear you on the budget pressure, and I want to find a way to work together.",
+        },
+        {
+          partKa: "მკაფიო ზღვარი ლოგიკით",
+          purposeKa: "დაიცავი ღირებულება ახსნით.",
+          exampleEn: "What I can't do is drop the rate — it reflects the senior team this project needs.",
+        },
+        {
+          partKa: "კრეატიული ალტერნატივები",
+          purposeKa: "გახსენი 'კი' გზები სტრუქტურაში.",
+          exampleEn: "We could phase the project, or trim phase one's scope.",
+        },
+        {
+          partKa: "არჩევანის კითხვა",
+          purposeKa: "საუბარი გააგრძელე შენს ჩარჩოში.",
+          exampleEn: "Which direction is more useful to explore?",
+        },
+      ],
+      examples: [
+        {
+          en: "What I can't do is drop the rate itself — cutting it would mean quietly cutting quality.",
+          ka: "რასაც ვერ გავაკეთებ, ეს ტარიფის შემცირებაა — მისი შემცირება ხარისხის ჩუმად შემცირებას ნიშნავს.",
+          noteKa: "ზღვარი ღირებულების ლოგიკით — არა სიჯიუტით.",
+        },
+        {
+          en: "What I can do: we could phase the project or trim the scope.",
+          ka: "რაც შემიძლია: პროექტი ფაზებად დავყოთ ან მოცულობა შევამციროთ.",
+          noteKa: "'can't' მაშინვე მიჰყვება 'can' — ინარჩუნებს კონსტრუქციულობას.",
+        },
+        {
+          en: "Which direction is more useful to explore?",
+          ka: "რომელი მიმართულების განხილვა უფრო სასარგებლოა?",
+          noteKa: "არჩევანი ორ 'კი'-ს შორის — არა 'კი/არა' ფასზე.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "სანდროს კლიენტი აწვება მნიშვნელოვან ფასდაკლებაზე. ის იცავს ტარიფს, მაგრამ სთავაზობს კრეატიულ სტრუქტურებს გარიგების შესანარჩუნებლად.",
+      subject: "On pricing — protecting quality, flexible on structure",
+      body: "Hi Karen,\n\nI hear you on the budget pressure — genuinely — and I want to find a way to make this work, because I think the fit between our teams is strong.\n\nLet me be transparent about where I have room and where I don't. What I can't do is drop the rate itself: it reflects the senior people this project actually needs, and cutting it would mean quietly cutting the quality you're hiring us for. I don't think either of us wants that.\n\nWhat I can do is be flexible on structure. Two options: we could phase the project so the first payment lands in your next budget cycle, or we could trim the scope of phase one to fit the current number and add the rest once you see results.\n\nBoth protect the outcome. Which direction feels more useful to explore?\n\nBest,\nSandro",
+      annotationsKa: [
+        "subject line თავადვე აყალიბებს პოზიციას — ხარისხი მყარია, სტრუქტურა მოქნილი.",
+        "'where I have room and where I don't' — გამჭვირვალე ზღვრები ნდობას ქმნის.",
+        "ფასის დაცვა ღირებულების ლოგიკითაა ('senior people the project needs'), არა სიჯიუტით.",
+        "ორი კონკრეტული ალტერნატივა საუბარს აგრძელებს მისსავე ჩარჩოში.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "მეორე მხარე (კლიენტი, პარტნიორი ან დამსაქმებელი) გაწვება მნიშვნელოვან დათმობაზე — ფასის ჭრა, ვადის შემცირება ან პირობის შეცვლა, რაც შენს ღირებულებას აზიანებს. დაწერე პასუხი, რომელიც იცავს შენს პოზიციას ლოგიკით და სთავაზობს კრეატიულ ალტერნატივებს.",
+      recipientRole: "someone pressuring you for a major concession",
+      promptKa: "დაწერე 6-9 წინადადება. თქვი მკაფიო 'არა' ღირებულების ლოგიკით და გახსენი ორი 'კი' გზა.",
+      hintsKa: [
+        "აღიარე მათი წნეხი ემპათიით, დათმობის გარეშე.",
+        "დაიცავი ზღვარი ღირებულების ახსნით — რატომ არის ფასი ის რაც არის.",
+        "'can't'-ს მაშინვე მიაყოლე 'can' — ორი კონკრეტული ალტერნატივა.",
+        "დაასრულე არჩევანის კითხვით ორ 'კი'-ს შორის.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "have room",
+        ka: "მოქნილობის ქონა",
+        exampleEn: "Let me show you where I have room.",
+        exampleKa: "მოდი გაჩვენოთ სად მაქვს მოქნილობა.",
+      },
+      {
+        en: "phase (a project)",
+        ka: "ფაზებად დაყოფა",
+        exampleEn: "We could phase the project.",
+        exampleKa: "შეგვიძლია პროექტი ფაზებად დავყოთ.",
+      },
+      {
+        en: "trim the scope",
+        ka: "მოცულობის შემცირება",
+        exampleEn: "Let's trim the scope of phase one.",
+        exampleKa: "მოდი პირველი ფაზის მოცულობა შევამციროთ.",
+      },
+      {
+        en: "concession",
+        ka: "დათმობა",
+        exampleEn: "That's a concession I can't make.",
+        exampleKa: "ეს დათმობაა, რომელსაც ვერ გავაკეთებ.",
+      },
+      {
+        en: "transparent",
+        ka: "გამჭვირვალე",
+        exampleEn: "Let me be transparent about pricing.",
+        exampleKa: "მოდი გამჭვირვალე ვიყო ფასებთან დაკავშირებით.",
+      },
+    ],
+    readAloudPhrases: [
+      "I hear you on the budget pressure, and I want to find a way to make this work.",
+      "What I can't do is drop the rate itself.",
+      "Cutting it would mean quietly cutting the quality you're hiring us for.",
+      "Which direction feels more useful to explore?",
+    ],
+  },
+};
+
+// ============================================================
+// TOPIC 7: CLOSING (გარიგების დახურვა)
+// ============================================================
+
+const closing: Record<Level, EmailLesson> = {
+  // ---------------- BEGINNER ----------------
+  business_beginner: {
+    emailType: "closing",
+    level: "business_beginner",
+    dailyFocusKa: "დღეს ვისწავლით შეთანხმების დადასტურებას — მკაფიოდ ვთქვათ რა შევთანხმდით და რა იქნება შემდეგ.",
+    estimatedMinutes: 10,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი დადასტურება უფრო მკაფიოა?",
+      options: [
+        {
+          label: "A",
+          text: "Great! So we agree: 50 units, delivery on Friday. I will send the payment today.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "OK sounds good, let's do it.",
+          isBetter: false,
+          issuesKa: [
+            "არ იმეორებს დეტალებს — რაზე შევთანხმდით?",
+            "გაუგებარია რა მოხდება შემდეგ.",
+          ],
+        },
+      ],
+      explanationKa:
+        "კარგი დადასტურება იმეორებს დეტალებს (50 ერთეული, პარასკევი) — ასე ორივე მხარე დარწმუნებულია, რომ ერთსა და იმავეზე შეთანხმდნენ.",
+    },
+    learn: {
+      titleKa: "შეთანხმების დადასტურების სამი ნაწილი",
+      explanationKa:
+        "როცა შეთანხმდები, დაწერე მოკლე წერილი: მადლობა, რა შევთანხმდით (დეტალები!) და რა იქნება შემდეგი ნაბიჯი. ეს თავიდან აგაცილებს გაუგებრობას.",
+      structure: [
+        {
+          partKa: "მადლობა",
+          purposeKa: "დაიწყე დადებითად.",
+          exampleEn: "Thank you for the good conversation.",
+        },
+        {
+          partKa: "შეთანხმების დეტალები",
+          purposeKa: "გაიმეორე რა შევთანხმდით.",
+          exampleEn: "So we agree: 50 units, delivery on Friday.",
+        },
+        {
+          partKa: "შემდეგი ნაბიჯი",
+          purposeKa: "თქვი ვინ რას გააკეთებს.",
+          exampleEn: "I will send the payment today.",
+        },
+      ],
+      examples: [
+        {
+          en: "So we agree: 50 units, delivery on Friday.",
+          ka: "მაშ ვთანხმდებით: 50 ერთეული, მიწოდება პარასკევს.",
+          noteKa: "დეტალების გამეორება გაუგებრობას გამორიცხავს.",
+        },
+        {
+          en: "I will send the payment today.",
+          ka: "დღეს გამოვგზავნი გადახდას.",
+        },
+        {
+          en: "Thank you for working with us.",
+          ka: "გმადლობთ, რომ ჩვენთან თანამშრომლობთ.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ნინო შეთანხმდა მომწოდებელთან. ის წერს მოკლე დადასტურებას.",
+      subject: "Confirmed — 50 units, Friday delivery",
+      body: "Hello,\n\nThank you for the good conversation today.\n\nSo we agree: 50 units at $10 each, delivery on Friday. I will send the payment today.\n\nThank you for working with us!\n\nBest,\nNino",
+      annotationsKa: [
+        "subject line-შივე ჩანს დადასტურება.",
+        "ნინო იმეორებს ყველა დეტალს — რაოდენობა, ფასი, დღე.",
+        "ამბობს რას გააკეთებს შემდეგ — გადახდას გაგზავნის.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ ახლახან შეთანხმდი ვინმესთან (შეკვეთა, შეხვედრა ან სამუშაო). დაწერე მოკლე წერილი, რომელიც ადასტურებს შეთანხმებას: მადლობა, დეტალები და შემდეგი ნაბიჯი.",
+      recipientRole: "a supplier or colleague",
+      promptKa: "დაწერე 3-4 წინადადება. გაიმეორე დეტალები და თქვი შემდეგი ნაბიჯი.",
+      hintsKa: [
+        "დაიწყე მადლობით.",
+        "გაიმეორე დეტალები — 'So we agree: ...'.",
+        "თქვი რა იქნება შემდეგ — 'I will...'.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "agree",
+        ka: "შეთანხმება",
+        exampleEn: "So we agree: delivery on Friday.",
+        exampleKa: "მაშ ვთანხმდებით: მიწოდება პარასკევს.",
+      },
+      {
+        en: "confirm",
+        ka: "დადასტურება",
+        exampleEn: "I want to confirm our agreement.",
+        exampleKa: "მინდა დავადასტურო ჩვენი შეთანხმება.",
+      },
+      {
+        en: "payment",
+        ka: "გადახდა",
+        exampleEn: "I will send the payment today.",
+        exampleKa: "დღეს გამოვგზავნი გადახდას.",
+      },
+    ],
+    readAloudPhrases: [
+      "Thank you for the good conversation today.",
+      "So we agree: fifty units, delivery on Friday.",
+      "I will send the payment today.",
+      "Thank you for working with us.",
+    ],
+  },
+
+  // ---------------- ELEMENTARY ----------------
+  business_elementary: {
+    emailType: "closing",
+    level: "business_elementary",
+    dailyFocusKa: "დღეს ვისწავლით გარიგების დახურვას — ყველა დეტალის დადასტურება და მკაფიო სამოქმედო ნაბიჯები ორივე მხარისთვის.",
+    estimatedMinutes: 12,
+    warmUp: {
+      kind: "compare",
+      promptKa: "რომელი დახურვის წერილი უფრო სრულია?",
+      options: [
+        {
+          label: "A",
+          text: "To confirm: project starts May 1, budget is $3,000, first draft due May 15. Next steps: I'll send the contract today; please sign by Wednesday.",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Great meeting! Excited to start the project soon. I'll be in touch about the details.",
+          isBetter: false,
+          issuesKa: [
+            "'the details' დაუზუსტებელი დარჩა — არაფერია დადასტურებული.",
+            "'soon' და 'be in touch' მკაფიო ვადებს არ იძლევა.",
+          ],
+        },
+      ],
+      explanationKa:
+        "დახურვის წერილი წერილობით აფიქსირებს ყველაფერს: თარიღები, თანხა, ვადები და ვინ რას აკეთებს. 'I'll be in touch' ღიად ტოვებს ყველაფერს.",
+    },
+    learn: {
+      titleKa: "სრული დახურვა: დეტალები + სამოქმედო ნაბიჯები",
+      explanationKa:
+        "გარიგების დახურვისას წერილი უნდა აფიქსირებდეს ყველა მთავარ დეტალს (თარიღები, თანხები, ვადები) და მკაფიო სამოქმედო ნაბიჯებს ორივე მხარისთვის — ვინ, რას, როდის. წერილობითი დადასტურება იცავს ორივეს.",
+      structure: [
+        {
+          partKa: "თბილი დასაწყისი",
+          purposeKa: "დაადასტურე კმაყოფილება.",
+          exampleEn: "Great speaking with you today.",
+        },
+        {
+          partKa: "დეტალების ჩამონათვალი",
+          purposeKa: "დააფიქსირე ყველა მთავარი პუნქტი.",
+          exampleEn: "To confirm: start May 1, budget $3,000, first draft May 15.",
+        },
+        {
+          partKa: "შენი ნაბიჯი",
+          purposeKa: "თქვი რას აკეთებ შენ.",
+          exampleEn: "I'll send the contract today.",
+        },
+        {
+          partKa: "მათი ნაბიჯი ვადით",
+          purposeKa: "თქვი რას ელი მათგან.",
+          exampleEn: "Please sign and return it by Wednesday.",
+        },
+      ],
+      examples: [
+        {
+          en: "To confirm what we agreed:",
+          ka: "დავადასტუროთ რაზეც შევთანხმდით:",
+          noteKa: "კარგი გადასასვლელი დეტალების ჩამონათვალზე.",
+        },
+        {
+          en: "I'll send the contract today.",
+          ka: "დღეს გამოგიგზავნით კონტრაქტს.",
+        },
+        {
+          en: "Please sign and return it by Wednesday.",
+          ka: "გთხოვთ ხელი მოაწეროთ და დააბრუნოთ ოთხშაბათამდე.",
+          noteKa: "მათი ნაბიჯი კონკრეტული ვადით.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "დავითი შეთანხმდა ფრილანსერთან პროექტზე. ის აგზავნის დახურვის წერილს ყველა დეტალით.",
+      subject: "Confirming our agreement — website project",
+      body: "Hi Salome,\n\nGreat speaking with you today — happy we found terms that work for both of us.\n\nTo confirm what we agreed:\n- Project: company website redesign\n- Budget: $3,000\n- Start date: May 1\n- First draft: May 15\n\nNext steps: I'll send the contract today. Please sign and return it by Wednesday so we can start on time.\n\nLooking forward to working together!\n\nBest,\nDavit",
+      annotationsKa: [
+        "ყველა მთავარი დეტალი ერთ ადგილას — ადვილი გადასამოწმებელი.",
+        "ორივე მხარის ნაბიჯები მკაფიოა ვადებით.",
+        "თბილი ტონი ინარჩუნებს კარგ ურთიერთობას საქმიანობასთან ერთად.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ ახლახან შეთანხმდი პროექტზე, შეკვეთაზე ან თანამშრომლობაზე. დაწერე დახურვის წერილი: დააფიქსირე ყველა დეტალი (თანხა, თარიღები) და მკაფიო ნაბიჯები ორივე მხარისთვის.",
+      recipientRole: "a new partner or freelancer",
+      promptKa: "დაწერე 5-6 წინადადება. ჩამოთვალე დეტალები და თქვი ვინ რას გააკეთებს და როდის.",
+      hintsKa: [
+        "გამოიყენე 'To confirm what we agreed:'.",
+        "ჩამოთვალე დეტალები — თანხა, თარიღები, ვადები.",
+        "თქვი შენი ნაბიჯი და მათი ნაბიჯი ვადით.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "terms",
+        ka: "პირობები",
+        exampleEn: "We found terms that work for both of us.",
+        exampleKa: "ვიპოვეთ პირობები, რომლებიც ორივეს გვაწყობს.",
+      },
+      {
+        en: "contract",
+        ka: "კონტრაქტი / ხელშეკრულება",
+        exampleEn: "I'll send the contract today.",
+        exampleKa: "დღეს გამოგიგზავნით კონტრაქტს.",
+      },
+      {
+        en: "sign",
+        ka: "ხელმოწერა",
+        exampleEn: "Please sign and return it.",
+        exampleKa: "გთხოვთ ხელი მოაწეროთ და დააბრუნოთ.",
+      },
+      {
+        en: "on time",
+        ka: "დროულად",
+        exampleEn: "So we can start on time.",
+        exampleKa: "რომ დროულად დავიწყოთ.",
+      },
+    ],
+    readAloudPhrases: [
+      "Great speaking with you today.",
+      "To confirm what we agreed.",
+      "I'll send the contract today.",
+      "Please sign and return it by Wednesday so we can start on time.",
+    ],
+  },
+
+  // ---------------- INTERMEDIATE ----------------
+  business_intermediate: {
+    emailType: "closing",
+    level: "business_intermediate",
+    dailyFocusKa: "დღეს ვისწავლით პროფესიონალურ დახურვას — გადამწყვეტი ტონი, სრული ფიქსაცია და მომენტუმის შენარჩუნება ბოლო ეტაპზე.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "გარიგება თითქმის დახურულია — რომელი წერილი უკეთ ინარჩუნებს მომენტუმს?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Rob,\n\nGlad we're aligned on everything. To lock it in: annual license at $12,000, onboarding starts July 1, and support included for year one.\n\nI'm sending the agreement within the hour — if you can sign by Friday, your team keeps the July onboarding slot. Anything else you need from me to make that easy?\n\nBest,\nKeti",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Rob,\n\nGlad we're aligned. Whenever you have time, take a look at the agreement and let me know your thoughts. No rush — whenever works for you.\n\nBest,\nKeti",
+          isBetter: false,
+          issuesKa: [
+            "'no rush, whenever works' კლავს მომენტუმს — გარიგებები ჭიანურდება და კვდება.",
+            "არ აფიქსირებს დეტალებს წერილობით.",
+            "არ აძლევს მიზეზს სწრაფად მოქმედებისთვის.",
+          ],
+        },
+      ],
+      explanationKa:
+        "დახურვის ეტაპზე მომენტუმი გადამწყვეტია. A აფიქსირებს პირობებს, იძლევა მკაფიო ვადას და აძლევს მიზეზს ('keeps the July slot') სწრაფად მოქმედებისთვის — ზეწოლის გარეშე.",
+    },
+    learn: {
+      titleKa: "დახურვა მომენტუმით: ფიქსაცია + ვადა + მიზეზი",
+      explanationKa:
+        "გარიგებები ბოლო ეტაპზე ყველაზე ხშირად ჭიანურდება. პროფესიონალური დახურვა სამ რამეს აკეთებს: წერილობით აფიქსირებს ყველა პირობას ('to lock it in'), აძლევს მკაფიო ვადას შემდეგი ნაბიჯისთვის და აძლევს ბუნებრივ მიზეზს იმ ვადისთვის — ეს ინარჩუნებს მომენტუმს ზეწოლის გარეშე.",
+      structure: [
+        {
+          partKa: "დადებითი დადასტურება",
+          purposeKa: "დაადასტურე შეთანხმება.",
+          exampleEn: "Glad we're aligned on everything.",
+        },
+        {
+          partKa: "პირობების ფიქსაცია",
+          purposeKa: "ჩამოწერე ყველა პირობა.",
+          exampleEn: "To lock it in: annual license at $12,000, onboarding July 1.",
+        },
+        {
+          partKa: "ვადა ბუნებრივი მიზეზით",
+          purposeKa: "შექმენი მომენტუმი ლოგიკით.",
+          exampleEn: "If you can sign by Friday, your team keeps the July onboarding slot.",
+        },
+        {
+          partKa: "დაბრკოლებების მოხსნა",
+          purposeKa: "გააადვილე ბოლო ნაბიჯი.",
+          exampleEn: "Anything else you need from me to make that easy?",
+        },
+      ],
+      examples: [
+        {
+          en: "To lock it in: annual license at $12,000, onboarding starts July 1.",
+          ka: "დასაფიქსირებლად: წლიური ლიცენზია 12,000 დოლარად, onboarding 1 ივლისს იწყება.",
+          noteKa: "'lock it in' — გადამწყვეტი, პროფესიონალური ფიქსაცია.",
+        },
+        {
+          en: "If you can sign by Friday, your team keeps the July onboarding slot.",
+          ka: "თუ პარასკევამდე მოაწერთ ხელს, თქვენი გუნდი ივლისის onboarding ადგილს ინარჩუნებს.",
+          noteKa: "ვადა ბუნებრივი მიზეზით — მომენტუმი ზეწოლის გარეშე.",
+        },
+        {
+          en: "Anything else you need from me to make that easy?",
+          ka: "კიდევ რამე გჭირდებათ ჩემგან, რომ ეს გაგიადვილდეთ?",
+          noteKa: "ხსნის ბოლო დაბრკოლებებს პროაქტიულად.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ქეთი ხურავს პროგრამული უზრუნველყოფის გარიგებას. ყველაფერზე შეთანხმდნენ — ახლა მას სჭირდება ხელმოწერა მომენტუმის დაკარგვის გარეშე.",
+      subject: "Locking in our agreement — July onboarding",
+      body: "Hi Rob,\n\nGlad we're aligned on everything — I think this is going to be a great fit for your team.\n\nTo lock it in, here's what we've agreed:\n- Annual license: $12,000\n- Onboarding: starts July 1\n- Priority support: included for year one\n\nI'm sending the agreement within the hour. If you can get signatures back by Friday, your team keeps the July onboarding slot — after that, the next opening is mid-August.\n\nIs there anything else you need from me — a security doc for IT, a call with procurement — to make the sign-off easy?\n\nBest,\nKeti",
+      annotationsKa: [
+        "subject line-შივე ჩანს გადამწყვეტი განწყობა — 'locking in'.",
+        "პირობები ჩამოთვლილია მკაფიოდ — მოგვიანებით დავის ადგილი აღარ რჩება.",
+        "ვადას ბუნებრივი მიზეზი აქვს (ივლისის slot) — მომენტუმი ზეწოლის გარეშე.",
+        "პროაქტიულად ხსნის შესაძლო დაბრკოლებებს (IT, procurement).",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენ თითქმის დახურე გარიგება — ყველაფერზე შეთანხმდით და ბოლო ნაბიჯი დარჩა (ხელმოწერა, გადახდა ან დადასტურება). დაწერე დახურვის წერილი, რომელიც აფიქსირებს პირობებს, აძლევს ვადას ბუნებრივი მიზეზით და ხსნის ბოლო დაბრკოლებებს.",
+      recipientRole: "a client about to sign",
+      promptKa: "დაწერე 5-7 წინადადება. დააფიქსირე პირობები, მიეცი ვადა მიზეზით და გააადვილე ბოლო ნაბიჯი.",
+      hintsKa: [
+        "გამოიყენე გადამწყვეტი ენა — 'to lock it in'.",
+        "ჩამოთვალე ყველა შეთანხმებული პირობა.",
+        "მიეცი ვადა ბუნებრივი მიზეზით, არა ზეწოლით.",
+        "იკითხე რა სჭირდებათ ბოლო ნაბიჯის გასაადვილებლად.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "aligned",
+        ka: "შეთანხმებული / ერთ ხაზზე",
+        exampleEn: "Glad we're aligned on everything.",
+        exampleKa: "მიხარია, რომ ყველაფერზე შეთანხმებულები ვართ.",
+      },
+      {
+        en: "lock in",
+        ka: "დაფიქსირება / დამაგრება",
+        exampleEn: "Let's lock in the terms.",
+        exampleKa: "მოდი პირობები დავაფიქსიროთ.",
+      },
+      {
+        en: "slot",
+        ka: "ადგილი / დრო (გრაფიკში)",
+        exampleEn: "Your team keeps the July slot.",
+        exampleKa: "თქვენი გუნდი ივლისის ადგილს ინარჩუნებს.",
+      },
+      {
+        en: "sign-off",
+        ka: "საბოლოო დამტკიცება",
+        exampleEn: "What do you need for the sign-off?",
+        exampleKa: "რა გჭირდებათ საბოლოო დამტკიცებისთვის?",
+      },
+      {
+        en: "procurement",
+        ka: "შესყიდვების განყოფილება",
+        exampleEn: "I can set up a call with procurement.",
+        exampleKa: "შემიძლია ზარი მოვაწყო შესყიდვების განყოფილებასთან.",
+      },
+    ],
+    readAloudPhrases: [
+      "Glad we're aligned on everything.",
+      "To lock it in, here's what we've agreed.",
+      "If you can get signatures back by Friday, your team keeps the July onboarding slot.",
+      "Is there anything else you need from me to make the sign-off easy?",
+    ],
+  },
+
+  // ---------------- ADVANCED ----------------
+  business_advanced: {
+    emailType: "closing",
+    level: "business_advanced",
+    dailyFocusKa: "დღეს დავხვეწავთ რთული დახურვის ხელოვნებას — ბოლო წუთის ყოყმანის მართვა და გარიგების დასრულება ღირებულების დათმობის გარეშე.",
+    estimatedMinutes: 15,
+    warmUp: {
+      kind: "spot_mistakes",
+      promptKa: "კლიენტი ბოლო წუთს ყოყმანობს ('ჯერ კიდევ ვფიქრობთ'). რომელი პასუხი უკეთ ხურავს?",
+      options: [
+        {
+          label: "A",
+          text: "Hi Laura,\n\nCompletely fair — a decision like this deserves proper thought. Can I ask what's giving you pause? If it's something concrete — budget timing, a stakeholder concern, a missing capability — I'd rather address it directly than leave it hanging.\n\nAnd to be transparent on my side: I can hold the current terms until the 15th. After that I'll need to release the implementation slot to the next project in line.\n\nEither way, I'd rather have a clear answer than a slow maybe — and I suspect you would too.\n\nBest,\nIrakli",
+          isBetter: true,
+          issuesKa: [],
+        },
+        {
+          label: "B",
+          text: "Hi Laura,\n\nI understand you need more time. Just let me know whenever you decide. We're also prepared to offer an extra 10% discount if that helps you decide faster.\n\nBest,\nIrakli",
+          isBetter: false,
+          issuesKa: [
+            "ფასდაკლების შეთავაზება ყოყმანზე ასწავლის კლიენტს, რომ ლოდინი ჯილდოვდება.",
+            "არ არკვევს ყოყმანის რეალურ მიზეზს.",
+            "'whenever you decide' მთლიანად თმობს კონტროლს ვადაზე.",
+          ],
+        },
+      ],
+      explanationKa:
+        "ყოყმანის დროს ფასის ჭრა სისუსტეა — ის ღირებულებას აყენებს ეჭვქვეშ. A ჯერ არკვევს რეალურ მიზეზს, აწესებს გამჭვირვალე ვადას რეალური მიზეზით და ითხოვს მკაფიო პასუხს — თუნდაც 'არა'-ს.",
+    },
+    learn: {
+      titleKa: "რთული დახურვა: ყოყმანის მართვა და მკაფიო პასუხის მიღება",
+      explanationKa:
+        "ბოლო წუთის ყოყმანი ('ჯერ ვფიქრობთ') ყველაზე სახიფათო ეტაპია — აქ კვდება გარიგებები ნელა. საუკეთესო მიდგომა: ჯერ გაარკვიე ყოყმანის კონკრეტული მიზეზი, შემდეგ დააწესე გამჭვირვალე ვადა რეალური ბიზნეს-მიზეზით (არა ხელოვნური ზეწოლით), და ღიად თქვი, რომ მკაფიო 'არა' ჯობია ბუნდოვან 'იქნებ'-ს. ეს ინარჩუნებს შენს ღირსებას და ხშირად სწორედ ეს ხურავს გარიგებას.",
+      structure: [
+        {
+          partKa: "ყოყმანის ვალიდაცია",
+          purposeKa: "აღიარე გადაწყვეტილების წონა.",
+          exampleEn: "Completely fair — a decision like this deserves proper thought.",
+        },
+        {
+          partKa: "მიზეზის გარკვევა",
+          purposeKa: "იპოვე რეალური დაბრკოლება.",
+          exampleEn: "Can I ask what's giving you pause?",
+        },
+        {
+          partKa: "გამჭვირვალე ვადა რეალური მიზეზით",
+          purposeKa: "დააწესე ზღვარი ბლეფის გარეშე.",
+          exampleEn: "I can hold the current terms until the 15th — then the slot goes to the next project.",
+        },
+        {
+          partKa: "მკაფიო პასუხის მოთხოვნა",
+          purposeKa: "ამჯობინე 'არა' ბუნდოვანებას.",
+          exampleEn: "I'd rather have a clear answer than a slow maybe.",
+        },
+      ],
+      examples: [
+        {
+          en: "Can I ask what's giving you pause?",
+          ka: "შემიძლია გკითხოთ, რა გაფიქრებთ?",
+          noteKa: "პირდაპირი, მაგრამ თავაზიანი — ხსნის რეალურ საუბარს.",
+        },
+        {
+          en: "I can hold the current terms until the 15th.",
+          ka: "მიმდინარე პირობებს 15 რიცხვამდე შევინარჩუნებ.",
+          noteKa: "ვადა კონკრეტული და გამჭვირვალეა — არა მუქარა.",
+        },
+        {
+          en: "I'd rather have a clear answer than a slow maybe — and I suspect you would too.",
+          ka: "მირჩევნია მკაფიო პასუხი, ვიდრე ნელი 'იქნებ' — და ვფიქრობ, თქვენც ასე გირჩევნიათ.",
+          noteKa: "ღირსეული პირდაპირობა — ხშირად სწორედ ეს იწვევს გადაწყვეტილებას.",
+        },
+      ],
+    },
+    realExample: {
+      contextKa: "ირაკლის გარიგება ბოლო ეტაპზეა, მაგრამ კლიენტი ყოყმანობს. ის წერს დახურვის წერილს, რომელიც არკვევს მიზეზს და აწესებს ღირსეულ ვადას ფასის დათმობის გარეშე.",
+      subject: "Where we stand — and an honest timeline from my side",
+      body: "Hi Laura,\n\nCompletely fair that you want more time — a decision like this deserves proper thought, and I'd never want you to rush it.\n\nThat said, let me ask directly: what's giving you pause? If it's something concrete — budget timing, a stakeholder who isn't convinced, a capability you're not sure we cover — I'd much rather address it head-on than leave it hanging. Nine times out of ten these things are solvable in one conversation.\n\nAnd to be fully transparent about my side: I can hold the current terms and the March implementation slot until the 15th. After that, I need to release the slot to the next project in our queue — not as pressure, just as the reality of our capacity planning.\n\nEither way, I'd genuinely rather have a clear answer than a slow maybe — and I suspect you're the same. Shall we grab 20 minutes this week?\n\nBest,\nIrakli",
+      annotationsKa: [
+        "subject line გულწრფელია — 'honest timeline' ნდობას ქმნის ბოლო ეტაპზე.",
+        "ყოყმანის მიზეზს პირდაპირ ეკითხება და კონკრეტულ ვარიანტებს ასახელებს — ეს რეალურ საუბარს ხსნის.",
+        "ვადა ახსნილია რეალური მიზეზით ('capacity planning') — გამჭვირვალობა, არა ბლეფი.",
+        "არ სთავაზობს ფასდაკლებას — ღირებულება მყარი რჩება ბოლომდე.",
+      ],
+    },
+    practice: {
+      scenarioKa:
+        "შენი გარიგება ბოლო ეტაპზეა, მაგრამ მეორე მხარე ყოყმანობს — 'ჯერ ვფიქრობთ', 'მალე გიპასუხებთ'. დაწერე დახურვის წერილი, რომელიც არკვევს ყოყმანის მიზეზს, აწესებს გამჭვირვალე ვადას რეალური მიზეზით და ითხოვს მკაფიო პასუხს — ფასის დათმობის გარეშე.",
+      recipientRole: "a hesitating decision-maker",
+      promptKa: "დაწერე 6-9 წინადადება. გაარკვიე მიზეზი, დააწესე ღირსეული ვადა და ამჯობინე მკაფიო პასუხი ბუნდოვანებას.",
+      hintsKa: [
+        "ჯერ აღიარე, რომ გადაწყვეტილება მნიშვნელოვანია.",
+        "პირდაპირ იკითხე რა აფიქრებთ — დაასახელე შესაძლო მიზეზები.",
+        "დააწესე ვადა რეალური ბიზნეს-მიზეზით, არა ხელოვნური ზეწოლით.",
+        "ნუ შესთავაზებ ფასდაკლებას ყოყმანის საპასუხოდ.",
+      ],
+    },
+    vocabulary: [
+      {
+        en: "give (someone) pause",
+        ka: "დაფიქრება / შეყოვნება",
+        exampleEn: "What's giving you pause?",
+        exampleKa: "რა გაფიქრებთ?",
+      },
+      {
+        en: "head-on",
+        ka: "პირდაპირ",
+        exampleEn: "Let's address it head-on.",
+        exampleKa: "მოდი პირდაპირ მოვაგვაროთ.",
+      },
+      {
+        en: "hold the terms",
+        ka: "პირობების შენარჩუნება",
+        exampleEn: "I can hold the terms until the 15th.",
+        exampleKa: "პირობებს 15 რიცხვამდე შევინარჩუნებ.",
+      },
+      {
+        en: "release (a slot)",
+        ka: "ადგილის გათავისუფლება",
+        exampleEn: "I'll need to release the slot.",
+        exampleKa: "ადგილის გათავისუფლება მომიწევს.",
+      },
+      {
+        en: "a slow maybe",
+        ka: "ნელი, ბუნდოვანი 'იქნებ'",
+        exampleEn: "A clear no beats a slow maybe.",
+        exampleKa: "მკაფიო 'არა' ჯობია ნელ 'იქნებ'-ს.",
+      },
+    ],
+    readAloudPhrases: [
+      "A decision like this deserves proper thought.",
+      "Can I ask what's giving you pause?",
+      "I can hold the current terms until the fifteenth.",
+      "I'd genuinely rather have a clear answer than a slow maybe.",
+    ],
+  },
+};
+
+// ============================================================
 // MASTER REGISTRY
 // ============================================================
 // As more topics are added, register them here keyed by curriculum key.
@@ -2169,9 +3735,9 @@ export const EMAIL_LESSONS: Record<string, Record<Level, EmailLesson>> = {
   follow_up: followUp,
   request,
   update,
-  // complaint,
-  // negotiation,
-  // closing,
+  complaint,
+  negotiation,
+  closing,
 };
 
 /**
