@@ -30,7 +30,7 @@ import {
   resetBusiness,
   saveBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
+import { emailStep, interviewStep } from "./lib/curriculum";
 import { loadProgress, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
@@ -54,12 +54,6 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
     doneTitle: "ყოჩაღ — დღევანდელი იმეილი დასრულდა",
     doneSubtitle: "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები.",
   },
-  meetings: {
-    title: "შეხვედრის სცენარი",
-    subtitle: "ჩაერთე რეალურ სამუშაო შეხვედრაში — გამოთქვი აზრი, შეუთანხმდი, აიღე გადაწყვეტილება.",
-    doneTitle: "ყოჩაღ — დღევანდელი შეხვედრა დასრულდა",
-    doneSubtitle: "შენი წვლილი დაფიქსირდა. ხვალ ახალი შეხვედრა გელოდება.",
-  },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
@@ -69,13 +63,13 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "vocabulary"]);
+const ACTIVE_MODULES = new Set(["emails", "interview", "vocabulary"]);
 
 // Local single-slug map kept for backward compat; multi-module map drives rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
-  work_communication: "meetings",
+  work_communication: "emails",
   remote_work: "emails",
   emails_writing: "emails",
   business_vocab: "vocabulary",
@@ -114,13 +108,11 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
+      const [emailsAll, emailsToday, interviewAll, interviewToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
         supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
-        supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-        supabase.from("business_meeting_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_vocab_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_vocab_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_vocab_progress").select("id", { count: "exact", head: true }).eq("user_id", user.id),
@@ -130,7 +122,6 @@ export default function BusinessHome() {
       setProgress({
         emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
-        meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
         vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
       setVocabWordCount(vocabWords.count ?? 0);
@@ -147,12 +138,11 @@ export default function BusinessHome() {
         if (!cancelled) setLastReassessmentAt(ra?.created_at ?? null);
       } catch {}
       try {
-        const [{ count: emailPhr }, { count: intPhr }, { count: meetPhr }] = await Promise.all([
+        const [{ count: emailPhr }, { count: intPhr }] = await Promise.all([
           supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
           supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-          supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         ]);
-        if (!cancelled) setPhraseCount((emailPhr ?? 0) + (intPhr ?? 0) + (meetPhr ?? 0));
+        if (!cancelled) setPhraseCount((emailPhr ?? 0) + (intPhr ?? 0));
       } catch {}
       try {
         const vp = await loadProgress(user.id);
@@ -247,9 +237,7 @@ export default function BusinessHome() {
       ? emailStep(progress.emails?.count ?? 0)
       : focusModuleSlug === "interview"
         ? interviewStep(progress.interview?.count ?? 0)
-        : focusModuleSlug === "meetings"
-          ? meetingStep(progress.meetings?.count ?? 0)
-          : null;
+        : null;
 
 
   const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
@@ -257,10 +245,9 @@ export default function BusinessHome() {
 
   const emailsCount = progress.emails?.count ?? 0;
   const interviewCount = progress.interview?.count ?? 0;
-  const meetingsCount = progress.meetings?.count ?? 0;
   const vocabSessionsCount = progress.vocabulary?.count ?? 0;
   const allFourMilestone =
-    emailsCount >= 7 && interviewCount >= 7 && meetingsCount >= 7 && vocabSessionsCount >= 7;
+    emailsCount >= 7 && interviewCount >= 7 && vocabSessionsCount >= 7;
   const showMilestone = !!plan && allFourMilestone && !s.firstMilestoneAcknowledged;
   const lastReassessmentLabel = lastReassessmentAt
     ? new Date(lastReassessmentAt).toLocaleDateString("ka-GE", { year: "numeric", month: "short", day: "numeric" })
@@ -291,7 +278,6 @@ export default function BusinessHome() {
                 await Promise.all([
                   supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
-                  supabase.from("business_meeting_sessions").update(patch).eq("user_id", user.id),
                   supabase.from("business_vocab_sessions").update(patch).eq("user_id", user.id),
                 ]);
               } catch {}
@@ -363,12 +349,12 @@ export default function BusinessHome() {
                     გილოცავ — დაასრულე პირველი დონე
                   </h2>
                   <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7+ სესია ოთხივე მოდულში. ეს სერიოზული ნაბიჯია.
+                    შენ შეასრულე 7+ სესია სამივე მოდულში. ეს სერიოზული ნაბიჯია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
                       <div className="text-xl font-bold">
-                        {emailsCount + interviewCount + meetingsCount + vocabSessionsCount}
+                        {emailsCount + interviewCount + vocabSessionsCount}
                       </div>
                       <div className="ka text-[10px] text-[#F0EBE3]/65 mt-0.5">სესია</div>
                     </div>
@@ -631,9 +617,7 @@ export default function BusinessHome() {
                     ? emailStep(count)
                     : m.slug === "interview"
                       ? interviewStep(count)
-                      : m.slug === "meetings"
-                        ? meetingStep(count)
-                        : null;
+                      : null;
                 const ModIcon = m.icon;
 
                 return (
@@ -693,7 +677,7 @@ export default function BusinessHome() {
                 <Stat label="გაუმჯობესებული იმეილები" value={String(emailsCount)} />
                 <Stat label="გასაუბრებები" value={String(interviewCount)} />
                 <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
-                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.meetings?.count ?? 0) + (progress.vocabulary?.count ?? 0))} />
+                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.vocabulary?.count ?? 0))} />
               </div>
               <Link
                 to="/path/business/lexicon"

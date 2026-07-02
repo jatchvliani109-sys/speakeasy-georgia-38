@@ -258,7 +258,7 @@ export const LEVEL_LABELS: Record<BusinessLevel, string> = {
 
 // Modules
 
-import { Briefcase, Mail, Users, BookOpen, type LucideIcon } from "lucide-react";
+import { Briefcase, Mail, BookOpen, type LucideIcon } from "lucide-react";
 
 export type BusinessModule = {
   slug: string;
@@ -281,12 +281,6 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     icon: Mail,
   },
   {
-    slug: "meetings",
-    title: "შეხვედრები და სამუშაო კომუნიკაცია",
-    description: "ისწავლე როგორ გამოთქვა აზრი, დასვა კითხვა და ჩაერთო სამუშაო საუბარში.",
-    icon: Users,
-  },
-  {
     slug: "vocabulary",
     title: "ბიზნეს ლექსიკა",
     description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
@@ -298,7 +292,7 @@ export const BUSINESS_MODULES: BusinessModule[] = [
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
-  work_communication: "meetings",
+  work_communication: "emails",
   remote_work: "emails",
   emails_writing: "emails",
   business_vocab: "vocabulary",
@@ -309,11 +303,11 @@ const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
 export const PRIORITY_TO_MODULES: Record<BusinessPriority, string[]> = {
   university: ["interview", "vocabulary"],
   job_interview: ["interview", "vocabulary"],
-  work_communication: ["meetings", "emails"],
+  work_communication: ["emails", "vocabulary"],
   remote_work: ["emails", "vocabulary"],
   emails_writing: ["emails"],
   business_vocab: ["vocabulary"],
-  general_business: ["vocabulary", "interview", "emails", "meetings"],
+  general_business: ["vocabulary", "interview", "emails"],
 };
 
 /**
