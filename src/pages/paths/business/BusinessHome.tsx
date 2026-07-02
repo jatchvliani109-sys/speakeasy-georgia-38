@@ -30,7 +30,7 @@ import {
   resetBusiness,
   saveBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep, meetingStep } from "./lib/curriculum";
+import { emailStep, interviewStep } from "./lib/curriculum";
 import { loadProgress, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
@@ -54,12 +54,6 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
     doneTitle: "ყოჩაღ — დღევანდელი იმეილი დასრულდა",
     doneSubtitle: "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები.",
   },
-  meetings: {
-    title: "შეხვედრის სცენარი",
-    subtitle: "ჩაერთე რეალურ სამუშაო შეხვედრაში — გამოთქვი აზრი, შეუთანხმდი, აიღე გადაწყვეტილება.",
-    doneTitle: "ყოჩაღ — დღევანდელი შეხვედრა დასრულდა",
-    doneSubtitle: "შენი წვლილი დაფიქსირდა. ხვალ ახალი შეხვედრა გელოდება.",
-  },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
@@ -69,13 +63,13 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "meetings", "vocabulary"]);
+const ACTIVE_MODULES = new Set(["emails", "interview", "vocabulary"]);
 
 // Local single-slug map kept for backward compat; multi-module map drives rotation.
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
-  work_communication: "meetings",
+  work_communication: "emails",
   remote_work: "emails",
   emails_writing: "emails",
   business_vocab: "vocabulary",
@@ -114,13 +108,11 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, meetingsAll, meetingsToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
+      const [emailsAll, emailsToday, interviewAll, interviewToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
         supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
-        supabase.from("business_meeting_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-        supabase.from("business_meeting_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_vocab_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_vocab_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_vocab_progress").select("id", { count: "exact", head: true }).eq("user_id", user.id),
@@ -130,7 +122,6 @@ export default function BusinessHome() {
       setProgress({
         emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
-        meetings: { slug: "meetings", count: meetingsAll.count ?? 0, doneToday: (meetingsToday.data?.length ?? 0) > 0 },
         vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
       setVocabWordCount(vocabWords.count ?? 0);
