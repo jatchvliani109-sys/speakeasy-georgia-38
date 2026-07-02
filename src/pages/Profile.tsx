@@ -95,7 +95,7 @@ export default function Profile() {
   }
 
   return (
-    <BusinessShell>
+    <BusinessShell seo={{ title: "ჩემი პროფილი — SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიული ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
       <header className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
           ანგარიში

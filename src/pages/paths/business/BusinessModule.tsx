@@ -41,7 +41,7 @@ export default function BusinessModule() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           მალე დაემატება
         </p>
-        <h3 className="ka text-base font-bold text-[#5C1A2E] mt-1">Coming next</h3>
+        <h2 className="ka text-base font-bold text-[#5C1A2E] mt-1">Coming next</h2>
         <p className="ka text-sm text-[#4A4A4A] mt-2">
           ეს მოდული ამჟამად მზადდება.
         </p>

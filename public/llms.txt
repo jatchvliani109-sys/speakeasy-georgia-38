@@ -1,0 +1,10 @@
+# SpeakBusy
+
+> AI-powered ბიზნეს ინგლისურის სასწავლო პლატფორმა ქართველი პროფესიონალებისთვის — პერსონალიზებული მოდულები ელ-ფოსტებში, გასაუბრებებში, შეხვედრებსა და პროფესიულ ლექსიკაში.
+
+SpeakBusy helps Georgian professionals learn business English through structured, AI-personalized modules covering business emails, job interviews, meetings, and professional vocabulary.
+
+## Pages
+
+- [Home](/): Landing page — product overview, value propositions, and modules.
+- [Sign in / Sign up](/auth): Authentication for new and returning learners.

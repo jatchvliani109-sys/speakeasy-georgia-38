@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
+import SEO from "@/components/SEO";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
@@ -86,6 +87,11 @@ export default function Auth() {
   if (pendingEmail) {
     return (
       <Layout showLogout={false}>
+        <SEO
+          title="დაადასტურე ელ-ფოსტა — SpeakBusy"
+          description="შეამოწმე შენი ელ-ფოსტა და დაადასტურე SpeakBusy-ის ანგარიში, რომ დაიწყო ბიზნეს ინგლისურის სწავლა."
+          path="/auth"
+        />
         <div className="max-w-sm mx-auto py-10">
           <div className="text-center mb-6">
             <span className="inline-flex w-14 h-14 rounded-full bg-[#3D1220] text-[#F8F5F0] items-center justify-center">
@@ -134,6 +140,15 @@ export default function Auth() {
 
   return (
     <Layout showLogout={false}>
+      <SEO
+        title={mode === "signup" ? "რეგისტრაცია — SpeakBusy" : "შესვლა — SpeakBusy"}
+        description={
+          mode === "signup"
+            ? "შექმენი უფასო SpeakBusy ანგარიში და დაიწყე ბიზნეს ინგლისურის სწავლა AI-powered პლატფორმით."
+            : "შედი შენს SpeakBusy ანგარიშში და გააგრძელე ბიზნეს ინგლისურის სწავლა."
+        }
+        path="/auth"
+      />
       <div className="max-w-sm mx-auto py-10">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
