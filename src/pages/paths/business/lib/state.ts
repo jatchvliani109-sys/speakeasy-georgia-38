@@ -281,10 +281,10 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     icon: Mail,
   },
   {
-    slug: "meetings",
-    title: "შეხვედრები და სამუშაო კომუნიკაცია",
-    description: "ისწავლე როგორ გამოთქვა აზრი, დასვა კითხვა და ჩაერთო სამუშაო საუბარში.",
-    icon: Users,
+    slug: "vocabulary",
+    title: "ბიზნეს ლექსიკა",
+    description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
+    icon: BookOpen,
   },
   {
     slug: "vocabulary",

@@ -3,7 +3,6 @@ import BusinessShell, { BizCard } from "./BusinessShell";
 import { BUSINESS_MODULES } from "./lib/state";
 import EmailsModule from "./EmailsModule";
 import InterviewModule from "./InterviewModule";
-import MeetingsModule from "./MeetingsModule";
 import VocabularyModule from "./VocabularyModule";
 
 export default function BusinessModule() {
@@ -12,7 +11,6 @@ export default function BusinessModule() {
 
   if (slug === "emails") return <EmailsModule />;
   if (slug === "interview") return <InterviewModule />;
-  if (slug === "meetings") return <MeetingsModule />;
   if (slug === "vocabulary") return <VocabularyModule />;
 
   if (!mod) {
