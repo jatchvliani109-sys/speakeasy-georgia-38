@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
+import SEO from "@/components/SEO";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
