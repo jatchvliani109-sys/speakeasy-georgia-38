@@ -258,7 +258,7 @@ export const LEVEL_LABELS: Record<BusinessLevel, string> = {
 
 // Modules
 
-import { Briefcase, Mail, Users, BookOpen, type LucideIcon } from "lucide-react";
+import { Briefcase, Mail, BookOpen, type LucideIcon } from "lucide-react";
 
 export type BusinessModule = {
   slug: string;
