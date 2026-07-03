@@ -75,8 +75,8 @@ export default function DocumentHelper() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "უკან Business-ზე" }}>
       <header className="mb-5">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-          ბიზნეს ინგლისური
+        <p className="text-[11px] uppercase tracking-wider text-[#1C1C1E] font-bold">
+          SpeakBusy
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დოკუმენტების ასისტენტი</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">

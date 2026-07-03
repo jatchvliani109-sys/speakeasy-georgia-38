@@ -41,8 +41,8 @@ export default function BusinessModulesList() {
   return (
     <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ელ-ფოსტები, გასაუბრება, შეხვედრები და პროფესიული ლექსიკა.", path: "/path/business/modules" }}>
       <header className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
-          ბიზნეს ინგლისური
+        <p className="text-[11px] uppercase tracking-wider text-[#4A4A4A] font-bold">
+          SpeakBusy
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">მოდულები</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-2">
