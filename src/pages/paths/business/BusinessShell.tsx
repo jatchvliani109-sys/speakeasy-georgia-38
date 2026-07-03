@@ -25,7 +25,7 @@ export default function BusinessShell({
             <span className="w-7 h-7 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center">
               <Briefcase size={14} strokeWidth={2.25} />
             </span>
-            <span className="ka font-semibold text-sm tracking-tight">ბიზნეს ინგლისური</span>
+            <span className="font-bold text-sm tracking-tight">SpeakBusy</span>
           </Link>
           <GlobalNav />
         </div>
