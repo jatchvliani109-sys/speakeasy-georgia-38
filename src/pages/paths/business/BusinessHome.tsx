@@ -258,8 +258,8 @@ export default function BusinessHome() {
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
-            ბიზნეს ინგლისური
+          <p className="text-[11px] uppercase tracking-wider text-[#4A4A4A] font-bold">
+            SpeakBusy
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1 leading-tight">
             გამარჯობა{displayName ? `, ${displayName}` : ""}
