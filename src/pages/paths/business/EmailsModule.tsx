@@ -348,7 +348,7 @@ export default function EmailsModule() {
 
   if (step === "loading" || !session) {
     return (
-      <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard>
           <p className="ka text-[#4A4A4A]">დღევანდელი სესია მზადდება შენი მიზნებისთვის...</p>
           <div className="mt-3 h-2 w-full bg-[#E0D8D0] rounded-full overflow-hidden">
@@ -365,7 +365,7 @@ export default function EmailsModule() {
   const afterFocusStep: Step = showWarmup ? "warmup" : "learn";
 
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <Header step={step} session={session} isLight={isLight} hasBonus={hasBonus} curriculum={curriculum} />
 
       {step === "focus" && (

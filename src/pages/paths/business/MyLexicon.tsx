@@ -72,7 +72,7 @@ export default function MyLexicon() {
   }, [tab]);
 
   return (
-    <BusinessShell seo={{ title: "ჩემი ლექსიკონი — SpeakBusy", description: "შენი პერსონალური ბიზნეს ლექსიკონი — სიტყვები და ფრაზები ერთ ადგილას.", path: "/path/business/lexicon" }} back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+    <BusinessShell seo={{ title: "ჩემი ლექსიკონი — SpeakBusy", description: "შენი პერსონალური ბიზნეს ლექსიკონი — სიტყვები და ფრაზები ერთ ადგილას.", path: "/path/business/lexicon" }} back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <header className="mb-4">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ლექსიკონი

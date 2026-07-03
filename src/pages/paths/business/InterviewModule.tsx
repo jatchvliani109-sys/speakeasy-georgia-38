@@ -359,7 +359,7 @@ export default function InterviewModule() {
 
   if (step === "loading" || !session) {
     return (
-      <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard>
           <p className="ka text-[#4A4A4A]">გასაუბრება მზადდება შენი პროფილისთვის...</p>
           <div className="mt-3 h-2 w-full bg-[#E0D8D0] rounded-full overflow-hidden">
@@ -375,7 +375,7 @@ export default function InterviewModule() {
   const b = session.briefing;
 
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       {step !== "done" && <Header step={step} session={session} stageIdx={stageIdx} curriculum={curriculum} />}
 
       {step === "briefing" && (

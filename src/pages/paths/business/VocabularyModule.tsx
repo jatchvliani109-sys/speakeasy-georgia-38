@@ -307,14 +307,14 @@ export default function VocabularyModule() {
 
   if (loading) {
     return (
-      <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard><p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p></BizCard>
       </BusinessShell>
     );
   }
 
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <header className="mb-5">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ლექსიკა

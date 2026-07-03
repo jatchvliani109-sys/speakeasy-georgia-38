@@ -25,7 +25,7 @@ export default function BusinessModule() {
 
   const Icon = mod.icon;
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "ბიზნეს ინგლისური" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <div className="mb-5 flex items-start gap-3">
         <span className="w-10 h-10 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0">
           <Icon size={18} strokeWidth={2} />
