@@ -2,6 +2,16 @@
 // All quiz questions are produced client-side from the static word bank + DB-tracked
 // progress. Spaced repetition follows simple buckets: wrong → +1 day, ok → +3 days,
 // easy → +7 days, mastered (confidence ≥ 4 streak) → +14 days.
+//
+// Session sizing (free vs paid):
+// - free: 6 new words + up to 8 review words per session.
+// - paid: total word budget starts at 30 for the first session of the day and
+//   drops by 5 per additional session (25, 20, 15...) with a floor of 10.
+//   New words are capped at 12 per session regardless of budget — retention
+//   collapses past ~10-12 new words — so bigger budgets mean MORE REVIEW.
+// Every new word gets two differently-formatted questions per quiz (encode +
+// retrieve), and review slots always fill: overdue first, then reinforcement,
+// then weakest seen words.
 
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -165,11 +175,30 @@ export function emptyProgressFor(w: VocabWord): ProgressRow {
 
 // ---------------- Session planning ----------------
 
+export type PlanTier = "free" | "paid";
+
+export type PlanOptions = {
+  /** Subscription tier — controls the session word budget. Defaults to "free". */
+  plan?: PlanTier;
+  /** Completed vocab sessions today — paid budgets shrink with each one. */
+  sessionsToday?: number;
+};
+
 export type SessionPlan = {
   newWords: VocabWord[];
   reviewKeys: string[];
   tierLevel: 1 | 2 | 3; // drives quiz question-type difficulty
 };
+
+// ---- Word budgets ----------------------------------------------------------
+const FREE_NEW_TARGET = 6;      // free users: 6 new words per session
+const FREE_REVIEW_TARGET = 8;   // free users: up to 8 review words per session
+
+const PAID_FIRST_BUDGET = 30;   // paid: total words in the first session of the day
+const PAID_BUDGET_STEP = 5;     // ...dropping by 5 per extra session that day
+const PAID_MIN_BUDGET = 10;     // ...never below 10
+const PAID_MAX_NEW = 12;        // hard cap on NEW words — retention drops past ~10-12,
+                                // so bigger budgets buy more review, not more new words
 
 // ---- Tier classification --------------------------------------------------
 // Tier 1 = foundation (core, weeks 1-3)
@@ -203,13 +232,38 @@ const TIER3_UNLOCK_PCT = 0.7;  // 70% of Tier 2 mastered → Tier 3 unlocks
 const TIER4_UNLOCK_PCT = 0.5;  // 50% of Tier 1 mastered → field words allowed
 
 /**
- * Pick today's words with progressive tier gating + cross-tier reinforcement.
+ * Pick today's words with progressive tier gating + layered review selection.
+ *
+ * New words: strict tier order, field words capped at 2 so core dominates,
+ * catch-up only from earlier tiers (never leaks locked higher tiers).
+ *
+ * Review words fill in three layers until the review target is met:
+ *   1. overdue words (real spaced repetition), hardest first
+ *   2. cross-tier reinforcement — earlier-tier words kept warm
+ *   3. weakest seen words even if not due yet — so every session
+ *      strengthens old material, not only when due dates line up
  */
 export function planSession(
   progress: ProgressRow[],
   fields: string[],
   goals: string[],
+  opts: PlanOptions = {},
 ): SessionPlan {
+  const plan: PlanTier = opts.plan ?? "free";
+  const sessionsToday = Math.max(0, opts.sessionsToday ?? 0);
+
+  // ---- Budgets per tier + session number ----
+  let newTarget: number;
+  let reviewTarget: number;
+  if (plan === "paid") {
+    const budget = Math.max(PAID_MIN_BUDGET, PAID_FIRST_BUDGET - PAID_BUDGET_STEP * sessionsToday);
+    newTarget = Math.min(PAID_MAX_NEW, Math.max(4, Math.round(budget / 3)));
+    reviewTarget = budget - newTarget;
+  } else {
+    newTarget = FREE_NEW_TARGET;
+    reviewTarget = FREE_REVIEW_TARGET;
+  }
+
   const now = Date.now();
   const seen = new Set(progress.map((p) => p.word_key));
   const masteredKeys = new Set(progress.filter(checkMastery).map((p) => p.word_key));
@@ -227,22 +281,38 @@ export function planSession(
 
   const currentTier: 1 | 2 | 3 = tier3Unlocked ? 3 : tier2Unlocked ? 2 : 1;
 
-  // Due review words (real spaced repetition) — hardest first.
+  // ---- Review selection: three layers, filled up to reviewTarget ----------
+
+  // Layer 1: overdue words (real spaced repetition) — hardest first.
   const dueRows = progress
     .filter((p) => !checkMastery(p))
     .filter((p) => new Date(p.due_at).getTime() <= now)
     .sort((a, b) => a.confidence - b.confidence
       || new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
 
-  const reviewKeys = dueRows.slice(0, 8).map((r) => r.word_key);
+  const reviewKeys = dueRows.slice(0, reviewTarget).map((r) => r.word_key);
 
-  // Cross-tier reinforcement: in Tier 2+, surface previously-seen earlier-tier
-  // words even if not strictly due, so foundation vocab stays warm.
-  if (currentTier >= 2) {
+  // Layer 2: cross-tier reinforcement — in Tier 2+, surface previously-seen
+  // earlier-tier words even if not strictly due, so foundation vocab stays warm.
+  if (currentTier >= 2 && reviewKeys.length < reviewTarget) {
     const earlier = currentTier === 3 ? [...t1, ...t2] : t1;
-    const earlierSeen = earlier.filter((w) => seen.has(w.key) && !reviewKeys.includes(w.key));
-    const reinforce = pick(earlierSeen, currentTier === 3 ? 3 : 2).map((w) => w.key);
-    reviewKeys.push(...reinforce);
+    const earlierSeen = earlier.filter(
+      (w) => seen.has(w.key) && !reviewKeys.includes(w.key) && !masteredKeys.has(w.key),
+    );
+    const room = Math.min(currentTier === 3 ? 3 : 2, reviewTarget - reviewKeys.length);
+    reviewKeys.push(...pick(earlierSeen, room).map((w) => w.key));
+  }
+
+  // Layer 3: weakest seen words (not yet due) — keeps every session
+  // strengthening old material instead of waiting for due dates.
+  if (reviewKeys.length < reviewTarget) {
+    const chosen = new Set(reviewKeys);
+    const weakest = progress
+      .filter((p) => !checkMastery(p) && !chosen.has(p.word_key))
+      .sort((a, b) => a.confidence - b.confidence || b.wrong_count - a.wrong_count)
+      .slice(0, reviewTarget - reviewKeys.length)
+      .map((p) => p.word_key);
+    reviewKeys.push(...weakest);
   }
 
   // ---- New word selection in strict tier order ---------------------------
@@ -254,32 +324,42 @@ export function planSession(
     : [];
 
   const newWords: VocabWord[] = [];
-  const TOTAL_NEW = 8;
+
+  // Field words capped at 2 so the core curriculum still dominates.
+  const fieldCap = tier4Unlocked ? Math.min(2, newTarget) : 0;
 
   const primary = currentTier === 3 ? t3Unseen : currentTier === 2 ? t2Unseen : t1Unseen;
   for (const w of primary) {
-    if (newWords.length >= 6) break;
+    if (newWords.length >= newTarget - fieldCap) break;
     newWords.push(w);
   }
 
-  // Field words only when unlocked, capped at 2 so core curriculum still dominates.
-  if (tier4Unlocked) {
+  if (fieldCap > 0) {
     let fieldAdded = 0;
     for (const w of fieldUnseen) {
-      if (fieldAdded >= 2 || newWords.length >= TOTAL_NEW) break;
+      if (fieldAdded >= fieldCap || newWords.length >= newTarget) break;
       newWords.push(w);
       fieldAdded++;
     }
   }
 
+  // If field words didn't fill their reserved slots, top back up from the
+  // primary tier so the session isn't short-changed.
+  if (newWords.length < newTarget) {
+    for (const w of primary) {
+      if (newWords.length >= newTarget) break;
+      if (!newWords.includes(w)) newWords.push(w);
+    }
+  }
+
   // Catch-up from earlier tiers only — NEVER leak in words from a higher
   // locked tier even when the current tier is exhausted.
-  if (newWords.length < TOTAL_NEW) {
+  if (newWords.length < newTarget) {
     const fallback: VocabWord[] = [];
     if (currentTier === 3) fallback.push(...t2Unseen, ...t1Unseen);
     else if (currentTier === 2) fallback.push(...t1Unseen);
     for (const w of fallback) {
-      if (newWords.length >= TOTAL_NEW) break;
+      if (newWords.length >= newTarget) break;
       if (!newWords.includes(w)) newWords.push(w);
     }
   }
@@ -429,6 +509,13 @@ const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   2: [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeSentenceCorrect, makeTrueFalse],
   3: [makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank, makeMcMeaning],
 };
+// Second-pass generators for NEW words: retrieval-heavier than the first pass,
+// so each new word is first recognized, then actively recalled.
+const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
+  1: [makeTrEnToKa, makeMcMeaning, makeTrueFalse, makeTrEnToKa],
+  2: [makeTrKaToEn, makeSentenceCorrect, makeFillBlank, makeMcMeaning, makeTrEnToKa],
+  3: [makeTrKaToEn, makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank],
+};
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeMcMeaning, makeTrKaToEn, makeTrueFalse, makeTrEnToKa],
   2: [makeFillBlank, makeTrKaToEn, makeMcMeaning, makeSentenceCorrect],
@@ -438,23 +525,30 @@ const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
 /**
  * Build a mixed quiz for the session.
  * - Question type difficulty scales with tierLevel.
- * - Review words (from earlier tiers when applicable) reinforce retention.
+ * - Every NEW word gets TWO differently-formatted questions (encode + retrieve),
+ *   spaced apart in the quiz — a word met once per session doesn't stick.
+ * - Review words get one question each and reinforce retention.
  * - Georgian mistake questions sprinkled in.
- * - Never the same type twice in a row.
+ * - Never the same question type — or the same word — twice in a row.
+ * - No arbitrary length cap: the quiz fits the session plan's word budget.
+ *   Pass opts.maxQuestions to cap explicitly if ever needed.
  */
 export function buildQuiz(
   newWords: VocabWord[],
   reviewKeys: string[],
   tierLevel: 1 | 2 | 3 = 1,
+  opts: { maxQuestions?: number } = {},
 ): QuizQuestion[] {
   const pool = ALL_WORDS;
   const reviewWords = reviewKeys.map(findWord).filter(Boolean) as VocabWord[];
 
   const newGens = NEW_GENERATORS_BY_TIER[tierLevel];
+  const secondGens = NEW_SECOND_PASS_BY_TIER[tierLevel];
   const reviewGens = REVIEW_GENERATORS_BY_TIER[tierLevel];
 
   const questions: QuizQuestion[] = [];
 
+  // Pass 1: encode — one question per new word.
   newWords.forEach((w, i) => {
     const gen = newGens[i % newGens.length];
     const q = gen(w, pool);
@@ -462,6 +556,15 @@ export function buildQuiz(
     else questions.push(makeMcMeaning(w, pool));
   });
 
+  // Pass 2: retrieve — a second, different-format question per new word.
+  newWords.forEach((w, i) => {
+    const gen = secondGens[i % secondGens.length];
+    const q = gen(w, pool);
+    if (q) questions.push(q);
+    else questions.push(makeTrEnToKa(w, pool));
+  });
+
+  // Review words: one question each.
   reviewWords.forEach((w, i) => {
     const gen = reviewGens[i % reviewGens.length];
     const q = gen(w, pool);
@@ -473,17 +576,27 @@ export function buildQuiz(
   const mistakeCount = tierLevel === 1 ? 1 : 2;
   const mistakes = pick(GEORGIAN_MISTAKES, mistakeCount).map(makeGeorgianMistake);
 
-  // Shuffle but avoid back-to-back same type
+  // Shuffle, then avoid back-to-back same type OR same word (so a new word's
+  // two questions don't land adjacent).
+  const keyOf = (q: QuizQuestion) =>
+    (q as any).wordKey ? String((q as any).wordKey) : `mistake:${(q as any).key ?? ""}`;
+
   let merged = shuffle([...questions, ...mistakes]);
   for (let i = 1; i < merged.length; i++) {
-    if (merged[i].type === merged[i - 1].type) {
-      const swapIdx = merged.findIndex((q, idx) => idx > i && q.type !== merged[i - 1].type);
+    const clashes = (a: QuizQuestion, b: QuizQuestion) =>
+      a.type === b.type || keyOf(a) === keyOf(b);
+    if (clashes(merged[i], merged[i - 1])) {
+      const swapIdx = merged.findIndex(
+        (q, idx) => idx > i && !clashes(q, merged[i - 1]) && (idx + 1 >= merged.length || !clashes(merged[i], merged[idx + 1] ?? q)),
+      );
       if (swapIdx > -1) {
         [merged[i], merged[swapIdx]] = [merged[swapIdx], merged[i]];
       }
     }
   }
-  return merged.slice(0, 20);
+
+  const cap = opts.maxQuestions ?? merged.length;
+  return merged.slice(0, cap);
 }
 
 // ---------------- Phrase ingestion from other modules ----------------
