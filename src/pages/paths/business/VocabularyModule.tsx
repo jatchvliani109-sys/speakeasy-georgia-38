@@ -562,7 +562,7 @@ function WordCard({ word }: { word: VocabWord }) {
             <p className="ka text-xs text-[#1C1C1E] font-mono mt-1">[{word.pronunciation}]</p>
           )}
         </div>
-        <ReadAloudButton text={word.en} size="md" />
+        <ReadAloudButton text={word.en} storageKey={word.key} size="md" />
       </div>
 
       {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
@@ -648,7 +648,7 @@ function QuestionCard({
           <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">აირჩიე სწორი თარგმანი</p>
           <div className="mt-3 flex items-center gap-2">
             <h3 className="text-2xl font-bold text-[#5C1A2E]">{q.en}</h3>
-            <ReadAloudButton text={q.en} size="sm" />
+            <ReadAloudButton text={q.en} storageKey={q.wordKey} size="sm" />
           </div>
           {renderChoices(q.choices, q.correctKa)}
         </div>
