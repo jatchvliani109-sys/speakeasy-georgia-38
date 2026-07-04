@@ -48,6 +48,7 @@ export default function BusinessSetup() {
     if (nameLoaded && displayName) setNameInput(displayName);
   }, [nameLoaded, displayName]);
 
+  useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
