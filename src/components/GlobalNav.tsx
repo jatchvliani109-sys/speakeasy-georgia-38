@@ -49,6 +49,7 @@ export default function GlobalNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
 
   const handleLogout = async () => {
     setOpen(false);
