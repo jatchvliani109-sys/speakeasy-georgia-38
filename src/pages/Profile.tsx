@@ -20,6 +20,7 @@ export default function Profile() {
   const { user } = useAuth();
   const [s, setS] = useState<BusinessState | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
+  const [initialName, setInitialName] = useState<string>("");
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [resumeName, setResumeName] = useState<string | null>(null);
   const [goals, setGoals] = useState<BusinessPriority[]>([]);
