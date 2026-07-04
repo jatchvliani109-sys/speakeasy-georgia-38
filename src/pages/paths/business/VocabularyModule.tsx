@@ -65,6 +65,7 @@ export default function VocabularyModule() {
   const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
   const [confettiKey, setConfettiKey] = useState(0);
   const [streakOverlay, setStreakOverlay] = useState<null | "mid" | "mega">(null);
+  const [streakN, setStreakN] = useState(0);
   const [progressPulse, setProgressPulse] = useState(0);
   const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
@@ -147,6 +148,7 @@ export default function VocabularyModule() {
   const currentQ = quiz[qIdx];
 
   const triggerStreak = (n: number) => {
+    setStreakN(n);
     if (n === 10 || (n > 10 && n % 10 === 0)) {
       setStreakOverlay("mega");
       setScreenFlash("mega");
@@ -365,8 +367,8 @@ export default function VocabularyModule() {
       {streakOverlay === "mid" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-streak-pop">
-            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#1C1C1E] to-[#C9A84C] text-white text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
-              🔥 5 სწორი პასუხი!
+            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#5C1A2E] to-[#1C1C1E] text-[#F8F5F0] text-2xl font-extrabold shadow-2xl border-2 border-[#C9A84C]/60 whitespace-nowrap">
+              🔥 <span className="text-[#C9A84C]">{streakN}</span> სწორი პასუხი!
             </div>
           </div>
         </div>
@@ -374,9 +376,9 @@ export default function VocabularyModule() {
       {streakOverlay === "mega" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-mega-pop">
-            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#1C1C1E] via-[#C9A84C] to-[#E5D4A8] text-white text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
-              <div className="text-4xl">⚡ 10 სწორი პასუხი!</div>
-              <div className="text-xl mt-1 text-white/85">გაუჩერებელი ხარ!</div>
+            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#5C1A2E] via-[#3A1220] to-[#1C1C1E] text-[#F8F5F0] text-3xl font-extrabold shadow-2xl border-2 border-[#C9A84C] text-center max-w-[90vw]">
+              <div className="text-4xl">⚡ <span className="text-[#C9A84C]">{streakN}</span> სწორი პასუხი!</div>
+              <div className="text-xl mt-1 text-[#E5D4A8]">გაუჩერებელი ხარ!</div>
             </div>
           </div>
         </div>
