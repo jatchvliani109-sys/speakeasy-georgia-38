@@ -47,6 +47,7 @@ export default function Profile() {
       setGoals(cur.mainPriority || []);
       setFields(cur.field || []);
       setDisplayName(prof.data?.display_name ?? "");
+      setInitialName(prof.data?.display_name ?? "");
       setHasResume(!!resume.data);
       setResumeName(resume.data?.file_name ?? resume.data?.full_name ?? null);
     })();
