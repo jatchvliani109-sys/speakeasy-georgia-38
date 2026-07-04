@@ -323,7 +323,7 @@ export default function VocabularyModule() {
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           {stage === "results"
-            ? "სესია დასრულდა"
+            ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
             : stage === "reviewIntro"
             ? "გამეორების დღე"
             : "დღევანდელი სიტყვები"}
