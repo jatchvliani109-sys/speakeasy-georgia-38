@@ -201,14 +201,15 @@ export default function BusinessHome() {
   }, [user]);
 
   const displayName = useMemo(() => {
+    if (profileName) return profileName;
     const meta = (user?.user_metadata as any) || {};
     return (
       meta.display_name ||
       meta.full_name ||
       meta.name ||
-      (user?.email ? user.email.split("@")[0] : "")
+      ""
     );
-  }, [user]);
+  }, [profileName, user]);
 
   // Build goal-weighted rotation queue across active modules.
   // Each goal contributes all its mapped modules; primary goal gets extra weight.
