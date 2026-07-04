@@ -3,3 +3,6 @@ project_id = "hmpwjhzrmfyapijikkuc"
 
 [functions.openai-text-to-speech]
 verify_jwt = false
+
+[functions.generate-word-audio]
+verify_jwt = false
