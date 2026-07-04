@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, pullBusinessFromSupabase } from "./lib/state";
 import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
+import { randomRoleCard, type RoleCard } from "./lib/roleCards";
 
 type Briefing = {
   companyName: string;
@@ -18,6 +19,7 @@ type Briefing = {
   interviewerTitle: string;
   aboutCompanyKa: string;
   whatToExpectKa: string;
+  focusAreasEn?: string[];
 };
 
 type WarmUpOption = { label: string; text: string; isBetter: boolean; whyKa: string };
@@ -57,10 +59,12 @@ type DebriefData = {
   hurtChances: { momentKa: string; phraseEn: string; whyKa: string }[];
   keyPhrases: { en: string; ka: string; whenKa: string }[];
   practiceNextKa: string;
+  modelAnswers?: { questionEn: string; theirAnswerKa: string; modelAnswerEn: string; whyStrongerKa: string }[];
   vocabulary: { en: string; ka: string; exampleEn: string; exampleKa: string }[];
 };
 
-type Step = "loading" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+type Mode = "real" | "matched" | "random";
 
 // How many interviewer turns per stage by intensity
 function stagePlan(intensity: string): Record<string, number> {
@@ -85,6 +89,14 @@ export default function InterviewModule() {
   const [stats, setStats] = useState<{ total: number }>({ total: 0 });
   const [curriculum, setCurriculum] = useState<CurriculumStep | null>(null);
   const [previouslyLearned, setPreviouslyLearned] = useState<PreviouslyLearned | null>(null);
+
+  // mode selection
+  const [mode, setMode] = useState<Mode | null>(null);
+  const [hasResume, setHasResume] = useState(false);
+  const [resume, setResume] = useState<any | null>(null);
+  const [jobPosting, setJobPosting] = useState("");
+  const [matchedPostingText, setMatchedPostingText] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
   // warmup
   const [warmupIdx, setWarmupIdx] = useState(0);
@@ -115,6 +127,7 @@ export default function InterviewModule() {
   const currentStage = stages[stageIdx];
   const remainingInStage = currentStage ? (plan[currentStage] || 1) - turnInStage : 0;
 
+  // Load context (business state, history, curriculum, resume) then show the mode picker.
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -134,60 +147,29 @@ export default function InterviewModule() {
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
-        const recentRoles = (recent || []).slice(0, 12).map((r: any) => r.role_title);
-
         const curStep = interviewStep(completed.length);
         setCurriculum(curStep);
         const lastCompleted = completed[0] || null;
-        const prev = extractPreviouslyLearned(lastCompleted, curStep.titleKa);
-        setPreviouslyLearned(prev);
+        setPreviouslyLearned(extractPreviouslyLearned(lastCompleted, curStep.titleKa));
 
-        const p = cur.plan;
-        const { data, error } = await supabase.functions.invoke("business-interview", {
-          body: {
-            action: "session",
-            level: p?.level || cur.level || "business_intermediate",
-            intensity: p?.intensity || cur.intensity || "standard",
-            fields: (p?.fields || cur.field || []).map(
-              (f) => FIELD_LABELS[f as keyof typeof FIELD_LABELS] || String(f),
-            ),
-            goals: (p?.mainGoals || cur.mainPriority || []).map(
-              (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
-            ),
-            recentRoles,
-            curriculumTopicKey: curStep.key,
-            curriculumTopicTitleKa: curStep.titleKa,
-            curriculumGuidance: curStep.guidanceEn,
-            curriculumStep: curStep.step,
-            curriculumTotal: curStep.total,
-            curriculumCycle: curStep.cycle,
-            previouslyLearned: prev,
-          },
-        });
-        if (cancelled) return;
-        if (error) throw error;
-        const s = data as SessionData;
-        if (!s?.briefing) throw new Error("Invalid session");
-        setSession(s);
+        // Load latest resume (for real/matched modes)
+        const { data: resumeRow } = await supabase
+          .from("business_resumes")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!cancelled) {
+          setResume(resumeRow || null);
+          setHasResume(!!resumeRow);
+        }
 
-        const { data: inserted } = await supabase
-          .from("business_interview_sessions")
-          .insert({
-            user_id: user.id,
-            role_title: s.briefing.roleTitle,
-            company_type: s.briefing.companyType,
-            scenario_key: s.scenarioKey,
-            session_data: s as any,
-            completed: false,
-          })
-          .select("id")
-          .single();
-        if (!cancelled && inserted) setSessionId(inserted.id);
-        setStep("briefing");
+        if (!cancelled) setStep("picker");
       } catch (e: any) {
         if (!cancelled) {
-          setError(e?.message || "სესიის ჩატვირთვა ვერ მოხერხდა.");
-          setStep("briefing");
+          setError(e?.message || "ჩატვირთვა ვერ მოხერხდა.");
+          setStep("picker");
         }
       }
     })();
@@ -195,6 +177,127 @@ export default function InterviewModule() {
       cancelled = true;
     };
   }, [user]);
+
+  // Fire the session once the user has picked a mode (and supplied a posting for "real").
+  async function startSession(chosen: Mode, postingText?: string) {
+    if (!user || starting) return;
+    setStarting(true);
+    setError(null);
+    setStep("loading");
+    try {
+      const cur = biz || (await pullBusinessFromSupabase(user.id));
+      const p = cur.plan;
+
+      // RANDOM mode: use a pre-made role card — zero AI setup cost.
+      if (chosen === "random") {
+        const { data: recent } = await supabase
+          .from("business_interview_sessions")
+          .select("scenario_key")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        const usedKeys = (recent || []).map((r: any) => r.scenario_key).filter(Boolean);
+        const card: RoleCard = randomRoleCard(usedKeys);
+        const s: SessionData = {
+          scenarioKey: card.scenarioKey,
+          briefing: card.briefing as any,
+          stages: ["small_talk", "background", "situational", "curveball", "closing"],
+          stageLabelsKa: {
+            small_talk: "გახურება",
+            background: "გამოცდილება",
+            situational: "სიტუაცია",
+            curveball: "უცაბედი კითხვა",
+            closing: "დახურვა",
+          },
+          warmUp: card.warmUp as any,
+          openingLineEn: card.openingLineEn,
+          estimatedMinutes: card.estimatedMinutes,
+        } as SessionData;
+        setSession(s);
+        const { data: inserted } = await supabase
+          .from("business_interview_sessions")
+          .insert({
+            user_id: user.id,
+            role_title: card.briefing.roleTitle,
+            company_type: card.briefing.companyType,
+            scenario_key: card.scenarioKey,
+            session_data: s as any,
+            completed: false,
+          })
+          .select("id")
+          .single();
+        if (inserted) setSessionId(inserted.id);
+        setStep("briefing");
+        return;
+      }
+
+      // REAL / MATCHED: call the edge function with resume (+ posting for real).
+      const curStep = curriculum || interviewStep(stats.total);
+      const { data: recent } = await supabase
+        .from("business_interview_sessions")
+        .select("role_title")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(12);
+      const recentRoles = (recent || []).map((r: any) => r.role_title).filter(Boolean);
+
+      const { data, error } = await supabase.functions.invoke("business-interview", {
+        body: {
+          action: "session",
+          mode: chosen,
+          resume: resume || null,
+          jobPosting: chosen === "real" ? (postingText || jobPosting) : null,
+          level: p?.level || cur.level || "business_intermediate",
+          intensity: p?.intensity || cur.intensity || "standard",
+          fields: (p?.fields || cur.field || []).map(
+            (f) => FIELD_LABELS[f as keyof typeof FIELD_LABELS] || String(f),
+          ),
+          goals: (p?.mainGoals || cur.mainPriority || []).map(
+            (g) => PRIORITY_LABELS[g as keyof typeof PRIORITY_LABELS] || String(g),
+          ),
+          recentRoles,
+          curriculumTopicKey: curStep.key,
+          curriculumTopicTitleKa: curStep.titleKa,
+          curriculumGuidance: curStep.guidanceEn,
+          curriculumStep: curStep.step,
+          curriculumTotal: curStep.total,
+          curriculumCycle: curStep.cycle,
+          previouslyLearned,
+        },
+      });
+      if (error) throw error;
+      const s = data as SessionData & { jobPostingEn?: string };
+      if (!s?.briefing) throw new Error("Invalid session");
+      setSession(s);
+
+      const { data: inserted } = await supabase
+        .from("business_interview_sessions")
+        .insert({
+          user_id: user.id,
+          role_title: s.briefing.roleTitle,
+          company_type: s.briefing.companyType,
+          scenario_key: s.scenarioKey,
+          session_data: s as any,
+          completed: false,
+        })
+        .select("id")
+        .single();
+      if (inserted) setSessionId(inserted.id);
+
+      // Matched mode: show the invented posting first, then briefing.
+      if (chosen === "matched" && s.jobPostingEn) {
+        setMatchedPostingText(s.jobPostingEn);
+        setStep("matchedPosting");
+      } else {
+        setStep("briefing");
+      }
+    } catch (e: any) {
+      setError(e?.message || "სესიის ჩატვირთვა ვერ მოხერხდა.");
+      setStep("picker");
+    } finally {
+      setStarting(false);
+    }
+  }
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -298,6 +401,7 @@ export default function InterviewModule() {
       const { data, error } = await supabase.functions.invoke("business-interview", {
         body: {
           action: "debrief",
+          mode: mode || "matched",
           level: biz?.plan?.level || biz?.level || "business_intermediate",
           briefing: session.briefing,
           history,
@@ -359,7 +463,7 @@ export default function InterviewModule() {
 
   // ----- Render -----
 
-  if (step === "loading" || !session) {
+  if (step === "loading") {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard>
@@ -375,6 +479,124 @@ export default function InterviewModule() {
   }
 
   const b = session.briefing;
+
+  // ---- Mode picker ----
+  if (step === "picker") {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <div className="space-y-3">
+          <BizCard>
+            <h2 className="ka text-lg font-bold text-[#1C1C1E]">აირჩიე გასაუბრების ტიპი</h2>
+            <p className="ka text-sm text-[#4A4A4A] mt-1">
+              სამი გზა ვარჯიშისთვის — რეალური ვაკანსიიდან შემთხვევით სცენარამდე.
+            </p>
+          </BizCard>
+
+          <ModeCard
+            titleKa="რეალური ვაკანსია"
+            descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოარგებს — სუსტ წერტილებზეც."
+            emoji="🎯"
+            locked={!hasResume}
+            lockedHintKa="ჯერ ატვირთე რეზიუმე"
+            onClick={() => { setMode("real"); setStep("posting"); }}
+            onLockedClick={() => navigate("/path/business/resume")}
+          />
+          <ModeCard
+            titleKa="მორგებული ვაკანსია"
+            descKa="AI შექმნის რეალისტურ ვაკანსიას შენს რეზიუმეზე მორგებულს, ერთი საფეხურით მაღლა. წაიკითხავ და გაივლი გასაუბრებას."
+            emoji="✨"
+            locked={!hasResume}
+            lockedHintKa="ჯერ ატვირთე რეზიუმე"
+            onClick={() => { setMode("matched"); startSession("matched"); }}
+            onLockedClick={() => navigate("/path/business/resume")}
+          />
+          <ModeCard
+            titleKa="შემთხვევითი გასაუბრება"
+            descKa="მზა როლი — გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
+            emoji="🎲"
+            locked={false}
+            onClick={() => { setMode("random"); startSession("random"); }}
+          />
+
+          {error && <p className="ka text-xs text-[#C0392B]">{error}</p>}
+        </div>
+      </BusinessShell>
+    );
+  }
+
+  // ---- Real mode: paste the job posting ----
+  if (step === "posting") {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <div className="space-y-3">
+          <BizCard>
+            <h2 className="ka text-lg font-bold text-[#1C1C1E]">ჩასვი ვაკანსიის ტექსტი</h2>
+            <p className="ka text-sm text-[#4A4A4A] mt-1">
+              დააკოპირე რეალური ვაკანსიის აღწერა (მოვალეობები და მოთხოვნები). გასაუბრება სწორედ ამ ვაკანსიაზე მოგირგებს.
+            </p>
+            <textarea
+              value={jobPosting}
+              onChange={(e) => setJobPosting(e.target.value)}
+              rows={10}
+              placeholder="Paste the job description here..."
+              className="mt-3 w-full rounded-xl border border-[#E0D8D0] bg-white p-3 text-sm text-[#1C1C1E] focus:outline-none focus:border-[#5C1A2E]"
+            />
+            <div className="mt-3 flex gap-2">
+              <BizButton
+                onClick={() => startSession("real", jobPosting)}
+                disabled={jobPosting.trim().length < 40 || starting}
+              >
+                გასაუბრების დაწყება
+              </BizButton>
+              <button
+                onClick={() => setStep("picker")}
+                className="ka px-4 py-2 rounded-xl border border-[#E0D8D0] text-sm text-[#4A4A4A]"
+              >
+                უკან
+              </button>
+            </div>
+            {jobPosting.trim().length > 0 && jobPosting.trim().length < 40 && (
+              <p className="ka text-xs text-[#C0392B] mt-2">ცოტა მეტი დეტალი ჩასვი (მინიმუმ რამდენიმე წინადადება).</p>
+            )}
+          </BizCard>
+        </div>
+      </BusinessShell>
+    );
+  }
+
+  // ---- Matched mode: show the invented posting before the briefing ----
+  if (step === "matchedPosting" && matchedPostingText) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <div className="space-y-3">
+          <BizCard>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">მორგებული ვაკანსია</p>
+            <h2 className="ka text-lg font-bold text-[#1C1C1E] mt-1">წაიკითხე ვაკანსია</h2>
+            <p className="ka text-sm text-[#4A4A4A] mt-1">
+              ეს ვაკანსია შენს რეზიუმეზეა მორგებული, ოდნავ მაღალ დონეზე. წაიკითხე, შემდეგ დაიწყე გასაუბრება.
+            </p>
+            <div className="mt-3 p-3 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0] whitespace-pre-wrap text-sm text-[#1C1C1E]">
+              {matchedPostingText}
+            </div>
+            <div className="mt-3">
+              <BizButton onClick={() => setStep("briefing")}>მზად ვარ — გავაგრძელოთ</BizButton>
+            </div>
+          </BizCard>
+        </div>
+      </BusinessShell>
+    );
+  }
+
+  if (!session) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <BizCard>
+          <p className="ka text-[#4A4A4A]">იტვირთება...</p>
+          {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
+        </BizCard>
+      </BusinessShell>
+    );
+  }
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
@@ -694,6 +916,24 @@ export default function InterviewModule() {
             </BizCard>
           )}
 
+          {debrief.modelAnswers && debrief.modelAnswers.length > 0 && (
+            <BizCard>
+              <p className="ka text-xs font-semibold text-[#5C1A2E]">💪 როგორ გეპასუხა უკეთ</p>
+              <div className="mt-2 space-y-3">
+                {debrief.modelAnswers.map((m, i) => (
+                  <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+                    <p className="text-sm font-semibold text-[#1C1C1E]">{m.questionEn}</p>
+                    <p className="ka text-[11px] text-[#C0392B] mt-1">{m.theirAnswerKa}</p>
+                    <div className="mt-2 p-2 rounded-lg bg-white border border-[#E0D8D0]">
+                      <p className="text-sm text-[#1C1C1E]">{m.modelAnswerEn}</p>
+                    </div>
+                    <p className="ka text-[11px] text-[#5A8A6A] mt-1.5">✓ {m.whyStrongerKa}</p>
+                  </div>
+                ))}
+              </div>
+            </BizCard>
+          )}
+
           <BizCard className="bg-[#F8F5F0] border-[#F0E8D8]">
             <p className="ka text-xs font-semibold text-[#1C1C1E]">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
             <p className="ka text-sm text-[#5C1A2E] mt-1">{debrief.practiceNextKa}</p>
@@ -804,6 +1044,39 @@ export default function InterviewModule() {
         @keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
       `}</style>
     </BusinessShell>
+  );
+}
+
+function ModeCard({
+  titleKa, descKa, emoji, locked, lockedHintKa, onClick, onLockedClick,
+}: {
+  titleKa: string; descKa: string; emoji: string; locked: boolean;
+  lockedHintKa?: string; onClick: () => void; onLockedClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={locked ? onLockedClick : onClick}
+      className={[
+        "w-full text-left p-4 rounded-2xl border transition-colors",
+        locked
+          ? "border-[#E0D8D0] bg-[#F8F5F0] opacity-80"
+          : "border-[#E0D8D0] bg-white hover:border-[#5C1A2E]/40 hover:bg-[#5C1A2E]/5",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-3">
+        <div className="text-2xl">{emoji}</div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="ka font-bold text-[#1C1C1E]">{titleKa}</h3>
+            {locked && <span className="text-xs">🔒</span>}
+          </div>
+          <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">{descKa}</p>
+          {locked && lockedHintKa && (
+            <p className="ka text-[11px] text-[#5C1A2E] font-semibold mt-1.5">{lockedHintKa} →</p>
+          )}
+        </div>
+      </div>
+    </button>
   );
 }
 

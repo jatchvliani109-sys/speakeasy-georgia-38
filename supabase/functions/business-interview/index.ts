@@ -3,10 +3,33 @@ import { requireUser } from "../_shared/auth.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
+// Model split (email-module economics): high quality only where it's felt.
+const MODEL_SESSION = "gpt-5.4";  // briefing/warm-ups — Georgian quality matters
+const MODEL_REPLY = "gpt-4o";     // in-character loop — fast, cheap, English-mostly
+const MODEL_VERDICT = "gpt-5-mini"; // short in-character English verdict
+const MODEL_DEBRIEF = "gpt-5.4";  // the rich Georgian teaching report
+
 type Action = "session" | "reply" | "verdict" | "debrief";
+
+type InterviewMode = "real" | "matched" | "random";
+
+type ResumeData = {
+  full_name?: string | null;
+  job_title?: string | null;
+  industry?: string | null;
+  technical_skills?: string[] | null;
+  soft_skills?: string[] | null;
+  years_of_experience?: number | string | null;
+  education?: string | null;
+  achievements?: string[] | null;
+  languages?: any;
+};
 
 type SessionBody = {
   action: "session";
+  mode?: InterviewMode;          // real | matched | random (default matched)
+  resume?: ResumeData | null;     // for real + matched
+  jobPosting?: string | null;     // real: user-pasted posting
   level?: string;
   intensity?: string;
   fields?: string[];
@@ -42,6 +65,7 @@ type VerdictBody = {
 type DebriefBody = {
   action: "debrief";
   level?: string;
+  mode?: InterviewMode;
   briefing: any;
   history: { role: "interviewer" | "candidate"; text: string }[];
   verdict: string;
@@ -115,12 +139,60 @@ Output STRICT JSON only:
   "keyPhrases": [
     { "en": "phrase to use next time", "ka": "Georgian translation", "whenKa": "when to use it" }
   ],
+  "modelAnswers": [
+    {
+      "questionEn": "the interviewer question they answered weakest",
+      "theirAnswerKa": "1 short Georgian note on what was weak about their actual answer",
+      "modelAnswerEn": "a strong model answer they could have given (3-5 sentences, natural spoken English)",
+      "whyStrongerKa": "1 Georgian sentence on why this version is stronger"
+    }
+  ],
   "practiceNextKa": "1 short Georgian sentence — one specific thing to practice before next interview",
   "vocabulary": [
     { "en": "phrase", "ka": "Georgian", "exampleEn": "1-sentence usage", "exampleKa": "Georgian translation" }
   ]
 }
-Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include 4-6 vocabulary items pulled from strong phrases + key phrases.`;
+Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include exactly 2 modelAnswers — for the learner's TWO WEAKEST answers, giving them a full model response to learn from. Include 4-6 vocabulary items pulled from strong phrases + key phrases.
+If focusAreas were provided (real/matched mode), explicitly comment in hurtChances or practiceNextKa on any REQUIRED competency the candidate failed to demonstrate.`;
+
+function resumeBlock(resume?: ResumeData | null): string {
+  if (!resume) return "(No resume provided.)";
+  const langs = Array.isArray(resume.languages)
+    ? resume.languages.map((l: any) => (typeof l === "string" ? l : l?.name)).filter(Boolean).join(", ")
+    : "";
+  return [
+    `- Name: ${resume.full_name || "(n/a)"}`,
+    `- Current/last role: ${resume.job_title || "(n/a)"}`,
+    `- Industry: ${resume.industry || "(n/a)"}`,
+    `- Years of experience: ${resume.years_of_experience ?? "(n/a)"}`,
+    `- Technical skills: ${(resume.technical_skills || []).join(", ") || "(n/a)"}`,
+    `- Soft skills: ${(resume.soft_skills || []).join(", ") || "(n/a)"}`,
+    `- Education: ${resume.education || "(n/a)"}`,
+    `- Achievements: ${(resume.achievements || []).join("; ") || "(n/a)"}`,
+    langs ? `- Languages: ${langs}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function modeGuidance(mode: InterviewMode, b: SessionBody): string {
+  if (mode === "real") {
+    return `MODE: REAL — the learner is preparing for an ACTUAL job they pasted below.
+Candidate's resume:
+${resumeBlock(b.resume)}
+
+The REAL job posting they're applying to:
+"""${(b.jobPosting || "").slice(0, 4000)}"""
+
+Build the briefing DIRECTLY from this real posting (real-sounding company/role derived from it — you may keep the real role title). The interview MUST probe the fit between the resume and this posting, INCLUDING GAPS: if the posting requires something the resume doesn't show, plan to test it (the interviewer will press on it later). In "briefing", add a "focusAreasEn" array (3-5 short strings) naming the exact competencies from the posting to probe — especially gaps.`;
+  }
+  if (mode === "matched") {
+    return `MODE: MATCHED — invent a realistic job posting that fits the learner's resume but is ONE STEP more ambitious (a natural next career move).
+Candidate's resume:
+${resumeBlock(b.resume)}
+
+Return the invented posting in "jobPostingEn" (6-10 lines: company one-liner, role, 4-6 responsibilities, 3-5 requirements) so the learner can read it before starting. Base the briefing on that invented posting. Probe realistic fit for the slightly-stretched role. Add "focusAreasEn" (3-5 strings) for the competencies to probe.`;
+  }
+  return `MODE: RANDOM — a generic practice role (no resume). Keep it broadly accessible for the learner's level and fields.`;
+}
 
 function sessionPrompt(b: SessionBody) {
   const intensity = b.intensity || "standard";
@@ -130,7 +202,11 @@ function sessionPrompt(b: SessionBody) {
         .join("\n")}\n→ Reference one of these phrases naturally inside warmUp options or in the interviewer's openingLineEn context.`
     : "(First interview session — set a welcoming tone.)";
 
+  const mode: InterviewMode = b.mode || "matched";
+
   return `Generate a personalized interview session.
+
+${modeGuidance(mode, b)}
 
 CURRICULUM LOCK (drives interview focus):
 - topicKey: ${b.curriculumTopicKey || "background"}
@@ -161,8 +237,10 @@ Return JSON exactly in this shape:
     "interviewerName": "first + last name",
     "interviewerTitle": "e.g. 'Head of Marketing'",
     "aboutCompanyKa": "2-3 sentence Georgian briefing on company context",
-    "whatToExpectKa": "1-2 sentence Georgian heads-up about the interview style"
+    "whatToExpectKa": "1-2 sentence Georgian heads-up about the interview style",
+    "focusAreasEn": ["only for real/matched: competencies to probe, especially gaps"]
   },
+  "jobPostingEn": "ONLY for matched mode: the invented posting text for the learner to read (omit otherwise)",
   "stages": ${intensity === "light"
     ? `["small_talk", "background", "situational", "closing"]`
     : `["small_talk", "background", "situational", "curveball", "closing"]`},
@@ -219,8 +297,12 @@ Pick a verdict that genuinely reflects performance and deliver a short closing m
 }
 
 function debriefPrompt(b: DebriefBody) {
+  const focus = b.briefing?.focusAreasEn?.length
+    ? `\nRequired competencies for this role (assess whether they were shown): ${b.briefing.focusAreasEn.join(", ")}`
+    : "";
   return `Learner level: ${b.level || "business_intermediate"}
-Verdict: ${b.verdict}
+Mode: ${b.mode || "matched"}
+Verdict: ${b.verdict}${focus}
 
 Briefing:
 ${JSON.stringify(b.briefing)}
@@ -231,7 +313,7 @@ ${b.history.map((t) => `${t.role.toUpperCase()}: ${t.text}`).join("\n")}
 Now break character and give the structured Georgian debrief.`;
 }
 
-async function callAI(system: string, user: string) {
+async function callAI(system: string, user: string, model = "gpt-4o") {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -239,7 +321,7 @@ async function callAI(system: string, user: string) {
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o",
+      model,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -269,13 +351,13 @@ Deno.serve(async (req) => {
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
     let r;
     if (body.action === "session") {
-      r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
+      r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody), MODEL_SESSION);
     } else if (body.action === "reply") {
-      r = await callAI(SYSTEM_REPLY, replyPrompt(body as unknown as ReplyBody));
+      r = await callAI(SYSTEM_REPLY, replyPrompt(body as unknown as ReplyBody), MODEL_REPLY);
     } else if (body.action === "verdict") {
-      r = await callAI(SYSTEM_VERDICT, verdictPrompt(body as unknown as VerdictBody));
+      r = await callAI(SYSTEM_VERDICT, verdictPrompt(body as unknown as VerdictBody), MODEL_VERDICT);
     } else if (body.action === "debrief") {
-      r = await callAI(SYSTEM_DEBRIEF, debriefPrompt(body as unknown as DebriefBody));
+      r = await callAI(SYSTEM_DEBRIEF, debriefPrompt(body as unknown as DebriefBody), MODEL_DEBRIEF);
     } else {
       return new Response(JSON.stringify({ error: "unknown action" }), {
         status: 400,
