@@ -721,7 +721,7 @@ export default function InterviewModule() {
                 </div>
               </div>
               <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E5D4A8] font-semibold mt-5">
-                შესრულებულია
+                {displayName ? `შესრულებულია, ${displayName}` : "შესრულებულია"}
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
                 {verdict?.headlineKa || "გასაუბრება დასრულდა"}
