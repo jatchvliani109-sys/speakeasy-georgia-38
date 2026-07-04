@@ -319,7 +319,7 @@ export default function BusinessHome() {
             SpeakBusy
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1 leading-tight">
-            გამარჯობა{displayName ? `, ${displayName}` : ""}
+            გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
             {plan ? ` — ${LEVEL_LABELS[plan.level]}` : ""}
           </h1>
         </div>
