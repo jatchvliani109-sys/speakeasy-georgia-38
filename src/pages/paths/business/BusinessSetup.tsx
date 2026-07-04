@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
+import { toast } from "sonner";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
   BusinessDeadline,
