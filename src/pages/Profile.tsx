@@ -65,8 +65,9 @@ export default function Profile() {
     const b = [...(s.mainPriority || [])].sort().join(",");
     const c = [...fields].sort().join(",");
     const d = [...(s.field || [])].sort().join(",");
-    return a !== b || c !== d;
-  }, [s, goals, fields]);
+    const nameChanged = displayName.trim() !== initialName.trim();
+    return a !== b || c !== d || nameChanged;
+  }, [s, goals, fields, displayName, initialName]);
 
   const toggleGoal = (g: BusinessPriority) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
