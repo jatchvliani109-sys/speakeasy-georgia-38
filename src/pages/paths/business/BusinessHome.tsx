@@ -287,6 +287,31 @@ export default function BusinessHome() {
 
   return (
     <BusinessShell seo={{ title: "ჩემი სწავლება — SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა — დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
+      <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
+        <DialogContent className="bg-[#F0EBE3] border-[#E0D8D0]">
+          <DialogHeader>
+            <DialogTitle className="ka text-[#5C1A2E]">როგორ მოგმართოთ?</DialogTitle>
+            <DialogDescription className="ka text-[#4A4A4A]">
+              შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") submitName(); }}
+            maxLength={60}
+            placeholder="მაგ. ნინო"
+            className="ka bg-white border-[#E0D8D0]"
+          />
+          <DialogFooter>
+            <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
+              {savingName ? "ინახება..." : "შენახვა"}
+            </BizButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
