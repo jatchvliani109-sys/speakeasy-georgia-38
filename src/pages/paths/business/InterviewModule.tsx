@@ -75,6 +75,7 @@ function stagePlan(intensity: string): Record<string, number> {
 
 export default function InterviewModule() {
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("loading");
   const [biz, setBiz] = useState<BusinessState | null>(null);
