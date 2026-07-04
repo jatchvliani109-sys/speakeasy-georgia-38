@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
@@ -91,6 +92,7 @@ type Step =
 
 export default function EmailsModule() {
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("loading");
   const [biz, setBiz] = useState<BusinessState | null>(null);
@@ -809,7 +811,7 @@ export default function EmailsModule() {
                 შესრულებულია
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
-                დღევანდელი გაკვეთილი დასრულებულია
+                {displayName ? `ყოჩაღ, ${displayName}!` : "ყოჩაღ!"} დღევანდელი გაკვეთილი დასრულებულია
               </h2>
               <p className="ka text-sm text-[#F0EBE3]/75 mt-2">
                 {labelFor(session.emailType)} · {session.dailyFocusKa}

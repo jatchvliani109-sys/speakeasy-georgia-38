@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 
 type NavItem = {
   to?: string;
@@ -48,6 +49,7 @@ export default function GlobalNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
 
   const handleLogout = async () => {
     setOpen(false);
@@ -114,7 +116,7 @@ export default function GlobalNav() {
           >
             <SheetHeader className="px-5 pt-5 pb-4 border-b border-[#E0D8D0]">
               <SheetTitle className="ka text-[#5C1A2E] text-base font-bold text-left">
-                ნავიგაცია
+                {displayName ? `გამარჯობა, ${displayName}` : "ნავიგაცია"}
               </SheetTitle>
               {user?.email && (
                 <p className="ka text-xs text-[#4A4A4A] text-left break-all">

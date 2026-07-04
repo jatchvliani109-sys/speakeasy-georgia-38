@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Volume2, VolumeX } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
@@ -38,6 +39,7 @@ const REVIEW_FALLBACK_SIZE = 10;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
   const [stage, setStage] = useState<Stage>("intro");
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
@@ -321,7 +323,7 @@ export default function VocabularyModule() {
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           {stage === "results"
-            ? "სესია დასრულდა"
+            ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
             : stage === "reviewIntro"
             ? "გამეორების დღე"
             : "დღევანდელი სიტყვები"}

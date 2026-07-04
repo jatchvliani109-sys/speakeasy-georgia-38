@@ -20,6 +20,7 @@ export default function Profile() {
   const { user } = useAuth();
   const [s, setS] = useState<BusinessState | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
+  const [initialName, setInitialName] = useState<string>("");
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [resumeName, setResumeName] = useState<string | null>(null);
   const [goals, setGoals] = useState<BusinessPriority[]>([]);
@@ -46,6 +47,7 @@ export default function Profile() {
       setGoals(cur.mainPriority || []);
       setFields(cur.field || []);
       setDisplayName(prof.data?.display_name ?? "");
+      setInitialName(prof.data?.display_name ?? "");
       setHasResume(!!resume.data);
       setResumeName(resume.data?.file_name ?? resume.data?.full_name ?? null);
     })();
@@ -63,8 +65,9 @@ export default function Profile() {
     const b = [...(s.mainPriority || [])].sort().join(",");
     const c = [...fields].sort().join(",");
     const d = [...(s.field || [])].sort().join(",");
-    return a !== b || c !== d;
-  }, [s, goals, fields]);
+    const nameChanged = displayName.trim() !== initialName.trim();
+    return a !== b || c !== d || nameChanged;
+  }, [s, goals, fields, displayName, initialName]);
 
   const toggleGoal = (g: BusinessPriority) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
@@ -73,10 +76,20 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!user || !s) return;
+    const cleanName = displayName.trim();
+    if (!cleanName) {
+      toast.error("სახელი არ შეიძლება იყოს ცარიელი");
+      return;
+    }
     setSaving(true);
     try {
       const nextPlan = s.plan ? { ...s.plan, mainGoals: goals, fields } : s.plan;
       saveBusiness(user.id, { mainPriority: goals, field: fields, plan: nextPlan ?? null });
+      if (cleanName !== initialName.trim()) {
+        const { error } = await supabase.from("profiles").update({ display_name: cleanName }).eq("id", user.id);
+        if (error) throw error;
+        setInitialName(cleanName);
+      }
       setS({ ...s, mainPriority: goals, field: fields, plan: nextPlan ?? null });
       toast.success("შენახულია");
     } catch (e: any) {
@@ -108,10 +121,21 @@ export default function Profile() {
           <span className="w-12 h-12 rounded-full bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0 text-base font-bold">
             {(displayName || email).slice(0, 1).toUpperCase()}
           </span>
-          <div className="flex-1 min-w-0 space-y-2">
-            <div className="flex items-center gap-2 text-[#1C1C1E]">
-              <UserIcon size={14} strokeWidth={2.25} className="text-[#4A4A4A]" />
-              <span className="ka font-bold text-base break-words min-w-0">{displayName || "—"}</span>
+          <div className="flex-1 min-w-0 space-y-3">
+            <div>
+              <label htmlFor="profile-name" className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold flex items-center gap-1.5">
+                <UserIcon size={12} strokeWidth={2.25} />
+                სახელი
+              </label>
+              <input
+                id="profile-name"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                maxLength={60}
+                placeholder="შენი სახელი"
+                className="ka mt-1 w-full px-3 py-2 rounded-md border border-[#E0D8D0] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+              />
             </div>
             <div className="flex items-center gap-2 text-[#4A4A4A]">
               <Mail size={13} strokeWidth={2.25} className="shrink-0" />

@@ -13,8 +13,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 import {
   BUSINESS_MODULES,
@@ -88,6 +92,10 @@ const todayIso = () => {
 export default function BusinessHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { displayName: profileName, loaded: nameLoaded, save: saveName } = useDisplayName();
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
@@ -97,6 +105,29 @@ export default function BusinessHome() {
   const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
   const [lastReassessmentAt, setLastReassessmentAt] = useState<string | null>(null);
   const [phraseCount, setPhraseCount] = useState<number>(0);
+
+  // Existing users with no saved name: prompt once.
+  useEffect(() => {
+    if (nameLoaded && !profileName) setNameDialogOpen(true);
+  }, [nameLoaded, profileName]);
+
+  const submitName = async () => {
+    const clean = nameInput.trim();
+    if (!clean) {
+      toast.error("გთხოვ, შეიყვანე შენი სახელი");
+      return;
+    }
+    setSavingName(true);
+    const res = await saveName(clean);
+    setSavingName(false);
+    if (!res.ok) {
+      toast.error("სახელის შენახვა ვერ მოხერხდა");
+      return;
+    }
+    setNameDialogOpen(false);
+    toast.success("გამარჯობა!");
+  };
+
 
   useEffect(() => {
     if (!user) return;
@@ -170,14 +201,15 @@ export default function BusinessHome() {
   }, [user]);
 
   const displayName = useMemo(() => {
+    if (profileName) return profileName;
     const meta = (user?.user_metadata as any) || {};
     return (
       meta.display_name ||
       meta.full_name ||
       meta.name ||
-      (user?.email ? user.email.split("@")[0] : "")
+      ""
     );
-  }, [user]);
+  }, [profileName, user]);
 
   // Build goal-weighted rotation queue across active modules.
   // Each goal contributes all its mapped modules; primary goal gets extra weight.
@@ -255,6 +287,31 @@ export default function BusinessHome() {
 
   return (
     <BusinessShell seo={{ title: "ჩემი სწავლება — SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა — დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
+      <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
+        <DialogContent className="bg-[#F0EBE3] border-[#E0D8D0]">
+          <DialogHeader>
+            <DialogTitle className="ka text-[#5C1A2E]">როგორ მოგმართოთ?</DialogTitle>
+            <DialogDescription className="ka text-[#4A4A4A]">
+              შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") submitName(); }}
+            maxLength={60}
+            placeholder="მაგ. ნინო"
+            className="ka bg-white border-[#E0D8D0]"
+          />
+          <DialogFooter>
+            <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
+              {savingName ? "ინახება..." : "შენახვა"}
+            </BizButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
@@ -262,7 +319,7 @@ export default function BusinessHome() {
             SpeakBusy
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1 leading-tight">
-            გამარჯობა{displayName ? `, ${displayName}` : ""}
+            გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
             {plan ? ` — ${LEVEL_LABELS[plan.level]}` : ""}
           </h1>
         </div>

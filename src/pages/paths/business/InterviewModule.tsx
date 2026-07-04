@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, pullBusinessFromSupabase } from "./lib/state";
@@ -74,6 +75,7 @@ function stagePlan(intensity: string): Record<string, number> {
 
 export default function InterviewModule() {
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("loading");
   const [biz, setBiz] = useState<BusinessState | null>(null);
@@ -719,7 +721,7 @@ export default function InterviewModule() {
                 </div>
               </div>
               <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E5D4A8] font-semibold mt-5">
-                შესრულებულია
+                {displayName ? `შესრულებულია, ${displayName}` : "შესრულებულია"}
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
                 {verdict?.headlineKa || "გასაუბრება დასრულდა"}
