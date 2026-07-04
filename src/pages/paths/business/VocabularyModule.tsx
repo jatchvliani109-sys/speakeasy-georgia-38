@@ -344,7 +344,7 @@ export default function VocabularyModule() {
 
       {stage === "quiz" && combo >= 2 && (
         <div className="mb-3 flex items-center justify-end">
-          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#1C1C1E] to-[#C9A84C] text-[#5C1A2E] text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
+          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#1C1C1E] to-[#C9A84C] text-white text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
             <span className="biz-flame">🔥</span>
             {combo} სწორი ზედიზედ
           </div>
