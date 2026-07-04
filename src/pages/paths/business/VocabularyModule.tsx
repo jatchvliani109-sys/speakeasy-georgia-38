@@ -39,6 +39,7 @@ const REVIEW_FALLBACK_SIZE = 10;
 
 export default function VocabularyModule() {
   const { user } = useAuth();
+  const { displayName } = useDisplayName();
   const [stage, setStage] = useState<Stage>("intro");
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
