@@ -811,7 +811,7 @@ export default function EmailsModule() {
                 შესრულებულია
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
-                დღევანდელი გაკვეთილი დასრულებულია
+                {displayName ? `ყოჩაღ, ${displayName}!` : "ყოჩაღ!"} დღევანდელი გაკვეთილი დასრულებულია
               </h2>
               <p className="ka text-sm text-[#F0EBE3]/75 mt-2">
                 {labelFor(session.emailType)} · {session.dailyFocusKa}
