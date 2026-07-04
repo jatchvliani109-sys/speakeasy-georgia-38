@@ -258,20 +258,31 @@ const WORDS: [string, string][] = [
   ["issue-log", "Issue log"],["status-report", "Status report"],["acceptance-criteria", "Acceptance criteria"],["go-live", "Go-live"],
 ];
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SERVICE_KEY =
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ??
+  Deno.env.get("SERVICE_ROLE_KEY") ??
+  Deno.env.get("SUPABASE_SERVICE_KEY") ??
+  "";
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
+
+function storageHeaders(extra: Record<string, string> = {}) {
+  return { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY, ...extra };
+}
 
 async function ensureBucket() {
   const res = await fetch(`${SUPABASE_URL}/storage/v1/bucket/${BUCKET}`, {
-    headers: { Authorization: `Bearer ${SERVICE_KEY}` },
+    headers: storageHeaders(),
   });
   if (res.ok) return;
-  await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
+  const create = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+    headers: storageHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({ id: BUCKET, name: BUCKET, public: true }),
   });
+  if (!create.ok) {
+    throw new Error(`bucket create ${create.status}: ${(await create.text()).slice(0, 300)}`);
+  }
 }
 
 async function listExisting(): Promise<Set<string>> {
@@ -280,7 +291,7 @@ async function listExisting(): Promise<Set<string>> {
   while (true) {
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+      headers: storageHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({ prefix: "", limit: 1000, offset }),
     });
     if (!res.ok) break;
@@ -305,11 +316,7 @@ async function tts(text: string): Promise<ArrayBuffer> {
 async function upload(name: string, audio: ArrayBuffer) {
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${SERVICE_KEY}`,
-      "Content-Type": "audio/mpeg",
-      "x-upsert": "true",
-    },
+    headers: storageHeaders({ "Content-Type": "audio/mpeg", "x-upsert": "true" }),
     body: audio,
   });
   if (!res.ok) throw new Error(`upload ${name} ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -333,6 +340,17 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   if (url.searchParams.get("token") !== ADMIN_TOKEN) {
     return new Response("forbidden", { status: 403 });
+  }
+  if (!SERVICE_KEY || !SUPABASE_URL || !OPENAI_API_KEY) {
+    const names = Object.keys(Deno.env.toObject())
+      .filter((k) => k.includes("SUPA") || k.includes("KEY") || k.includes("URL"))
+      .sort()
+      .join("\n");
+    return page(
+      `<h1>⚠️ Missing configuration</h1>` +
+        `<div class="err">SUPABASE_URL set: ${!!SUPABASE_URL}\nSERVICE key set: ${!!SERVICE_KEY}\nOPENAI key set: ${!!OPENAI_API_KEY}\n\nAvailable env variable NAMES (values hidden):\n${names}</div>`,
+      false,
+    );
   }
   try {
     await ensureBucket();
