@@ -76,10 +76,20 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!user || !s) return;
+    const cleanName = displayName.trim();
+    if (!cleanName) {
+      toast.error("სახელი არ შეიძლება იყოს ცარიელი");
+      return;
+    }
     setSaving(true);
     try {
       const nextPlan = s.plan ? { ...s.plan, mainGoals: goals, fields } : s.plan;
       saveBusiness(user.id, { mainPriority: goals, field: fields, plan: nextPlan ?? null });
+      if (cleanName !== initialName.trim()) {
+        const { error } = await supabase.from("profiles").update({ display_name: cleanName }).eq("id", user.id);
+        if (error) throw error;
+        setInitialName(cleanName);
+      }
       setS({ ...s, mainPriority: goals, field: fields, plan: nextPlan ?? null });
       toast.success("შენახულია");
     } catch (e: any) {
