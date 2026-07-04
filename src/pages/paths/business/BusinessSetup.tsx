@@ -32,7 +32,10 @@ const FIELD_KEYS = Object.keys(FIELD_LABELS) as BusinessField[];
 export default function BusinessSetup() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { displayName, loaded: nameLoaded, save: saveName } = useDisplayName();
 
+  const [nameInput, setNameInput] = useState<string>("");
+  const [savingName, setSavingName] = useState(false);
   const [step, setStep] = useState<Step>(0);
 
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
@@ -42,6 +45,9 @@ export default function BusinessSetup() {
   const [field, setField] = useState<BusinessField[]>([]);
 
   useEffect(() => {
+    if (nameLoaded && displayName) setNameInput(displayName);
+  }, [nameLoaded, displayName]);
+
     if (!user) return;
     let cancelled = false;
     (async () => {
