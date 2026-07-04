@@ -92,6 +92,10 @@ const todayIso = () => {
 export default function BusinessHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { displayName: profileName, loaded: nameLoaded, save: saveName } = useDisplayName();
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
@@ -101,6 +105,29 @@ export default function BusinessHome() {
   const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
   const [lastReassessmentAt, setLastReassessmentAt] = useState<string | null>(null);
   const [phraseCount, setPhraseCount] = useState<number>(0);
+
+  // Existing users with no saved name: prompt once.
+  useEffect(() => {
+    if (nameLoaded && !profileName) setNameDialogOpen(true);
+  }, [nameLoaded, profileName]);
+
+  const submitName = async () => {
+    const clean = nameInput.trim();
+    if (!clean) {
+      toast.error("გთხოვ, შეიყვანე შენი სახელი");
+      return;
+    }
+    setSavingName(true);
+    const res = await saveName(clean);
+    setSavingName(false);
+    if (!res.ok) {
+      toast.error("სახელის შენახვა ვერ მოხერხდა");
+      return;
+    }
+    setNameDialogOpen(false);
+    toast.success("გამარჯობა!");
+  };
+
 
   useEffect(() => {
     if (!user) return;
