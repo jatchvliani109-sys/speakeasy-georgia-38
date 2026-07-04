@@ -363,7 +363,7 @@ export default function VocabularyModule() {
       {streakOverlay === "mid" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-streak-pop">
-            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#1C1C1E] to-[#C9A84C] text-[#5C1A2E] text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
+            <div className="ka px-7 py-4 rounded-2xl bg-gradient-to-br from-[#1C1C1E] to-[#C9A84C] text-white text-2xl font-extrabold shadow-2xl border-2 border-white/30 whitespace-nowrap">
               🔥 5 სწორი პასუხი!
             </div>
           </div>
@@ -372,9 +372,9 @@ export default function VocabularyModule() {
       {streakOverlay === "mega" && (
         <div className="pointer-events-none fixed inset-0 z-50 flex">
           <div className="absolute left-1/2 top-1/2 biz-mega-pop">
-            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#1C1C1E] via-[#C9A84C] to-[#E5D4A8] text-[#5C1A2E] text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
+            <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#1C1C1E] via-[#C9A84C] to-[#E5D4A8] text-white text-3xl font-extrabold shadow-2xl border-2 border-white/40 text-center max-w-[90vw]">
               <div className="text-4xl">⚡ 10 სწორი პასუხი!</div>
-              <div className="text-xl mt-1 text-[#5C1A2E]/85">გაუჩერებელი ხარ!</div>
+              <div className="text-xl mt-1 text-white/85">გაუჩერებელი ხარ!</div>
             </div>
           </div>
         </div>
