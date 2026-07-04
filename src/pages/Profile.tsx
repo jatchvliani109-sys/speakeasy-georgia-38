@@ -121,10 +121,21 @@ export default function Profile() {
           <span className="w-12 h-12 rounded-full bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0 text-base font-bold">
             {(displayName || email).slice(0, 1).toUpperCase()}
           </span>
-          <div className="flex-1 min-w-0 space-y-2">
-            <div className="flex items-center gap-2 text-[#1C1C1E]">
-              <UserIcon size={14} strokeWidth={2.25} className="text-[#4A4A4A]" />
-              <span className="ka font-bold text-base break-words min-w-0">{displayName || "—"}</span>
+          <div className="flex-1 min-w-0 space-y-3">
+            <div>
+              <label htmlFor="profile-name" className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold flex items-center gap-1.5">
+                <UserIcon size={12} strokeWidth={2.25} />
+                სახელი
+              </label>
+              <input
+                id="profile-name"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                maxLength={60}
+                placeholder="შენი სახელი"
+                className="ka mt-1 w-full px-3 py-2 rounded-md border border-[#E0D8D0] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+              />
             </div>
             <div className="flex items-center gap-2 text-[#4A4A4A]">
               <Mail size={13} strokeWidth={2.25} className="shrink-0" />
