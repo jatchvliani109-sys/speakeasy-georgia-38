@@ -138,17 +138,71 @@ export default function BusinessSetup() {
   };
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);
 
+  const needsName = nameLoaded && !displayName;
+
+  const submitName = async () => {
+    const clean = nameInput.trim();
+    if (!clean) {
+      toast.error("გთხოვ, შეიყვანე შენი სახელი");
+      return;
+    }
+    setSavingName(true);
+    const res = await saveName(clean);
+    setSavingName(false);
+    if (!res.ok) toast.error("სახელის შენახვა ვერ მოხერხდა");
+  };
+
+  if (needsName) {
+    return (
+      <BusinessShell>
+        <div className="mb-6">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            ნაბიჯი 1 / 5
+          </p>
+          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ მოგმართოთ?</h1>
+          <p className="ka text-sm text-[#4A4A4A] mt-1">
+            შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
+          </p>
+        </div>
+        <BizCard>
+          <label className="ka text-xs text-[#4A4A4A] font-semibold" htmlFor="name-input">
+            შენი სახელი
+          </label>
+          <input
+            id="name-input"
+            type="text"
+            autoFocus
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") submitName();
+            }}
+            maxLength={60}
+            placeholder="მაგ. ნინო"
+            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-base"
+          />
+          <div className="flex justify-end mt-6">
+            <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
+              {savingName ? "ინახება..." : "შემდეგი"}
+            </BizButton>
+          </div>
+        </BizCard>
+      </BusinessShell>
+    );
+  }
+
   return (
     <BusinessShell>
       <div className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-          ნაბიჯი {step + 1} / 4
+          ნაბიჯი {step + 2} / 5
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
-          მითხარი რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
+          {displayName ? `${displayName}, მ` : "მ"}ითხარი რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
       </div>
+
 
       <BizCard>
         {step === 0 && (
