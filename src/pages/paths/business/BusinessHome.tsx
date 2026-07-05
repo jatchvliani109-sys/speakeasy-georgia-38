@@ -290,7 +290,7 @@ export default function BusinessHome() {
       <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
         <DialogContent className="bg-[#F0EBE3] border-[#E0D8D0]">
           <DialogHeader>
-            <DialogTitle className="ka text-[#5C1A2E]">როგორ მოგმართოთ?</DialogTitle>
+            <DialogTitle className="ka text-[#5C1A2E]">როგორ დაგიძახოთ?</DialogTitle>
             <DialogDescription className="ka text-[#4A4A4A]">
               შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
             </DialogDescription>

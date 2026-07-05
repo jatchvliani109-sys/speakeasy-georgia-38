@@ -153,7 +153,7 @@ export default function BusinessSetup() {
           <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
             ნაბიჯი 1 / 4
           </p>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ მოგმართოთ?</h1>
+          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ დაგიძახოთ?</h1>
           <p className="ka text-sm text-[#4A4A4A] mt-1">
             შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
           </p>
