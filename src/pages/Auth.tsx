@@ -185,9 +185,19 @@ export default function Auth() {
             />
           </div>
           <div>
-            <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
-              პაროლი
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+                პაროლი
+              </Label>
+              {mode === "login" && (
+                <Link
+                  to="/forgot-password"
+                  className="ka text-xs text-[#4A4A4A] hover:text-[#3D1220] underline underline-offset-2 transition-colors"
+                >
+                  დაგავიწყდათ პაროლი?
+                </Link>
+              )}
+            </div>
             <Input
               id="password"
               type="password"
