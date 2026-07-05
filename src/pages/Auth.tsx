@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Layout from "@/components/Layout";
 import SEO from "@/components/SEO";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
 const schema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
   password: z.string().min(6, "მინიმუმ 6 სიმბოლო").max(72),
+  termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ პირობებს და პოლიტიკას" }),
 });
 
 export default function Auth() {
@@ -19,6 +21,7 @@ export default function Auth() {
   const [mode, setMode] = useState<"signup" | "login">(params.get("mode") === "login" ? "login" : "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
@@ -26,7 +29,7 @@ export default function Auth() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password });
+    const parsed = schema.safeParse({ email, password, termsAccepted });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
@@ -194,6 +197,26 @@ export default function Auth() {
               className="h-11 mt-1.5 rounded-lg bg-white border-[#E0D8D0] focus-visible:ring-[#1C1C1E]"
             />
           </div>
+          {mode === "signup" && (
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                className="mt-0.5 border-[#E0D8D0] data-[state=checked]:bg-[#3D1220] data-[state=checked]:text-[#F8F5F0]"
+              />
+              <Label htmlFor="terms" className="text-xs text-[#4A4A4A] ka leading-relaxed cursor-pointer">
+                ვეთანხმები{" "}
+                <Link to="/terms" className="underline hover:text-[#3D1220] transition-colors">
+                  მომსახურების პირობებს
+                </Link>{" "}
+                და{" "}
+                <Link to="/privacy" className="underline hover:text-[#3D1220] transition-colors">
+                  კონფიდენციალურობის პოლიტიკას
+                </Link>
+              </Label>
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
@@ -216,6 +239,16 @@ export default function Auth() {
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
+
+        <div className="flex items-center justify-center gap-4 mt-6 text-xs text-[#6B6B6B] ka">
+          <Link to="/privacy" className="hover:text-[#3D1220] transition-colors">
+            კონფიდენციალურობა
+          </Link>
+          <span className="text-[#E0D8D0]">|</span>
+          <Link to="/terms" className="hover:text-[#3D1220] transition-colors">
+            მომსახურების პირობები
+          </Link>
+        </div>
       </div>
     </Layout>
   );
