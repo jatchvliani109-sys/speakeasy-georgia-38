@@ -151,7 +151,7 @@ export default function BusinessSetup() {
       <BusinessShell>
         <div className="mb-6">
           <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-            ნაბიჯი 1 / 5
+            ნაბიჯი 1 / 4
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ მოგმართოთ?</h1>
           <p className="ka text-sm text-[#4A4A4A] mt-1">
@@ -189,7 +189,7 @@ export default function BusinessSetup() {
     <BusinessShell>
       <div className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-          ნაბიჯი {step + 2} / 5
+          ნაბიჯი {step + 2} / 4
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
