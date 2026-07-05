@@ -9,22 +9,19 @@ import {
   BusinessField,
   BusinessGoal,
   BusinessIntensity,
-  BusinessPriority,
   DEADLINE_LABELS,
   FIELD_LABELS,
   GOAL_LABELS,
   INTENSITY_LABELS,
-  PRIORITY_LABELS,
   buildPlan,
   pullBusinessFromSupabase,
   saveBusiness,
   saveBusinessAsync,
 } from "./lib/state";
 
-type Step = 0 | 1 | 2 | 3;
+type Step = 0 | 1 | 2;
 
 const GOAL_KEYS = Object.keys(GOAL_LABELS) as BusinessGoal[];
-const PRIORITY_KEYS = Object.keys(PRIORITY_LABELS) as BusinessPriority[];
 const INTENSITY_KEYS = Object.keys(INTENSITY_LABELS) as BusinessIntensity[];
 const DEADLINE_KEYS = Object.keys(DEADLINE_LABELS) as Exclude<BusinessDeadline, null>[];
 const FIELD_KEYS = Object.keys(FIELD_LABELS) as BusinessField[];
@@ -39,7 +36,6 @@ export default function BusinessSetup() {
   const [step, setStep] = useState<Step>(0);
 
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
-  const [priority, setPriority] = useState<BusinessPriority[]>([]);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
   const [deadline, setDeadline] = useState<BusinessDeadline>(null);
   const [field, setField] = useState<BusinessField[]>([]);
@@ -66,7 +62,6 @@ export default function BusinessSetup() {
         return;
       }
       setGoals(cur.goals ?? []);
-      setPriority(cur.mainPriority ?? []);
       setIntensity(cur.intensity ?? null);
       setDeadline(cur.deadline ?? null);
       setField(cur.field ?? []);
@@ -77,20 +72,17 @@ export default function BusinessSetup() {
 
   const toggleGoal = (g: BusinessGoal) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
-  const togglePriority = (p: BusinessPriority) =>
-    setPriority((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
   const toggleField = (f: BusinessField) =>
     setField((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
 
   const canNext =
     (step === 0 && goals.length > 0) ||
-    (step === 1 && priority.length > 0) ||
-    (step === 2 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
-    (step === 3 && field.length > 0);
+    (step === 1 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
+    (step === 2 && field.length > 0);
 
 
   const next = async () => {
-    if (step < 3) {
+    if (step < 2) {
       setStep((s) => (s + 1) as Step);
       return;
     }
@@ -100,7 +92,7 @@ export default function BusinessSetup() {
       return;
     }
 
-    console.log("[setup] completing setup", { goals, priority, intensity, deadline, field });
+    console.log("[setup] completing setup", { goals, intensity, deadline, field });
 
     // Safety net: never let the user stay stuck on this screen.
     const failsafe = setTimeout(() => {
@@ -110,9 +102,11 @@ export default function BusinessSetup() {
 
     try {
       // Save + await remote write so the plan page guard sees the latest state.
+      // mainPriority mirrors goals since the standalone priority question was removed —
+      // downstream logic (plan, curriculum, vocab, docs) still reads mainPriority.
       const saved = await saveBusinessAsync(user.id, {
         goals,
-        mainPriority: priority,
+        mainPriority: goals,
         intensity,
         deadline: intensity === "deadline" ? deadline : null,
         field,
@@ -157,7 +151,7 @@ export default function BusinessSetup() {
       <BusinessShell>
         <div className="mb-6">
           <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-            ნაბიჯი 1 / 5
+            ნაბიჯი 1 / 4
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ მოგმართოთ?</h1>
           <p className="ka text-sm text-[#4A4A4A] mt-1">
@@ -195,7 +189,7 @@ export default function BusinessSetup() {
     <BusinessShell>
       <div className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-          ნაბიჯი {step + 2} / 5
+          ნაბიჯი {step + 2} / 4
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
@@ -233,16 +227,6 @@ export default function BusinessSetup() {
         )}
 
         {step === 1 && (
-          <MultiSelect
-            title="რომელია შენი მთავარი მიზანი ახლა?"
-            hint="შეგიძლია რამდენიმე პასუხი აირჩიო."
-            options={PRIORITY_KEYS.map((k) => ({ value: k, label: PRIORITY_LABELS[k] }))}
-            values={priority}
-            onToggle={(v) => togglePriority(v as BusinessPriority)}
-          />
-        )}
-
-        {step === 2 && (
           <div>
             <SingleSelect
               title="რამდენად ინტენსიურად გინდა სწავლა?"
@@ -266,7 +250,7 @@ export default function BusinessSetup() {
           </div>
         )}
 
-        {step === 3 && (
+        {step === 2 && (
           <MultiSelect
             title="რომელი სფეროები გაინტერესებს?"
             hint="შეგიძლია რამდენიმე სფერო აირჩიო."
@@ -281,7 +265,7 @@ export default function BusinessSetup() {
             უკან
           </BizButton>
           <BizButton onClick={next} disabled={!canNext}>
-            {step < 3 ? "შემდეგი" : "გეგმის ნახვა"}
+            {step < 2 ? "შემდეგი" : "გეგმის ნახვა"}
           </BizButton>
         </div>
       </BizCard>
