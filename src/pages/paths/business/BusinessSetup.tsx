@@ -21,7 +21,7 @@ import {
   saveBusinessAsync,
 } from "./lib/state";
 
-type Step = 0 | 1 | 2 | 3;
+type Step = 0 | 1 | 2;
 
 const GOAL_KEYS = Object.keys(GOAL_LABELS) as BusinessGoal[];
 const PRIORITY_KEYS = Object.keys(PRIORITY_LABELS) as BusinessPriority[];
@@ -39,7 +39,6 @@ export default function BusinessSetup() {
   const [step, setStep] = useState<Step>(0);
 
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
-  const [priority, setPriority] = useState<BusinessPriority[]>([]);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
   const [deadline, setDeadline] = useState<BusinessDeadline>(null);
   const [field, setField] = useState<BusinessField[]>([]);
@@ -66,7 +65,6 @@ export default function BusinessSetup() {
         return;
       }
       setGoals(cur.goals ?? []);
-      setPriority(cur.mainPriority ?? []);
       setIntensity(cur.intensity ?? null);
       setDeadline(cur.deadline ?? null);
       setField(cur.field ?? []);
@@ -77,20 +75,17 @@ export default function BusinessSetup() {
 
   const toggleGoal = (g: BusinessGoal) =>
     setGoals((prev) => (prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]));
-  const togglePriority = (p: BusinessPriority) =>
-    setPriority((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
   const toggleField = (f: BusinessField) =>
     setField((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
 
   const canNext =
     (step === 0 && goals.length > 0) ||
-    (step === 1 && priority.length > 0) ||
-    (step === 2 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
-    (step === 3 && field.length > 0);
+    (step === 1 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
+    (step === 2 && field.length > 0);
 
 
   const next = async () => {
-    if (step < 3) {
+    if (step < 2) {
       setStep((s) => (s + 1) as Step);
       return;
     }
@@ -100,7 +95,7 @@ export default function BusinessSetup() {
       return;
     }
 
-    console.log("[setup] completing setup", { goals, priority, intensity, deadline, field });
+    console.log("[setup] completing setup", { goals, intensity, deadline, field });
 
     // Safety net: never let the user stay stuck on this screen.
     const failsafe = setTimeout(() => {
@@ -110,9 +105,11 @@ export default function BusinessSetup() {
 
     try {
       // Save + await remote write so the plan page guard sees the latest state.
+      // mainPriority mirrors goals since the standalone priority question was removed —
+      // downstream logic (plan, curriculum, vocab, docs) still reads mainPriority.
       const saved = await saveBusinessAsync(user.id, {
         goals,
-        mainPriority: priority,
+        mainPriority: goals,
         intensity,
         deadline: intensity === "deadline" ? deadline : null,
         field,
