@@ -197,6 +197,26 @@ export default function Auth() {
               className="h-11 mt-1.5 rounded-lg bg-white border-[#E0D8D0] focus-visible:ring-[#1C1C1E]"
             />
           </div>
+          {mode === "signup" && (
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                className="mt-0.5 border-[#E0D8D0] data-[state=checked]:bg-[#3D1220] data-[state=checked]:text-[#F8F5F0]"
+              />
+              <Label htmlFor="terms" className="text-xs text-[#4A4A4A] ka leading-relaxed cursor-pointer">
+                ვეთანხმები{" "}
+                <Link to="/terms" className="underline hover:text-[#3D1220] transition-colors">
+                  მომსახურების პირობებს
+                </Link>{" "}
+                და{" "}
+                <Link to="/privacy" className="underline hover:text-[#3D1220] transition-colors">
+                  კონფიდენციალურობის პოლიტიკას
+                </Link>
+              </Label>
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
