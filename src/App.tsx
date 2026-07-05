@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
@@ -18,7 +19,6 @@ import BusinessHome from "./pages/paths/business/BusinessHome";
 import BusinessModule from "./pages/paths/business/BusinessModule";
 import MyLexicon from "./pages/paths/business/MyLexicon";
 import BusinessReassessment from "./pages/paths/business/BusinessReassessment";
-import { Navigate } from "react-router-dom";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
