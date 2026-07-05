@@ -10,9 +10,11 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
 
-const schema = z.object({
+const loginSchema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
   password: z.string().min(6, "მინიმუმ 6 სიმბოლო").max(72),
+});
+const signupSchema = loginSchema.extend({
   termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ პირობებს და პოლიტიკას" }),
 });
 
@@ -29,7 +31,9 @@ export default function Auth() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password, termsAccepted });
+    const parsed = mode === "signup"
+      ? signupSchema.safeParse({ email, password, termsAccepted })
+      : loginSchema.safeParse({ email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
@@ -229,7 +233,7 @@ export default function Auth() {
           )}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (mode === "signup" && !termsAccepted)}
             className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#3D1220] text-[#F8F5F0] text-sm font-semibold tracking-wide ka hover:bg-[#4A1525] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
