@@ -597,6 +597,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           english_level: string | null
+          first_name: string | null
           id: string
           last_activity: string | null
           level_test_completed: boolean
@@ -613,6 +614,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           english_level?: string | null
+          first_name?: string | null
           id: string
           last_activity?: string | null
           level_test_completed?: boolean
@@ -629,6 +631,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           english_level?: string | null
+          first_name?: string | null
           id?: string
           last_activity?: string | null
           level_test_completed?: boolean
