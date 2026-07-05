@@ -13,6 +13,7 @@ import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
 const schema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
   password: z.string().min(6, "მინიმუმ 6 სიმბოლო").max(72),
+  termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ პირობებს და პოლიტიკას" }),
 });
 
 export default function Auth() {
@@ -20,6 +21,7 @@ export default function Auth() {
   const [mode, setMode] = useState<"signup" | "login">(params.get("mode") === "login" ? "login" : "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
@@ -27,7 +29,7 @@ export default function Auth() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password });
+    const parsed = schema.safeParse({ email, password, termsAccepted });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
