@@ -239,6 +239,16 @@ export default function Auth() {
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
+
+        <div className="flex items-center justify-center gap-4 mt-6 text-xs text-[#6B6B6B] ka">
+          <Link to="/privacy" className="hover:text-[#3D1220] transition-colors">
+            კონფიდენციალურობა
+          </Link>
+          <span className="text-[#E0D8D0]">|</span>
+          <Link to="/terms" className="hover:text-[#3D1220] transition-colors">
+            მომსახურების პირობები
+          </Link>
+        </div>
       </div>
     </Layout>
   );
