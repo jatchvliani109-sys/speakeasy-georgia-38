@@ -10,9 +10,11 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
 
-const schema = z.object({
+const loginSchema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
   password: z.string().min(6, "მინიმუმ 6 სიმბოლო").max(72),
+});
+const signupSchema = loginSchema.extend({
   termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ პირობებს და პოლიტიკას" }),
 });
 
