@@ -9,12 +9,10 @@ import {
   BusinessField,
   BusinessGoal,
   BusinessIntensity,
-  BusinessPriority,
   DEADLINE_LABELS,
   FIELD_LABELS,
   GOAL_LABELS,
   INTENSITY_LABELS,
-  PRIORITY_LABELS,
   buildPlan,
   pullBusinessFromSupabase,
   saveBusiness,
@@ -24,7 +22,6 @@ import {
 type Step = 0 | 1 | 2;
 
 const GOAL_KEYS = Object.keys(GOAL_LABELS) as BusinessGoal[];
-const PRIORITY_KEYS = Object.keys(PRIORITY_LABELS) as BusinessPriority[];
 const INTENSITY_KEYS = Object.keys(INTENSITY_LABELS) as BusinessIntensity[];
 const DEADLINE_KEYS = Object.keys(DEADLINE_LABELS) as Exclude<BusinessDeadline, null>[];
 const FIELD_KEYS = Object.keys(FIELD_LABELS) as BusinessField[];
@@ -230,16 +227,6 @@ export default function BusinessSetup() {
         )}
 
         {step === 1 && (
-          <MultiSelect
-            title="რომელია შენი მთავარი მიზანი ახლა?"
-            hint="შეგიძლია რამდენიმე პასუხი აირჩიო."
-            options={PRIORITY_KEYS.map((k) => ({ value: k, label: PRIORITY_LABELS[k] }))}
-            values={priority}
-            onToggle={(v) => togglePriority(v as BusinessPriority)}
-          />
-        )}
-
-        {step === 2 && (
           <div>
             <SingleSelect
               title="რამდენად ინტენსიურად გინდა სწავლა?"
@@ -263,7 +250,7 @@ export default function BusinessSetup() {
           </div>
         )}
 
-        {step === 3 && (
+        {step === 2 && (
           <MultiSelect
             title="რომელი სფეროები გაინტერესებს?"
             hint="შეგიძლია რამდენიმე სფერო აირჩიო."
@@ -278,7 +265,7 @@ export default function BusinessSetup() {
             უკან
           </BizButton>
           <BizButton onClick={next} disabled={!canNext}>
-            {step < 3 ? "შემდეგი" : "გეგმის ნახვა"}
+            {step < 2 ? "შემდეგი" : "გეგმის ნახვა"}
           </BizButton>
         </div>
       </BizCard>
