@@ -20,11 +20,12 @@ export function useDisplayName() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("display_name")
+        .select("first_name, display_name")
         .eq("id", user.id)
         .maybeSingle();
       if (cancelled) return;
-      const name = (data?.display_name ?? "").trim();
+      // Prefer the new first_name column; fall back to legacy display_name.
+      const name = ((data as any)?.first_name ?? data?.display_name ?? "").toString().trim();
       setDisplayName(name);
       setLoaded(true);
       setLoading(false);
@@ -41,7 +42,7 @@ export function useDisplayName() {
       if (!name) return { ok: false as const, error: "empty" };
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: name })
+        .update({ first_name: name, display_name: name } as any)
         .eq("id", user.id);
       if (error) return { ok: false as const, error: error.message };
       setDisplayName(name);
