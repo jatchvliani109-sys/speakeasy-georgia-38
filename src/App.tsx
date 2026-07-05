@@ -24,6 +24,8 @@ import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import Lesson from "./pages/Lesson";
 import Summary from "./pages/Summary";
@@ -46,6 +48,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             <Route path="/path/business/modules" element={<RequireAuth><BusinessModulesList /></RequireAuth>} />
