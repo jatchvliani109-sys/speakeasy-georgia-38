@@ -33,7 +33,7 @@ export default function Profile() {
     (async () => {
       const [cur, prof, resume] = await Promise.all([
         pullBusinessFromSupabase(user.id),
-        supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("first_name, display_name").eq("id", user.id).maybeSingle(),
         supabase
           .from("business_resumes")
           .select("file_name, full_name")
@@ -46,8 +46,9 @@ export default function Profile() {
       setS(cur);
       setGoals(cur.mainPriority || []);
       setFields(cur.field || []);
-      setDisplayName(prof.data?.display_name ?? "");
-      setInitialName(prof.data?.display_name ?? "");
+      const currentName = ((prof.data as any)?.first_name ?? prof.data?.display_name ?? "").toString();
+      setDisplayName(currentName);
+      setInitialName(currentName);
       setHasResume(!!resume.data);
       setResumeName(resume.data?.file_name ?? resume.data?.full_name ?? null);
     })();
@@ -86,7 +87,7 @@ export default function Profile() {
       const nextPlan = s.plan ? { ...s.plan, mainGoals: goals, fields } : s.plan;
       saveBusiness(user.id, { mainPriority: goals, field: fields, plan: nextPlan ?? null });
       if (cleanName !== initialName.trim()) {
-        const { error } = await supabase.from("profiles").update({ display_name: cleanName }).eq("id", user.id);
+        const { error } = await supabase.from("profiles").update({ first_name: cleanName, display_name: cleanName } as any).eq("id", user.id);
         if (error) throw error;
         setInitialName(cleanName);
       }
