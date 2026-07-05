@@ -31,7 +31,9 @@ export default function Auth() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password, termsAccepted });
+    const parsed = mode === "signup"
+      ? signupSchema.safeParse({ email, password, termsAccepted })
+      : loginSchema.safeParse({ email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
