@@ -233,7 +233,7 @@ export default function Auth() {
           )}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (mode === "signup" && !termsAccepted)}
             className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#3D1220] text-[#F8F5F0] text-sm font-semibold tracking-wide ka hover:bg-[#4A1525] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
