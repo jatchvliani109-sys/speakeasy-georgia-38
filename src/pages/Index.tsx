@@ -297,6 +297,14 @@ const Index = () => {
             <div className="text-[#F8F5F0]">
               <Wordmark size="md" />
             </div>
+            <div className="flex items-center gap-4 text-xs ka tracking-wide">
+              <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
+                კონფიდენციალურობა
+              </Link>
+              <Link to="/terms" className="hover:text-[#F8F5F0] transition-colors">
+                მომსახურების პირობები
+              </Link>
+            </div>
             <p className="text-xs ka tracking-wide">
               © 2026 SpeakBusy. ყველა უფლება დაცულია.
             </p>
