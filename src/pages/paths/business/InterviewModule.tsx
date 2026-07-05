@@ -212,6 +212,7 @@ export default function InterviewModule() {
           warmUp: card.warmUp as any,
           openingLineEn: card.openingLineEn,
           estimatedMinutes: card.estimatedMinutes,
+          tomorrowTeaseKa: "შემდეგი სესია კიდევ უფრო საინტერესო იქნება.",
         } as SessionData;
         setSession(s);
         const { data: inserted } = await supabase
