@@ -29,6 +29,12 @@ export default function Auth() {
   const [resending, setResending] = useState(false);
   const navigate = useNavigate();
 
+  // Preserve return target (used by /.lovable/oauth/consent redirect flow).
+  const rawNext = params.get("next") ?? "";
+  const nextPath = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+  const afterAuthAbsolute = `${window.location.origin}${nextPath}`;
+
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = mode === "signup"
@@ -44,15 +50,13 @@ export default function Auth() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+          options: { emailRedirectTo: afterAuthAbsolute },
         });
         if (error) throw error;
-        // With email confirmation required, no session is returned until the
-        // user clicks the link in their inbox.
         if (!data.session) {
           setPendingEmail(email);
         } else {
-          navigate("/dashboard");
+          window.location.href = afterAuthAbsolute;
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -64,7 +68,7 @@ export default function Auth() {
           throw error;
         }
         toast.success("კეთილი იყოს თქვენი დაბრუნება");
-        navigate("/dashboard");
+        window.location.href = afterAuthAbsolute;
       }
     } catch (err: any) {
       toast.error(err.message ?? "შეცდომა");
@@ -80,7 +84,7 @@ export default function Auth() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: pendingEmail,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+        options: { emailRedirectTo: afterAuthAbsolute },
       });
       if (error) throw error;
       toast.success("ბმული თავიდან გაიგზავნა");

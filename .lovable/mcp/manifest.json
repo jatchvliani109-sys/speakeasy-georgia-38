@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://hmpwjhzrmfyapijikkuc.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "speakbusy-mcp",
+      "version": "0.1.0",
+      "title": "SpeakBusy"
+    },
+    "tools": [
+      {
+        "name": "get_profile",
+        "title": "Get profile",
+        "description": "Read the signed-in SpeakBusy user's profile: name, English level, learning path, streak, and onboarding status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_vocabulary",
+        "title": "List vocabulary",
+        "description": "List the signed-in user's saved vocabulary words (English word, Georgian meaning, example, status).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Max rows to return (default 50)."
+            },
+            "status": {
+              "type": "string",
+              "description": "Optional status filter (e.g. 'new', 'learning', 'mastered')."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_vocabulary_word",
+        "title": "Add vocabulary word",
+        "description": "Add a new English word with a Georgian meaning to the signed-in user's vocabulary notebook.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "english_word": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The English word or phrase to save."
+            },
+            "georgian_meaning": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Georgian translation / meaning."
+            },
+            "example_sentence": {
+              "type": "string",
+              "description": "Optional example sentence in English."
+            },
+            "difficulty": {
+              "type": "string",
+              "enum": [
+                "easy",
+                "medium",
+                "hard"
+              ]
+            }
+          },
+          "required": [
+            "english_word",
+            "georgian_meaning"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_mistakes",
+        "title": "List mistakes",
+        "description": "List the signed-in user's recorded English mistakes with corrections and Georgian explanations.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Max rows to return (default 30)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_business_progress",
+        "title": "Get business English progress",
+        "description": "Read the signed-in user's business English learning state and recent vocab session stats.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
