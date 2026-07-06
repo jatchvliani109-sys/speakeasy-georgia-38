@@ -237,8 +237,9 @@ async function callAI(system: string, user: string, model = "gpt-5-mini") {
   });
   if (!res.ok) {
     const txt = await res.text();
+    console.error(`[callAI] model=${model} status=${res.status} body=${txt.slice(0, 500)}`);
     const status = res.status === 429 || res.status === 402 ? res.status : 500;
-    return { ok: false as const, status, error: `AI gateway ${res.status}`, detail: txt };
+    return { ok: false as const, status, error: `AI gateway ${res.status}`, detail: txt.slice(0, 500) };
   }
   const data = await res.json();
   const content = data?.choices?.[0]?.message?.content ?? "{}";
@@ -259,9 +260,17 @@ Deno.serve(async (req) => {
     if (body.action === "session") {
       r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody));
     } else if (body.action === "feedback") {
-      // First feedback is the key teaching moment — use the higher-quality model
-      // for genuinely good, specific Georgian.
-      r = await callAI(SYSTEM_FEEDBACK, feedbackPrompt(body as unknown as FeedbackBody), "gpt-5.4");
+      // First feedback is the key teaching moment — prefer the higher-quality model,
+      // but fall back automatically if it's unavailable so feedback never hard-blocks.
+      const fp = feedbackPrompt(body as unknown as FeedbackBody);
+      r = await callAI(SYSTEM_FEEDBACK, fp, "gpt-5.4");
+      if (!r.ok || (r.ok && !(r.parsed as any)?.verdict)) {
+        console.error("[feedback] primary model failed or returned no verdict, falling back", {
+          ok: r.ok,
+          detail: (r as any).detail,
+        });
+        r = await callAI(SYSTEM_FEEDBACK, fp, "gpt-4o");
+      }
     } else if (body.action === "improve") {
       // Retry loop — cheap model, English-only output, Georgian supplied by the app.
       r = await callAI(SYSTEM_IMPROVE, improvePrompt(body as unknown as ImproveBody));
