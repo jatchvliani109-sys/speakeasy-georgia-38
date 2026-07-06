@@ -29,6 +29,12 @@ export default function Auth() {
   const [resending, setResending] = useState(false);
   const navigate = useNavigate();
 
+  // Preserve return target (used by /.lovable/oauth/consent redirect flow).
+  const rawNext = params.get("next") ?? "";
+  const nextPath = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+  const afterAuthAbsolute = `${window.location.origin}${nextPath}`;
+
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = mode === "signup"
@@ -80,7 +86,7 @@ export default function Auth() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: pendingEmail,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+        options: { emailRedirectTo: afterAuthAbsolute },
       });
       if (error) throw error;
       toast.success("ბმული თავიდან გაიგზავნა");
