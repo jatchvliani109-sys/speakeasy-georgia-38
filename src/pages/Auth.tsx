@@ -50,15 +50,13 @@ export default function Auth() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+          options: { emailRedirectTo: afterAuthAbsolute },
         });
         if (error) throw error;
-        // With email confirmation required, no session is returned until the
-        // user clicks the link in their inbox.
         if (!data.session) {
           setPendingEmail(email);
         } else {
-          navigate("/dashboard");
+          window.location.href = afterAuthAbsolute;
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -70,7 +68,7 @@ export default function Auth() {
           throw error;
         }
         toast.success("კეთილი იყოს თქვენი დაბრუნება");
-        navigate("/dashboard");
+        window.location.href = afterAuthAbsolute;
       }
     } catch (err: any) {
       toast.error(err.message ?? "შეცდომა");
