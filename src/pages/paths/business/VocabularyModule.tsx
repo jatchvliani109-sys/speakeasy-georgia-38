@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BookOpen, Volume2, VolumeX } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
@@ -25,8 +25,8 @@ import {
   upsertProgress,
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
-import type { VocabWord } from "./lib/vocabBank";
-import { getContext } from "./lib/vocabContext";
+import { findWord, type VocabWord } from "./lib/vocabBank";
+import { clusterById, getContext, type SituationCluster } from "./lib/vocabContext";
 import {
   isSoundEnabled,
   playCombo,
@@ -52,6 +52,11 @@ export default function VocabularyModule() {
   const [state, setState] = useState<BusinessState | null>(null);
   const [newWords, setNewWords] = useState<VocabWord[]>([]);
   const [reviewKeys, setReviewKeys] = useState<string[]>([]);
+  // Scenario mode: /path/business/vocabulary?scenario=<cluster-id> scopes the
+  // session to that scenario's words (from vocabContext).
+  const [searchParams] = useSearchParams();
+  const scenarioId = searchParams.get("scenario");
+  const [scenario, setScenario] = useState<SituationCluster | null>(null);
   const [tierLevel, setTierLevel] = useState<1 | 2 | 3>(1);
   // Question-format difficulty — escalates above tierLevel automatically when
   // recent accuracy is very high, eases back when it drops.
@@ -107,11 +112,23 @@ export default function VocabularyModule() {
       if (cancelled) return;
       setProgress(p);
       setTotalVocab(p.length);
-      setNewWords(plan.newWords);
-      setReviewKeys(plan.reviewKeys);
+      const sc = scenarioId ? clusterById(scenarioId) : undefined;
+      let newW = plan.newWords;
+      let revK = plan.reviewKeys;
+      if (sc) {
+        // Scenario session: only this scenario's words. Unseen ones are
+        // taught as new; already-studied ones come back as review.
+        setScenario(sc);
+        const words = sc.wordKeys.map(findWord).filter(Boolean) as VocabWord[];
+        const seenKeys = new Set(p.map((r) => r.word_key));
+        newW = words.filter((w) => !seenKeys.has(w.key));
+        revK = words.filter((w) => seenKeys.has(w.key)).map((w) => w.key);
+      }
+      setNewWords(newW);
+      setReviewKeys(revK);
       setTierLevel(plan.tierLevel);
       setFormatTier(computeFormatTier(plan.tierLevel, recent));
-      if (!plan.newWords.length && !plan.reviewKeys.length) {
+      if (!newW.length && !revK.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
           setReviewWords(fallback);
@@ -124,7 +141,7 @@ export default function VocabularyModule() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, scenarioId]);
 
   const startSession = () => {
     // Resume audio on user gesture (browsers require it).
@@ -434,6 +451,13 @@ export default function VocabularyModule() {
 
       {stage === "intro" && (
         <>
+          {scenario && (
+            <div className="mb-3 text-center">
+              <span className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] bg-[#C9A84C]/20 border border-[#C9A84C]/35 px-3 py-1.5 rounded-full">
+                🎬 სცენარი: {scenario.titleKa}
+              </span>
+            </div>
+          )}
           <IntroCard
             newWords={newWords}
             reviewCount={reviewKeys.length}

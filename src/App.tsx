@@ -22,6 +22,8 @@ import BusinessReassessment from "./pages/paths/business/BusinessReassessment";
 import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
+import Scenarios from "./pages/paths/business/Scenarios";
+import VocabularyModule from "./pages/paths/business/VocabularyModule";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -71,6 +73,8 @@ const App = () => (
             <Route path="/path/business/dictionary" element={<Navigate to="/path/business/lexicon?tab=phrases" replace />} />
             <Route path="/path/business/vocabulary/notebook" element={<Navigate to="/path/business/lexicon?tab=words" replace />} />
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
+            <Route path="/path/business/scenarios" element={<RequireAuth><Scenarios /></RequireAuth>} />
+            <Route path="/path/business/vocabulary" element={<RequireAuth><VocabularyModule /></RequireAuth>} />
 
             
             <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />

@@ -844,7 +844,7 @@ export const WORD_CONTEXT: Record<string, WordContext> = {
   "audience": {
     key: "audience",
     examples: [
-      { en: "Know your audience before you write the talk.", ka: "სანამ მოხსენებას დაწერ, შენი აუდიტორია გაიცანი." },
+      { en: "Understand your audience before you write the talk.", ka: "სანამ მოხსენებას დაწერ, შენი აუდიტორია შეისწავლე." },
       { en: "The audience asked great questions.", ka: "აუდიტორიამ შესანიშნავი კითხვები დასვა." },
     ],
     collocations: [
@@ -866,12 +866,12 @@ export const WORD_CONTEXT: Record<string, WordContext> = {
   "summary": {
     key: "summary",
     examples: [
-      { en: "Let me end with a short summary.", ka: "ბოლოს მოკლე მიმოხილვით დავასრულებ." },
-      { en: "The summary fits on one page.", ka: "მოკლე მიმოხილვა ერთ გვერდზე ეტევა." },
+      { en: "Let me end with a short summary.", ka: "ბოლოს მოკლე შეჯამებით დავასრულებ." },
+      { en: "The summary fits on one page.", ka: "შეჯამება ერთ გვერდზე ეტევა." },
     ],
     collocations: [
-      { en: "brief summary", ka: "მოკლე მიმოხილვა" },
-      { en: "one-page summary", ka: "ერთგვერდიანი მიმოხილვა" },
+      { en: "brief summary", ka: "მოკლე შეჯამება" },
+      { en: "one-page summary", ka: "ერთგვერდიანი შეჯამება" },
     ],
   },
   "takeaway": {
@@ -1042,14 +1042,14 @@ export const SITUATION_CLUSTERS: SituationCluster[] = [
     scenarioKa: "წარმოიდგინე, რომ კვარტალურ შედეგებს გუნდის წინაშე წარადგენ — მკაფიო სლაიდებით და ერთი მთავარი დასკვნით.",
     wordKeys: ["presentation", "slide", "audience", "present", "summary", "takeaway"],
     paragraphEn: "Luka is giving the quarterly presentation. He keeps it to ten slides and starts with the main takeaway, so the audience knows from the first minute why it matters. He presents the numbers slowly, pausing for questions. At the end he shows a one-slide summary and asks: what should we do differently next quarter?",
-    paragraphKa: "ლუკა კვარტალურ პრეზენტაციას ატარებს. ის ათ სლაიდში ეტევა და მთავარი დასკვნით იწყებს, რომ აუდიტორიამ პირველივე წუთიდან იცოდეს, რატომ არის ეს მნიშვნელოვანი. ციფრებს ნელა წარადგენს და კითხვებისთვის პაუზებს აკეთებს. ბოლოს ერთსლაიდიან მოკლე მიმოხილვას აჩვენებს და ეკითხება: რა უნდა გავაკეთოთ განსხვავებულად მომავალ კვარტალში?",
+    paragraphKa: "ლუკა კვარტალურ პრეზენტაციას ატარებს. ის ათ სლაიდში ეტევა და მთავარი დასკვნით იწყებს, რომ აუდიტორიამ პირველივე წუთიდან იცოდეს, რატომ არის ეს მნიშვნელოვანი. ციფრებს ნელა წარადგენს და კითხვებისთვის პაუზებს აკეთებს. ბოლოს ერთსლაიდიან შეჯამებას აჩვენებს და ეკითხება: რა უნდა გავაკეთოთ განსხვავებულად მომავალ კვარტალში?",
     dialogue: [
       { speaker: "ლუკა", en: "Before I start the presentation — can everyone see the first slide?", ka: "სანამ პრეზენტაციას დავიწყებ — პირველი სლაიდი ყველას უჩანს?" },
       { speaker: "ანა", en: "Yes, all good.", ka: "კი, ყველაფერი კარგადაა." },
       { speaker: "ლუკა", en: "Great. The main takeaway today: revenue is up twelve percent.", ka: "მშვენიერია. დღევანდელი მთავარი დასკვნა: შემოსავალი თორმეტი პროცენტით გაიზარდა." },
       { speaker: "ანა", en: "Nice opening — the audience loves numbers first.", ka: "კარგი დასაწყისია — აუდიტორიას ციფრები თავიდან უყვარს." },
       { speaker: "ლუკა", en: "I'll present the details region by region, then take questions.", ka: "დეტალებს რეგიონების მიხედვით წარვადგენ, შემდეგ კითხვებს ვუპასუხებ." },
-      { speaker: "ანა", en: "Perfect. End with the summary slide — people remember the last thing they see.", ka: "იდეალურია. მოკლე მიმოხილვის სლაიდით დაასრულე — ხალხს ბოლოს ნანახი ამახსოვრდება." },
+      { speaker: "ანა", en: "Perfect. End with the summary slide — people remember the last thing they see.", ka: "იდეალურია. შეჯამების სლაიდით დაასრულე — ხალხს ბოლოს ნანახი ამახსოვრდება." },
     ],
   },
 ];
