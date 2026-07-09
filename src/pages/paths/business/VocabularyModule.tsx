@@ -9,8 +9,10 @@ import {
   applySessionResults,
   buildQuiz,
   buildReviewQuiz,
+  dueToday,
   emptyProgressFor,
   ingestExternalPhrases,
+  isProductionType,
   loadProgress,
   pickLowestConfidenceWords,
   planSession,
@@ -21,6 +23,7 @@ import {
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 import type { VocabWord } from "./lib/vocabBank";
+import { getContext } from "./lib/vocabContext";
 import {
   isSoundEnabled,
   playCombo,
@@ -50,12 +53,12 @@ export default function VocabularyModule() {
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
-  const [answers, setAnswers] = useState<{ wordKey: string; correct: boolean }[]>([]);
+  const [answers, setAnswers] = useState<{ wordKey: string; correct: boolean; production: boolean }[]>([]);
   const [selected, setSelected] = useState<string | number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [totalVocab, setTotalVocab] = useState(0);
   const [lastResults, setLastResults] = useState<{
-    answers: { wordKey: string; correct: boolean }[];
+    answers: { wordKey: string; correct: boolean; production: boolean }[];
     newWords: VocabWord[];
   } | null>(null);
   const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
@@ -70,6 +73,10 @@ export default function VocabularyModule() {
   const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
   const autoAdvanceRef = useRef<number | null>(null);
+
+  // Words due for review today — shown on the intro screen so the learner
+  // sees exactly what today's session will strengthen.
+  const dueList = useMemo(() => dueToday(progress), [progress]);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -171,7 +178,7 @@ export default function VocabularyModule() {
     setSelected(val);
     const correct = checkAnswer(currentQ, val);
     const key = "wordKey" in currentQ ? currentQ.wordKey : `mistake:${currentQ.key}`;
-    const nextAnswers = [...answers, { wordKey: key, correct }];
+    const nextAnswers = [...answers, { wordKey: key, correct, production: isProductionType(currentQ.type) }];
     setAnswers(nextAnswers);
     setRevealed(true);
 
@@ -195,7 +202,7 @@ export default function VocabularyModule() {
     }
   };
 
-  const goNext = (ans: { wordKey: string; correct: boolean }[]) => {
+  const goNext = (ans: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
@@ -207,18 +214,20 @@ export default function VocabularyModule() {
   };
 
 
-  const finishSession = async (finalAnswers: { wordKey: string; correct: boolean }[]) => {
+  const finishSession = async (finalAnswers: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (!user) return;
     // Aggregate per word
-    const perWord = new Map<string, boolean[]>();
+    const perWord = new Map<string, { correct: boolean; production: boolean }[]>();
     finalAnswers.forEach((a) => {
       const arr = perWord.get(a.wordKey) || [];
-      arr.push(a.correct);
+      arr.push({ correct: a.correct, production: a.production });
       perWord.set(a.wordKey, arr);
     });
 
     const updated: ProgressRow[] = [];
-    for (const [wordKey, results] of perWord.entries()) {
+    for (const [wordKey, entries] of perWord.entries()) {
+      const results = entries.map((e) => e.correct);
+      const prodCorrect = entries.filter((e) => e.correct && e.production).length;
       const existing = progress.find((p) => p.word_key === wordKey);
       let row =
         existing ||
@@ -230,7 +239,7 @@ export default function VocabularyModule() {
           return null;
         })();
       if (!row) continue;
-      row = applySessionResults(row, results);
+      row = applySessionResults(row, results, prodCorrect);
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
@@ -387,11 +396,34 @@ export default function VocabularyModule() {
       {confettiKey > 0 && <Confetti seed={confettiKey} />}
 
       {stage === "intro" && (
-        <IntroCard
-          newWords={newWords}
-          reviewCount={reviewKeys.length}
-          onStart={startSession}
-        />
+        <>
+          <IntroCard
+            newWords={newWords}
+            reviewCount={reviewKeys.length}
+            onStart={startSession}
+          />
+          {dueList.length > 0 && (
+            <BizCard className="mt-4">
+              <div className="flex items-baseline justify-between">
+                <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+                  დღეს გასამეორებელი
+                </p>
+                <p className="text-[11px] text-[#4A4A4A] font-mono">{dueList.length}</p>
+              </div>
+              <ul className="mt-2 space-y-1.5">
+                {dueList.slice(0, 6).map((w) => (
+                  <li key={w.key} className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-semibold text-[#5C1A2E]">{w.en}</span>
+                    <span className="ka text-xs text-[#4A4A4A] truncate">{w.ka}</span>
+                  </li>
+                ))}
+              </ul>
+              {dueList.length > 6 && (
+                <p className="ka text-xs text-[#4A4A4A] mt-2">+{dueList.length - 6} სხვა სიტყვა</p>
+              )}
+            </BizCard>
+          )}
+        </>
       )}
 
       {stage === "reviewIntro" && (
@@ -556,6 +588,7 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
 }
 
 function WordCard({ word }: { word: VocabWord }) {
+  const ctx = getContext(word.key);
   return (
     <div key={word.key} className="biz-card-flip bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
       <div className="flex items-start justify-between gap-3">
@@ -573,14 +606,43 @@ function WordCard({ word }: { word: VocabWord }) {
         <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{word.explanationKa}</p>
       )}
 
+      {ctx && ctx.collocations.length > 0 && (
+        <div className="mt-4">
+          <p className="ka text-[10px] uppercase tracking-wider text-[#4A4A4A] font-semibold">როგორ იყენებენ</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {ctx.collocations.slice(0, 3).map((c) => (
+              <span
+                key={c.en}
+                title={c.ka}
+                className="text-[11px] px-2 py-1 rounded-lg bg-[#C9A84C]/15 border border-[#C9A84C]/35 text-[#5C1A2E] font-medium"
+              >
+                {c.en}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-4">
         <div className="p-3 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
           <p className="text-sm text-[#5C1A2E]">"{word.exampleEn}"</p>
           <p className="ka text-xs text-[#4A4A4A] mt-1">{word.exampleKa}</p>
         </div>
+        {ctx && ctx.examples[0] && (
+          <div className="mt-2 p-3 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+            <p className="text-sm text-[#5C1A2E]">"{ctx.examples[0].en}"</p>
+            <p className="ka text-xs text-[#4A4A4A] mt-1">{ctx.examples[0].ka}</p>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+// Typed answers: forgiving on case, extra spaces, and hyphen-vs-space
+// ("Follow up" counts for "follow-up") — strict on actual spelling.
+function normalizeTyped(s: string): string {
+  return s.toLowerCase().trim().replace(/[-\s]+/g, " ");
 }
 
 function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
@@ -598,6 +660,12 @@ function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
     case "sentence_correct":
     case "georgian_mistake":
       return selected === q.correctIndex;
+    case "listening":
+      return selected === q.correct;
+    case "type_word":
+      return normalizeTyped(String(selected)) === normalizeTyped(q.correct);
+    case "context_cloze":
+      return selected === q.correct;
   }
 }
 
@@ -723,7 +791,100 @@ function QuestionCard({
           )}
         </div>
       );
+    case "listening":
+      return (
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">მოისმინე და აირჩიე სწორი სიტყვა</p>
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <div className="p-5 rounded-full bg-[#F8F5F0] border border-[#E0D8D0]">
+              <ReadAloudButton text={q.correct} storageKey={q.wordKey} size="md" />
+            </div>
+            <p className="ka text-[11px] text-[#4A4A4A]">დააჭირე მოსასმენად 🔊</p>
+          </div>
+          {renderChoices(q.choices, q.correct)}
+        </div>
+      );
+    case "type_word":
+      return <TypeWordCard q={q} revealed={revealed} submit={(v) => setSelected(v)} />;
+    case "context_cloze":
+      return (
+        <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი სიტუაციაში</p>
+          <span className="ka inline-block mt-2 text-[11px] text-[#5C1A2E] bg-[#C9A84C]/20 border border-[#C9A84C]/35 px-2 py-0.5 rounded-md font-semibold">
+            {q.titleKa}
+          </span>
+          <div className="mt-3 p-4 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+            <p className="text-sm text-[#5C1A2E] leading-relaxed">{q.paragraph}</p>
+          </div>
+          {renderChoices(q.choices, q.correct)}
+        </div>
+      );
   }
+}
+
+function TypeWordCard({
+  q,
+  revealed,
+  submit,
+}: {
+  q: Extract<QuizQuestion, { type: "type_word" }>;
+  revealed: boolean;
+  submit: (v: string) => void;
+}) {
+  const [text, setText] = useState("");
+  const isCorrect = revealed && normalizeTyped(text) === normalizeTyped(q.correct);
+
+  const trySubmit = () => {
+    if (revealed || !text.trim()) return;
+    submit(text);
+  };
+
+  return (
+    <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+      <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">დაწერე სიტყვა ინგლისურად</p>
+      <h3 className="ka text-2xl font-bold text-[#5C1A2E] mt-3">{q.ka}</h3>
+      <p className="text-lg font-mono tracking-[0.25em] text-[#4A4A4A] mt-2">{q.hint}</p>
+
+      <div className="mt-4 flex gap-2">
+        <input
+          type="text"
+          value={text}
+          disabled={revealed}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") trySubmit(); }}
+          placeholder="ჩაწერე აქ..."
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
+          className={`ka flex-1 min-w-0 px-4 py-3 rounded-xl border text-base outline-none transition-colors
+            ${revealed && isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900" : ""}
+            ${revealed && !isCorrect ? "border-red-400 bg-red-50 text-red-900" : ""}
+            ${!revealed ? "border-[#E0D8D0] bg-white text-[#1C1C1E] focus:border-[#5C1A2E]" : ""}
+          `}
+        />
+        {!revealed && (
+          <button
+            onClick={trySubmit}
+            disabled={!text.trim()}
+            className="ka px-4 py-3 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-sm font-bold disabled:opacity-40 transition-opacity"
+          >
+            შემოწმება
+          </button>
+        )}
+      </div>
+
+      {revealed && (
+        <div className={`mt-3 p-3 rounded-xl border animate-[bizFade_.3s_ease-out_both] ${isCorrect ? "border-emerald-200 bg-emerald-50" : "border-red-200 bg-red-50"}`}>
+          {isCorrect ? (
+            <p className="ka text-sm text-emerald-800 font-semibold">სწორია! ✓ {q.correct}</p>
+          ) : (
+            <p className="ka text-sm text-red-800">სწორი პასუხი: <span className="font-bold">{q.correct}</span></p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Results({

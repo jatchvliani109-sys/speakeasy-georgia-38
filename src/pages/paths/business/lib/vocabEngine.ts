@@ -24,6 +24,7 @@ import {
   type GeorgianMistake,
   type VocabWord,
 } from "./vocabBank";
+import { clusterFor } from "./vocabContext";
 
 export type ProgressRow = {
   id?: string;
@@ -71,7 +72,10 @@ export function applyAnswer(p: ProgressRow, correct: boolean): ProgressRow {
 
 // Aggregate one full session's results for a single word. This drives
 // mastery: confidence + history are bumped once per session, not per answer.
-export function applySessionResults(p: ProgressRow, results: boolean[]): ProgressRow {
+// `prodCorrect` = how many of this session's correct answers came from
+// production-type questions; accumulated in meta.prodCorrect for the
+// production gate in checkMastery.
+export function applySessionResults(p: ProgressRow, results: boolean[], prodCorrect = 0): ProgressRow {
   if (!results.length) return p;
   const correctCount = results.filter(Boolean).length;
   const wrongCount = results.length - correctCount;
@@ -86,7 +90,11 @@ export function applySessionResults(p: ProgressRow, results: boolean[]): Progres
     Math.min(5, sessionCorrect ? p.confidence + 1 : p.confidence - 1),
   );
   const newCorrectTotal = p.correct_count + correctCount;
-  const meta = { ...(p.meta || {}), history };
+  const meta = {
+    ...(p.meta || {}),
+    history,
+    prodCorrect: (p.meta?.prodCorrect ?? 0) + Math.max(0, prodCorrect),
+  };
   const mastered = checkMastery({
     ...p,
     confidence,
@@ -115,10 +123,31 @@ export function applySessionResults(p: ProgressRow, results: boolean[]): Progres
   };
 }
 
+// Question types that count as PRODUCTION (active recall): the learner must
+// produce or retrieve the word, not just recognize it. tr_ka_to_en is included
+// so long multi-word entries (which type_word skips) can still reach mastery.
+export const PRODUCTION_TYPES = new Set<QuizQuestion["type"]>([
+  "type_word",
+  "context_cloze",
+  "fill_blank",
+  "tr_ka_to_en",
+]);
+// Correct production answers (cumulative, stored in meta.prodCorrect) required
+// before a word can count as mastered.
+export const PRODUCTION_MASTERY_MIN = 2;
+
+export function isProductionType(t: QuizQuestion["type"]): boolean {
+  return PRODUCTION_TYPES.has(t);
+}
+
 // Mastery requires: ≥4 correct answers total, correct sessions across ≥3
-// different days, and no wrong sessions in the last 2 appearances.
+// different days, no wrong sessions in the last 2 appearances, AND at least
+// 2 correct answers on production-type questions (typed recall, context cloze,
+// fill-in-blank, KA→EN recall) — recognizing a word is not the same as
+// being able to use it.
 export function checkMastery(p: ProgressRow): boolean {
   if (p.correct_count < 4) return false;
+  if ((p.meta?.prodCorrect ?? 0) < PRODUCTION_MASTERY_MIN) return false;
   const history: { date: string; correct: boolean }[] = Array.isArray(p.meta?.history)
     ? p.meta.history
     : [];
@@ -376,7 +405,10 @@ export type QuizQuestion =
   | { type: "tr_ka_to_en"; wordKey: string; ka: string; correct: string; choices: string[] }
   | { type: "true_false"; wordKey: string; en: string; ka: string; isCorrect: boolean }
   | { type: "sentence_correct"; wordKey: string; promptKa: string; choices: string[]; correctIndex: number }
-  | { type: "georgian_mistake"; key: string; promptKa: string; choices: string[]; correctIndex: number; explanationKa: string };
+  | { type: "georgian_mistake"; key: string; promptKa: string; choices: string[]; correctIndex: number; explanationKa: string }
+  | { type: "listening"; wordKey: string; correct: string; choices: string[] }
+  | { type: "type_word"; wordKey: string; ka: string; correct: string; hint: string }
+  | { type: "context_cloze"; wordKey: string; paragraph: string; choices: string[]; correct: string; titleKa: string };
 
 function pick<T>(arr: T[], n: number): T[] {
   const c = [...arr];
@@ -499,27 +531,81 @@ function makeGeorgianMistake(m: GeorgianMistake): QuizQuestion {
   };
 }
 
+// LISTENING — plays the word's pre-generated MP3 (ReadAloudButton hits the
+// word-audio bucket first, live TTS only as fallback). The learner never sees
+// the word — they must recognize it by ear. The "hear" step.
+function makeListening(word: VocabWord, pool: VocabWord[]): QuizQuestion {
+  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
+  return { type: "listening", wordKey: word.key, correct: word.en, choices };
+}
+
+// TYPE THE WORD — production, not recognition: the learner sees the Georgian
+// meaning plus a first-letter mask and must type the English word. The "type"
+// step. Skips long/awkward entries (>20 chars, >2 words, non-latin) — the
+// quiz builder falls back to another format for those.
+function makeTypeWord(word: VocabWord): QuizQuestion | null {
+  const en = word.en.trim();
+  if (en.length > 20 || en.split(/\s+/).length > 2) return null;
+  if (!/^[A-Za-z][A-Za-z' -]*$/.test(en)) return null;
+  const hint = en[0] + en.slice(1).replace(/[A-Za-z]/g, "_");
+  return { type: "type_word", wordKey: word.key, ka: word.ka, correct: en, hint };
+}
+
+// CONTEXT CLOZE — blanks the word inside its situational cluster's business
+// paragraph (from vocabContext.ts, pre-generated, zero AI cost). The "use"
+// step. Returns null for words without a cluster — builder falls back.
+function makeContextCloze(word: VocabWord): QuizQuestion | null {
+  const cluster = clusterFor(word.key);
+  if (!cluster) return null;
+  const paragraph = cluster.paragraphEn;
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const wordLower = word.en.toLowerCase();
+  const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
+  let re: RegExp;
+  if (fullRe.test(paragraph)) {
+    re = fullRe;
+  } else {
+    const first = wordLower.split(" ")[0];
+    re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
+    if (!re.test(paragraph)) return null;
+  }
+  const masked = paragraph.replace(re, "______");
+  const choices = shuffle([word.en, ...distractorsEn(word, ALL_WORDS, 3)]);
+  return {
+    type: "context_cloze",
+    wordKey: word.key,
+    paragraph: masked,
+    choices,
+    correct: word.en,
+    titleKa: cluster.titleKa,
+  };
+}
+
 // Progressive generator pools by tier level.
-// Tier 1: easy recognition-heavy formats (MC, T/F, EN→KA recognition).
-// Tier 2: introduces fill-in-blank and sentence-correctness questions.
-// Tier 3: production-heavy — fill_blank, sentence_correct, KA→EN recall dominate.
+// Tier 1: recognition-heavy (MC, T/F, EN→KA) + listening from stored MP3s;
+//         typed recall appears once in the second pass, with a letter hint.
+// Tier 2: adds fill-in-blank, sentence-correctness, typed recall and context-cloze.
+// Tier 3: production-heavy — typing, context-cloze, KA→EN recall dominate.
+// This is the see → hear → type → use ladder: cards (see) → listening (hear)
+// → type_word (type) → context_cloze (use). Generators that can return null
+// (type_word, context_cloze, fill_blank) fall back to safe formats in buildQuiz.
 type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
 const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeTrueFalse, makeTrEnToKa, makeMcMeaning],
-  2: [makeMcMeaning, makeFillBlank, makeTrEnToKa, makeSentenceCorrect, makeTrueFalse],
-  3: [makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank, makeMcMeaning],
+  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa],
+  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa],
+  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn],
 };
 // Second-pass generators for NEW words: retrieval-heavier than the first pass,
-// so each new word is first recognized, then actively recalled.
+// so each new word is first recognized, then actively recalled/produced.
 const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeTrEnToKa, makeMcMeaning, makeTrueFalse, makeTrEnToKa],
-  2: [makeTrKaToEn, makeSentenceCorrect, makeFillBlank, makeMcMeaning, makeTrEnToKa],
-  3: [makeTrKaToEn, makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank],
+  1: [makeListening, makeTrEnToKa, makeTypeWord, makeMcMeaning],
+  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening],
+  3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeTypeWord],
 };
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeTrKaToEn, makeTrueFalse, makeTrEnToKa],
-  2: [makeFillBlank, makeTrKaToEn, makeMcMeaning, makeSentenceCorrect],
-  3: [makeFillBlank, makeSentenceCorrect, makeTrKaToEn, makeFillBlank],
+  1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse],
+  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze],
+  3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening],
 };
 
 /**
@@ -724,13 +810,33 @@ export function pickLowestConfidenceWords(progress: ProgressRow[], n = 10): Voca
 }
 
 /**
+ * Words due for review today (overdue included), weakest first — powers the
+ * "დღეს გასამეორებელი" list on the vocab intro screen. Excludes words never
+ * actually studied (last_seen_at null), so freshly-ingested phrases don't show
+ * as "due" before the learner has ever met them.
+ */
+export function dueToday(progress: ProgressRow[]): VocabWord[] {
+  const now = Date.now();
+  return progress
+    .filter((p) => !checkMastery(p) && p.last_seen_at !== null)
+    .filter((p) => new Date(p.due_at).getTime() <= now)
+    .sort(
+      (a, b) =>
+        a.confidence - b.confidence ||
+        new Date(a.due_at).getTime() - new Date(b.due_at).getTime(),
+    )
+    .map(progressToWord)
+    .filter(Boolean) as VocabWord[];
+}
+
+/**
  * Build a 15-20 question quiz using only the supplied review words. Generates
  * roughly 2 varied questions per word so even a 10-word pool reaches ~20 Qs.
  */
 export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
   if (!words.length) return [];
   const pool = ALL_WORDS;
-  const generators = [makeMcMeaning, makeTrKaToEn, makeFillBlank, makeTrEnToKa];
+  const generators: Generator[] = [makeMcMeaning, makeTrKaToEn, makeListening, makeFillBlank, makeTypeWord, makeTrEnToKa];
   const questions: QuizQuestion[] = [];
 
   // Pass 1: one varied question per word
