@@ -406,7 +406,7 @@ export type QuizQuestion =
   | { type: "true_false"; wordKey: string; en: string; ka: string; isCorrect: boolean }
   | { type: "sentence_correct"; wordKey: string; promptKa: string; choices: string[]; correctIndex: number }
   | { type: "georgian_mistake"; key: string; promptKa: string; choices: string[]; correctIndex: number; explanationKa: string }
-  | { type: "listening"; wordKey: string; correct: string; choices: string[] }
+  | { type: "listening"; wordKey: string; en: string; correctKa: string; choices: string[] }
   | { type: "type_word"; wordKey: string; ka: string; correct: string; hint: string }
   | { type: "context_cloze"; wordKey: string; paragraph: string; choices: string[]; correct: string; titleKa: string };
 
@@ -533,10 +533,12 @@ function makeGeorgianMistake(m: GeorgianMistake): QuizQuestion {
 
 // LISTENING — plays the word's pre-generated MP3 (ReadAloudButton hits the
 // word-audio bucket first, live TTS only as fallback). The learner never sees
-// the word — they must recognize it by ear. The "hear" step.
+// the English word — they hear it and must pick its GEORGIAN meaning, which
+// tests comprehension rather than sound-to-spelling matching. The "hear" step.
+// `en` is carried only as the audio/TTS text and is never displayed.
 function makeListening(word: VocabWord, pool: VocabWord[]): QuizQuestion {
-  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
-  return { type: "listening", wordKey: word.key, correct: word.en, choices };
+  const choices = shuffle([word.ka, ...distractorsKa(word, pool, 3)]);
+  return { type: "listening", wordKey: word.key, en: word.en, correctKa: word.ka, choices };
 }
 
 // TYPE THE WORD — production, not recognition: the learner sees the Georgian

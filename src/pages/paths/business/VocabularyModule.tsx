@@ -661,7 +661,7 @@ function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
     case "georgian_mistake":
       return selected === q.correctIndex;
     case "listening":
-      return selected === q.correct;
+      return selected === q.correctKa;
     case "type_word":
       return normalizeTyped(String(selected)) === normalizeTyped(q.correct);
     case "context_cloze":
@@ -794,14 +794,14 @@ function QuestionCard({
     case "listening":
       return (
         <div className="bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
-          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">მოისმინე და აირჩიე სწორი სიტყვა</p>
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">მოისმინე და აირჩიე მნიშვნელობა</p>
           <div className="mt-4 flex flex-col items-center gap-2">
             <div className="p-5 rounded-full bg-[#F8F5F0] border border-[#E0D8D0]">
-              <ReadAloudButton text={q.correct} storageKey={q.wordKey} size="md" />
+              <ReadAloudButton text={q.en} storageKey={q.wordKey} size="md" />
             </div>
             <p className="ka text-[11px] text-[#4A4A4A]">დააჭირე მოსასმენად 🔊</p>
           </div>
-          {renderChoices(q.choices, q.correct)}
+          {renderChoices(q.choices, q.correctKa)}
         </div>
       );
     case "type_word":
