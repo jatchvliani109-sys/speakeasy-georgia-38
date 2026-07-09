@@ -106,7 +106,7 @@ async function listExisting(): Promise<Set<string>> {
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
       method: "POST",
       headers: storageHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ prefix: "dlg-", limit: 1000, offset }),
+      body: JSON.stringify({ prefix: "", limit: 1000, offset }),
     });
     if (!res.ok) break;
     const rows = (await res.json()) as { name: string }[];
