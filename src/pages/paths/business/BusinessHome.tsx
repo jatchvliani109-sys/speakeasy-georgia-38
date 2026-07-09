@@ -54,7 +54,7 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
   },
   emails: {
     title: "დღევანდელი იმეილის გამოწვევა",
-    subtitle: "დაწერე ერთი პროფესიული იმეილი და მიიღე AI უკუკავშირი.",
+    subtitle: "დაწერე ერთი პროფესიონალური იმეილი და მიიღე AI უკუკავშირი.",
     doneTitle: "ყოჩაღ — დღევანდელი იმეილი დასრულდა",
     doneSubtitle: "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები.",
   },
@@ -230,15 +230,20 @@ export default function BusinessHome() {
     Array.from(ACTIVE_MODULES).forEach((m) => {
       if (!weighted.includes(m)) weighted.push(m);
     });
-    return weighted;
+    // VOCAB-FIRST pivot: vocabulary always leads the day, interview second,
+    // emails demoted to a side feature. Goal weighting still shapes frequency
+    // further down the queue via the stable sort.
+    const pivotRank = (slug: string) =>
+      slug === "vocabulary" ? 0 : slug === "interview" ? 1 : 2;
+    return weighted.sort((a, b) => pivotRank(a) - pivotRank(b));
   }, [s]);
 
   // Pick today's focus: first slot in rotation that hasn't been done today.
   // If everything done, fall back to the first goal-priority module.
   const focusModuleSlug = useMemo(() => {
-    if (!Object.keys(progress).length) return s?.plan?.recommendedModule || "emails";
+    if (!Object.keys(progress).length) return "vocabulary";
     const undone = rotationQueue.find((slug) => !progress[slug]?.doneToday);
-    return undone || rotationQueue[0] || s?.plan?.recommendedModule || "emails";
+    return undone || rotationQueue[0] || "vocabulary";
   }, [progress, rotationQueue, s]);
 
   // Suggestion: another active module not yet done today (after primary focus is done).
@@ -259,7 +264,7 @@ export default function BusinessHome() {
   const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
   const focusMod = BUSINESS_MODULES.find((m) => m.slug === focusModuleSlug);
-  const focusCopy = MODULE_FOCUS[focusModuleSlug] || MODULE_FOCUS.emails;
+  const focusCopy = MODULE_FOCUS[focusModuleSlug] || MODULE_FOCUS.vocabulary;
   const focusMinutes = plan ? INTENSITY_MINUTES[plan.intensity] : "15 წუთი";
   const focusDoneToday = progress[focusModuleSlug]?.doneToday ?? false;
 
@@ -530,7 +535,35 @@ export default function BusinessHome() {
             </div>
           </section>
 
-          {/* 2a. Document Helper */}
+          {/* 2a. Scenarios — learn words inside real situations */}
+          <section className="mb-5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
+              <Sparkles size={12} strokeWidth={2.25} /> სცენარები
+            </p>
+            <button
+              onClick={() => navigate("/path/business/scenarios")}
+              className="w-full text-left rounded-lg p-5 border border-[#C9A84C]/45 bg-gradient-to-br from-[#C9A84C]/15 to-white hover:border-[#C9A84C] transition-colors"
+            >
+              <div className="flex items-start gap-4">
+                <span className="w-11 h-11 rounded-md bg-[#5C1A2E] text-[#C9A84C] grid place-items-center shrink-0 text-lg">
+                  🎬
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="ka font-bold text-[#5C1A2E] text-base">
+                    ისწავლე სიტყვები რეალურ სიტუაციებში
+                  </p>
+                  <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
+                    შეხვედრები, იმეილები, გასაუბრება, პრეზენტაციები — დიალოგებით, აუდიოთი და ვარჯიშით.
+                  </p>
+                  <span className="ka inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#5C1A2E]">
+                    სცენარების ნახვა <ArrowRight size={12} strokeWidth={2.25} />
+                  </span>
+                </div>
+              </div>
+            </button>
+          </section>
+
+          {/* 2b. Document Helper */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <FileText size={12} strokeWidth={2.25} /> დოკუმენტების ასისტენტი
@@ -620,7 +653,7 @@ export default function BusinessHome() {
                     რეკომენდაცია
                   </p>
                   <p className="ka text-sm font-semibold text-[#5C1A2E] mt-1">
-                    შექმენი შენი პროფესიული წარდგენა
+                    შექმენი შენი პროფესიონალური წარდგენა
                   </p>
                   <p className="ka text-xs text-[#4A4A4A] mt-1">
                     სასარგებლოა გასაუბრებებზე, networking-ზე და LinkedIn-ზე.
@@ -647,7 +680,7 @@ export default function BusinessHome() {
                     ატვირთე რეზიუმე
                   </p>
                   <p className="ka text-xs text-[#4A4A4A] mt-1">
-                    გაკვეთილები მოერგება შენს პროფესიულ გამოცდილებას.
+                    გაკვეთილები მოერგება შენს პროფესიონალურ გამოცდილებას.
                   </p>
                 </div>
                 <Link
@@ -666,7 +699,14 @@ export default function BusinessHome() {
               მოდულები
             </p>
             <div className="grid gap-2 md:grid-cols-2">
-              {BUSINESS_MODULES.map((m) => {
+              {[...BUSINESS_MODULES]
+                .sort((a, b) => {
+                  // VOCAB-FIRST: vocabulary, interview, everything else, emails last.
+                  const r = (slug: string) =>
+                    slug === "vocabulary" ? 0 : slug === "interview" ? 1 : slug === "emails" ? 3 : 2;
+                  return r(a.slug) - r(b.slug);
+                })
+                .map((m) => {
                 const count = progress[m.slug]?.count ?? 0;
                 const started = count > 0;
                 const cur =
