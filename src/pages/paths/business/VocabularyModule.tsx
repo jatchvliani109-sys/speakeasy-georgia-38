@@ -6,14 +6,17 @@ import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
+  applyKnownWordFastTrack,
   applySessionResults,
   buildQuiz,
   buildReviewQuiz,
+  computeFormatTier,
   dueToday,
   emptyProgressFor,
   ingestExternalPhrases,
   isProductionType,
   loadProgress,
+  loadRecentSessions,
   pickLowestConfidenceWords,
   planSession,
   progressToWord,
@@ -50,6 +53,11 @@ export default function VocabularyModule() {
   const [newWords, setNewWords] = useState<VocabWord[]>([]);
   const [reviewKeys, setReviewKeys] = useState<string[]>([]);
   const [tierLevel, setTierLevel] = useState<1 | 2 | 3>(1);
+  // Question-format difficulty — escalates above tierLevel automatically when
+  // recent accuracy is very high, eases back when it drops.
+  const [formatTier, setFormatTier] = useState<1 | 2 | 3>(1);
+  // Words the learner marked "I already know this" on the card stage.
+  const [claimed, setClaimed] = useState<Set<string>>(new Set());
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
@@ -95,11 +103,14 @@ export default function VocabularyModule() {
       p = await ingestExternalPhrases(user.id, p);
       if (cancelled) return;
       const plan = planSession(p, s.field || [], s.mainPriority || []);
+      const recent = await loadRecentSessions(user.id);
+      if (cancelled) return;
       setProgress(p);
       setTotalVocab(p.length);
       setNewWords(plan.newWords);
       setReviewKeys(plan.reviewKeys);
       setTierLevel(plan.tierLevel);
+      setFormatTier(computeFormatTier(plan.tierLevel, recent));
       if (!plan.newWords.length && !plan.reviewKeys.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
@@ -121,6 +132,7 @@ export default function VocabularyModule() {
     masteredBaselineRef.current = progress.filter((p) => p.confidence >= 4).length;
     setCombo(0);
     setBestCombo(0);
+    setClaimed(new Set());
     if (reviewMode) {
       setQuiz(buildReviewQuiz(reviewWords));
       setQIdx(0);
@@ -130,15 +142,38 @@ export default function VocabularyModule() {
       setStage("quiz");
       return;
     }
-    const q = buildQuiz(newWords, reviewKeys, tierLevel);
-    setQuiz(q);
     setCardIdx(0);
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
     setRevealed(false);
-    if (newWords.length) playFlip();
-    setStage(newWords.length ? "cards" : "quiz");
+    if (newWords.length) {
+      // Quiz is built AFTER the cards stage so "I know this word" claims can
+      // shape it (claimed words get one typed proof instead of two questions).
+      playFlip();
+      setStage("cards");
+    } else {
+      setQuiz(buildQuiz([], reviewKeys, formatTier));
+      setStage("quiz");
+    }
+  };
+
+  const beginQuiz = () => {
+    setQuiz(buildQuiz(newWords, reviewKeys, formatTier, { claimedKeys: Array.from(claimed) }));
+    setQIdx(0);
+    setAnswers([]);
+    setSelected(null);
+    setRevealed(false);
+    setStage("quiz");
+  };
+
+  const toggleClaim = (key: string) => {
+    setClaimed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
 
   // CARDS
@@ -147,7 +182,7 @@ export default function VocabularyModule() {
       setCardIdx((i) => i + 1);
       playFlip();
     } else {
-      setStage("quiz");
+      beginQuiz();
     }
   };
 
@@ -239,7 +274,9 @@ export default function VocabularyModule() {
           return null;
         })();
       if (!row) continue;
-      row = applySessionResults(row, results, prodCorrect);
+      row = claimed.has(wordKey)
+        ? applyKnownWordFastTrack(row, results, prodCorrect)
+        : applySessionResults(row, results, prodCorrect);
       updated.push(row);
     }
     await upsertProgress(user.id, updated);
@@ -310,7 +347,7 @@ export default function VocabularyModule() {
     // skip the cards stage and go straight to quiz.
     setNewWords([]);
     setReviewKeys(pool.map((w) => w.key));
-    setQuiz(buildQuiz(pool, [], tierLevel));
+    setQuiz(buildQuiz(pool, [], formatTier));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);
@@ -402,6 +439,11 @@ export default function VocabularyModule() {
             reviewCount={reviewKeys.length}
             onStart={startSession}
           />
+          {formatTier > tierLevel && (
+            <p className="ka text-xs text-[#4A4A4A] mt-2 text-center">
+              📈 ბოლო შედეგების მიხედვით კითხვები ოდნავ გართულდა
+            </p>
+          )}
           {dueList.length > 0 && (
             <BizCard className="mt-4">
               <div className="flex items-baseline justify-between">
@@ -450,7 +492,12 @@ export default function VocabularyModule() {
       {stage === "cards" && newWords[cardIdx] && (
         <>
           <ProgressBar value={cardIdx + 1} total={newWords.length} label={`ახალი სიტყვა ${cardIdx + 1}/${newWords.length}`} />
-          <WordCard key={newWords[cardIdx].key} word={newWords[cardIdx]} />
+          <WordCard
+            key={newWords[cardIdx].key}
+            word={newWords[cardIdx]}
+            claimed={claimed.has(newWords[cardIdx].key)}
+            onToggleClaim={() => toggleClaim(newWords[cardIdx].key)}
+          />
           <div className="mt-4 flex justify-end">
             <BizButton onClick={onNextCard}>
               {cardIdx + 1 < newWords.length ? "შემდეგი →" : "ქვიზის დაწყება →"}
@@ -587,7 +634,15 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
   );
 }
 
-function WordCard({ word }: { word: VocabWord }) {
+function WordCard({
+  word,
+  claimed,
+  onToggleClaim,
+}: {
+  word: VocabWord;
+  claimed?: boolean;
+  onToggleClaim?: () => void;
+}) {
   const ctx = getContext(word.key);
   return (
     <div key={word.key} className="biz-card-flip bg-white border border-[#E0D8D0] rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
@@ -601,6 +656,20 @@ function WordCard({ word }: { word: VocabWord }) {
         </div>
         <ReadAloudButton text={word.en} storageKey={word.key} size="md" />
       </div>
+
+      {onToggleClaim && (
+        <button
+          type="button"
+          onClick={onToggleClaim}
+          className={`ka mt-3 text-[11px] px-3 py-1.5 rounded-full border font-semibold transition-colors
+            ${claimed
+              ? "border-[#C9A84C] bg-[#C9A84C]/15 text-[#5C1A2E]"
+              : "border-[#E0D8D0] bg-white text-[#4A4A4A] hover:border-[#C9A84C] hover:text-[#5C1A2E]"}
+          `}
+        >
+          {claimed ? "✓ ვიცი — ქვიზში დავადასტურებ" : "ვიცი ეს სიტყვა"}
+        </button>
+      )}
 
       {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
         <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{word.explanationKa}</p>

@@ -140,6 +140,41 @@ export function isProductionType(t: QuizQuestion["type"]): boolean {
   return PRODUCTION_TYPES.has(t);
 }
 
+// "I already know this word" fast-track. The learner claimed the word on its
+// card and then had to PROVE it in the quiz (typed recall, or KA→EN recall for
+// words the typing format skips). If every proof answer was correct, the word
+// jumps straight to high confidence with a 14-day interval — no beginner
+// ladder. Any miss and the claim is ignored: normal session handling applies.
+// Mastery rules are NOT bypassed: the word still needs correct sessions on 3
+// different days and 2 production-correct answers like everything else.
+export function applyKnownWordFastTrack(
+  p: ProgressRow,
+  results: boolean[],
+  prodCorrect = 0,
+): ProgressRow {
+  const allCorrect = results.length > 0 && results.every(Boolean);
+  if (!allCorrect) return applySessionResults(p, results, prodCorrect);
+  const today = new Date().toISOString().slice(0, 10);
+  const prevHistory: { date: string; correct: boolean }[] = Array.isArray(p.meta?.history)
+    ? p.meta.history
+    : [];
+  const history = [...prevHistory, { date: today, correct: true }].slice(-30);
+  const meta = {
+    ...(p.meta || {}),
+    history,
+    prodCorrect: (p.meta?.prodCorrect ?? 0) + Math.max(0, prodCorrect),
+    fastTracked: true,
+  };
+  return {
+    ...p,
+    confidence: Math.max(p.confidence, 4),
+    correct_count: p.correct_count + results.length,
+    last_seen_at: new Date().toISOString(),
+    due_at: new Date(Date.now() + 14 * DAY_MS).toISOString(),
+    meta,
+  };
+}
+
 // Mastery requires: ≥4 correct answers total, correct sessions across ≥3
 // different days, no wrong sessions in the last 2 appearances, AND at least
 // 2 correct answers on production-type questions (typed recall, context cloze,
@@ -200,6 +235,46 @@ export function emptyProgressFor(w: VocabWord): ProgressRow {
     last_seen_at: null,
     meta: {},
   };
+}
+
+// ---------------- Adaptive difficulty (format tier) ----------------
+// Curriculum tier controls WHICH words appear; format tier controls HOW HARD
+// the questions are. They start equal, but if the learner's recent accuracy
+// is very high the format tier escalates one level (more typing/cloze, fewer
+// easy recognition formats) even while the curriculum stays put — and eases
+// back down if accuracy drops. Fully automatic; no "was this too easy?" nags.
+
+const FORMAT_BOOST_ACCURACY = 0.9; // ≥90% over recent sessions → harder formats
+const FORMAT_EASE_ACCURACY = 0.6;  // <60% → gentler formats
+const FORMAT_MIN_SESSIONS = 2;     // need at least 2 recent sessions to judge
+
+export function computeFormatTier(
+  curriculumTier: 1 | 2 | 3,
+  recentSessions: { score: number; total: number }[],
+): 1 | 2 | 3 {
+  if (recentSessions.length < FORMAT_MIN_SESSIONS) return curriculumTier;
+  const score = recentSessions.reduce((s, r) => s + (r.score || 0), 0);
+  const total = recentSessions.reduce((s, r) => s + (r.total || 0), 0);
+  if (!total) return curriculumTier;
+  const accuracy = score / total;
+  if (accuracy >= FORMAT_BOOST_ACCURACY) return Math.min(3, curriculumTier + 1) as 1 | 2 | 3;
+  if (accuracy < FORMAT_EASE_ACCURACY) return Math.max(1, curriculumTier - 1) as 1 | 2 | 3;
+  return curriculumTier;
+}
+
+/** Last `n` completed vocab sessions (score/total), newest first. */
+export async function loadRecentSessions(
+  userId: string,
+  n = 3,
+): Promise<{ score: number; total: number }[]> {
+  const { data } = await supabase
+    .from("business_vocab_sessions")
+    .select("score,total")
+    .eq("user_id", userId)
+    .eq("completed", true)
+    .order("completed_at", { ascending: false })
+    .limit(n);
+  return (data || []) as any;
 }
 
 // ---------------- Session planning ----------------
@@ -625,10 +700,11 @@ export function buildQuiz(
   newWords: VocabWord[],
   reviewKeys: string[],
   tierLevel: 1 | 2 | 3 = 1,
-  opts: { maxQuestions?: number } = {},
+  opts: { maxQuestions?: number; claimedKeys?: string[] } = {},
 ): QuizQuestion[] {
   const pool = ALL_WORDS;
   const reviewWords = reviewKeys.map(findWord).filter(Boolean) as VocabWord[];
+  const claimedSet = new Set(opts.claimedKeys ?? []);
 
   const newGens = NEW_GENERATORS_BY_TIER[tierLevel];
   const secondGens = NEW_SECOND_PASS_BY_TIER[tierLevel];
@@ -636,8 +712,13 @@ export function buildQuiz(
 
   const questions: QuizQuestion[] = [];
 
-  // Pass 1: encode — one question per new word.
+  // Pass 1: encode — one question per new word. Words the learner claimed to
+  // already know get a single typed PROOF question instead of the usual pair.
   newWords.forEach((w, i) => {
+    if (claimedSet.has(w.key)) {
+      questions.push(makeTypeWord(w) || makeTrKaToEn(w, pool));
+      return;
+    }
     const gen = newGens[i % newGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
@@ -645,7 +726,9 @@ export function buildQuiz(
   });
 
   // Pass 2: retrieve — a second, different-format question per new word.
+  // Claimed words skip this: one proof is enough.
   newWords.forEach((w, i) => {
+    if (claimedSet.has(w.key)) return;
     const gen = secondGens[i % secondGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
