@@ -479,7 +479,7 @@ export default function InterviewModule() {
     );
   }
 
-  const b = session.briefing;
+  const b = session?.briefing as any;
 
   // ---- Mode picker ----
   if (step === "picker") {
