@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Award,
@@ -23,18 +23,14 @@ import { toast } from "sonner";
 import {
   BUSINESS_MODULES,
   BusinessIntensity,
-  BusinessPriority,
   BusinessState,
-  FIELD_LABELS,
-  INTENSITY_LABELS,
   LEVEL_LABELS,
-  PRIORITY_LABELS,
   PRIORITY_TO_MODULES,
   pullBusinessFromSupabase,
   resetBusiness,
   saveBusiness,
 } from "./lib/state";
-import { emailStep, interviewStep } from "./lib/curriculum";
+import { interviewStep } from "./lib/curriculum";
 import { loadProgress, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
@@ -52,12 +48,6 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
     doneTitle: "ყოჩაღ — დღევანდელი გასაუბრება დასრულდა",
     doneSubtitle: "სცადე ერთი ფრაზა გაიხსენო რომელიც დღეს გამოგივიდა.",
   },
-  emails: {
-    title: "დღევანდელი იმეილის გამოწვევა",
-    subtitle: "დაწერე ერთი პროფესიონალური იმეილი და მიიღე AI უკუკავშირი.",
-    doneTitle: "ყოჩაღ — დღევანდელი იმეილი დასრულდა",
-    doneSubtitle: "შენი პროგრესი განახლდა. ხვალ ახალი სცენარით დაგხვდები.",
-  },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
@@ -67,19 +57,7 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
 };
 
 // Modules that are fully built today
-const ACTIVE_MODULES = new Set(["emails", "interview", "vocabulary"]);
-
-// Local single-slug map kept for backward compat; multi-module map drives rotation.
-const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
-  university: "interview",
-  job_interview: "interview",
-  work_communication: "emails",
-  remote_work: "emails",
-  emails_writing: "emails",
-  business_vocab: "vocabulary",
-  general_business: "interview",
-};
-
+const ACTIVE_MODULES = new Set(["interview", "vocabulary"]);
 
 type ModuleProgress = { slug: string; count: number; doneToday: boolean };
 
@@ -100,11 +78,12 @@ export default function BusinessHome() {
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
-  const [vocabPreview, setVocabPreview] = useState<VocabWord | null>(null);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
   const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
   const [lastReassessmentAt, setLastReassessmentAt] = useState<string | null>(null);
   const [phraseCount, setPhraseCount] = useState<number>(0);
+  // Raw completed_at timestamps (vocab + interview) powering the daily streak.
+  const [streakDates, setStreakDates] = useState<string[]>([]);
 
   // Existing users with no saved name: prompt once.
   useEffect(() => {
@@ -139,9 +118,7 @@ export default function BusinessHome() {
 
       const startIso = todayIso();
 
-      const [emailsAll, emailsToday, interviewAll, interviewToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
-        supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-        supabase.from("business_email_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
+      const [interviewAll, interviewToday, vocabAll, vocabToday, vocabWords] = await Promise.all([
         supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
         supabase.from("business_interview_sessions").select("id").eq("user_id", user.id).eq("completed", true).gte("completed_at", startIso).limit(1),
         supabase.from("business_vocab_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
@@ -151,7 +128,6 @@ export default function BusinessHome() {
 
       if (cancelled) return;
       setProgress({
-        emails: { slug: "emails", count: emailsAll.count ?? 0, doneToday: (emailsToday.data?.length ?? 0) > 0 },
         interview: { slug: "interview", count: interviewAll.count ?? 0, doneToday: (interviewToday.data?.length ?? 0) > 0 },
         vocabulary: { slug: "vocabulary", count: vocabAll.count ?? 0, doneToday: (vocabToday.data?.length ?? 0) > 0 },
       });
@@ -169,11 +145,25 @@ export default function BusinessHome() {
         if (!cancelled) setLastReassessmentAt(ra?.created_at ?? null);
       } catch {}
       try {
-        const [{ count: emailPhr }, { count: intPhr }] = await Promise.all([
-          supabase.from("business_email_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
-          supabase.from("business_interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("completed", true),
+        const { count: intPhr } = await supabase
+          .from("business_interview_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true);
+        if (!cancelled) setPhraseCount(intPhr ?? 0);
+      } catch {}
+      // Daily streak: dates of ALL completed sessions (vocab + interview).
+      try {
+        const [vd, idd] = await Promise.all([
+          supabase.from("business_vocab_sessions").select("completed_at").eq("user_id", user.id).eq("completed", true).order("completed_at", { ascending: false }).limit(120),
+          supabase.from("business_interview_sessions").select("completed_at").eq("user_id", user.id).eq("completed", true).order("completed_at", { ascending: false }).limit(120),
         ]);
-        if (!cancelled) setPhraseCount((emailPhr ?? 0) + (intPhr ?? 0));
+        if (!cancelled) {
+          const dates = [...(vd.data || []), ...(idd.data || [])]
+            .map((r: any) => r.completed_at)
+            .filter(Boolean);
+          setStreakDates(dates);
+        }
       } catch {}
       try {
         const vp = await loadProgress(user.id);
@@ -181,7 +171,6 @@ export default function BusinessHome() {
           const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);
-          setVocabPreview(plan.newWords[0] || null);
         }
       } catch {}
 
@@ -200,16 +189,31 @@ export default function BusinessHome() {
     };
   }, [user]);
 
-  const displayName = useMemo(() => {
-    if (profileName) return profileName;
-    const meta = (user?.user_metadata as any) || {};
-    return (
-      meta.display_name ||
-      meta.full_name ||
-      meta.name ||
-      ""
-    );
-  }, [profileName, user]);
+  // Only the name the user actually told us — never an account username
+  // like "jatchvliani109". Blank beats wrong.
+  const displayName = profileName || "";
+
+  // Daily streak from completed-session dates (Duolingo-style: any one
+  // session counts the day; a missed today doesn't kill the streak until
+  // the day actually ends).
+  const { streak, last7 } = useMemo(() => {
+    const days = new Set(streakDates.map((d) => new Date(d).toDateString()));
+    let count = 0;
+    const cursor = new Date();
+    if (!days.has(cursor.toDateString())) cursor.setDate(cursor.getDate() - 1);
+    while (days.has(cursor.toDateString())) {
+      count++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    const KA_DAYS = ["კვ", "ორ", "სა", "ოთ", "ხუ", "პა", "შა"];
+    const week: { label: string; done: boolean; isToday: boolean }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      week.push({ label: KA_DAYS[d.getDay()], done: days.has(d.toDateString()), isToday: i === 0 });
+    }
+    return { streak: count, last7: week };
+  }, [streakDates]);
 
   // Build goal-weighted rotation queue across active modules.
   // Each goal contributes all its mapped modules; primary goal gets extra weight.
@@ -263,28 +267,21 @@ export default function BusinessHome() {
   const plan = s.plan;
   const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
-  const focusMod = BUSINESS_MODULES.find((m) => m.slug === focusModuleSlug);
   const focusCopy = MODULE_FOCUS[focusModuleSlug] || MODULE_FOCUS.vocabulary;
   const focusMinutes = plan ? INTENSITY_MINUTES[plan.intensity] : "15 წუთი";
   const focusDoneToday = progress[focusModuleSlug]?.doneToday ?? false;
 
   // Curriculum preview for focus module
   const focusCurriculum =
-    focusModuleSlug === "emails"
-      ? emailStep(progress.emails?.count ?? 0)
-      : focusModuleSlug === "interview"
-        ? interviewStep(progress.interview?.count ?? 0)
-        : null;
+    focusModuleSlug === "interview" ? interviewStep(progress.interview?.count ?? 0) : null;
 
 
   const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
   const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
 
-  const emailsCount = progress.emails?.count ?? 0;
   const interviewCount = progress.interview?.count ?? 0;
   const vocabSessionsCount = progress.vocabulary?.count ?? 0;
-  const allFourMilestone =
-    emailsCount >= 7 && interviewCount >= 7 && vocabSessionsCount >= 7;
+  const allFourMilestone = interviewCount >= 7 && vocabSessionsCount >= 7;
   const showMilestone = !!plan && allFourMilestone && !s.firstMilestoneAcknowledged;
   const lastReassessmentLabel = lastReassessmentAt
     ? new Date(lastReassessmentAt).toLocaleDateString("ka-GE", { year: "numeric", month: "short", day: "numeric" })
@@ -325,8 +322,12 @@ export default function BusinessHome() {
           </p>
           <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1 leading-tight">
             გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
-            {plan ? ` — ${LEVEL_LABELS[plan.level]}` : ""}
           </h1>
+          {plan && (
+            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-[#4A4A4A] border border-[#E0D8D0] bg-white px-2 py-0.5 rounded-full">
+              {LEVEL_LABELS[plan.level]}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -368,32 +369,44 @@ export default function BusinessHome() {
 
       {plan && (
         <>
-          {/* Level Assessment */}
+          {/* Daily streak — the retention heartbeat. One session counts the day. */}
           <section className="mb-5">
-            <button
-              onClick={() => navigate("/path/business/reassessment")}
-              className="w-full text-left bg-white border border-[#E0D8D0] hover:border-[#5C1A2E]/50 rounded-lg p-4 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-10 h-10 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0">
-                  <Award size={18} strokeWidth={2} />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
-                    შენი მიმდინარე დონე
-                  </p>
-                  <p className="ka font-bold text-[#5C1A2E] text-base mt-0.5">
-                    {LEVEL_LABELS[plan.level]}
-                  </p>
-                  <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
-                    ბოლო შეფასება: {lastReassessmentLabel}
-                  </p>
+            <div className="bg-white border border-[#E0D8D0] rounded-lg p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-2xl leading-none">🔥</span>
+                  <div className="min-w-0">
+                    <p className="text-lg font-bold text-[#5C1A2E] leading-tight">
+                      {streak}{" "}
+                      <span className="ka text-xs font-semibold text-[#4A4A4A]">
+                        დღე ზედიზედ
+                      </span>
+                    </p>
+                    <p className="ka text-[10px] text-[#4A4A4A] mt-0.5">
+                      {last7[6]?.done
+                        ? "დღევანდელი დღე ჩათვლილია ✓"
+                        : "ერთი სესია საკმარისია დღის ჩასათვლელად"}
+                    </p>
+                  </div>
                 </div>
-                <span className="ka inline-flex items-center gap-1 text-xs font-semibold text-[#5C1A2E] border border-[#E0D8D0] rounded-md px-3 py-2 shrink-0">
-                  დონის შეფასება <ArrowRight size={13} strokeWidth={2.25} />
-                </span>
+                <div className="flex gap-1.5 shrink-0">
+                  {last7.map((d, i) => (
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <span
+                        className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
+                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : "border border-[#E0D8D0] text-transparent"}
+                          ${d.isToday && !d.done ? "border-[#5C1A2E]/50 border-dashed" : ""}`}
+                      >
+                        {d.done ? "✓" : "·"}
+                      </span>
+                      <span className={`ka text-[8px] ${d.isToday ? "font-bold text-[#5C1A2E]" : "text-[#4A4A4A]"}`}>
+                        {d.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </button>
+            </div>
           </section>
 
           {/* Milestone celebration */}
@@ -411,12 +424,12 @@ export default function BusinessHome() {
                     გილოცავ — დაასრულე პირველი დონე
                   </h2>
                   <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7+ სესია სამივე მოდულში. ეს სერიოზული ნაბიჯია.
+                    შენ შეასრულე 7+ სესია ორივე მოდულში. ეს სერიოზული ნაბიჯია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
                       <div className="text-xl font-bold">
-                        {emailsCount + interviewCount + vocabSessionsCount}
+                        {interviewCount + vocabSessionsCount}
                       </div>
                       <div className="ka text-[10px] text-[#F0EBE3]/65 mt-0.5">სესია</div>
                     </div>
@@ -508,21 +521,7 @@ export default function BusinessHome() {
                         ? `${vocabReviewToday} გასამეორებელი სიტყვა`
                         : "გამეორების დღე — ყველაზე რთული სიტყვები"}
                     </p>
-                    {vocabPreview && (
-                      <div className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#F0EBE3]/15">
-                        <span className="ka text-[9px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-                          პირველი სიტყვა
-                        </span>
-                        <span className="text-sm font-bold text-[#F0EBE3]">{vocabPreview.en}</span>
-                        <span className="ka text-[11px] text-[#F0EBE3]/70">· {vocabPreview.ka}</span>
-                      </div>
-                    )}
                   </div>
-                )}
-                {focusMod && (
-                  <p className="ka text-[11px] text-[#F0EBE3]/60 mt-3">
-                    მოდული: {focusMod.title}
-                  </p>
                 )}
                 <button
                   onClick={() => navigate(`/path/business/module/${focusModuleSlug}`)}
@@ -563,34 +562,6 @@ export default function BusinessHome() {
             </button>
           </section>
 
-          {/* 2b. Document Helper */}
-          <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
-              <FileText size={12} strokeWidth={2.25} /> დოკუმენტების ასისტენტი
-            </p>
-            <button
-              onClick={() => navigate("/path/business/documents")}
-              className="w-full text-left bg-white border border-[#E0D8D0] hover:border-[#5C1A2E]/50 rounded-lg p-5 transition-colors"
-            >
-              <div className="flex items-start gap-4">
-                <span className="w-11 h-11 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0">
-                  <FileText size={20} strokeWidth={2} />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="ka font-bold text-[#5C1A2E] text-base">
-                    შექმენი ან გაასწორე რეალური დოკუმენტი
-                  </p>
-                  <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
-                    იმეილი, სამოტივაციო წერილი, რეზიუმე, ბიო — შენი მონაცემებით, წამიერად. ან ჩასვი იმეილი და მიიღე გაუმჯობესებული ვერსია.
-                  </p>
-                  <span className="ka inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#5C1A2E]">
-                    გახსნა <ArrowRight size={12} strokeWidth={2.25} />
-                  </span>
-                </div>
-              </div>
-            </button>
-          </section>
-
           {/* 2b. Still have energy */}
           {focusDoneToday && suggestionMod && suggestionCopy && (() => {
             const SugIcon = suggestionMod.icon;
@@ -620,30 +591,6 @@ export default function BusinessHome() {
               </BizCard>
             );
           })()}
-
-          {/* 3. Your Plan */}
-          <section className="mb-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
-              შენი გეგმა
-            </p>
-            <BizCard>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <Mini label="დონე" value={LEVEL_LABELS[plan.level]} />
-                <Mini label="ინტენსივობა" value={INTENSITY_LABELS[plan.intensity]} />
-                <Mini
-                  label="მთავარი მიზნები"
-                  value={plan.mainGoals.map((g) => PRIORITY_LABELS[g]).join(", ")}
-                />
-                <Mini label="სფეროები" value={plan.fields.map((f) => FIELD_LABELS[f]).join(", ")} />
-              </div>
-              <Link
-                to="/path/business/plan"
-                className="ka text-[11px] text-[#5C1A2E] underline underline-offset-2 mt-3 inline-block"
-              >
-                სრული გეგმის ნახვა
-              </Link>
-            </BizCard>
-          </section>
 
           {showIntroCard && (
             <BizCard className="mb-5 border-dashed">
@@ -701,20 +648,14 @@ export default function BusinessHome() {
             <div className="grid gap-2 md:grid-cols-2">
               {[...BUSINESS_MODULES]
                 .sort((a, b) => {
-                  // VOCAB-FIRST: vocabulary, interview, everything else, emails last.
-                  const r = (slug: string) =>
-                    slug === "vocabulary" ? 0 : slug === "interview" ? 1 : slug === "emails" ? 3 : 2;
+                  // VOCAB-FIRST: vocabulary leads, interview second.
+                  const r = (slug: string) => (slug === "vocabulary" ? 0 : slug === "interview" ? 1 : 2);
                   return r(a.slug) - r(b.slug);
                 })
                 .map((m) => {
                 const count = progress[m.slug]?.count ?? 0;
                 const started = count > 0;
-                const cur =
-                  m.slug === "emails"
-                    ? emailStep(count)
-                    : m.slug === "interview"
-                      ? interviewStep(count)
-                      : null;
+                const cur = m.slug === "interview" ? interviewStep(count) : null;
                 const ModIcon = m.icon;
 
                 return (
@@ -764,17 +705,44 @@ export default function BusinessHome() {
             </div>
           </section>
 
-          {/* 5. Progress */}
+          {/* 5. More — compact rows for everything that used to be big cards */}
+          <section className="mb-5">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
+              მეტი
+            </p>
+            <div className="bg-white border border-[#E0D8D0] rounded-lg divide-y divide-[#F0EBE3]">
+              <MoreRow
+                icon={<FileText size={15} strokeWidth={2} />}
+                title="დოკუმენტების ასისტენტი"
+                sub="იმეილი, რეზიუმე, სამოტივაციო — შენი მონაცემებით"
+                onClick={() => navigate("/path/business/documents")}
+              />
+              <MoreRow
+                icon={<Award size={15} strokeWidth={2} />}
+                title="დონის შეფასება"
+                sub={`ბოლო: ${lastReassessmentLabel}`}
+                onClick={() => navigate("/path/business/reassessment")}
+              />
+              <MoreRow
+                icon={<Target size={15} strokeWidth={2} />}
+                title="სრული გეგმა"
+                sub="შენი მიზნები, ინტენსივობა და სფეროები"
+                onClick={() => navigate("/path/business/plan")}
+              />
+            </div>
+          </section>
+
+          {/* 6. Progress */}
           <section>
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <BarChart2 size={12} strokeWidth={2.25} /> პროგრესი
             </p>
             <BizCard>
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="გაუმჯობესებული იმეილები" value={String(emailsCount)} />
-                <Stat label="გასაუბრებები" value={String(interviewCount)} />
+                <Stat label="🔥 სერია (დღე)" value={String(streak)} />
                 <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
-                <Stat label="გაკვეთილები" value={String(emailsCount + interviewCount + (progress.vocabulary?.count ?? 0))} />
+                <Stat label="გასაუბრებები" value={String(interviewCount)} />
+                <Stat label="სესიები სულ" value={String(interviewCount + (progress.vocabulary?.count ?? 0))} />
               </div>
               <Link
                 to="/path/business/lexicon"
@@ -794,12 +762,32 @@ export default function BusinessHome() {
   );
 }
 
-function Mini({ label, value }: { label: string; value: string }) {
+function MoreRow({
+  icon,
+  title,
+  sub,
+  onClick,
+}: {
+  icon: ReactNode;
+  title: string;
+  sub: string;
+  onClick: () => void;
+}) {
   return (
-    <div className="bg-[#F0EBE3] border border-[#E0D8D0] rounded-md px-3 py-2">
-      <div className="ka text-[10px] text-[#4A4A4A]">{label}</div>
-      <div className="ka text-xs font-semibold text-[#5C1A2E] mt-0.5">{value}</div>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#F8F5F0] transition-colors first:rounded-t-lg last:rounded-b-lg"
+    >
+      <span className="w-8 h-8 rounded-md bg-[#5C1A2E]/5 text-[#5C1A2E] border border-[#E0D8D0] grid place-items-center shrink-0">
+        {icon}
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="ka block text-sm font-semibold text-[#5C1A2E]">{title}</span>
+        <span className="ka block text-[11px] text-[#4A4A4A] mt-0.5 truncate">{sub}</span>
+      </span>
+      <ArrowRight size={14} strokeWidth={2.25} className="text-[#4A4A4A] shrink-0" />
+    </button>
   );
 }
 

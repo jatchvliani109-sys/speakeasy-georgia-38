@@ -44,7 +44,7 @@ export default function BusinessModulesList() {
   const recommended = useMemo(() => recommendedModuleSlugs(goals), [goals]);
 
   return (
-    <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ელ-ფოსტები, გასაუბრება, შეხვედრები და პროფესიონალური ლექსიკა.", path: "/path/business/modules" }}>
+    <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ლექსიკა, სცენარები და გასაუბრება.", path: "/path/business/modules" }}>
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-wider text-[#4A4A4A] font-bold">
           SpeakBusy
