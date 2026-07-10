@@ -84,13 +84,28 @@ Rules:
 - Level scale: business_beginner (A1-A2 simple), business_elementary (A2-B1), business_intermediate (B1-B2), business_advanced (B2-C1 nuanced).
 - intensity "light" => fewer stages (skip curveball); "intensive"/"deadline" => richer briefing + harder pushback.
 - Warm-up: 2-3 multiple-choice prompts (Georgian instruction, 2 English answer options each). Each option labeled "A"/"B" with isBetter flag and a short Georgian explanation per option.
-- Tone: warm, encouraging Georgian copy. English content stays natural & professional.`;
+- Tone: warm, encouraging Georgian copy. English content stays natural & professional.
+
+REAL/MATCHED MODES — GROUNDED QUESTION PLANNING (this is what makes the interview feel human):
+Work in two internal stages.
+Stage 1 — EXTRACT concrete facts. From the resume: company names, role titles, durations, employment gaps, specific achievements with numbers, claimed skills. From the posting: must-have requirements, key responsibilities, seniority signals.
+Stage 2 — PLAN questions GROUNDED in those facts, the way a real interviewer works: name the specifics ("I see you spent two years at Alpha Consulting — what made you leave?"), probe every posting requirement the resume does NOT clearly demonstrate, and challenge vague or unquantified claims. Generic template questions ("tell me about a challenge you overcame") are FORBIDDEN except at most ONE classic behavioral.
+For real/matched, ADD inside "briefing" an "interviewPlan" object:
+"interviewPlan": {
+  "resumeFacts": ["5-8 short concrete facts extracted from the resume"],
+  "postingRequirements": ["4-6 must-have requirements from the posting"],
+  "plannedQuestions": [
+    { "stage": "background" | "situational" | "curveball" | "closing", "questionEn": "the grounded question", "groundedIn": "resume: ... | posting: ... | gap: ..." }
+  ]
+}
+plannedQuestions: 6-8 questions spread across the stages, each explicitly grounded. Omit interviewPlan entirely for random mode.`;
 
 const SYSTEM_REPLY = `You are an interviewer in a job interview roleplay. STAY 100% IN CHARACTER — never reveal you are AI, never give feedback, never speak Georgian.
 - Speak ONLY in natural professional English. 2-4 sentences max per turn.
 - Adapt to the candidate's last answer: ask a relevant follow-up, push back gently when answers are vague ("interesting — can you give me a specific example?"), or move forward when they did well.
 - Stay in the requested stage (small_talk, background, situational, curveball, closing). When remainingQuestions <= 1, wrap up that stage cleanly (closing stage = invite their questions).
 - Level adapts complexity: beginner/elementary = simpler vocabulary, slower pace; intermediate/advanced = nuanced situational/curveball questions.
+- If briefing.interviewPlan exists: prefer its plannedQuestions for the CURRENT stage — ask them adapted naturally to the conversation flow, referencing the concrete facts they're grounded in (company names, durations, posting requirements). Ask one follow-up on the candidate's answer before moving to the next planned question. NEVER invent resume or posting facts that aren't in interviewPlan.
 
 Also score this single exchange and optionally surface a phrase highlight.
 
@@ -153,7 +168,8 @@ Output STRICT JSON only:
   ]
 }
 Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include exactly 2 modelAnswers — for the learner's TWO WEAKEST answers, giving them a full model response to learn from. Include 4-6 vocabulary items pulled from strong phrases + key phrases.
-If focusAreas were provided (real/matched mode), explicitly comment in hurtChances or practiceNextKa on any REQUIRED competency the candidate failed to demonstrate.`;
+If focusAreas were provided (real/matched mode), explicitly comment in hurtChances or practiceNextKa on any REQUIRED competency the candidate failed to demonstrate.
+If briefing.interviewPlan exists, judge specifically how the candidate handled the GROUNDED questions (employment gaps, posting requirements, challenged claims) and reference those moments concretely in wentWell/hurtChances.`;
 
 function resumeBlock(resume?: ResumeData | null): string {
   if (!resume) return "(No resume provided.)";
@@ -182,14 +198,14 @@ ${resumeBlock(b.resume)}
 The REAL job posting they're applying to:
 """${(b.jobPosting || "").slice(0, 4000)}"""
 
-Build the briefing DIRECTLY from this real posting (real-sounding company/role derived from it — you may keep the real role title). The interview MUST probe the fit between the resume and this posting, INCLUDING GAPS: if the posting requires something the resume doesn't show, plan to test it (the interviewer will press on it later). In "briefing", add a "focusAreasEn" array (3-5 short strings) naming the exact competencies from the posting to probe — especially gaps.`;
+Build the briefing DIRECTLY from this real posting (real-sounding company/role derived from it — you may keep the real role title). The interview MUST probe the fit between the resume and this posting, INCLUDING GAPS: if the posting requires something the resume doesn't show, plan to test it (the interviewer will press on it later). In "briefing", add a "focusAreasEn" array (3-5 short strings) naming the exact competencies from the posting to probe — especially gaps. Fill briefing.interviewPlan from THIS resume + posting per the system rules — every planned question must cite a real detail from them.`;
   }
   if (mode === "matched") {
     return `MODE: MATCHED — invent a realistic job posting that fits the learner's resume but is ONE STEP more ambitious (a natural next career move).
 Candidate's resume:
 ${resumeBlock(b.resume)}
 
-Return the invented posting in "jobPostingEn" (6-10 lines: company one-liner, role, 4-6 responsibilities, 3-5 requirements) so the learner can read it before starting. Base the briefing on that invented posting. Probe realistic fit for the slightly-stretched role. Add "focusAreasEn" (3-5 strings) for the competencies to probe.`;
+Return the invented posting in "jobPostingEn" (6-10 lines: company one-liner, role, 4-6 responsibilities, 3-5 requirements) so the learner can read it before starting. Base the briefing on that invented posting. Probe realistic fit for the slightly-stretched role. Add "focusAreasEn" (3-5 strings) for the competencies to probe, and fill briefing.interviewPlan from the resume + your invented posting per the system rules.`;
   }
   return `MODE: RANDOM — a generic practice role (no resume). Keep it broadly accessible for the learner's level and fields.`;
 }
@@ -313,34 +329,48 @@ ${b.history.map((t) => `${t.role.toUpperCase()}: ${t.text}`).join("\n")}
 Now break character and give the structured Georgian debrief.`;
 }
 
+const FALLBACK_MODEL = "gpt-4o";
+
 async function callAI(system: string, user: string, model = "gpt-4o") {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      response_format: { type: "json_object" },
-    }),
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    const status = res.status === 429 || res.status === 402 ? res.status : 500;
-    return { ok: false as const, status, error: `AI gateway ${res.status}`, detail: txt };
+  const attempt = async (m: string) => {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: m,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      const status = res.status === 429 || res.status === 402 ? res.status : 500;
+      return { ok: false as const, status, error: `AI gateway ${res.status}`, detail: txt };
+    }
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content ?? "{}";
+    try {
+      return { ok: true as const, parsed: JSON.parse(content) };
+    } catch {
+      return { ok: true as const, parsed: { raw: content } };
+    }
+  };
+
+  let r = await attempt(model);
+  // If the primary model is unavailable (retired name, quota, gateway error),
+  // silently retry once with the known-good fallback instead of failing the
+  // learner's session.
+  if (!r.ok && model !== FALLBACK_MODEL) {
+    console.log(`[business-interview] ${model} failed (${r.error}); retrying with ${FALLBACK_MODEL}`);
+    r = await attempt(FALLBACK_MODEL);
   }
-  const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content ?? "{}";
-  try {
-    return { ok: true as const, parsed: JSON.parse(content) };
-  } catch {
-    return { ok: true as const, parsed: { raw: content } };
-  }
+  return r;
 }
 
 Deno.serve(async (req) => {

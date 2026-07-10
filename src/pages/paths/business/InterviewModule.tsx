@@ -63,6 +63,13 @@ type DebriefData = {
   vocabulary: { en: string; ka: string; exampleEn: string; exampleKa: string }[];
 };
 
+// ---- Premium gating ----
+// REAL mode (actual posting + resume) is the premium feature. While payments
+// aren't live it stays open with a premium badge; once subscriptions launch,
+// flip PAYMENTS_LIVE and it locks for free users automatically.
+const PAYMENTS_LIVE = false;
+const isPaidUser = false; // TODO(payments): read real subscription status
+
 type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
 type Mode = "real" | "matched" | "random";
 
@@ -495,12 +502,13 @@ export default function InterviewModule() {
 
           <ModeCard
             titleKa="რეალური ვაკანსია"
+            badgeKa="⭐ პრემიუმ"
             descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოარგებს — სუსტ წერტილებზეც."
             emoji="🎯"
-            locked={!hasResume}
-            lockedHintKa="ჯერ ატვირთე რეზიუმე"
+            locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser)}
+            lockedHintKa={!hasResume ? "ჯერ ატვირთე რეზიუმე" : "პრემიუმ ფუნქცია"}
             onClick={() => { setMode("real"); setStep("posting"); }}
-            onLockedClick={() => navigate("/path/business/resume")}
+            onLockedClick={() => { if (!hasResume) navigate("/path/business/resume"); }}
           />
           <ModeCard
             titleKa="მორგებული ვაკანსია"
@@ -1049,10 +1057,11 @@ export default function InterviewModule() {
 }
 
 function ModeCard({
-  titleKa, descKa, emoji, locked, lockedHintKa, onClick, onLockedClick,
+  titleKa, descKa, emoji, locked, lockedHintKa, onClick, onLockedClick, badgeKa,
 }: {
   titleKa: string; descKa: string; emoji: string; locked: boolean;
   lockedHintKa?: string; onClick: () => void; onLockedClick?: () => void;
+  badgeKa?: string;
 }) {
   return (
     <button
@@ -1069,6 +1078,11 @@ function ModeCard({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="ka font-bold text-[#1C1C1E]">{titleKa}</h3>
+            {badgeKa && (
+              <span className="ka text-[10px] font-bold text-[#5C1A2E] bg-[#C9A84C]/25 border border-[#C9A84C]/40 px-1.5 py-0.5 rounded-full">
+                {badgeKa}
+              </span>
+            )}
             {locked && <span className="text-xs">🔒</span>}
           </div>
           <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">{descKa}</p>

@@ -11,6 +11,7 @@ import {
   buildQuiz,
   buildReviewQuiz,
   computeFormatTier,
+  countSessionsToday,
   dueToday,
   emptyProgressFor,
   ingestExternalPhrases,
@@ -43,6 +44,12 @@ type Stage = "intro" | "cards" | "quiz" | "results" | "empty" | "reviewIntro";
 const PRACTICE_TARGET = 12;
 const REVIEW_FALLBACK_SIZE = 10;
 
+// ---- Free-tier daily cap ----
+// Vocab costs nothing to serve, so this is pacing + a future upgrade lever,
+// not cost control. When payments launch, wire isPaidUser to the real plan.
+const FREE_DAILY_SESSIONS = 1;
+const isPaidUser = false; // TODO(payments): read real subscription status
+
 export default function VocabularyModule() {
   const { user } = useAuth();
   const { displayName } = useDisplayName();
@@ -63,6 +70,7 @@ export default function VocabularyModule() {
   const [formatTier, setFormatTier] = useState<1 | 2 | 3>(1);
   // Words the learner marked "I already know this" on the card stage.
   const [claimed, setClaimed] = useState<Set<string>>(new Set());
+  const [sessionsToday, setSessionsToday] = useState(0);
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
@@ -109,7 +117,9 @@ export default function VocabularyModule() {
       if (cancelled) return;
       const plan = planSession(p, s.field || [], s.mainPriority || []);
       const recent = await loadRecentSessions(user.id);
+      const doneToday = await countSessionsToday(user.id);
       if (cancelled) return;
+      setSessionsToday(doneToday);
       setProgress(p);
       setTotalVocab(p.length);
       const sc = scenarioId ? clusterById(scenarioId) : undefined;
@@ -143,7 +153,10 @@ export default function VocabularyModule() {
     return () => { cancelled = true; };
   }, [user, scenarioId]);
 
+  const dailyLimitReached = !isPaidUser && sessionsToday >= FREE_DAILY_SESSIONS;
+
   const startSession = () => {
+    if (dailyLimitReached) return;
     // Resume audio on user gesture (browsers require it).
     try { (window as any).AudioContext && new (window as any).AudioContext().resume?.(); } catch {}
     masteredBaselineRef.current = progress.filter((p) => p.confidence >= 4).length;
@@ -449,7 +462,39 @@ export default function VocabularyModule() {
 
       {confettiKey > 0 && <Confetti seed={confettiKey} />}
 
-      {stage === "intro" && (
+      {stage === "intro" && dailyLimitReached && (
+        <>
+          <div className="rounded-3xl p-6 text-center text-[#F8F5F0] bg-gradient-to-br from-[#5C1A2E] to-[#1C1C1E] shadow-lg">
+            <div className="text-4xl">✓</div>
+            <h2 className="ka text-xl font-bold mt-2">დღევანდელი ვარჯიში შესრულებულია</h2>
+            <p className="ka text-sm text-[#F8F5F0]/80 mt-2 leading-relaxed">
+              სერია დაცულია 🔥 ხვალ ახალი სიტყვები და გამეორება გელოდება.
+            </p>
+            <Link
+              to="/path/business/home"
+              className="ka inline-block mt-5 px-6 py-3 rounded-full bg-[#C9A84C] text-[#5C1A2E] text-sm font-bold"
+            >
+              მთავარზე დაბრუნება
+            </Link>
+          </div>
+          {dueList.length > 0 && (
+            <BizCard className="mt-4">
+              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+                ხვალ გასამეორებელი
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {dueList.slice(0, 4).map((w) => (
+                  <li key={w.key} className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-semibold text-[#5C1A2E]">{w.en}</span>
+                    <span className="ka text-xs text-[#4A4A4A] truncate">{w.ka}</span>
+                  </li>
+                ))}
+              </ul>
+            </BizCard>
+          )}
+        </>
+      )}
+      {stage === "intro" && !dailyLimitReached && (
         <>
           {scenario && (
             <div className="mb-3 text-center">

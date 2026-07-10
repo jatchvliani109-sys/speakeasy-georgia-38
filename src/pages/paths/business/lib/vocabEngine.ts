@@ -262,6 +262,19 @@ export function computeFormatTier(
   return curriculumTier;
 }
 
+/** Completed vocab sessions since local midnight — powers the free daily cap. */
+export async function countSessionsToday(userId: string): Promise<number> {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const { count } = await supabase
+    .from("business_vocab_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("completed", true)
+    .gte("completed_at", startOfDay.toISOString());
+  return count ?? 0;
+}
+
 /** Last `n` completed vocab sessions (score/total), newest first. */
 export async function loadRecentSessions(
   userId: string,
