@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessLevel, LEVEL_LABELS, pullBusinessFromSupabase, saveBusiness } from "./lib/state";
 
@@ -58,7 +59,7 @@ const QUESTIONS: Question[] = [
     type: "mcq",
     weight: 2,
     prompt: "You missed a deadline. Which message is the most professional?",
-    promptKa: "აირჩიე ყველაზე პროფესიული პასუხი.",
+    promptKa: "აირჩიე ყველაზე პროფესიონალური პასუხი.",
     options: [
       "Sorry, I forgot. Will send it later today.",
       "Apologies for the delay — I'll have it on your desk by end of day.",
@@ -137,7 +138,7 @@ const QUESTIONS: Question[] = [
     type: "mcq",
     weight: 3,
     prompt: "Choose the best rewrite of: 'We can't do this because we don't have enough money.'",
-    promptKa: "აირჩიე საუკეთესო პროფესიული გადაწერა.",
+    promptKa: "აირჩიე საუკეთესო პროფესიონალური გადაწერა.",
     options: [
       "We are unable to proceed due to current budget constraints.",
       "We can't proceed because of money problems right now.",
@@ -176,12 +177,43 @@ const LEVEL_BLURB: Record<BusinessLevel, string> = {
   business_intermediate:
     "შენ კარგად მართავ ბიზნეს კომუნიკაციას. შენი გეგმა გააძლიერებს ნუანსს, ტონს, შეხვედრებსა და პრეზენტაციებში თავდაჯერებას.",
   business_advanced:
-    "შენ მაღალ დონეზე ფლობ ბიზნეს ინგლისურს. შენი გეგმა გაასწავლის გამოცდილ ნიუანსებს, იდიომებს, რთულ მოლაპარაკებებსა და დახვეწილ წერას.",
+    "შენ მაღალ დონეზე ფლობ ბიზნეს ინგლისურს. შენი გეგმა გაასწავლის გამოცდილ ნიუანსებს, idiom-ებს, რთულ მოლაპარაკებებსა და დახვეწილ წერას.",
 };
 
 export default function BusinessPlacementTest() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { displayName, loaded: nameLoaded, save: saveName } = useDisplayName();
+  const [askName, setAskName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  // After the result screen: ask the name once (warm moment, right after the
+  // level reveal). Users who already have a saved name skip straight to setup.
+  const continueAfterResult = () => {
+    if (nameLoaded && !displayName) {
+      setAskName(true);
+      return;
+    }
+    navigate("/path/business/setup", { replace: true });
+  };
+
+  const submitNameAndContinue = async () => {
+    const clean = nameInput.trim();
+    if (!clean) {
+      setNameError("გთხოვ, შეიყვანე შენი სახელი");
+      return;
+    }
+    setSavingName(true);
+    const res = await saveName(clean);
+    setSavingName(false);
+    if (!res.ok) {
+      setNameError("სახელის შენახვა ვერ მოხერხდა — სცადე თავიდან");
+      return;
+    }
+    navigate("/path/business/setup", { replace: true });
+  };
   const total = QUESTIONS.length;
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<(number | string | null)[]>(() =>
@@ -241,6 +273,52 @@ export default function BusinessPlacementTest() {
   }, [user, navigate, done]);
 
 
+  if (done && askName) {
+    return (
+      <BusinessShell>
+        <BizCard>
+          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            გაცნობა
+          </p>
+          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
+            სანამ დავიწყებთ — რა გქვია?
+          </h1>
+          <p className="ka text-sm text-[#4A4A4A] mt-2 leading-relaxed">
+            ამ სახელით მოგმართავთ აპლიკაციაში — მისალმებაში, გაკვეთილებში და შედეგებში.
+          </p>
+          <input
+            autoFocus
+            type="text"
+            value={nameInput}
+            onChange={(e) => {
+              setNameInput(e.target.value);
+              if (nameError) setNameError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") submitNameAndContinue();
+            }}
+            maxLength={60}
+            placeholder="მაგ. ნინო"
+            className="ka mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-base bg-white"
+          />
+          {nameError && <p className="ka text-xs text-red-700 mt-2">{nameError}</p>}
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/path/business/setup", { replace: true })}
+              className="ka text-xs text-[#4A4A4A] underline underline-offset-2"
+            >
+              ახლა გამოვტოვებ
+            </button>
+            <BizButton onClick={submitNameAndContinue} disabled={savingName || !nameInput.trim()}>
+              {savingName ? "ინახება..." : "შენახვა და გაგრძელება"}
+            </BizButton>
+          </div>
+        </BizCard>
+      </BusinessShell>
+    );
+  }
+
   if (done && resultLevel) {
     return (
       <BusinessShell>
@@ -259,7 +337,7 @@ export default function BusinessPlacementTest() {
             {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
-            <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>
+            <BizButton onClick={continueAfterResult}>
               გაგრძელება
             </BizButton>
           </div>
