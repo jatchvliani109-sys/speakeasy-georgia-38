@@ -219,7 +219,7 @@ export default function BusinessHome() {
           : streakTier === 1
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
-              ? "კარგი დასაწყისია — გააგრძელე!"
+              ? "კარგი დასაწყისია — ასე გააგრძელე!"
               : "დაიწყე დღეს — ერთი სესია საკმარისია";
   const streakDark = streakTier >= 3;
 
