@@ -315,12 +315,13 @@ function PhrasesTab() {
 // =================================================================
 // WORDS TAB
 // =================================================================
-type WordFilter = "all" | "difficult" | "mastered" | "field";
+type WordFilter = "all" | "learned" | "learning" | "fresh" | "difficult";
 const WORD_FILTERS: { id: WordFilter; label: string }[] = [
   { id: "all", label: "ყველა" },
+  { id: "learned", label: "✓ ვიცი" },
+  { id: "learning", label: "ვსწავლობ" },
+  { id: "fresh", label: "ახალი" },
   { id: "difficult", label: "რთული" },
-  { id: "mastered", label: "დაძლეული" },
-  { id: "field", label: "სფეროს მიხედვით" },
 ];
 
 function WordsTab() {
@@ -336,10 +337,14 @@ function WordsTab() {
     (async () => {
       const p = await loadProgress(user.id);
       if (cancelled) return;
-      // Only words actually encountered in a vocab session.
-      // External phrase rows (source = email/interview/meeting) live in the phrases tab.
+      // Only words the learner has actually ANSWERED in a session — this is
+      // the airtight test. Legacy/ingested/planned-but-unseen rows always have
+      // zero answers, so they can never leak in here regardless of origin.
       const encountered = p.filter(
-        (r) => r.last_seen_at !== null && (r.source === "core" || r.source === "field"),
+        (r) =>
+          r.correct_count + r.wrong_count > 0 &&
+          r.last_seen_at !== null &&
+          (r.source === "core" || r.source === "field"),
       );
       setRows(encountered);
       setLoading(false);
@@ -358,10 +363,12 @@ function WordsTab() {
     let list = rows;
     if (filter === "difficult") {
       list = list.filter((r) => r.manual_label === "difficult" || r.wrong_count > r.correct_count);
-    } else if (filter === "mastered") {
+    } else if (filter === "learned") {
       list = list.filter((r) => r.confidence >= 4 || r.manual_label === "easy");
-    } else if (filter === "field") {
-      list = list.filter((r) => r.source === "field");
+    } else if (filter === "learning") {
+      list = list.filter((r) => r.confidence >= 2 && r.confidence <= 3 && r.manual_label !== "easy");
+    } else if (filter === "fresh") {
+      list = list.filter((r) => r.confidence <= 1 && r.manual_label !== "easy");
     }
     const q = query.trim().toLowerCase();
     if (q) {
@@ -376,8 +383,10 @@ function WordsTab() {
 
   const counts = useMemo(() => {
     const difficult = rows.filter((r) => r.manual_label === "difficult" || r.wrong_count > r.correct_count).length;
-    const mastered = rows.filter((r) => r.confidence >= 4 || r.manual_label === "easy").length;
-    return { total: rows.length, difficult, mastered };
+    const learned = rows.filter((r) => r.confidence >= 4 || r.manual_label === "easy").length;
+    const learning = rows.filter((r) => r.confidence >= 2 && r.confidence <= 3 && r.manual_label !== "easy").length;
+    const fresh = rows.filter((r) => r.confidence <= 1 && r.manual_label !== "easy").length;
+    return { total: rows.length, difficult, learned, learning, fresh };
   }, [rows]);
 
   return (
@@ -389,7 +398,7 @@ function WordsTab() {
               სულ {counts.total} სიტყვა შესწავლილია
             </p>
             <p className="ka text-[11px] text-[#F0EBE3]/70 mt-1">
-              {counts.mastered} დაძლეული · {counts.difficult} რთული
+              {counts.learned} ვიცი · {counts.learning} ვსწავლობ · {counts.fresh} ახალი
             </p>
           </div>
           <div className="text-4xl font-bold leading-none">{counts.total}</div>
@@ -407,6 +416,11 @@ function WordsTab() {
                 : "bg-white text-[#5C1A2E] border-[#E0D8D0] hover:bg-[#F8F5F0]"}`}
           >
             {f.label}
+            {f.id !== "all" && (
+              <span className="ml-1 opacity-70">
+                {f.id === "learned" ? counts.learned : f.id === "learning" ? counts.learning : f.id === "fresh" ? counts.fresh : counts.difficult}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -443,7 +457,7 @@ function WordsTab() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-bold text-[#5C1A2E]">{w.en}</h3>
-                      <ReadAloudButton text={w.en} size="sm" />
+                      <ReadAloudButton text={w.en} storageKey={w.key} size="sm" />
                     </div>
                     <p className="ka text-xs text-[#4A4A4A] mt-0.5">{w.ka}</p>
                     {w.pronunciation && (
