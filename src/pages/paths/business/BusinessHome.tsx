@@ -25,7 +25,6 @@ import {
   BusinessIntensity,
   BusinessState,
   LEVEL_LABELS,
-  PRIORITY_TO_MODULES,
   pullBusinessFromSupabase,
   resetBusiness,
   saveBusiness,
@@ -42,22 +41,13 @@ const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
 };
 
 const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle: string; doneSubtitle: string }> = {
-  interview: {
-    title: "გასაუბრების პასუხების ვარჯიში",
-    subtitle: "ერთი კითხვა, მკაფიო პასუხი — დღევანდელი მცირე გამარჯვება.",
-    doneTitle: "ყოჩაღ — დღევანდელი გასაუბრება დასრულდა",
-    doneSubtitle: "სცადე ერთი ფრაზა გაიხსენო რომელიც დღეს გამოგივიდა.",
-  },
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
-    doneTitle: "შესრულდა",
-    doneSubtitle: "კარგი მუშაობა დღეს.",
+    doneTitle: "ყოჩაღ — დღევანდელი ვარჯიში დასრულდა",
+    doneSubtitle: "სერია დაცულია 🔥 ხვალ ახალი სიტყვები გელოდება.",
   },
 };
-
-// Modules that are fully built today
-const ACTIVE_MODULES = new Set(["interview", "vocabulary"]);
 
 type ModuleProgress = { slug: string; count: number; doneToday: boolean };
 
@@ -215,45 +205,28 @@ export default function BusinessHome() {
     return { streak: count, last7: week };
   }, [streakDates]);
 
-  // Build goal-weighted rotation queue across active modules.
-  // Each goal contributes all its mapped modules; primary goal gets extra weight.
-  const rotationQueue = useMemo<string[]>(() => {
-    const plan = s?.plan;
-    const goals = plan?.mainGoals || s?.mainPriority || [];
-    const weighted: string[] = [];
-    goals.forEach((g, idx) => {
-      const slugs = PRIORITY_TO_MODULES[g] || [];
-      slugs.forEach((slug, i) => {
-        if (!ACTIVE_MODULES.has(slug)) return;
-        // Primary goal repeats twice; primary module within a goal repeats more.
-        const reps = (idx === 0 ? 2 : 1) * (i === 0 ? 2 : 1);
-        for (let n = 0; n < reps; n++) weighted.push(slug);
-      });
-    });
-    // Ensure every active module appears at least once (balanced exposure).
-    Array.from(ACTIVE_MODULES).forEach((m) => {
-      if (!weighted.includes(m)) weighted.push(m);
-    });
-    // VOCAB-FIRST pivot: vocabulary always leads the day, interview second,
-    // emails demoted to a side feature. Goal weighting still shapes frequency
-    // further down the queue via the stable sort.
-    const pivotRank = (slug: string) =>
-      slug === "vocabulary" ? 0 : slug === "interview" ? 1 : 2;
-    return weighted.sort((a, b) => pivotRank(a) - pivotRank(b));
-  }, [s]);
+  // Streak drama scales with the count (Duolingo-style): bigger flame, richer
+  // card, escalating copy, and a progress bar toward the next milestone.
+  const streakTier = streak >= 30 ? 4 : streak >= 14 ? 3 : streak >= 7 ? 2 : streak >= 3 ? 1 : 0;
+  const nextMilestone = streak >= 30 ? null : streak >= 14 ? 30 : streak >= 7 ? 14 : streak >= 3 ? 7 : 3;
+  const streakMsg =
+    streakTier === 4
+      ? "ლეგენდარული სერია! 👑"
+      : streakTier === 3
+        ? "ორ კვირაზე მეტი — სერიოზული ხარ 🏆"
+        : streakTier === 2
+          ? "კვირაზე მეტი — შთამბეჭდავია!"
+          : streakTier === 1
+            ? "ჩვევა ყალიბდება 💪"
+            : streak > 0
+              ? "კარგი დასაწყისია — გააგრძელე!"
+              : "დაიწყე დღეს — ერთი სესია საკმარისია";
+  const streakDark = streakTier >= 3;
 
-  // Pick today's focus: first slot in rotation that hasn't been done today.
-  // If everything done, fall back to the first goal-priority module.
-  const focusModuleSlug = useMemo(() => {
-    if (!Object.keys(progress).length) return "vocabulary";
-    const undone = rotationQueue.find((slug) => !progress[slug]?.doneToday);
-    return undone || rotationQueue[0] || "vocabulary";
-  }, [progress, rotationQueue, s]);
-
-  // Suggestion: another active module not yet done today (after primary focus is done).
-  const suggestionSlug = useMemo(() => {
-    return rotationQueue.find((slug) => slug !== focusModuleSlug && !progress[slug]?.doneToday) || null;
-  }, [rotationQueue, focusModuleSlug, progress]);
+  // VOCAB-FIRST: vocabulary IS the daily mission — always. Interview stays a
+  // side feature in the modules grid, never the recommended focus (it also
+  // burns AI tokens; vocabulary is free to serve).
+  const focusModuleSlug = "vocabulary";
 
   if (!s) {
     return (
@@ -267,21 +240,15 @@ export default function BusinessHome() {
   const plan = s.plan;
   const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
-  const focusCopy = MODULE_FOCUS[focusModuleSlug] || MODULE_FOCUS.vocabulary;
+  const focusCopy = MODULE_FOCUS.vocabulary;
   const focusMinutes = plan ? INTENSITY_MINUTES[plan.intensity] : "15 წუთი";
   const focusDoneToday = progress[focusModuleSlug]?.doneToday ?? false;
 
-  // Curriculum preview for focus module
-  const focusCurriculum =
-    focusModuleSlug === "interview" ? interviewStep(progress.interview?.count ?? 0) : null;
 
-
-  const suggestionMod = suggestionSlug ? BUSINESS_MODULES.find((m) => m.slug === suggestionSlug) : null;
-  const suggestionCopy = suggestionSlug ? MODULE_FOCUS[suggestionSlug] : null;
 
   const interviewCount = progress.interview?.count ?? 0;
   const vocabSessionsCount = progress.vocabulary?.count ?? 0;
-  const allFourMilestone = interviewCount >= 7 && vocabSessionsCount >= 7;
+  const allFourMilestone = vocabSessionsCount >= 7;
   const showMilestone = !!plan && allFourMilestone && !s.firstMilestoneAcknowledged;
   const lastReassessmentLabel = lastReassessmentAt
     ? new Date(lastReassessmentAt).toLocaleDateString("ka-GE", { year: "numeric", month: "short", day: "numeric" })
@@ -369,23 +336,43 @@ export default function BusinessHome() {
 
       {plan && (
         <>
-          {/* Daily streak — the retention heartbeat. One session counts the day. */}
+          {/* Daily streak — drama scales with the count. */}
           <section className="mb-5">
-            <div className="bg-white border border-[#E0D8D0] rounded-lg p-4">
+            <div
+              className={`rounded-lg p-4 border transition-colors ${
+                streakTier === 4
+                  ? "bg-gradient-to-br from-[#5C1A2E] via-[#6E2038] to-[#8a5a1f] border-[#C9A84C] text-[#F8F5F0] shadow-lg"
+                  : streakTier === 3
+                    ? "bg-gradient-to-br from-[#5C1A2E] to-[#1C1C1E] border-[#5C1A2E] text-[#F8F5F0] shadow-md"
+                    : streakTier === 2
+                      ? "bg-gradient-to-br from-[#C9A84C]/30 to-white border-[#C9A84C]"
+                      : streakTier === 1
+                        ? "bg-white border-[#C9A84C]/60"
+                        : "bg-white border-[#E0D8D0]"
+              }`}
+            >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-2xl leading-none">🔥</span>
+                  <span
+                    className={`leading-none ${
+                      streakTier >= 3 ? "text-4xl" : streakTier === 2 ? "text-3xl" : "text-2xl"
+                    } ${streak === 0 ? "grayscale opacity-50" : ""}`}
+                  >
+                    🔥
+                  </span>
                   <div className="min-w-0">
-                    <p className="text-lg font-bold text-[#5C1A2E] leading-tight">
+                    <p
+                      className={`font-bold leading-tight ${streakTier >= 2 ? "text-2xl" : "text-lg"} ${
+                        streakDark ? "text-[#F8F5F0]" : "text-[#5C1A2E]"
+                      }`}
+                    >
                       {streak}{" "}
-                      <span className="ka text-xs font-semibold text-[#4A4A4A]">
+                      <span className={`ka text-xs font-semibold ${streakDark ? "text-[#F8F5F0]/70" : "text-[#4A4A4A]"}`}>
                         დღე ზედიზედ
                       </span>
                     </p>
-                    <p className="ka text-[10px] text-[#4A4A4A] mt-0.5">
-                      {last7[6]?.done
-                        ? "დღევანდელი დღე ჩათვლილია ✓"
-                        : "ერთი სესია საკმარისია დღის ჩასათვლელად"}
+                    <p className={`ka text-[10px] mt-0.5 font-semibold ${streakDark ? "text-[#C9A84C]" : "text-[#4A4A4A]"}`}>
+                      {streakMsg}
                     </p>
                   </div>
                 </div>
@@ -394,18 +381,44 @@ export default function BusinessHome() {
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
                         className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
-                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : "border border-[#E0D8D0] text-transparent"}
-                          ${d.isToday && !d.done ? "border-[#5C1A2E]/50 border-dashed" : ""}`}
+                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : streakDark ? "border border-[#F8F5F0]/30 text-transparent" : "border border-[#E0D8D0] text-transparent"}
+                          ${d.isToday && !d.done ? (streakDark ? "border-[#C9A84C] border-dashed" : "border-[#5C1A2E]/50 border-dashed") : ""}`}
                       >
                         {d.done ? "✓" : "·"}
                       </span>
-                      <span className={`ka text-[8px] ${d.isToday ? "font-bold text-[#5C1A2E]" : "text-[#4A4A4A]"}`}>
+                      <span
+                        className={`ka text-[8px] ${
+                          d.isToday
+                            ? streakDark
+                              ? "font-bold text-[#C9A84C]"
+                              : "font-bold text-[#5C1A2E]"
+                            : streakDark
+                              ? "text-[#F8F5F0]/60"
+                              : "text-[#4A4A4A]"
+                        }`}
+                      >
                         {d.label}
                       </span>
                     </div>
                   ))}
                 </div>
               </div>
+              <p className={`ka text-[10px] mt-3 ${streakDark ? "text-[#F8F5F0]/70" : "text-[#4A4A4A]"}`}>
+                {last7[6]?.done ? "დღევანდელი დღე ჩათვლილია ✓" : "ერთი სესია საკმარისია დღის ჩასათვლელად"}
+              </p>
+              {nextMilestone !== null && (
+                <div className="mt-2">
+                  <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-[#F8F5F0]/15" : "bg-[#F0EBE3]"}`}>
+                    <div
+                      className="h-full bg-[#C9A84C] rounded-full transition-all"
+                      style={{ width: `${Math.min(100, Math.round((streak / nextMilestone) * 100))}%` }}
+                    />
+                  </div>
+                  <p className={`ka text-[9px] mt-1 ${streakDark ? "text-[#F8F5F0]/60" : "text-[#4A4A4A]"}`}>
+                    შემდეგი ნიშნული: {nextMilestone} დღე
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -424,7 +437,7 @@ export default function BusinessHome() {
                     გილოცავ — დაასრულე პირველი დონე
                   </h2>
                   <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7+ სესია ორივე მოდულში. ეს სერიოზული ნაბიჯია.
+                    შენ შეასრულე 7 სავარჯიშო სესია — ეს ნამდვილი ჩვევის დასაწყისია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
@@ -492,11 +505,6 @@ export default function BusinessHome() {
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
-                  {focusCurriculum && (
-                    <span className="ka text-[10px] border border-[#F0EBE3]/15 text-[#F0EBE3]/80 px-2 py-0.5 rounded-md font-semibold">
-                      ეტაპი {focusCurriculum.step}/{focusCurriculum.total}
-                    </span>
-                  )}
                 </div>
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
@@ -504,12 +512,7 @@ export default function BusinessHome() {
                 <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
-                {focusCurriculum && !focusDoneToday && (
-                  <p className="ka text-[11px] text-[#1C1C1E] mt-2">
-                    დღევანდელი თემა: {focusCurriculum.titleKa}
-                  </p>
-                )}
-                {focusModuleSlug === "vocabulary" && !focusDoneToday && (
+                {!focusDoneToday && (
                   <div className="mt-3 space-y-2">
                     <p className="ka text-[11px] text-[#1C1C1E]">
                       დღეს {vocabWordCount} სიტყვა იცი
@@ -524,10 +527,12 @@ export default function BusinessHome() {
                   </div>
                 )}
                 <button
-                  onClick={() => navigate(`/path/business/module/${focusModuleSlug}`)}
+                  onClick={() =>
+                    navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
+                  }
                   className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#6E2038] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                 >
-                  {focusDoneToday ? "კიდევ ერთი სესია" : "დაწყება"}
+                  {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                   <ArrowRight size={14} strokeWidth={2.25} />
                 </button>
               </div>
@@ -561,36 +566,6 @@ export default function BusinessHome() {
               </div>
             </button>
           </section>
-
-          {/* 2b. Still have energy */}
-          {focusDoneToday && suggestionMod && suggestionCopy && (() => {
-            const SugIcon = suggestionMod.icon;
-            return (
-              <BizCard className="mb-5 border-l-2 border-l-[#1C1C1E]">
-                <div className="flex items-start gap-3">
-                  <span className="w-9 h-9 rounded-md bg-[#5C1A2E]/5 text-[#5C1A2E] grid place-items-center shrink-0 border border-[#E0D8D0]">
-                    <SugIcon size={16} strokeWidth={2} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
-                      კიდევ გრძნობ ენერგიას?
-                    </p>
-                    <p className="ka text-sm font-semibold text-[#5C1A2E] mt-1">
-                      კარგად გააკეთე! თუ კიდევ გრძნობ ენერგიას, შეგიძლია სცადო{" "}
-                      {suggestionMod.title.toLowerCase()}.
-                    </p>
-                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{suggestionCopy.subtitle}</p>
-                    <button
-                      onClick={() => navigate(`/path/business/module/${suggestionMod.slug}`)}
-                      className="ka mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#5C1A2E] underline underline-offset-2"
-                    >
-                      დაწყება <ArrowRight size={12} strokeWidth={2.25} />
-                    </button>
-                  </div>
-                </div>
-              </BizCard>
-            );
-          })()}
 
           {showIntroCard && (
             <BizCard className="mb-5 border-dashed">

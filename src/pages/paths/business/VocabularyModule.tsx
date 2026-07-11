@@ -336,6 +336,8 @@ export default function VocabularyModule() {
         answers: finalAnswers,
       },
     });
+    // Count it now so the daily cap applies within this visit too.
+    setSessionsToday((x) => x + 1);
 
     // Mastered milestone (every 10 mastered → confetti)
     const newMastered = newProgress.filter((p) => p.confidence >= 4).length;
@@ -603,7 +605,7 @@ export default function VocabularyModule() {
           newWords={lastResults.newWords}
           reviewCount={reviewKeys.length}
           totalVocab={totalVocab}
-          canPracticeMore={lastResults.answers.some((a) => !a.correct) || progress.length > 0}
+          canPracticeMore={!dailyLimitReached && (lastResults.answers.some((a) => !a.correct) || progress.length > 0)}
           onPracticeMore={startPracticeMore}
         />
       )}
@@ -1121,10 +1123,14 @@ function Results({
       )}
 
       <div className="space-y-2 pt-2">
-        {canPracticeMore && (
+        {canPracticeMore ? (
           <BizButton className="w-full" onClick={onPracticeMore}>
             დღეს კიდევ ვივარჯიშოთ →
           </BizButton>
+        ) : (
+          <p className="ka text-center text-xs text-[#4A4A4A]">
+            დღევანდელი ვარჯიში შესრულებულია — ხვალ ახალი სესია გელოდება 🔥
+          </p>
         )}
         <Link to="/path/business/home" className="block">
           <BizButton variant="outline" className="w-full">
