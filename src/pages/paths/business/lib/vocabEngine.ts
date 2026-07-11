@@ -24,7 +24,7 @@ import {
   type GeorgianMistake,
   type VocabWord,
 } from "./vocabBank";
-import { clusterFor } from "./vocabContext";
+import { SITUATION_CLUSTERS, clusterFor, type SituationCluster } from "./vocabContext";
 
 export type ProgressRow = {
   id?: string;
@@ -260,6 +260,42 @@ export function computeFormatTier(
   if (accuracy >= FORMAT_BOOST_ACCURACY) return Math.min(3, curriculumTier + 1) as 1 | 2 | 3;
   if (accuracy < FORMAT_EASE_ACCURACY) return Math.max(1, curriculumTier - 1) as 1 | 2 | 3;
   return curriculumTier;
+}
+
+/** Total completed vocab sessions ever — drives the scenario-day cadence. */
+export async function countCompletedSessions(userId: string): Promise<number> {
+  const { count } = await supabase
+    .from("business_vocab_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("completed", true);
+  return count ?? 0;
+}
+
+/**
+ * SCENARIO OF THE DAY — the app picks, the learner just shows up.
+ * Cadence: after the first regular session, every 2nd session is a scenario
+ * session (sessions #2, #4, #6...). The scenario is chosen deterministically:
+ * the first cluster (in curriculum order) that still has unseen words; once
+ * everything has been seen, the first cluster with unmastered words comes
+ * back as a themed review. Returns null on regular days or when all scenario
+ * material is mastered.
+ */
+export function pickDailyScenario(
+  progress: ProgressRow[],
+  totalCompletedSessions: number,
+): SituationCluster | null {
+  if (totalCompletedSessions % 2 !== 1) return null;
+  const seen = new Set(progress.map((p) => p.word_key));
+  const withUnseen = SITUATION_CLUSTERS.find((c) =>
+    c.wordKeys.some((k) => !seen.has(k)),
+  );
+  if (withUnseen) return withUnseen;
+  const mastered = new Set(progress.filter(checkMastery).map((p) => p.word_key));
+  return (
+    SITUATION_CLUSTERS.find((c) => c.wordKeys.some((k) => !mastered.has(k))) ??
+    null
+  );
 }
 
 /** Completed vocab sessions since local midnight — powers the free daily cap. */

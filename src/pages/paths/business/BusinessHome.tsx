@@ -30,7 +30,7 @@ import {
   saveBusiness,
 } from "./lib/state";
 import { interviewStep } from "./lib/curriculum";
-import { loadProgress, planSession } from "./lib/vocabEngine";
+import { loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
@@ -69,6 +69,7 @@ export default function BusinessHome() {
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
+  const [scenarioToday, setScenarioToday] = useState<{ titleKa: string } | null>(null);
   const [vocabReviewToday, setVocabReviewToday] = useState<number>(0);
   const [lastReassessmentAt, setLastReassessmentAt] = useState<string | null>(null);
   const [phraseCount, setPhraseCount] = useState<number>(0);
@@ -157,7 +158,14 @@ export default function BusinessHome() {
       } catch {}
       try {
         const vp = await loadProgress(user.id);
+        const { count: totalVocabSessions } = await supabase
+          .from("business_vocab_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true);
         if (!cancelled) {
+          const sc = pickDailyScenario(vp, totalVocabSessions ?? 0);
+          setScenarioToday(sc ? { titleKa: sc.titleKa } : null);
           const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);
@@ -219,7 +227,7 @@ export default function BusinessHome() {
           : streakTier === 1
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
-              ? "კარგი დასაწყისია — ასე გააგრძელე!"
+              ? "კარგი დასაწყისია — გააგრძელე!"
               : "დაიწყე დღეს — ერთი სესია საკმარისია";
   const streakDark = streakTier >= 3;
 
@@ -514,6 +522,11 @@ export default function BusinessHome() {
                 </p>
                 {!focusDoneToday && (
                   <div className="mt-3 space-y-2">
+                    {scenarioToday && (
+                      <p className="ka text-[11px] font-semibold text-[#E5D4A8]">
+                        🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
+                      </p>
+                    )}
                     <p className="ka text-[11px] text-[#1C1C1E]">
                       დღეს {vocabWordCount} სიტყვა იცი
                     </p>
@@ -537,34 +550,6 @@ export default function BusinessHome() {
                 </button>
               </div>
             </div>
-          </section>
-
-          {/* 2a. Scenarios — learn words inside real situations */}
-          <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
-              <Sparkles size={12} strokeWidth={2.25} /> სცენარები
-            </p>
-            <button
-              onClick={() => navigate("/path/business/scenarios")}
-              className="w-full text-left rounded-lg p-5 border border-[#C9A84C]/45 bg-gradient-to-br from-[#C9A84C]/15 to-white hover:border-[#C9A84C] transition-colors"
-            >
-              <div className="flex items-start gap-4">
-                <span className="w-11 h-11 rounded-md bg-[#5C1A2E] text-[#C9A84C] grid place-items-center shrink-0 text-lg">
-                  🎬
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="ka font-bold text-[#5C1A2E] text-base">
-                    ისწავლე სიტყვები რეალურ სიტუაციებში
-                  </p>
-                  <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
-                    შეხვედრები, იმეილები, გასაუბრება, პრეზენტაციები — დიალოგებით, აუდიოთი და ვარჯიშით.
-                  </p>
-                  <span className="ka inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#5C1A2E]">
-                    სცენარების ნახვა <ArrowRight size={12} strokeWidth={2.25} />
-                  </span>
-                </div>
-              </div>
-            </button>
           </section>
 
           {showIntroCard && (
@@ -686,6 +671,12 @@ export default function BusinessHome() {
               მეტი
             </p>
             <div className="bg-white border border-[#E0D8D0] rounded-lg divide-y divide-[#F0EBE3]">
+              <MoreRow
+                icon={<Sparkles size={15} strokeWidth={2} />}
+                title="სცენარები"
+                sub="ყველა სამუშაო სიტუაციის დათვალიერება"
+                onClick={() => navigate("/path/business/scenarios")}
+              />
               <MoreRow
                 icon={<FileText size={15} strokeWidth={2} />}
                 title="დოკუმენტების ასისტენტი"

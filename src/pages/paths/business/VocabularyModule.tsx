@@ -11,7 +11,9 @@ import {
   buildQuiz,
   buildReviewQuiz,
   computeFormatTier,
+  countCompletedSessions,
   countSessionsToday,
+  pickDailyScenario,
   dueToday,
   emptyProgressFor,
   ingestExternalPhrases,
@@ -118,11 +120,16 @@ export default function VocabularyModule() {
       const plan = planSession(p, s.field || [], s.mainPriority || []);
       const recent = await loadRecentSessions(user.id);
       const doneToday = await countSessionsToday(user.id);
+      const totalDone = await countCompletedSessions(user.id);
       if (cancelled) return;
       setSessionsToday(doneToday);
       setProgress(p);
       setTotalVocab(p.length);
-      const sc = scenarioId ? clusterById(scenarioId) : undefined;
+      // Explicit ?scenario link wins; otherwise the app decides — on scenario
+      // days the session is automatically themed (no choosing).
+      const sc = scenarioId
+        ? clusterById(scenarioId)
+        : pickDailyScenario(p, totalDone) ?? undefined;
       let newW = plan.newWords;
       let revK = plan.reviewKeys;
       if (sc) {
@@ -131,8 +138,11 @@ export default function VocabularyModule() {
         setScenario(sc);
         const words = sc.wordKeys.map(findWord).filter(Boolean) as VocabWord[];
         const seenKeys = new Set(p.map((r) => r.word_key));
-        newW = words.filter((w) => !seenKeys.has(w.key));
-        revK = words.filter((w) => seenKeys.has(w.key)).map((w) => w.key);
+        newW = words.filter((w) => !seenKeys.has(w.key)).slice(0, 8);
+        revK = words
+          .filter((w) => seenKeys.has(w.key))
+          .map((w) => w.key)
+          .slice(0, 8);
       }
       setNewWords(newW);
       setReviewKeys(revK);
@@ -503,6 +513,9 @@ export default function VocabularyModule() {
               <span className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] bg-[#C9A84C]/20 border border-[#C9A84C]/35 px-3 py-1.5 rounded-full">
                 🎬 სცენარი: {scenario.titleKa}
               </span>
+              <p className="ka text-xs text-[#4A4A4A] mt-2 leading-relaxed px-2">
+                {scenario.scenarioKa}
+              </p>
             </div>
           )}
           <IntroCard
