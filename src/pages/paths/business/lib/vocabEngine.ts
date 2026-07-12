@@ -910,13 +910,7 @@ export async function ingestExternalPhrases(userId: string, existing: ProgressRo
   const have = new Set(existing.map((p) => p.word_key));
   const newRows: ProgressRow[] = [];
 
-  const [emails, interviews, meetings] = await Promise.all([
-    supabase
-      .from("business_email_sessions")
-      .select("session_data")
-      .eq("user_id", userId)
-      .eq("completed", true)
-      .limit(20),
+  const [interviews, meetings] = await Promise.all([
     supabase
       .from("business_interview_sessions")
       .select("session_data")
@@ -931,7 +925,7 @@ export async function ingestExternalPhrases(userId: string, existing: ProgressRo
       .limit(20),
   ]);
 
-  const ingest = (rows: any[] | null | undefined, source: "email" | "interview" | "meeting") => {
+  const ingest = (rows: any[] | null | undefined, source: "interview" | "meeting") => {
     (rows || []).forEach((row) => {
       const vocab = row.session_data?.vocabulary as any[] | undefined;
       if (!Array.isArray(vocab)) return;
@@ -961,7 +955,6 @@ export async function ingestExternalPhrases(userId: string, existing: ProgressRo
     });
   };
 
-  ingest(emails.data, "email");
   ingest(interviews.data, "interview");
   ingest(meetings.data, "meeting");
 

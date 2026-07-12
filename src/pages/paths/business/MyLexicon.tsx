@@ -135,13 +135,7 @@ function PhrasesTab() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [emails, interviews, meetings] = await Promise.all([
-        supabase
-          .from("business_email_sessions")
-          .select("id, email_type, completed_at, session_data")
-          .eq("user_id", user.id)
-          .eq("completed", true)
-          .order("completed_at", { ascending: false }),
+      const [interviews, meetings] = await Promise.all([
         supabase
           .from("business_interview_sessions")
           .select("id, role_title, completed_at, session_data")
@@ -157,10 +151,6 @@ function PhrasesTab() {
       ]);
       if (cancelled) return;
       const list: SessionRow[] = [
-        ...(emails.data || []).map((r: any) => ({
-          id: r.id, kind: "email" as const, title_raw: r.email_type,
-          completed_at: r.completed_at, session_data: r.session_data,
-        })),
         ...(interviews.data || []).map((r: any) => ({
           id: r.id, kind: "interview" as const, title_raw: r.role_title,
           completed_at: r.completed_at, session_data: r.session_data,
@@ -234,7 +224,7 @@ function PhrasesTab() {
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
           <div className="mt-5">
-            <Link to="/path/business/module/emails">
+            <Link to="/path/business/module/vocabulary">
               <BizButton>დაიწყე პირველი სესია →</BizButton>
             </Link>
           </div>

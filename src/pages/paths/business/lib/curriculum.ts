@@ -15,7 +15,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     key: "introduction",
     titleKa: "გაცნობის წერილი",
     shortKa: "გაცნობა",
-    focusKa: "პროფესიული გაცნობა — სტრუქტურა, მისალმება, მკაფიო შესავალი.",
+    focusKa: "პროფესიონალური გაცნობა — სტრუქტურა, მისალმება, მკაფიო შესავალი.",
     guidanceEn:
       "INTRODUCTION emails — basic structure, professional greeting, simple but clear opener. Keep tone friendly + professional. Foundation skill.",
   },
@@ -31,7 +31,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     key: "request",
     titleKa: "მოთხოვნის წერილი",
     shortKa: "მოთხოვნა",
-    focusKa: "პროფესიული ტონი, ნათელი მოთხოვნა, შესაბამისი ფორმალურობა.",
+    focusKa: "პროფესიონალური ტონი, ნათელი მოთხოვნა, შესაბამისი ფორმალურობა.",
     guidanceEn:
       "MAKING REQUESTS — professional tone, clear specific ask, appropriate formality (modal verbs, softeners). Builds on opener + follow-up framing.",
   },
@@ -55,7 +55,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     key: "negotiation",
     titleKa: "მოლაპარაკება და წინადადება",
     shortKa: "მოლაპარაკება",
-    focusKa: "დარწმუნება პროფესიული ტონით, ალტერნატივების შეთავაზება.",
+    focusKa: "დარწმუნება პროფესიონალური ტონით, ალტერნატივების შეთავაზება.",
     guidanceEn:
       "NEGOTIATING AND PROPOSING — persuasive but professional, offer alternatives, hedge language, value framing. Builds on request + complaint tone.",
   },
@@ -63,7 +63,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     key: "closing",
     titleKa: "გარიგების დახურვა",
     shortKa: "დახურვა",
-    focusKa: "გადამწყვეტი, მკაფიო, პროფესიული დახურვა და დადასტურება.",
+    focusKa: "გადამწყვეტი, მკაფიო, პროფესიონალური დახურვა და დადასტურება.",
     guidanceEn:
       "CLOSING DEALS AND CONFIRMING — decisive, clear, confirming details (dates, scope, next actions). Caps the negotiation arc.",
   },
