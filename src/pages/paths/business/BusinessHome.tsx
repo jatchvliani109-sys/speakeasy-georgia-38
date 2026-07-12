@@ -30,7 +30,7 @@ import {
   saveBusiness,
 } from "./lib/state";
 import { interviewStep } from "./lib/curriculum";
-import { loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
+import { computeStreakWithFreezes, loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
@@ -194,24 +194,46 @@ export default function BusinessHome() {
   // Daily streak from completed-session dates (Duolingo-style: any one
   // session counts the day; a missed today doesn't kill the streak until
   // the day actually ends).
-  const { streak, last7 } = useMemo(() => {
+  const { streak, last7, freezesLeft, usedFreezeToday } = useMemo(() => {
+    const banked = s?.streakFreezes ?? 2;
+    const priorDays = s?.freezeDays ?? [];
+    const res = computeStreakWithFreezes(streakDates, banked, priorDays);
     const days = new Set(streakDates.map((d) => new Date(d).toDateString()));
-    let count = 0;
-    const cursor = new Date();
-    if (!days.has(cursor.toDateString())) cursor.setDate(cursor.getDate() - 1);
-    while (days.has(cursor.toDateString())) {
-      count++;
-      cursor.setDate(cursor.getDate() - 1);
-    }
+    const priorSet = new Set([...priorDays, ...res.freezeDaysUsed]);
     const KA_DAYS = ["კვ", "ორ", "სა", "ოთ", "ხუ", "პა", "შა"];
-    const week: { label: string; done: boolean; isToday: boolean }[] = [];
+    const week: { label: string; done: boolean; frozen: boolean; isToday: boolean }[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      week.push({ label: KA_DAYS[d.getDay()], done: days.has(d.toDateString()), isToday: i === 0 });
+      const key = d.toDateString();
+      week.push({
+        label: KA_DAYS[d.getDay()],
+        done: days.has(key),
+        frozen: !days.has(key) && priorSet.has(key),
+        isToday: i === 0,
+      });
     }
-    return { streak: count, last7: week };
-  }, [streakDates]);
+    return {
+      streak: res.streak,
+      last7: week,
+      freezesLeft: res.freezesLeft,
+      usedFreezeToday: res.usedFreezeToday,
+    };
+  }, [streakDates, s]);
+
+  // Persist freeze spend/earn back to state when it changes (fire-once per load).
+  useEffect(() => {
+    if (!user || !s || !streakDates.length) return;
+    const banked = s.streakFreezes ?? 2;
+    const priorDays = s.freezeDays ?? [];
+    const res = computeStreakWithFreezes(streakDates, banked, priorDays);
+    const newlyUsed = res.freezeDaysUsed.filter((d) => !priorDays.includes(d));
+    if (newlyUsed.length || res.freezesLeft !== banked) {
+      const mergedDays = [...priorDays, ...newlyUsed].slice(-30);
+      saveBusiness(user.id, { streakFreezes: res.freezesLeft, freezeDays: mergedDays });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streakDates, user]);
 
   // Streak drama scales with the count (Duolingo-style): bigger flame, richer
   // card, escalating copy, and a progress bar toward the next milestone.
@@ -382,6 +404,12 @@ export default function BusinessHome() {
                     <p className={`ka text-[10px] mt-0.5 font-semibold ${streakDark ? "text-[#C9A84C]" : "text-[#4A4A4A]"}`}>
                       {streakMsg}
                     </p>
+                    {freezesLeft > 0 && (
+                      <p className={`ka text-[9px] mt-0.5 ${streakDark ? "text-[#F8F5F0]/60" : "text-[#4A4A4A]"}`}>
+                        ❄ {freezesLeft} გაყინვა დაცულია
+                        {usedFreezeToday ? " · სერია გადარჩა!" : ""}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-1.5 shrink-0">
@@ -389,10 +417,11 @@ export default function BusinessHome() {
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
                         className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
-                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : streakDark ? "border border-[#F8F5F0]/30 text-transparent" : "border border-[#E0D8D0] text-transparent"}
-                          ${d.isToday && !d.done ? (streakDark ? "border-[#C9A84C] border-dashed" : "border-[#5C1A2E]/50 border-dashed") : ""}`}
+                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : d.frozen ? "bg-[#7Fb2d9]/30 border border-[#7Fb2d9]/60" : streakDark ? "border border-[#F8F5F0]/30 text-transparent" : "border border-[#E0D8D0] text-transparent"}
+                          ${d.isToday && !d.done && !d.frozen ? (streakDark ? "border-[#C9A84C] border-dashed" : "border-[#5C1A2E]/50 border-dashed") : ""}`}
+                        title={d.frozen ? "გაყინვა გამოყენებულია" : undefined}
                       >
-                        {d.done ? "✓" : "·"}
+                        {d.done ? "✓" : d.frozen ? "❄" : "·"}
                       </span>
                       <span
                         className={`ka text-[8px] ${

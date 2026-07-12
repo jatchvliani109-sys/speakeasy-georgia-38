@@ -262,6 +262,87 @@ export function computeFormatTier(
   return curriculumTier;
 }
 
+export type StreakResult = {
+  streak: number;
+  freezesLeft: number;
+  freezeDaysUsed: string[]; // days newly covered by a freeze this computation
+  usedFreezeToday: boolean; // whether a freeze is currently shielding the run
+};
+
+/**
+ * Streak with auto-consumed freezes. Walking back from today (or yesterday if
+ * today isn't done yet), each MISSED day spends one banked freeze to bridge the
+ * gap and keep the run alive; when freezes run out, the streak ends at that gap.
+ * Earning: +1 freeze per 7 days of streak, capped at maxFreezes. Freezes already
+ * spent on a given day (persisted in priorFreezeDays) are not re-charged.
+ *
+ * Pure + deterministic given `now`, so it's unit-testable.
+ */
+export function computeStreakWithFreezes(
+  completedDates: string[],
+  bankedFreezes: number,
+  priorFreezeDays: string[],
+  now: Date = new Date(),
+  maxFreezes = 2,
+): StreakResult {
+  const done = new Set(completedDates.map((d) => new Date(d).toDateString()));
+  const priorSet = new Set(priorFreezeDays);
+  const dayMs = 86_400_000;
+
+  // Earliest real activity — never spend freezes to bridge past the day the
+  // user first started (that would invent streak backwards forever).
+  const earliest = completedDates.length
+    ? Math.min(...completedDates.map((d) => new Date(new Date(d).toDateString()).getTime()))
+    : Infinity;
+
+  // Anchor: if today isn't done, start counting from yesterday (today still has
+  // time — it shouldn't break the streak yet).
+  const cursor = new Date(now);
+  const todayStr = cursor.toDateString();
+  const startedToday = done.has(todayStr);
+  if (!startedToday) cursor.setTime(cursor.getTime() - dayMs);
+
+  let streak = 0;
+  let freezesLeft = bankedFreezes;
+  const newlyUsed: string[] = [];
+  let usedFreezeToday = false;
+
+  // Walk back day by day.
+  for (let guard = 0; guard < 400; guard++) {
+    const key = cursor.toDateString();
+    if (done.has(key)) {
+      streak++;
+      cursor.setTime(cursor.getTime() - dayMs);
+      continue;
+    }
+    // Missed day. Was it already freeze-covered on a prior computation — and
+    // is it still within the active history (not before the user's start)?
+    if (priorSet.has(key) && cursor.getTime() > earliest) {
+      streak++;
+      if (streak <= 1) usedFreezeToday = true;
+      cursor.setTime(cursor.getTime() - dayMs);
+      continue;
+    }
+    // Spend a fresh freeze to bridge, but only if we're mid-run AND there is
+    // still earlier activity to connect back to (never bridge into the void).
+    if (freezesLeft > 0 && streak > 0 && cursor.getTime() > earliest) {
+      freezesLeft--;
+      newlyUsed.push(key);
+      streak++;
+      cursor.setTime(cursor.getTime() - dayMs);
+      continue;
+    }
+    break; // gap can't be bridged — streak ends here
+  }
+
+  // Earn freezes back for consistency: every 7 days of streak tops you up by
+  // one, never above maxFreezes, and never below what you have banked now.
+  const earned = Math.min(maxFreezes, Math.floor(streak / 7));
+  freezesLeft = Math.min(maxFreezes, Math.max(freezesLeft, earned));
+
+  return { streak, freezesLeft, freezeDaysUsed: newlyUsed, usedFreezeToday };
+}
+
 /** Total completed vocab sessions ever — drives the scenario-day cadence. */
 export async function countCompletedSessions(userId: string): Promise<number> {
   const { count } = await supabase

@@ -61,6 +61,12 @@ export type BusinessState = {
   businessResumeUploaded?: boolean;
   businessResumeSkipped?: boolean;
   firstMilestoneAcknowledged?: boolean;
+  // Streak freeze: auto-consumed protection so one missed day doesn't reset
+  // the streak. `streakFreezes` = how many are banked; `freezeDays` = the
+  // toDateString() days a freeze has already been spent to cover (so a spent
+  // freeze can't be reused on later loads).
+  streakFreezes?: number;
+  freezeDays?: string[];
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -80,6 +86,8 @@ const empty = (): BusinessState => ({
   businessResumeUploaded: false,
   businessResumeSkipped: false,
   firstMilestoneAcknowledged: false,
+  streakFreezes: 2,
+  freezeDays: [],
 });
 
 export function loadBusiness(uid: string): BusinessState {
