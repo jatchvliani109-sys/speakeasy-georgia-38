@@ -11,6 +11,7 @@ import {
   buildQuiz,
   buildReviewQuiz,
   computeFormatTier,
+  computeStreakWithFreezes,
   countCompletedSessions,
   countSessionsToday,
   pickDailyScenario,
@@ -73,6 +74,7 @@ export default function VocabularyModule() {
   // Words the learner marked "I already know this" on the card stage.
   const [claimed, setClaimed] = useState<Set<string>>(new Set());
   const [sessionsToday, setSessionsToday] = useState(0);
+  const [streakCelebration, setStreakCelebration] = useState<{ from: number; to: number } | null>(null);
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
@@ -357,6 +359,30 @@ export default function VocabularyModule() {
     }
     masteredBaselineRef.current = newMastered;
 
+    // Streak celebration: compute the streak as it was BEFORE today's session
+    // vs. after, so the results screen can tick the flame up by one when today
+    // is the day that extended it.
+    try {
+      const { supabase: sb } = await import("@/integrations/supabase/client");
+      const { data: sessRows } = await sb
+        .from("business_vocab_sessions")
+        .select("completed_at")
+        .eq("user_id", user.id)
+        .eq("completed", true)
+        .order("completed_at", { ascending: false })
+        .limit(120);
+      const allDates = (sessRows || []).map((r: any) => r.completed_at).filter(Boolean);
+      const todayStr = new Date().toDateString();
+      const beforeDates = allDates.filter((d: string) => new Date(d).toDateString() !== todayStr);
+      const bank = state?.streakFreezes ?? 2;
+      const fdays = state?.freezeDays ?? [];
+      const before = computeStreakWithFreezes(beforeDates, bank, fdays).streak;
+      const after = computeStreakWithFreezes(allDates, bank, fdays).streak;
+      setStreakCelebration({ from: before, to: Math.max(after, before) });
+    } catch {
+      setStreakCelebration(null);
+    }
+
     playComplete();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
@@ -618,6 +644,7 @@ export default function VocabularyModule() {
           newWords={lastResults.newWords}
           reviewCount={reviewKeys.length}
           totalVocab={totalVocab}
+          streakCelebration={streakCelebration}
           canPracticeMore={!dailyLimitReached && (lastResults.answers.some((a) => !a.correct) || progress.length > 0)}
           onPracticeMore={startPracticeMore}
         />
@@ -1045,6 +1072,7 @@ function Results({
   newWords,
   reviewCount,
   totalVocab,
+  streakCelebration,
   canPracticeMore,
   onPracticeMore,
 }: {
@@ -1052,6 +1080,7 @@ function Results({
   newWords: VocabWord[];
   reviewCount: number;
   totalVocab: number;
+  streakCelebration: { from: number; to: number } | null;
   canPracticeMore: boolean;
   onPracticeMore: () => void;
 }) {
@@ -1085,8 +1114,26 @@ function Results({
     pct >= 50 ? "კარგი დასაწყისია — გავიმეოროთ ცოტა მეტი." :
                 "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
 
+  const streakGrew = !!streakCelebration && streakCelebration.to > streakCelebration.from;
+
   return (
     <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
+      {streakCelebration && streakCelebration.to > 0 && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1C1C1E] via-[#5C1A2E] to-[#C9A84C] text-[#F8F5F0] p-4 text-center shadow-lg animate-[bizFade_.5s_ease-out_both]">
+          <div className="relative flex items-center justify-center gap-3">
+            <span className={`text-4xl ${streakGrew ? "biz-flame" : ""}`}>🔥</span>
+            <div className="text-left">
+              <p className="text-3xl font-bold leading-none tabular-nums">
+                <StreakTick from={streakCelebration.from} to={streakCelebration.to} />
+                <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
+              </p>
+              <p className="ka text-[11px] text-[#F8F5F0]/80 mt-1">
+                {streakGrew ? "სერია გაიზარდა! ნუ გააჩერებ 💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] p-6 text-center">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
         <div className="relative">
@@ -1252,5 +1299,37 @@ function CountUp({ to, duration = 1000 }: { to: number; duration?: number }): JS
     return () => cancelAnimationFrame(raf);
   }, [to, duration]);
   return <>{val}</>;
+}
+
+// Holds on the previous streak for a beat, then flips up to the new number —
+// the little "+1" moment that makes finishing a session feel earned.
+function StreakTick({ from, to }: { from: number; to: number }): JSX.Element {
+  const [val, setVal] = useState(from);
+  const [bump, setBump] = useState(false);
+  useEffect(() => {
+    if (to <= from) {
+      setVal(to);
+      return;
+    }
+    const t = window.setTimeout(() => {
+      setVal(to);
+      setBump(true);
+      window.setTimeout(() => setBump(false), 450);
+    }, 650);
+    return () => window.clearTimeout(t);
+  }, [from, to]);
+  return (
+    <span
+      className="inline-block"
+      style={bump ? { animation: "bizStreakBump 450ms ease-out", display: "inline-block" } : undefined}
+    >
+      {val}
+      <style>{`@keyframes bizStreakBump {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.5); color: #C9A84C; }
+        100% { transform: scale(1); }
+      }`}</style>
+    </span>
+  );
 }
 
