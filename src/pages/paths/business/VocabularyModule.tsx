@@ -995,7 +995,15 @@ function QuestionCard({
             <div className="p-5 rounded-full bg-[#F5F4F2] border border-[#E4E2DF]">
               <ReadAloudButton text={q.en} storageKey={q.wordKey} size="md" />
             </div>
-            <p className="ka text-[11px] text-[#4A4A4A]">დააჭირე მოსასმენად 🔊</p>
+            {revealed ? (
+              /* Reveal the written word after answering — closes the loop
+                 between what they heard and how it's spelled. */
+              <p className="text-xl font-bold text-[#5C1A2E] animate-[bizFade_.3s_ease-out_both]">
+                {q.en}
+              </p>
+            ) : (
+              <p className="ka text-[11px] text-[#4A4A4A]">დააჭირე მოსასმენად 🔊</p>
+            )}
           </div>
           {renderChoices(q.choices, q.correctKa)}
         </div>
