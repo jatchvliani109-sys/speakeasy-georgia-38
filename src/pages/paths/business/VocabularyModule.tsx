@@ -51,7 +51,6 @@ const REVIEW_FALLBACK_SIZE = 10;
 // Vocab costs nothing to serve, so this is pacing + a future upgrade lever,
 // not cost control. When payments launch, wire isPaidUser to the real plan.
 const FREE_DAILY_SESSIONS = 1;
-const isPaidUser = false; // TODO(payments): read real subscription status
 
 export default function VocabularyModule() {
   const { user } = useAuth();
@@ -165,6 +164,8 @@ export default function VocabularyModule() {
     return () => { cancelled = true; };
   }, [user, scenarioId]);
 
+  // Mock premium (placeholder until real payments): unlocks unlimited sessions.
+  const isPaidUser = state?.mockPro === true;
   const dailyLimitReached = !isPaidUser && sessionsToday >= FREE_DAILY_SESSIONS;
 
   const startSession = () => {

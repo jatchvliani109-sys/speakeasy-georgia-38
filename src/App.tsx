@@ -23,6 +23,7 @@ import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
 import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
 import DocumentHelper from "./pages/paths/business/DocumentHelper";
 import Scenarios from "./pages/paths/business/Scenarios";
+import BusinessPremium from "./pages/paths/business/BusinessPremium";
 import VocabularyModule from "./pages/paths/business/VocabularyModule";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/path/business/vocabulary/notebook" element={<Navigate to="/path/business/lexicon?tab=words" replace />} />
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
             <Route path="/path/business/scenarios" element={<RequireAuth><Scenarios /></RequireAuth>} />
+            <Route path="/path/business/premium" element={<RequireAuth><BusinessPremium /></RequireAuth>} />
             <Route path="/path/business/vocabulary" element={<RequireAuth><VocabularyModule /></RequireAuth>} />
 
             

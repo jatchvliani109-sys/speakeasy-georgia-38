@@ -67,6 +67,10 @@ export type BusinessState = {
   // freeze can't be reused on later loads).
   streakFreezes?: number;
   freezeDays?: string[];
+  // MOCK premium flag — placeholder until real payments (post-registration).
+  // Flipped by the premium page's unlock button; replaced by server-side
+  // is_pro / subscription status in the payments build.
+  mockPro?: boolean;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -88,6 +92,7 @@ const empty = (): BusinessState => ({
   firstMilestoneAcknowledged: false,
   streakFreezes: 2,
   freezeDays: [],
+  mockPro: false,
 });
 
 export function loadBusiness(uid: string): BusinessState {

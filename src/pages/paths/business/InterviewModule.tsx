@@ -67,8 +67,10 @@ type DebriefData = {
 // REAL mode (actual posting + resume) is the premium feature. While payments
 // aren't live it stays open with a premium badge; once subscriptions launch,
 // flip PAYMENTS_LIVE and it locks for free users automatically.
-const PAYMENTS_LIVE = false;
-const isPaidUser = false; // TODO(payments): read real subscription status
+const PAYMENTS_LIVE = true; // gating active (mock premium unlocks it)
+const REAL_MONTHLY_LIMIT = 5;      // real interviews per month (premium)
+const FREE_PRACTICE_LIMIT = 2;     // matched+random per month (free tier)
+const PREMIUM_PRACTICE_LIMIT = 20; // matched+random per month (premium fair use)
 
 type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
 type Mode = "real" | "matched" | "random";
@@ -90,6 +92,16 @@ export default function InterviewModule() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("loading");
   const [biz, setBiz] = useState<BusinessState | null>(null);
+  const [realThisMonth, setRealThisMonth] = useState(0);
+  const [practiceThisMonth, setPracticeThisMonth] = useState(0);
+  // Mock premium (placeholder until real payments).
+  const isPaidUser = biz?.mockPro === true;
+  const realCapReached = isPaidUser && realThisMonth >= REAL_MONTHLY_LIMIT;
+  const practiceLimit = isPaidUser ? PREMIUM_PRACTICE_LIMIT : FREE_PRACTICE_LIMIT;
+  const practiceCapReached = practiceThisMonth >= practiceLimit;
+  const practiceLockedHint = isPaidUser
+    ? "ამ თვის ლიმიტი ამოწურულია — განახლდება შემდეგ თვეს"
+    : `ამ თვის ${FREE_PRACTICE_LIMIT} უფასო გასაუბრება ამოწურულია — ⭐ პრემიუმი`;
   const [session, setSession] = useState<SessionData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -153,6 +165,31 @@ export default function InterviewModule() {
 
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
+
+        // Monthly AI-usage counters (every interview costs AI per turn, so
+        // ALL modes are capped: 5 real + 20 practice premium, 2 practice free).
+        // Only mode-stamped sessions count, so counters start fresh from the
+        // day this shipped — old test sessions don't lock anyone out.
+        const monthStart = new Date();
+        monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+        const [{ count: realCount }, { count: stampedCount }] = await Promise.all([
+          supabase
+            .from("business_interview_sessions")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("session_data->>mode", "real")
+            .gte("created_at", monthStart.toISOString()),
+          supabase
+            .from("business_interview_sessions")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .not("session_data->>mode", "is", null)
+            .gte("created_at", monthStart.toISOString()),
+        ]);
+        if (!cancelled) {
+          setRealThisMonth(realCount ?? 0);
+          setPracticeThisMonth(Math.max(0, (stampedCount ?? 0) - (realCount ?? 0)));
+        }
 
         const curStep = interviewStep(completed.length);
         setCurriculum(curStep);
@@ -229,7 +266,7 @@ export default function InterviewModule() {
             role_title: card.briefing.roleTitle,
             company_type: card.briefing.companyType,
             scenario_key: card.scenarioKey,
-            session_data: s as any,
+            session_data: { ...s, mode: "random" } as any,
             completed: false,
           })
           .select("id")
@@ -285,7 +322,7 @@ export default function InterviewModule() {
           role_title: s.briefing.roleTitle,
           company_type: s.briefing.companyType,
           scenario_key: s.scenarioKey,
-          session_data: s as any,
+          session_data: { ...s, mode } as any,
           completed: false,
         })
         .select("id")
@@ -498,6 +535,11 @@ export default function InterviewModule() {
             <p className="ka text-sm text-[#4A4A4A] mt-1">
               სამი გზა ვარჯიშისთვის — რეალური ვაკანსიიდან შემთხვევით სცენარამდე.
             </p>
+            <p className="ka text-[11px] text-[#4A4A4A] mt-1.5">
+              {isPaidUser
+                ? `ამ თვეში: ${realThisMonth}/${REAL_MONTHLY_LIMIT} რეალური · ${practiceThisMonth}/${PREMIUM_PRACTICE_LIMIT} სავარჯიშო`
+                : `უფასოდ: ${FREE_PRACTICE_LIMIT} სავარჯიშო გასაუბრება თვეში (დარჩა ${Math.max(0, FREE_PRACTICE_LIMIT - practiceThisMonth)})`}
+            </p>
           </BizCard>
 
           <ModeCard
@@ -505,26 +547,40 @@ export default function InterviewModule() {
             badgeKa="⭐ პრემიუმ"
             descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოარგებს — სუსტ წერტილებზეც."
             emoji="🎯"
-            locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser)}
-            lockedHintKa={!hasResume ? "ჯერ ატვირთე რეზიუმე" : "პრემიუმ ფუნქცია"}
+            locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser) || realCapReached}
+            lockedHintKa={
+              !hasResume
+                ? "ჯერ ატვირთე რეზიუმე"
+                : realCapReached
+                  ? `ამ თვის ${REAL_MONTHLY_LIMIT} გასაუბრება ამოწურულია`
+                  : "⭐ პრემიუმ ფუნქცია"
+            }
             onClick={() => { setMode("real"); setStep("posting"); }}
-            onLockedClick={() => { if (!hasResume) navigate("/path/business/resume"); }}
+            onLockedClick={() => {
+              if (!hasResume) navigate("/path/business/resume");
+              else if (PAYMENTS_LIVE && !isPaidUser) navigate("/path/business/premium");
+            }}
           />
           <ModeCard
             titleKa="მორგებული ვაკანსია"
             descKa="AI შექმნის რეალისტურ ვაკანსიას შენს რეზიუმეზე მორგებულს, ერთი საფეხურით მაღლა. წაიკითხავ და გაივლი გასაუბრებას."
             emoji="✨"
-            locked={!hasResume}
-            lockedHintKa="ჯერ ატვირთე რეზიუმე"
+            locked={!hasResume || practiceCapReached}
+            lockedHintKa={!hasResume ? "ჯერ ატვირთე რეზიუმე" : practiceLockedHint}
             onClick={() => { setMode("matched"); startSession("matched"); }}
-            onLockedClick={() => navigate("/path/business/resume")}
+            onLockedClick={() => {
+              if (!hasResume) navigate("/path/business/resume");
+              else if (!isPaidUser) navigate("/path/business/premium");
+            }}
           />
           <ModeCard
             titleKa="შემთხვევითი გასაუბრება"
             descKa="მზა როლი — გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
             emoji="🎲"
-            locked={false}
+            locked={practiceCapReached}
+            lockedHintKa={practiceLockedHint}
             onClick={() => { setMode("random"); startSession("random"); }}
+            onLockedClick={() => { if (!isPaidUser) navigate("/path/business/premium"); }}
           />
 
           {error && <p className="ka text-xs text-[#C0392B]">{error}</p>}
