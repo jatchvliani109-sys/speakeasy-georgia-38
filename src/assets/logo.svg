@@ -1,0 +1,64 @@
+<svg width="900" height="720" viewBox="0 0 900 720" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="720" fill="#F8F5F0"/>
+  <text x="450" y="44" font-family="-apple-system, Segoe UI, sans-serif" font-size="20" font-weight="700" fill="#1C1C1E" text-anchor="middle">SpeakBusy — final logo set</text>
+
+  <!-- ================= HORIZONTAL LOCKUP (primary) ================= -->
+  <text x="60" y="104" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#9A8" letter-spacing="1">PRIMARY LOCKUP</text>
+  <g transform="translate(60,120)">
+    <rect x="0" y="0" width="104" height="104" rx="24" fill="#1C1C1E"/>
+    <text x="52" y="75" font-family="Georgia, 'Times New Roman', serif" font-size="70" font-weight="700" fill="#C9A84C" text-anchor="middle">S</text>
+    <text x="126" y="58" font-family="-apple-system, Segoe UI, sans-serif" font-size="38" font-weight="800" fill="#1C1C1E" letter-spacing="-0.5">Speak<tspan fill="#C9A84C">Busy</tspan></text>
+    <text x="128" y="84" font-family="-apple-system, sans-serif" font-size="15" fill="#6B6B6B" letter-spacing="0.5">Business English</text>
+  </g>
+
+  <!-- ================= LOCKUP ON DARK ================= -->
+  <text x="500" y="104" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#9A8" letter-spacing="1">ON DARK</text>
+  <g transform="translate(500,120)">
+    <rect x="-20" y="-16" width="380" height="136" rx="16" fill="#1C1C1E"/>
+    <rect x="0" y="0" width="104" height="104" rx="24" fill="#C9A84C"/>
+    <text x="52" y="75" font-family="Georgia, serif" font-size="70" font-weight="700" fill="#1C1C1E" text-anchor="middle">S</text>
+    <text x="126" y="58" font-family="-apple-system, Segoe UI, sans-serif" font-size="38" font-weight="800" fill="#F8F5F0" letter-spacing="-0.5">Speak<tspan fill="#C9A84C">Busy</tspan></text>
+    <text x="128" y="84" font-family="-apple-system, sans-serif" font-size="15" fill="#B0A896" letter-spacing="0.5">Business English</text>
+  </g>
+
+  <!-- ================= ICON (app / favicon source) ================= -->
+  <text x="60" y="300" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#9A8" letter-spacing="1">ICON — used for favicon &amp; app tile</text>
+  <g transform="translate(60,320)">
+    <rect x="0" y="0" width="150" height="150" rx="34" fill="#1C1C1E"/>
+    <text x="75" y="108" font-family="Georgia, serif" font-size="102" font-weight="700" fill="#C9A84C" text-anchor="middle">S</text>
+  </g>
+
+  <!-- favicon size previews -->
+  <g transform="translate(250,320)">
+    <text x="0" y="-6" font-family="-apple-system, sans-serif" font-size="11" fill="#6B6B6B">actual favicon sizes:</text>
+    <rect x="0" y="8" width="64" height="64" rx="15" fill="#1C1C1E"/>
+    <text x="32" y="54" font-family="Georgia, serif" font-size="44" font-weight="700" fill="#C9A84C" text-anchor="middle">S</text>
+    <text x="32" y="90" font-family="-apple-system, sans-serif" font-size="10" fill="#6B6B6B" text-anchor="middle">64px</text>
+
+    <rect x="88" y="24" width="32" height="32" rx="7.5" fill="#1C1C1E"/>
+    <text x="104" y="48" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#C9A84C" text-anchor="middle">S</text>
+    <text x="104" y="90" font-family="-apple-system, sans-serif" font-size="10" fill="#6B6B6B" text-anchor="middle">32px</text>
+
+    <rect x="140" y="32" width="16" height="16" rx="4" fill="#1C1C1E"/>
+    <text x="148" y="44" font-family="Georgia, serif" font-size="12" font-weight="700" fill="#C9A84C" text-anchor="middle">S</text>
+    <text x="148" y="90" font-family="-apple-system, sans-serif" font-size="10" fill="#6B6B6B" text-anchor="middle">16px</text>
+  </g>
+
+  <!-- gold-tile icon variant -->
+  <g transform="translate(450,320)">
+    <rect x="0" y="0" width="150" height="150" rx="34" fill="#C9A84C"/>
+    <text x="75" y="108" font-family="Georgia, serif" font-size="102" font-weight="700" fill="#1C1C1E" text-anchor="middle">S</text>
+    <text x="75" y="178" font-family="-apple-system, sans-serif" font-size="12" fill="#6B6B6B" text-anchor="middle">alt: gold tile</text>
+  </g>
+
+  <!-- ================= wordmark only ================= -->
+  <text x="60" y="540" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#9A8" letter-spacing="1">WORDMARK ONLY</text>
+  <text x="60" y="590" font-family="-apple-system, Segoe UI, sans-serif" font-size="44" font-weight="800" fill="#1C1C1E" letter-spacing="-0.5">Speak<tspan fill="#C9A84C">Busy</tspan></text>
+
+  <!-- clear-space / color notes -->
+  <g transform="translate(60,620)">
+    <rect x="0" y="0" width="20" height="20" fill="#1C1C1E"/><text x="28" y="15" font-family="-apple-system, sans-serif" font-size="13" fill="#3A3A3A">Charcoal #1C1C1E</text>
+    <rect x="220" y="0" width="20" height="20" fill="#C9A84C"/><text x="248" y="15" font-family="-apple-system, sans-serif" font-size="13" fill="#3A3A3A">Gold #C9A84C</text>
+    <rect x="420" y="0" width="20" height="20" fill="#F8F5F0" stroke="#DDD"/><text x="448" y="15" font-family="-apple-system, sans-serif" font-size="13" fill="#3A3A3A">Off-white #F8F5F0</text>
+  </g>
+</svg>
