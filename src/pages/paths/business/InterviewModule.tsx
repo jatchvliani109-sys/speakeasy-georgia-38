@@ -761,7 +761,7 @@ export default function InterviewModule() {
           {/* Interview "set" card */}
           <div className="rounded-2xl bg-gradient-to-br from-[#232323] via-[#5C1A2E] to-[#161616] text-[#F5F4F2] p-4 shadow-[0_12px_30px_-15px_rgba(92,26,46,0.5)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] text-[#5C1A2E] grid place-items-center font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] text-[#C9A84C] grid place-items-center font-bold text-sm">
                 {initials(b.interviewerName)}
               </div>
               <div className="min-w-0">
@@ -1000,7 +1000,7 @@ export default function InterviewModule() {
                 <div className="absolute inset-0 rounded-full bg-[#1C1C1E]/15 animate-[ping_1.6s_ease-out_1]" />
                 <div className="absolute inset-0 rounded-full border border-[#1C1C1E]/40" />
                 <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#3A3A3A] grid place-items-center shadow-[0_8px_24px_-6px_rgba(28,28,30,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
-                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#5C1A2E]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#C9A84C]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>
                 </div>

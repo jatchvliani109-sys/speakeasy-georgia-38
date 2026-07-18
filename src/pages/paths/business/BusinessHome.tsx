@@ -457,8 +457,8 @@ export default function BusinessHome() {
               <div className="relative overflow-hidden rounded-lg bg-[#232323] text-[#F5F4F2] p-6 border border-[#5C1A2E]">
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
-                    <Award size={16} strokeWidth={2.25} className="text-[#1C1C1E]" />
-                    <span className="ka text-[10px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+                    <Award size={16} strokeWidth={2.25} className="text-[#C9A84C]" />
+                    <span className="ka text-[10px] uppercase tracking-wider text-[#C9A84C] font-semibold">
                       მიღწევა განბლოკილია
                     </span>
                   </div>
@@ -484,7 +484,7 @@ export default function BusinessHome() {
                       <div className="ka text-[10px] text-[#F5F4F2]/65 mt-0.5">ფრაზა</div>
                     </div>
                   </div>
-                  <p className="ka text-sm font-semibold text-[#1C1C1E] mt-4">
+                  <p className="ka text-sm font-semibold text-[#F5F4F2]/85 mt-4">
                     შეამოწმე რამდენად გაიზარდე — გაიარე ხელახალი შეფასება
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row gap-2">
@@ -493,7 +493,7 @@ export default function BusinessHome() {
                         if (user) saveBusiness(user.id, { firstMilestoneAcknowledged: true });
                         navigate("/path/business/reassessment");
                       }}
-                      className="ka inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
+                      className="ka inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#C9A84C] hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
                     >
                       ხელახალი შეფასების დაწყება <ArrowRight size={14} strokeWidth={2.25} />
                     </button>
@@ -539,7 +539,7 @@ export default function BusinessHome() {
             <div className="relative overflow-hidden rounded-lg bg-[#232323] text-[#F5F4F2] p-6 border border-[#5C1A2E]">
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className="ka text-[10px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+                  <span className="ka text-[10px] uppercase tracking-wider text-[#F5F4F2]/70 font-semibold">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
                   {focusDoneToday ? (
@@ -570,7 +570,7 @@ export default function BusinessHome() {
                         🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
-                    <p className="ka text-[11px] text-[#1C1C1E]">
+                    <p className="ka text-[11px] text-[#F5F4F2]/85">
                       დღეს {vocabWordCount} სიტყვა იცი
                     </p>
                     <p className="ka text-[11px] text-[#F5F4F2]/75">

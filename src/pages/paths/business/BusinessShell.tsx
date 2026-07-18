@@ -82,7 +82,7 @@ export function BizButton({
     variant === "primary"
       ? "bg-[#232323] text-[#F5F4F2] hover:bg-[#111111]"
       : variant === "accent"
-      ? "bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#3A3A3A]"
+      ? "bg-[#1C1C1E] text-[#C9A84C] hover:bg-[#3A3A3A]"
       : variant === "outline"
       ? "border border-[#5C1A2E]/25 text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
       : "text-[#5C1A2E] hover:bg-[#5C1A2E]/5";
