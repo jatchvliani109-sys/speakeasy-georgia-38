@@ -523,7 +523,7 @@ export default function BusinessHome() {
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
                 <div className="min-w-0">
-                  <p className="ka text-[13px] font-bold text-[#F8F5F0] truncate">პრემიუმი — ულიმიტო სესიები</p>
+                  <p className="ka text-[13px] font-bold text-[#F8F5F0] truncate">პრემიუმი - სიტყვების ულიმიტო სესიები</p>
                   <p className="ka text-[11px] text-[#F8F5F0]/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
