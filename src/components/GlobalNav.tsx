@@ -3,12 +3,17 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   Home,
-  LayoutGrid,
-  BookOpen,
+  GraduationCap,
+  Briefcase,
+  Mail,
+  MailCheck,
   FileText,
+  FileEdit,
+  UserCircle,
+  BookOpen,
+  Star,
   User,
   LogOut,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,9 +37,15 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/path/business/home", label: "მთავარი", icon: Home, match: (p) => p === "/path/business/home" || p === "/path/business" },
-  { to: "/path/business/modules", label: "მოდულები", icon: LayoutGrid, match: (p) => p.startsWith("/path/business/modules") || p.startsWith("/path/business/module/") },
+  { to: "/path/business/module/vocabulary", label: "ბიზნეს ლექსიკა", icon: GraduationCap, match: (p) => p.startsWith("/path/business/module/vocabulary") || p.startsWith("/path/business/vocabulary") },
+  { to: "/path/business/module/interview", label: "გასაუბრება", icon: Briefcase, match: (p) => p.startsWith("/path/business/module/interview") },
+  { to: "/path/business/documents?tool=email", label: "იმეილის დაწერა", icon: Mail },
+  { to: "/path/business/documents?tool=email_fix", label: "იმეილის გასწორება", icon: MailCheck },
+  { to: "/path/business/documents?tool=cover_letter", label: "სამოტივაციო წერილი", icon: FileText },
+  { to: "/path/business/documents?tool=resume_improve", label: "რეზიუმეს გაუმჯობესება", icon: FileEdit },
+  { to: "/path/business/documents?tool=bio", label: "პროფესიონალური ბიო", icon: UserCircle },
   { to: "/path/business/lexicon", label: "ჩემი ლექსიკონი", icon: BookOpen, match: (p) => p.startsWith("/path/business/lexicon") },
-  { to: "/path/business/documents", label: "დოკუმენტების ასისტენტი", icon: FileText, match: (p) => p.startsWith("/path/business/documents") },
+  { to: "/path/business/premium", label: "⭐ პრემიუმი", icon: Star, match: (p) => p.startsWith("/path/business/premium") },
   { to: "/profile", label: "პროფილი", icon: User, match: (p) => p.startsWith("/profile") },
   { label: "გასვლა", icon: LogOut, action: "logout" },
 ];
@@ -69,7 +80,9 @@ export default function GlobalNav() {
     <>
       {/* Desktop: inline top nav */}
       <nav className="hidden lg:flex items-center gap-1">
-        {NAV_ITEMS.filter((i) => i.action !== "logout").map((item) => {
+        {NAV_ITEMS.filter((i) => i.action !== "logout")
+          .filter((i) => ["მთავარი", "ბიზნეს ლექსიკა", "გასაუბრება", "ჩემი ლექსიკონი"].includes(i.label))
+          .map((item) => {
           const active = isItemActive(item, pathname);
           const Icon = item.icon;
           return (

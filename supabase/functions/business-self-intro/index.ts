@@ -27,7 +27,8 @@ General:
 - Never invent experience the user did not provide. If they have none, say they are learning / studying.
 - Avoid AI cliches ("passionate", "results-driven", "hard-working individual").
 - Keep it usable in real life.
-- Always reply with valid JSON only, no markdown, no comments.`;
+- Always reply with valid JSON only, no markdown, no comments.
+- GEORGIAN LANGUAGE RULE (strict): never write the word "პროფესიული" in any Georgian text — always use "პროფესიონალური" instead. All Georgian must be natural and grammatically correct.`;
 
 function buildPrompt(b: Body): string {
   return `Generate a professional self-introduction.

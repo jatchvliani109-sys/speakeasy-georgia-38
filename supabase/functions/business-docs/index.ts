@@ -31,7 +31,8 @@ Rules:
 - Add 3-6 "highlights": short phrases from the document with a 1-line Georgian explanation of WHY they work. These are subtle learning moments.
 - Tone: professional, natural, modern (not stiff, not corporate-cliche).
 - Use the user's profile/resume context to personalize specifics (industry, role, skills).
-- Never invent fake credentials or specific employer names not in the profile.`;
+- Never invent fake credentials or specific employer names not in the profile.
+- GEORGIAN LANGUAGE RULE (strict): never write the word "პროფესიული" in any Georgian text — always use "პროფესიონალური" instead. All Georgian must be natural and grammatically correct.`;
 
 function profileBlock(p: Profile) {
   return `
@@ -132,7 +133,7 @@ Tone preference: ${b.tone || "confident, warm, professional"}
 
 Return JSON:
 {
-  "title": "Georgian title (e.g. 'პროფესიული ბიო')",
+  "title": "Georgian title (e.g. 'პროფესიონალური ბიო')",
   "short": "2-3 sentence English bio",
   "medium": "1 paragraph (4-6 sentences) English bio",
   "full": "2-3 paragraph English bio with line breaks (\\n\\n)",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { toast } from "@/components/ui/use-toast";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -45,7 +45,21 @@ export default function DocumentHelper() {
   const [state, setState] = useState<BusinessState | null>(null);
   const [resumeReady, setResumeReady] = useState(false);
   const [docs, setDocs] = useState<BusinessDocument[]>([]);
-  const [view, setView] = useState<View>({ kind: "home" });
+  const [searchParams] = useSearchParams();
+  // Menu deep-links must also work when already on this page.
+  useEffect(() => {
+    const t = searchParams.get("tool");
+    const valid = ["email", "email_fix", "cover_letter", "resume_improve", "bio"];
+    if (t && valid.includes(t)) setView({ kind: "tool", tool: t as DocType });
+  }, [searchParams]);
+  const [view, setView] = useState<View>(() => {
+    // Deep link from the menu: /path/business/documents?tool=email etc.
+    const t = searchParams.get("tool");
+    const valid: DocType[] = ["email", "email_fix", "cover_letter", "resume_improve", "bio"];
+    return t && (valid as string[]).includes(t)
+      ? { kind: "tool", tool: t as DocType }
+      : { kind: "home" };
+  });
 
   useEffect(() => {
     if (!user) return;
