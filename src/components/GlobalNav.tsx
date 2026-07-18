@@ -100,6 +100,14 @@ export default function GlobalNav() {
             </Link>
           );
         })}
+        <button
+          onClick={handleLogout}
+          aria-label="გასვლა"
+          title="გასვლა"
+          className="hidden lg:inline-flex items-center justify-center w-9 h-9 ml-1 rounded-md text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+        >
+          <LogOut size={16} strokeWidth={2.25} />
+        </button>
       </nav>
 
       {/* Hamburger sheet — all breakpoints. On desktop it complements the
@@ -131,29 +139,39 @@ export default function GlobalNav() {
                 </p>
               )}
             </SheetHeader>
-            <nav className="px-3 py-3 space-y-0.5">
-              {NAV_ITEMS.map((item) => {
-                const active = isItemActive(item, pathname);
-                const Icon = item.icon;
-                const isLogout = item.action === "logout";
-                return (
-                  <button
-                    key={item.label}
-                    onClick={() => handleItem(item)}
-                    className={`ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold transition-colors ${
-                      isLogout
-                        ? "text-[#5C1A2E] hover:bg-[#5C1A2E]/5 mt-2 border-t border-[#E4E2DF] rounded-none pt-4"
-                        : active
-                        ? "bg-[#232323] text-[#F5F4F2]"
-                        : "text-[#1C1C1E] hover:bg-[#5C1A2E]/5 hover:text-[#5C1A2E]"
-                    }`}
-                  >
-                    <Icon size={16} strokeWidth={2.25} />
-                    {item.label}
-                  </button>
-                );
-              })}
-            </nav>
+            <div className="flex flex-col h-[calc(100%-92px)]">
+              {/* scrollable feature list */}
+              <nav className="px-3 py-3 space-y-0.5 flex-1 overflow-y-auto">
+                {NAV_ITEMS.filter((i) => i.action !== "logout").map((item) => {
+                  const active = isItemActive(item, pathname);
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={() => handleItem(item)}
+                      className={`ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold transition-colors ${
+                        active
+                          ? "bg-[#232323] text-[#F5F4F2]"
+                          : "text-[#1C1C1E] hover:bg-[#5C1A2E]/5 hover:text-[#5C1A2E]"
+                      }`}
+                    >
+                      <Icon size={16} strokeWidth={2.25} />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+              {/* logout pinned at the bottom — always visible, never scrolled away */}
+              <div className="px-3 py-3 border-t border-[#E4E2DF] bg-[#F5F4F2]">
+                <button
+                  onClick={handleLogout}
+                  className="ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+                >
+                  <LogOut size={16} strokeWidth={2.25} />
+                  გასვლა
+                </button>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
       </div>
