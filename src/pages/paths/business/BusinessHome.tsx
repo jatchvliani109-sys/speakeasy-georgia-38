@@ -514,6 +514,23 @@ export default function BusinessHome() {
             </section>
           )}
 
+          {/* Premium banner — persistent, small, gone once premium */}
+          {s && !s.mockPro && (
+            <button
+              onClick={() => navigate("/path/business/premium")}
+              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#5C1A2E] to-[#1C1C1E] text-left shadow-sm hover:opacity-95 transition-opacity"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
+                <div className="min-w-0">
+                  <p className="ka text-[13px] font-bold text-[#F8F5F0] truncate">პრემიუმი — ულიმიტო სესიები</p>
+                  <p className="ka text-[11px] text-[#F8F5F0]/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#C9A84C] shrink-0" />
+            </button>
+          )}
+
           {/* 2. Today's Focus */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">

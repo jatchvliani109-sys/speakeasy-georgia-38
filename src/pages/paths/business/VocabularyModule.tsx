@@ -515,6 +515,12 @@ export default function VocabularyModule() {
             >
               მთავარზე დაბრუნება
             </Link>
+            <Link
+              to="/path/business/premium"
+              className="ka block mt-3 text-[12px] font-semibold text-[#F8F5F0]/85 underline underline-offset-4"
+            >
+              ⭐ პრემიუმით მეორე სესია ახლავე შეგეძლო — ულიმიტოდ
+            </Link>
           </div>
           {dueList.length > 0 && (
             <BizCard className="mt-4">
@@ -647,6 +653,7 @@ export default function VocabularyModule() {
           totalVocab={totalVocab}
           streakCelebration={streakCelebration}
           canPracticeMore={!dailyLimitReached && (lastResults.answers.some((a) => !a.correct) || progress.length > 0)}
+          isPaid={isPaidUser}
           onPracticeMore={startPracticeMore}
         />
       )}
@@ -1076,6 +1083,7 @@ function Results({
   streakCelebration,
   canPracticeMore,
   onPracticeMore,
+  isPaid,
 }: {
   answers: { wordKey: string; correct: boolean }[];
   newWords: VocabWord[];
@@ -1084,6 +1092,7 @@ function Results({
   streakCelebration: { from: number; to: number } | null;
   canPracticeMore: boolean;
   onPracticeMore: () => void;
+  isPaid: boolean;
 }) {
   const total = answers.length;
   const correct = answers.filter((a) => a.correct).length;
@@ -1189,9 +1198,16 @@ function Results({
             დღეს კიდევ ვივარჯიშოთ →
           </BizButton>
         ) : (
-          <p className="ka text-center text-xs text-[#4A4A4A]">
-            დღევანდელი ვარჯიში შესრულებულია — ხვალ ახალი სესია გელოდება 🔥
-          </p>
+          <div className="text-center space-y-1.5">
+            <p className="ka text-xs text-[#4A4A4A]">
+              დღევანდელი ვარჯიში შესრულებულია — ხვალ ახალი სესია გელოდება 🔥
+            </p>
+            {!isPaid && (
+              <Link to="/path/business/premium" className="ka block text-xs font-semibold text-[#5C1A2E] underline underline-offset-4">
+                ⭐ პრემიუმით მეორე სესია ახლავე — ულიმიტოდ
+              </Link>
+            )}
+          </div>
         )}
         <Link to="/path/business/home" className="block">
           <BizButton variant="outline" className="w-full">
