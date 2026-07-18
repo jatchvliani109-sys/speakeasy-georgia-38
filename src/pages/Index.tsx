@@ -125,21 +125,21 @@ const Index = () => {
   if (user) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F5F0] text-[#1C1C1E]">
+    <div className="min-h-screen flex flex-col bg-[#F5F4F2] text-[#1C1C1E]">
       <SEO
         title="SpeakBusy — ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
         description="ისწავლე ბიზნეს ინგლისური ყოველდღიური ლექსიკის სესიებით — რეალური სცენარები, აუდიო და შენზე მორგებული გეგმა ქართველი პროფესიონალებისთვის. დაიწყე უფასოდ."
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#F8F5F0]/85 border-b border-[#E0D8D0]">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#F5F4F2]/85 border-b border-[#E4E2DF]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-[#3D1220] hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center text-[#5C1A2E] hover:opacity-80 transition-opacity">
             <Wordmark size="md" />
           </Link>
           <Link
             to="/auth?mode=login"
-            className="inline-flex items-center gap-1.5 h-10 px-5 rounded-lg border border-[#1C1C1E]/15 text-sm font-semibold text-[#1C1C1E] hover:bg-[#1C1C1E] hover:text-[#F8F5F0] transition-colors ka"
+            className="inline-flex items-center gap-1.5 h-10 px-5 rounded-lg border border-[#1C1C1E]/15 text-sm font-semibold text-[#1C1C1E] hover:bg-[#1C1C1E] hover:text-[#F5F4F2] transition-colors ka"
           >
             შესვლა
           </Link>
@@ -171,7 +171,7 @@ const Index = () => {
               <span className="block mt-2 text-[#C9A84C]">რომელიც კარიერას ცვლის.</span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-[#B8B0A8] leading-relaxed max-w-2xl ka">
+            <p className="mt-6 text-base sm:text-lg text-[#A3A3A0] leading-relaxed max-w-2xl ka">
               ყოველდღიური მოკლე სესიები ქართველი პროფესიონალებისთვის — ბიზნეს ლექსიკა
               რეალურ სიტუაციებში, ქართული ახსნებით და აუდიოთი.
             </p>
@@ -186,24 +186,24 @@ const Index = () => {
               </Link>
               <Link
                 to="/auth?mode=login"
-                className="text-sm font-semibold text-[#B8B0A8] hover:text-white transition-colors ka underline-offset-4 hover:underline"
+                className="text-sm font-semibold text-[#A3A3A0] hover:text-white transition-colors ka underline-offset-4 hover:underline"
               >
                 უკვე გაქვს ანგარიში? შედი
               </Link>
             </div>
           </div>
 
-          <WaveDivider fill="#F8F5F0" />
+          <WaveDivider fill="#F5F4F2" />
         </section>
 
         {/* ═══════════════ VALUE CARDS ═══════════════ */}
-        <section className="bg-[#F8F5F0] py-20 sm:py-28">
+        <section className="bg-[#F5F4F2] py-20 sm:py-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#5C1A2E] mb-3">
-                <span className="h-px w-6 bg-[#5C1A2E]" />
+                <span className="h-px w-6 bg-[#232323]" />
                 Why SpeakBusy
-                <span className="h-px w-6 bg-[#5C1A2E]" />
+                <span className="h-px w-6 bg-[#232323]" />
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-[#1C1C1E]">
                 რატომ SpeakBusy?
@@ -214,9 +214,9 @@ const Index = () => {
               {valueCards.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="group relative bg-white border border-[#E0D8D0] rounded-2xl p-8 hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
+                  className="group relative bg-white border border-[#E4E2DF] rounded-2xl p-8 hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
                 >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#5C1A2E] text-[#C9A84C] mb-5">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#232323] text-[#C9A84C] mb-5">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold ka text-[#1C1C1E] mb-2">{title}</h3>
@@ -228,7 +228,7 @@ const Index = () => {
         </section>
 
         {/* curved transition into modules */}
-        <WaveDivider fill="#F8F5F0" flip className="bg-white" />
+        <WaveDivider fill="#F5F4F2" flip className="bg-white" />
 
         {/* ═══════════════ MODULES ═══════════════ */}
         <section className="bg-white py-20 sm:py-28">
@@ -248,7 +248,7 @@ const Index = () => {
               {modules.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="relative bg-[#F8F5F0] border border-[#E0D8D0] rounded-2xl p-6 hover:bg-white hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
+                  className="relative bg-[#F5F4F2] border border-[#E4E2DF] rounded-2xl p-6 hover:bg-white hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
                 >
                   <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[#1C1C1E] text-[#C9A84C] mb-4">
                     <Icon className="w-5 h-5" />
@@ -262,10 +262,10 @@ const Index = () => {
         </section>
 
         {/* curved transition into CTA */}
-        <WaveDivider fill="#FFFFFF" flip className="bg-[#5C1A2E]" />
+        <WaveDivider fill="#FFFFFF" flip className="bg-[#232323]" />
 
         {/* ═══════════════ FINAL CTA ═══════════════ */}
-        <section className="relative bg-[#5C1A2E] text-white overflow-hidden">
+        <section className="relative bg-[#232323] text-white overflow-hidden">
           <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-white" />
           <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-white" />
           <GoldLine className="top-16 right-10 w-24" />
@@ -275,7 +275,7 @@ const Index = () => {
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
               მზად ხარ დაეუფლო პროფესიონალურ ინგლისურს?
             </h2>
-            <p className="mt-5 text-base sm:text-lg text-[#E8D5DA] ka leading-relaxed">
+            <p className="mt-5 text-base sm:text-lg text-[#D6D4D1] ka leading-relaxed">
               შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
             </p>
             <div className="mt-10">
@@ -291,16 +291,16 @@ const Index = () => {
         </section>
 
         {/* ═══════════════ FOOTER ═══════════════ */}
-        <footer className="bg-[#1C1C1E] text-[#B8B0A8]">
+        <footer className="bg-[#1C1C1E] text-[#A3A3A0]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-[#F8F5F0]">
+            <div className="text-[#F5F4F2]">
               <Wordmark size="md" />
             </div>
             <div className="flex items-center gap-4 text-xs ka tracking-wide">
-              <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
+              <Link to="/privacy" className="hover:text-[#F5F4F2] transition-colors">
                 კონფიდენციალურობა
               </Link>
-              <Link to="/terms" className="hover:text-[#F8F5F0] transition-colors">
+              <Link to="/terms" className="hover:text-[#F5F4F2] transition-colors">
                 მომსახურების პირობები
               </Link>
             </div>

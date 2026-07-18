@@ -119,7 +119,7 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-start gap-4">
-          <span className="w-12 h-12 rounded-full bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0 text-base font-bold">
+          <span className="w-12 h-12 rounded-full bg-[#232323] text-[#F5F4F2] grid place-items-center shrink-0 text-base font-bold">
             {(displayName || email).slice(0, 1).toUpperCase()}
           </span>
           <div className="flex-1 min-w-0 space-y-3">
@@ -135,7 +135,7 @@ export default function Profile() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={60}
                 placeholder="შენი სახელი"
-                className="ka mt-1 w-full px-3 py-2 rounded-md border border-[#E0D8D0] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+                className="ka mt-1 w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
               />
             </div>
             <div className="flex items-center gap-2 text-[#4A4A4A]">
@@ -161,7 +161,7 @@ export default function Profile() {
           </div>
           <Link
             to="/path/business/reassessment"
-            className="ka text-xs font-semibold text-[#5C1A2E] border border-[#E0D8D0] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
+            className="ka text-xs font-semibold text-[#5C1A2E] border border-[#E4E2DF] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
           >
             შეფასება
           </Link>
@@ -183,7 +183,7 @@ export default function Profile() {
           </div>
           <Link
             to="/path/business/resume"
-            className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] border border-[#E0D8D0] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
+            className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] border border-[#E4E2DF] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
           >
             <Upload size={12} strokeWidth={2.25} />
             {hasResume ? "განახლება" : "ატვირთვა"}
@@ -206,8 +206,8 @@ export default function Profile() {
                 onClick={() => toggleGoal(g)}
                 className={`ka inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
-                    ? "bg-[#5C1A2E] text-[#F0EBE3] border-[#5C1A2E]"
-                    : "bg-white text-[#1C1C1E] border-[#E0D8D0] hover:border-[#5C1A2E]/40"
+                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
+                    : "bg-white text-[#1C1C1E] border-[#E4E2DF] hover:border-[#5C1A2E]/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}
@@ -233,8 +233,8 @@ export default function Profile() {
                 onClick={() => toggleField(f)}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
-                    ? "bg-[#5C1A2E] text-[#F0EBE3] border-[#5C1A2E]"
-                    : "bg-white text-[#1C1C1E] border-[#E0D8D0] hover:border-[#5C1A2E]/40"
+                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
+                    : "bg-white text-[#1C1C1E] border-[#E4E2DF] hover:border-[#5C1A2E]/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}

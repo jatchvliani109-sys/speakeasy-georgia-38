@@ -45,8 +45,8 @@ export default function Scenarios() {
               onClick={() => setCategory(null)}
               className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                 ${category === null
-                  ? "bg-[#5C1A2E] text-[#F8F5F0] border-[#5C1A2E]"
-                  : "bg-white text-[#4A4A4A] border-[#E0D8D0] hover:border-[#C9A84C]"}`}
+                  ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
+                  : "bg-white text-[#4A4A4A] border-[#E4E2DF] hover:border-[#C9A84C]"}`}
             >
               ყველა
             </button>
@@ -57,8 +57,8 @@ export default function Scenarios() {
                 onClick={() => setCategory(cat)}
                 className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                   ${category === cat
-                    ? "bg-[#5C1A2E] text-[#F8F5F0] border-[#5C1A2E]"
-                    : "bg-white text-[#4A4A4A] border-[#E0D8D0] hover:border-[#C9A84C]"}`}
+                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
+                    : "bg-white text-[#4A4A4A] border-[#E4E2DF] hover:border-[#C9A84C]"}`}
               >
                 {CATEGORY_LABELS_KA[cat]}
               </button>
@@ -71,7 +71,7 @@ export default function Scenarios() {
                 key={c.id}
                 type="button"
                 onClick={() => setScenario(c)}
-                className="w-full text-left bg-white border border-[#E0D8D0] rounded-2xl p-4 shadow-sm hover:border-[#C9A84C] transition-colors"
+                className="w-full text-left bg-white border border-[#E4E2DF] rounded-2xl p-4 shadow-sm hover:border-[#C9A84C] transition-colors"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -103,13 +103,13 @@ export default function Scenarios() {
           </button>
 
           {/* Scene setup */}
-          <div className="rounded-3xl p-6 text-[#F8F5F0] bg-gradient-to-br from-[#5C1A2E] to-[#1C1C1E] shadow-lg">
+          <div className="rounded-3xl p-6 text-[#F5F4F2] bg-gradient-to-br from-[#232323] to-[#1C1C1E] shadow-lg">
             <p className="ka text-[10px] uppercase tracking-wider text-[#C9A84C] font-bold">
               {CATEGORY_LABELS_KA[scenario.category]}
             </p>
             <h1 className="ka text-2xl font-bold mt-1">{scenario.titleKa}</h1>
-            <p className="text-sm text-[#F8F5F0]/80 mt-0.5">{scenario.titleEn}</p>
-            <p className="ka text-sm leading-relaxed mt-3 text-[#F8F5F0]/95">{scenario.scenarioKa}</p>
+            <p className="text-sm text-[#F5F4F2]/80 mt-0.5">{scenario.titleEn}</p>
+            <p className="ka text-sm leading-relaxed mt-3 text-[#F5F4F2]/95">{scenario.scenarioKa}</p>
           </div>
 
           {/* Words */}
@@ -117,7 +117,7 @@ export default function Scenarios() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
               სიტყვები ({scenario.wordKeys.length})
             </p>
-            <ul className="mt-2 divide-y divide-[#F0EAE2]">
+            <ul className="mt-2 divide-y divide-[#EFEEEC]">
               {scenario.wordKeys.map((key) => {
                 const w = findWord(key);
                 if (!w) return null;

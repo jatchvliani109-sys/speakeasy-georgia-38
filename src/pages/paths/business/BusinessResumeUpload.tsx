@@ -267,9 +267,9 @@ export default function BusinessResumeUpload() {
           <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
             შენი ამჟამინდელი რეზიუმე
           </p>
-          <div className="mt-3 p-4 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+          <div className="mt-3 p-4 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#5C1A2E] text-white grid place-items-center text-sm font-bold shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-[#232323] text-white grid place-items-center text-sm font-bold shrink-0">
                 PDF
               </div>
               <div className="flex-1 min-w-0">
@@ -324,7 +324,7 @@ export default function BusinessResumeUpload() {
             className={`cursor-pointer rounded-2xl border-2 border-dashed transition-colors p-8 text-center ${
               dragging
                 ? "border-[#5C1A2E] bg-[#5C1A2E]/5"
-                : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 hover:bg-[#F8F5F0]"
+                : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 hover:bg-[#F5F4F2]"
             }`}
           >
             <div className="mx-auto w-12 h-12 rounded-full bg-[#5C1A2E]/10 grid place-items-center text-[#5C1A2E] text-xl mb-3">
@@ -482,13 +482,13 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 rounded-lg border border-[#E0D8D0] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] bg-white resize-none"
+          className="w-full px-3 py-2 rounded-lg border border-[#E4E2DF] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] bg-white resize-none"
         />
       ) : (
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-[#E0D8D0] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] bg-white"
+          className="w-full px-3 py-2 rounded-lg border border-[#E4E2DF] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] bg-white"
         />
       )}
     </div>

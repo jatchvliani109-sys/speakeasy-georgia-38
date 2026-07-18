@@ -169,7 +169,7 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
         "inline-flex items-center justify-center rounded-full border transition-colors select-none",
         active
           ? "border-[#5C1A2E]/40 bg-[#5C1A2E]/5 text-[#5C1A2E]"
-          : "border-[#E0D8D0] bg-white/70 text-[#4A4A4A] hover:text-[#5C1A2E] hover:border-[#5C1A2E]/30 hover:bg-[#5C1A2E]/5",
+          : "border-[#E4E2DF] bg-white/70 text-[#4A4A4A] hover:text-[#5C1A2E] hover:border-[#5C1A2E]/30 hover:bg-[#5C1A2E]/5",
         sizeCls,
         className,
       ].join(" ")}

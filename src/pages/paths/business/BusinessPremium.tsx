@@ -74,9 +74,9 @@ export default function BusinessPremium() {
       </div>
 
       {/* Offer card */}
-      <div className="rounded-2xl overflow-hidden border border-[#C9A84C]/40 bg-gradient-to-br from-[#5C1A2E] to-[#3D1220] text-[#F8F5F0] p-6 mb-4">
+      <div className="rounded-2xl overflow-hidden border border-[#C9A84C]/40 bg-gradient-to-br from-[#232323] to-[#161616] text-[#F5F4F2] p-6 mb-4">
         <p className="text-3xl font-bold">
-          {PRICE_GEL} <span className="ka text-base font-semibold text-[#F8F5F0]/80">ლარი / თვეში</span>
+          {PRICE_GEL} <span className="ka text-base font-semibold text-[#F5F4F2]/80">ლარი / თვეში</span>
         </p>
         <div className="mt-5 space-y-3">
           {FEATURES.map((f) => (
@@ -86,7 +86,7 @@ export default function BusinessPremium() {
               </span>
               <div>
                 <p className="ka text-sm font-semibold">{f.titleKa}</p>
-                <p className="ka text-[12px] text-[#F8F5F0]/70">{f.subKa}</p>
+                <p className="ka text-[12px] text-[#F5F4F2]/70">{f.subKa}</p>
               </div>
             </div>
           ))}
@@ -101,7 +101,7 @@ export default function BusinessPremium() {
             <BizButton onClick={unlock} disabled={busy || isPro === null}>
               {busy ? "..." : "განბლოკვა ⭐"}
             </BizButton>
-            <p className="ka text-[11px] text-[#F8F5F0]/60 mt-2">
+            <p className="ka text-[11px] text-[#F5F4F2]/60 mt-2">
               სატესტო რეჟიმი — გადახდა ჯერ არ არის საჭირო. გამოშვებისას აქ
               რეალური გადახდა იქნება, 7-დღიანი უფასო პერიოდით.
             </p>

@@ -113,7 +113,7 @@ export default function BusinessPlan() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-[#E0D8D0] last:border-0">
+    <div className="flex items-center justify-between py-2 border-b border-[#E4E2DF] last:border-0">
       <span className="ka text-xs text-[#4A4A4A]">{label}</span>
       <span className="ka text-sm font-semibold text-[#5C1A2E]">{value}</span>
     </div>

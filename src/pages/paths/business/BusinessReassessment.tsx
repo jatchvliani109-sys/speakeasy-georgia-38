@@ -188,7 +188,7 @@ export default function BusinessReassessment() {
           <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{blurb}</p>
 
           {weakAreas.length > 0 && went <= 0 && (
-            <div className="mt-4 p-3 rounded-xl bg-[#F8F5F0] border border-[#F0E8D8]">
+            <div className="mt-4 p-3 rounded-xl bg-[#F5F4F2] border border-[#F0E8D8]">
               <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                 სფეროები სამუშაოდ
               </p>
@@ -243,7 +243,7 @@ export default function BusinessReassessment() {
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
                       ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                      : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                      : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                   }`}
                 >
                   {opt}
@@ -260,7 +260,7 @@ export default function BusinessReassessment() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
             <p className="ka text-xs text-[#4A4A4A] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.

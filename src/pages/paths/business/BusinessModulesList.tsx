@@ -59,7 +59,7 @@ export default function BusinessModulesList() {
         <Link to="/path/business/scenarios" className="group sm:col-span-2">
           <BizCard className="h-full border-[#C9A84C]/45 hover:border-[#C9A84C] transition-colors">
             <div className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-md bg-[#5C1A2E] text-[#C9A84C] grid place-items-center shrink-0 text-base">
+              <span className="w-10 h-10 rounded-md bg-[#232323] text-[#C9A84C] grid place-items-center shrink-0 text-base">
                 🎬
               </span>
               <div className="flex-1 min-w-0">
@@ -87,7 +87,7 @@ export default function BusinessModulesList() {
             <Link key={m.slug} to={`/path/business/module/${m.slug}`} className="group">
               <BizCard className="h-full hover:border-[#5C1A2E]/50 transition-colors">
                 <div className="flex items-start gap-3">
-                  <span className="w-10 h-10 rounded-md bg-[#5C1A2E] text-[#F0EBE3] grid place-items-center shrink-0">
+                  <span className="w-10 h-10 rounded-md bg-[#232323] text-[#F5F4F2] grid place-items-center shrink-0">
                     <Icon size={18} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">

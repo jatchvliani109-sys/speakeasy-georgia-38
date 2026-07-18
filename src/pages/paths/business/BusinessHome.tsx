@@ -286,7 +286,7 @@ export default function BusinessHome() {
   return (
     <BusinessShell seo={{ title: "ჩემი სწავლება — SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა — დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
       <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
-        <DialogContent className="bg-[#F0EBE3] border-[#E0D8D0]">
+        <DialogContent className="bg-[#F5F4F2] border-[#E4E2DF]">
           <DialogHeader>
             <DialogTitle className="ka text-[#5C1A2E]">როგორ დაგიძახოთ?</DialogTitle>
             <DialogDescription className="ka text-[#4A4A4A]">
@@ -300,7 +300,7 @@ export default function BusinessHome() {
             onKeyDown={(e) => { if (e.key === "Enter") submitName(); }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka bg-white border-[#E0D8D0]"
+            className="ka bg-white border-[#E4E2DF]"
           />
           <DialogFooter>
             <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
@@ -320,7 +320,7 @@ export default function BusinessHome() {
             გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
           </h1>
           {plan && (
-            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-[#4A4A4A] border border-[#E0D8D0] bg-white px-2 py-0.5 rounded-full">
+            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-[#4A4A4A] border border-[#E4E2DF] bg-white px-2 py-0.5 rounded-full">
               {LEVEL_LABELS[plan.level]}
             </span>
           )}
@@ -343,7 +343,7 @@ export default function BusinessHome() {
               resetBusiness(user.id);
               window.location.reload();
             }}
-            className="font-mono text-[10px] uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E0D8D0] text-[#4A4A4A] hover:bg-white hover:text-[#5C1A2E] transition"
+            className="font-mono text-[10px] uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E4E2DF] text-[#4A4A4A] hover:bg-white hover:text-[#5C1A2E] transition"
           >
             <RotateCcw size={11} strokeWidth={2.25} /> reset
           </button>
@@ -370,14 +370,14 @@ export default function BusinessHome() {
             <div
               className={`rounded-lg p-4 border transition-colors ${
                 streakTier === 4
-                  ? "bg-gradient-to-br from-[#5C1A2E] via-[#6E2038] to-[#8a5a1f] border-[#C9A84C] text-[#F8F5F0] shadow-lg"
+                  ? "bg-gradient-to-br from-[#232323] via-[#3A3A3A] to-[#8a5a1f] border-[#C9A84C] text-[#F5F4F2] shadow-lg"
                   : streakTier === 3
-                    ? "bg-gradient-to-br from-[#5C1A2E] to-[#1C1C1E] border-[#5C1A2E] text-[#F8F5F0] shadow-md"
+                    ? "bg-gradient-to-br from-[#232323] to-[#1C1C1E] border-[#5C1A2E] text-[#F5F4F2] shadow-md"
                     : streakTier === 2
                       ? "bg-gradient-to-br from-[#C9A84C]/30 to-white border-[#C9A84C]"
                       : streakTier === 1
                         ? "bg-white border-[#C9A84C]/60"
-                        : "bg-white border-[#E0D8D0]"
+                        : "bg-white border-[#E4E2DF]"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
@@ -392,11 +392,11 @@ export default function BusinessHome() {
                   <div className="min-w-0">
                     <p
                       className={`font-bold leading-tight ${streakTier >= 2 ? "text-2xl" : "text-lg"} ${
-                        streakDark ? "text-[#F8F5F0]" : "text-[#5C1A2E]"
+                        streakDark ? "text-[#F5F4F2]" : "text-[#5C1A2E]"
                       }`}
                     >
                       {streak}{" "}
-                      <span className={`ka text-xs font-semibold ${streakDark ? "text-[#F8F5F0]/70" : "text-[#4A4A4A]"}`}>
+                      <span className={`ka text-xs font-semibold ${streakDark ? "text-[#F5F4F2]/70" : "text-[#4A4A4A]"}`}>
                         დღე ზედიზედ{freezesLeft > 0 ? ` · ❄${freezesLeft}` : ""}
                       </span>
                     </p>
@@ -415,7 +415,7 @@ export default function BusinessHome() {
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
                         className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
-                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : d.frozen ? "bg-[#7Fb2d9]/30 border border-[#7Fb2d9]/60" : streakDark ? "border border-[#F8F5F0]/30 text-transparent" : "border border-[#E0D8D0] text-transparent"}
+                          ${d.done ? "bg-[#C9A84C] text-[#5C1A2E]" : d.frozen ? "bg-[#7Fb2d9]/30 border border-[#7Fb2d9]/60" : streakDark ? "border border-[#F5F4F2]/30 text-transparent" : "border border-[#E4E2DF] text-transparent"}
                           ${d.isToday && !d.done && !d.frozen ? (streakDark ? "border-[#C9A84C] border-dashed" : "border-[#5C1A2E]/50 border-dashed") : ""}`}
                         title={d.frozen ? "გაყინვა გამოყენებულია" : undefined}
                       >
@@ -428,7 +428,7 @@ export default function BusinessHome() {
                               ? "font-bold text-[#C9A84C]"
                               : "font-bold text-[#5C1A2E]"
                             : streakDark
-                              ? "text-[#F8F5F0]/60"
+                              ? "text-[#F5F4F2]/60"
                               : "text-[#4A4A4A]"
                         }`}
                       >
@@ -440,7 +440,7 @@ export default function BusinessHome() {
               </div>
               {nextMilestone !== null && (
                 <div className="mt-3">
-                  <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-[#F8F5F0]/15" : "bg-[#F0EBE3]"}`}>
+                  <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-[#F5F4F2]/15" : "bg-[#F5F4F2]"}`}>
                     <div
                       className="h-full bg-[#C9A84C] rounded-full transition-all"
                       style={{ width: `${Math.min(100, Math.round((streak / nextMilestone) * 100))}%` }}
@@ -454,7 +454,7 @@ export default function BusinessHome() {
           {/* Milestone celebration */}
           {showMilestone && (
             <section className="mb-5 animate-fade-in">
-              <div className="relative overflow-hidden rounded-lg bg-[#5C1A2E] text-[#F0EBE3] p-6 border border-[#5C1A2E]">
+              <div className="relative overflow-hidden rounded-lg bg-[#232323] text-[#F5F4F2] p-6 border border-[#5C1A2E]">
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
                     <Award size={16} strokeWidth={2.25} className="text-[#1C1C1E]" />
@@ -465,23 +465,23 @@ export default function BusinessHome() {
                   <h2 className="ka text-xl font-bold leading-snug">
                     გილოცავ — დაასრულე პირველი დონე
                   </h2>
-                  <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
+                  <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
                     შენ შეასრულე 7 სავარჯიშო სესია — ეს ნამდვილი ჩვევის დასაწყისია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
+                    <div className="border border-[#F5F4F2]/15 rounded-md px-2 py-3">
                       <div className="text-xl font-bold">
                         {interviewCount + vocabSessionsCount}
                       </div>
-                      <div className="ka text-[10px] text-[#F0EBE3]/65 mt-0.5">სესია</div>
+                      <div className="ka text-[10px] text-[#F5F4F2]/65 mt-0.5">სესია</div>
                     </div>
-                    <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
+                    <div className="border border-[#F5F4F2]/15 rounded-md px-2 py-3">
                       <div className="text-xl font-bold">{vocabWordCount}</div>
-                      <div className="ka text-[10px] text-[#F0EBE3]/65 mt-0.5">სიტყვა</div>
+                      <div className="ka text-[10px] text-[#F5F4F2]/65 mt-0.5">სიტყვა</div>
                     </div>
-                    <div className="border border-[#F0EBE3]/15 rounded-md px-2 py-3">
+                    <div className="border border-[#F5F4F2]/15 rounded-md px-2 py-3">
                       <div className="text-xl font-bold">{phraseCount}</div>
-                      <div className="ka text-[10px] text-[#F0EBE3]/65 mt-0.5">ფრაზა</div>
+                      <div className="ka text-[10px] text-[#F5F4F2]/65 mt-0.5">ფრაზა</div>
                     </div>
                   </div>
                   <p className="ka text-sm font-semibold text-[#1C1C1E] mt-4">
@@ -493,7 +493,7 @@ export default function BusinessHome() {
                         if (user) saveBusiness(user.id, { firstMilestoneAcknowledged: true });
                         navigate("/path/business/reassessment");
                       }}
-                      className="ka inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#6E2038] transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
+                      className="ka inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-[#5C1A2E] hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
                     >
                       ხელახალი შეფასების დაწყება <ArrowRight size={14} strokeWidth={2.25} />
                     </button>
@@ -504,7 +504,7 @@ export default function BusinessHome() {
                           setS(next);
                         }
                       }}
-                      className="ka inline-flex items-center justify-center px-5 py-2.5 rounded-md text-sm font-semibold text-[#F0EBE3]/80 hover:text-[#F0EBE3] border border-[#F0EBE3]/20 hover:border-[#F0EBE3]/40 transition-colors"
+                      className="ka inline-flex items-center justify-center px-5 py-2.5 rounded-md text-sm font-semibold text-[#F5F4F2]/80 hover:text-[#F5F4F2] border border-[#F5F4F2]/20 hover:border-[#F5F4F2]/40 transition-colors"
                     >
                       მოგვიანებით
                     </button>
@@ -518,13 +518,13 @@ export default function BusinessHome() {
           {s && !s.mockPro && (
             <button
               onClick={() => navigate("/path/business/premium")}
-              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#5C1A2E] to-[#1C1C1E] text-left shadow-sm hover:opacity-95 transition-opacity"
+              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#232323] to-[#1C1C1E] text-left shadow-sm hover:opacity-95 transition-opacity"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
                 <div className="min-w-0">
-                  <p className="ka text-[13px] font-bold text-[#F8F5F0] truncate">პრემიუმი - სიტყვების ულიმიტო სესიები</p>
-                  <p className="ka text-[11px] text-[#F8F5F0]/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
+                  <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">პრემიუმი - სიტყვების ულიმიტო სესიები</p>
+                  <p className="ka text-[11px] text-[#F5F4F2]/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
               <ArrowRight size={15} className="text-[#C9A84C] shrink-0" />
@@ -536,18 +536,18 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <Target size={12} strokeWidth={2.25} /> დღევანდელი ფოკუსი
             </p>
-            <div className="relative overflow-hidden rounded-lg bg-[#5C1A2E] text-[#F0EBE3] p-6 border border-[#5C1A2E]">
+            <div className="relative overflow-hidden rounded-lg bg-[#232323] text-[#F5F4F2] p-6 border border-[#5C1A2E]">
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="ka text-[10px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
                   {focusDoneToday ? (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-[#F0EBE3]/20 text-[#F0EBE3]/85 px-2 py-0.5 rounded-md font-semibold">
+                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-[#F5F4F2]/20 text-[#F5F4F2]/85 px-2 py-0.5 rounded-md font-semibold">
                       <Check size={11} strokeWidth={2.5} /> დასრულდა
                     </span>
                   ) : (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 text-[#F0EBE3]/70">
+                    <span className="ka text-[10px] inline-flex items-center gap-1 text-[#F5F4F2]/70">
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
@@ -555,7 +555,7 @@ export default function BusinessHome() {
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
-                <p className="ka text-sm text-[#F0EBE3]/80 mt-2 leading-relaxed">
+                <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
                 {!focusDoneToday && (
@@ -568,7 +568,7 @@ export default function BusinessHome() {
                     <p className="ka text-[11px] text-[#1C1C1E]">
                       დღეს {vocabWordCount} სიტყვა იცი
                     </p>
-                    <p className="ka text-[11px] text-[#F0EBE3]/75">
+                    <p className="ka text-[11px] text-[#F5F4F2]/75">
                       {vocabNewToday > 0
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
@@ -581,7 +581,7 @@ export default function BusinessHome() {
                   onClick={() =>
                     navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
                   }
-                  className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#6E2038] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                  className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                 >
                   {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                   <ArrowRight size={14} strokeWidth={2.25} />
@@ -643,7 +643,7 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
               მეტი
             </p>
-            <div className="bg-white border border-[#E0D8D0] rounded-lg divide-y divide-[#F0EBE3]">
+            <div className="bg-white border border-[#E4E2DF] rounded-lg divide-y divide-[#F5F4F2]">
               <MoreRow
                 icon={<Briefcase size={15} strokeWidth={2} />}
                 title="გასაუბრება"
@@ -691,7 +691,7 @@ export default function BusinessHome() {
               </div>
               <Link
                 to="/path/business/lexicon"
-                className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-md bg-[#5C1A2E] text-[#F0EBE3] hover:bg-[#3D1220] transition-colors text-sm font-semibold"
+                className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-md bg-[#232323] text-[#F5F4F2] hover:bg-[#111111] transition-colors text-sm font-semibold"
               >
                 <span className="flex items-center gap-2">
                   <Library size={15} strokeWidth={2} />
@@ -722,9 +722,9 @@ function MoreRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#F8F5F0] transition-colors first:rounded-t-lg last:rounded-b-lg"
+      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#F5F4F2] transition-colors first:rounded-t-lg last:rounded-b-lg"
     >
-      <span className="w-8 h-8 rounded-md bg-[#5C1A2E]/5 text-[#5C1A2E] border border-[#E0D8D0] grid place-items-center shrink-0">
+      <span className="w-8 h-8 rounded-md bg-[#5C1A2E]/5 text-[#5C1A2E] border border-[#E4E2DF] grid place-items-center shrink-0">
         {icon}
       </span>
       <span className="flex-1 min-w-0">
@@ -738,7 +738,7 @@ function MoreRow({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[#F0EBE3] border border-[#E0D8D0] rounded-md px-3 py-3">
+    <div className="bg-[#F5F4F2] border border-[#E4E2DF] rounded-md px-3 py-3">
       <div className="text-xl font-bold text-[#5C1A2E]">{value}</div>
       <div className="ka text-[11px] text-[#4A4A4A] mt-0.5">{label}</div>
     </div>

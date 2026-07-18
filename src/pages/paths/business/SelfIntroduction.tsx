@@ -269,7 +269,7 @@ export default function SelfIntroduction() {
         <div className="mb-5">
           <div className="flex items-center gap-1">
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#5C1A2E]" : "bg-[#E0D8D0]"}`} />
+              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#232323]" : "bg-[#E4E2DF]"}`} />
             ))}
           </div>
           <p className="ka text-[11px] text-[#4A4A4A] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
@@ -326,7 +326,7 @@ export default function SelfIntroduction() {
           </p>
           <ol className="mt-4 space-y-3">
             {STRUCTURE_PARTS.map((p, i) => (
-              <li key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+              <li key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="ka text-xs font-bold text-[#5C1A2E]">{i + 1}. {p.ka} <span className="text-[#4A4A4A] font-normal">({p.en})</span></p>
@@ -357,13 +357,13 @@ export default function SelfIntroduction() {
                 className={`ka text-left px-4 py-2.5 rounded-xl border text-sm transition-all ${
                   inputs.purpose === p.id
                     ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E] font-semibold"
-                    : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                    : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                 }`}>{p.label}</button>
             ))}
           </div>
 
           {inputs.purpose && EXAMPLES[inputs.purpose] && (
-            <div className="mt-5 p-4 rounded-xl bg-[#F8F5F0] border border-[#E0D8D0]">
+            <div className="mt-5 p-4 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
               <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold mb-2">
                 მაგალითი შენი დონისთვის
               </p>
@@ -408,7 +408,7 @@ export default function SelfIntroduction() {
                     className={`ka text-xs px-3 py-2 rounded-lg border ${
                       inputs.status === s.id
                         ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E] font-semibold"
-                        : "border-[#E0D8D0] text-[#1C1C1E]"}`}>{s.label}</button>
+                        : "border-[#E4E2DF] text-[#1C1C1E]"}`}>{s.label}</button>
                 ))}
               </div>
             </Field>
@@ -468,7 +468,7 @@ export default function SelfIntroduction() {
               </p>
               <div className="mt-3 space-y-3">
                 {result.phrases.map((p, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+                  <div key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-[#5C1A2E] text-sm">{p.en}</p>
                       <ReadAloudButton text={p.en} />
@@ -476,7 +476,7 @@ export default function SelfIntroduction() {
                     <p className="ka text-xs text-[#4A4A4A] mt-1">{p.ka}</p>
                     <p className="ka text-xs text-[#1C1C1E] mt-2">{p.explanationKa}</p>
                     {p.exampleEn && (
-                      <div className="mt-2 pt-2 border-t border-[#E0D8D0]">
+                      <div className="mt-2 pt-2 border-t border-[#E4E2DF]">
                         <p className="text-xs text-[#5C1A2E]">{p.exampleEn}</p>
                         {(isBeginner || isElementary) && <p className="ka text-xs text-[#4A4A4A] mt-0.5">{p.exampleKa}</p>}
                       </div>
@@ -505,7 +505,7 @@ export default function SelfIntroduction() {
             {(["short", "standard", "polished"] as const).map((v) => (
               <button key={v} onClick={() => setSelected(v)}
                 className={`text-left px-4 py-3 rounded-xl border text-sm ${
-                  selected === v ? "border-[#5C1A2E] bg-[#5C1A2E]/5" : "border-[#E0D8D0]"}`}>
+                  selected === v ? "border-[#5C1A2E] bg-[#5C1A2E]/5" : "border-[#E4E2DF]"}`}>
                 <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">{v}</p>
                 <p className="text-sm text-[#5C1A2E] mt-1">{result[v].en}</p>
               </button>
@@ -541,7 +541,7 @@ export default function SelfIntroduction() {
                 style={{ animation: "siRingPulse 1.6s ease-out 0.3s infinite" }}
               />
               <span
-                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] shadow-[0_8px_24px_-8px_rgba(92,26,46,0.5)] ring-2 ring-[#1C1C1E]/40"
+                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#232323] to-[#161616] shadow-[0_8px_24px_-8px_rgba(92,26,46,0.5)] ring-2 ring-[#1C1C1E]/40"
                 style={{ animation: "siCircleIn 0.5s cubic-bezier(.2,.8,.2,1) both" }}
               >
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -568,8 +568,8 @@ export default function SelfIntroduction() {
             <>
               {/* Premium document card */}
               <div className="relative si-rise-3">
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#1C1C1E]/40 via-transparent to-[#5C1A2E]/20 blur-[2px]" aria-hidden />
-                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#F8F5F0] border border-[#E0D8D0] shadow-[0_2px_4px_rgba(92,26,46,0.04),0_20px_50px_-20px_rgba(92,26,46,0.25)] overflow-hidden">
+                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#1C1C1E]/40 via-transparent to-[#232323]/20 blur-[2px]" aria-hidden />
+                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#F5F4F2] border border-[#E4E2DF] shadow-[0_2px_4px_rgba(92,26,46,0.04),0_20px_50px_-20px_rgba(92,26,46,0.25)] overflow-hidden">
                   <div className="h-[3px] bg-gradient-to-r from-[#1C1C1E] via-[#C9A84C] to-[#1C1C1E]" />
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
@@ -582,7 +582,7 @@ export default function SelfIntroduction() {
                     <p className="text-[15px] text-[#5C1A2E] leading-[1.7] font-medium" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
                       "{saved[0][saved[0].selected].en}"
                     </p>
-                    <div className="mt-4 pt-4 border-t border-dashed border-[#E0D8D0] flex items-center justify-between">
+                    <div className="mt-4 pt-4 border-t border-dashed border-[#E4E2DF] flex items-center justify-between">
                       <p className="ka text-[10px] text-[#8A8578] italic">— შენი ხელით აშენებული</p>
                       <ReadAloudButton text={saved[0][saved[0].selected].en} label="მოსმენა" />
                     </div>
@@ -593,7 +593,7 @@ export default function SelfIntroduction() {
               {/* Phrases bonus reward */}
               {saved[0].phrases?.length > 0 && (
                 <div className="mt-5 si-rise-4">
-                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#F8F5F0] via-[#FAF5E8] to-[#FAF5E8] border border-[#C9A84C]/50 shadow-[0_8px_24px_-12px_rgba(28,28,30,0.35)]">
+                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#F5F4F2] via-[#FAF5E8] to-[#FAF5E8] border border-[#C9A84C]/50 shadow-[0_8px_24px_-12px_rgba(28,28,30,0.35)]">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-base" style={{ animation: "siGoldShimmer 2s ease-in-out infinite" }}>✦</span>
                       <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#8A6A0F] font-bold">ბონუსი · ნასწავლი ფრაზები</p>
@@ -618,13 +618,13 @@ export default function SelfIntroduction() {
             <div className="grid gap-2.5">
               <button
                 onClick={() => navigate("/path/business/home")}
-                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(92,26,46,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(92,26,46,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#232323] to-[#161616] text-[#F5F4F2] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(92,26,46,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(92,26,46,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
                 <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#C9A84C] to-[#1C1C1E]" />
                 <span className="flex items-center justify-between pl-2">
                   <span className="flex flex-col items-start gap-0.5">
                     <span>ბიზნეს გაკვეთილებზე გადასვლა</span>
-                    <span className="text-[11px] font-normal text-[#F0EBE3]/70">გააგრძელე შენი მოგზაურობა</span>
+                    <span className="text-[11px] font-normal text-[#F5F4F2]/70">გააგრძელე შენი მოგზაურობა</span>
                   </span>
                   <span className="text-lg transition-transform duration-200 group-hover:translate-x-1">→</span>
                 </span>
@@ -663,8 +663,8 @@ export default function SelfIntroduction() {
                   <p className="ka text-xs text-[#4A4A4A] mt-2">{v.ka}</p>
                   <div className="mt-3 flex gap-2 flex-wrap">
                     <ReadAloudButton text={v.en} label="მოსმენა" />
-                    <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E0D8D0]">კოპირება</button>
-                    <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E0D8D0]">I practiced</button>
+                    <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E4E2DF]">კოპირება</button>
+                    <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E4E2DF]">I practiced</button>
                   </div>
                   {s.practicedAt && (
                     <p className="ka text-[10px] text-[#4A4A4A] mt-2">ბოლო ვარჯიში: {new Date(s.practicedAt).toLocaleDateString()}</p>
@@ -680,7 +680,7 @@ export default function SelfIntroduction() {
 }
 
 // ---------- subcomponents ----------
-const inputCls = "w-full px-3 py-2 rounded-lg border border-[#E0D8D0] text-sm outline-none focus:border-[#5C1A2E] bg-white";
+const inputCls = "w-full px-3 py-2 rounded-lg border border-[#E4E2DF] text-sm outline-none focus:border-[#5C1A2E] bg-white";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -706,7 +706,7 @@ function VersionCard({
         <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">{label}</p>
         <button onClick={onSelect}
           className={`ka text-[11px] px-2.5 py-1 rounded-full border ${
-            isSelected ? "bg-[#5C1A2E] text-white border-[#5C1A2E]" : "border-[#E0D8D0] text-[#5C1A2E]"}`}>
+            isSelected ? "bg-[#232323] text-white border-[#5C1A2E]" : "border-[#E4E2DF] text-[#5C1A2E]"}`}>
           {isSelected ? "არჩეული" : "Use this"}
         </button>
       </div>
@@ -727,7 +727,7 @@ function VersionCard({
 function ChipBtn({ children, onClick, loading }: { children: React.ReactNode; onClick: () => void; loading?: boolean }) {
   return (
     <button onClick={onClick} disabled={loading}
-      className="text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E0D8D0] text-[#5C1A2E] hover:bg-[#5C1A2E]/5 disabled:opacity-50">
+      className="text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E4E2DF] text-[#5C1A2E] hover:bg-[#5C1A2E]/5 disabled:opacity-50">
       {loading ? "..." : children}
     </button>
   );
@@ -760,7 +760,7 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
   };
 
   return (
-    <div className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+    <div className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
       <p className="ka text-[11px] text-[#4A4A4A]">{idx}. {ex.promptKa}</p>
       <p className="text-sm text-[#5C1A2E] mt-1 font-medium">{ex.prompt}</p>
 
@@ -769,7 +769,7 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
           {ex.options.map((opt, i) => (
             <button key={i} onClick={() => { setPick(i); setChecked(null); }}
               className={`block w-full text-left text-xs px-3 py-2 rounded border ${
-                pick === i ? "border-[#5C1A2E] bg-white" : "border-[#E0D8D0] bg-white"}`}>
+                pick === i ? "border-[#5C1A2E] bg-white" : "border-[#E4E2DF] bg-white"}`}>
               {opt}
             </button>
           ))}
