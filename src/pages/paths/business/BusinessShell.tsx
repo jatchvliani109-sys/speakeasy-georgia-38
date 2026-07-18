@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
 import SEO from "@/components/SEO";
@@ -15,7 +15,6 @@ export default function BusinessShell({
   back?: { to: string; label: string };
   seo?: { title: string; description?: string; path: string };
 }) {
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#F5F4F2]">
       {seo && <SEO {...seo} />}
