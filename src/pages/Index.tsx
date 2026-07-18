@@ -2,6 +2,7 @@ import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight,
   BookOpen,
+  MessageSquare,
   TrendingUp,
   Mail,
   Briefcase,
@@ -70,44 +71,51 @@ const WaveDivider = ({
 const valueCards = [
   {
     icon: BookOpen,
-    title: "ყოველდღიური ლექსიკის სესიები",
-    body:
-      "დღეში ერთი მოკლე სესია: ახალი ბიზნეს სიტყვები ქართული ახსნებით, აუდიოთი და გამეორების ჭკვიანი სისტემით, რომელიც შენს ტემპს ერგება.",
+    title: "დღეში 5 წუთი",
+    body: "მოკლე სესია ახალი სიტყვებით. ყოველ დღე.",
   },
   {
     icon: Users,
-    title: "რეალური სამუშაო სცენარები",
-    body:
-      "შეხვედრები, იმეილები, პრეზენტაციები — ისწავლე სიტყვები ცოცხალი დიალოგებით სწორედ იმ სიტუაციებში, სადაც მათ რეალურად გამოიყენებ.",
+    title: "რეალურ სიტუაციებში",
+    body: "შეხვედრები, იმეილები, გასაუბრება — ცოცხალი დიალოგებით.",
   },
   {
     icon: TrendingUp,
-    title: "პროგრესი, რომელიც ჩანს",
-    body:
-      "ყოველდღიური სერია, დონეები და შენზე მორგებული სირთულე — შედეგს ყოველდღე ხედავ და მოტივაცია არ გიქრება.",
+    title: "სერია გამოტოვების გარეშე",
+    body: "ყოველდღიური სერია, რომელიც მოტივაციას ინარჩუნებს.",
   },
 ];
 
 const modules = [
   {
     icon: GraduationCap,
-    title: "ბიზნეს ლექსიკა",
-    body: "900+ სიტყვა და ფრაზა — მაგალითებით, ქართული ახსნებით და ხმოვანი გახმოვანებით.",
+    title: "900+ სიტყვა",
+    body: "ყოველდღიური სესიები აუდიოთი და ქართული ახსნებით.",
   },
   {
     icon: Users,
     title: "სცენარები",
-    body: "რეალური სამუშაო სიტუაციები ცოცხალი დიალოგებით — შეხვედრები, იმეილები, პრეზენტაციები.",
+    body: "რეალური სამუშაო სიტუაციები ცოცხალი დიალოგებით.",
   },
   {
     icon: Briefcase,
     title: "გასაუბრების სიმულატორი",
-    body: "ივარჯიშე რეალურ ვაკანსიაზე შენი რეზიუმეთი — კითხვები, რომლებსაც ნამდვილად დაგისვამენ.",
+    body: "კითხვები შენს რეზიუმეზე და რეალურ ვაკანსიაზე.",
   },
   {
     icon: Mail,
     title: "დოკუმენტების ასისტენტი",
-    body: "იმეილი, რეზიუმე, სამოტივაციო წერილი — შექმენი ან გააუმჯობესე წამებში.",
+    body: "იმეილი, სამოტივაციო, რეზიუმე, ბიო — შენი მონაცემებით.",
+  },
+  {
+    icon: MessageSquare,
+    title: "შენი წარდგენა",
+    body: "პროფესიონალური თვითწარდგენა — შენი ხმით, ინგლისურად.",
+  },
+  {
+    icon: TrendingUp,
+    title: "ყოველდღიური სერია",
+    body: "პროგრესი, რომელიც ჩანს და მოტივაცია, რომელიც რჩება.",
   },
 ];
 
@@ -128,7 +136,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-[#F5F4F2] text-[#1C1C1E]">
       <SEO
         title="SpeakBusy — ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
-        description="ისწავლე ბიზნეს ინგლისური ყოველდღიური ლექსიკის სესიებით — რეალური სცენარები, აუდიო და შენზე მორგებული გეგმა ქართველი პროფესიონალებისთვის. დაიწყე უფასოდ."
+        description="ისწავლე ბიზნეს ინგლისური დღეში 5 წუთში — სიტყვები აუდიოთი და ქართული ახსნებით. უფასოდ."
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
@@ -167,13 +175,12 @@ const Index = () => {
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ბიზნეს ინგლისური,
-              <span className="block mt-2 text-[#C9A84C]">რომელიც კარიერას ცვლის.</span>
+              ისწავლე ბიზნეს ინგლისური
+              <span className="block mt-2 text-[#C9A84C]">დღეში 5 წუთში.</span>
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-[#A3A3A0] leading-relaxed max-w-2xl ka">
-              ყოველდღიური მოკლე სესიები ქართველი პროფესიონალებისთვის — ბიზნეს ლექსიკა
-              რეალურ სიტუაციებში, ქართული ახსნებით და აუდიოთი.
+              ყოველდღიური სიტყვები აუდიოთი და ქართული ახსნებით. უფასოდ.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -206,7 +213,7 @@ const Index = () => {
                 <span className="h-px w-6 bg-[#232323]" />
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-[#1C1C1E]">
-                რატომ SpeakBusy?
+                მარტივი. ყოველდღიური. შენი.
               </h2>
             </div>
 
@@ -240,11 +247,11 @@ const Index = () => {
                 <span className="h-px w-6 bg-[#C9A84C]" />
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-[#1C1C1E]">
-                რას ისწავლი?
+                რას მიიღებ
               </h2>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {modules.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
@@ -273,10 +280,10 @@ const Index = () => {
 
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center relative z-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
-              მზად ხარ დაეუფლო პროფესიონალურ ინგლისურს?
+              დაიწყე დღეს. უფასოდ.
             </h2>
             <p className="mt-5 text-base sm:text-lg text-[#D6D4D1] ka leading-relaxed">
-              შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
+              დღეში 5 წუთი — შენი ბიზნეს ინგლისურისთვის.
             </p>
             <div className="mt-10">
               <Link
