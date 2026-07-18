@@ -50,7 +50,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export function nextDue(confidence: number, correct: boolean): string {
   const now = Date.now();
   let days: number;
-  if (!correct) days = 1;
+  // Wrong answers become due IMMEDIATELY: the very next session (even the
+  // same day, for premium multi-session users) repeats them via the overdue
+  // layer instead of burying them until tomorrow.
+  if (!correct) return new Date(now).toISOString();
   else if (confidence <= 1) days = 1;
   else if (confidence === 2) days = 3;
   else if (confidence === 3) days = 7;
@@ -111,7 +114,7 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
       : confidence === 3
       ? 7
       : 14
-    : 1;
+    : 0; // any wrong in the session -> due right away, not tomorrow
   return {
     ...p,
     confidence,

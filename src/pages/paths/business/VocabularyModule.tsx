@@ -543,12 +543,15 @@ export default function VocabularyModule() {
         <>
           {scenario && (
             <div className="mb-3 text-center">
-              <span className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] bg-[#C9A84C]/20 border border-[#C9A84C]/35 px-3 py-1.5 rounded-full">
-                🎬 სცენარი: {scenario.titleKa}
-              </span>
-              <p className="ka text-xs text-[#4A4A4A] mt-2 leading-relaxed px-2">
-                {scenario.scenarioKa}
-              </p>
+              <div className="rounded-2xl border-2 border-[#C9A84C] bg-[#C9A84C]/10 p-4 text-left">
+                <p className="ka text-sm font-bold text-[#5C1A2E]">🎬 დღევანდელი სცენარი: {scenario.titleKa}</p>
+                <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
+                  {scenario.scenarioKa}
+                </p>
+                <p className="ka text-[11px] text-[#5C1A2E] font-semibold mt-2">
+                  ამ სესიის ყველა სიტყვა ამ სიტუაციიდანაა
+                </p>
+              </div>
             </div>
           )}
           <IntroCard
@@ -626,6 +629,11 @@ export default function VocabularyModule() {
       {stage === "quiz" && currentQ && (
         <>
           <ProgressBar value={qIdx + (revealed ? 1 : 0)} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} pulse={progressPulse} />
+          {scenario && (
+            <p className="ka text-[11px] font-semibold text-[#5C1A2E] -mt-1">
+              🎬 {scenario.titleKa}
+            </p>
+          )}
           <div key={qIdx} className="biz-question-slide">
             <QuestionCard
               q={currentQ}

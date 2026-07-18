@@ -558,6 +558,11 @@ export default function BusinessHome() {
                 <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
+                {focusDoneToday && s?.mockPro && scenarioToday && (
+                  <p className="ka text-[11px] font-semibold text-[#E5D4A8] mt-2">
+                    🎬 შემდეგი სესია — სცენარი: {scenarioToday.titleKa}
+                  </p>
+                )}
                 {!focusDoneToday && (
                   <div className="mt-3 space-y-2">
                     {scenarioToday && (
@@ -584,7 +589,7 @@ export default function BusinessHome() {
                       onClick={() => navigate("/path/business/module/vocabulary")}
                       className="ka inline-flex items-center justify-center gap-2 bg-[#C9A84C] text-[#1C1C1E] hover:bg-[#D4B560] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                     >
-                      მეორე სესია ახლავე ⭐
+                      კიდევ ერთი სესია ⭐
                       <ArrowRight size={14} strokeWidth={2.25} />
                     </button>
                   )}
