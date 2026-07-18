@@ -523,7 +523,7 @@ export default function BusinessHome() {
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
                 <div className="min-w-0">
-                  <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">პრემიუმი - სიტყვების ულიმიტო სესიები</p>
+                  <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">პრემიუმი — ულიმიტო სესიები</p>
                   <p className="ka text-[11px] text-[#F5F4F2]/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
@@ -577,15 +577,27 @@ export default function BusinessHome() {
                     </p>
                   </div>
                 )}
-                <button
-                  onClick={() =>
-                    navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
-                  }
-                  className="ka mt-5 inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
-                >
-                  {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
-                  <ArrowRight size={14} strokeWidth={2.25} />
-                </button>
+                <div className="mt-5 flex flex-col sm:flex-row gap-2">
+                  {/* Premium: the day is never "over" — offer the next session. */}
+                  {focusDoneToday && s?.mockPro && (
+                    <button
+                      onClick={() => navigate("/path/business/module/vocabulary")}
+                      className="ka inline-flex items-center justify-center gap-2 bg-[#C9A84C] text-[#1C1C1E] hover:bg-[#D4B560] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                    >
+                      მეორე სესია ახლავე ⭐
+                      <ArrowRight size={14} strokeWidth={2.25} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() =>
+                      navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
+                    }
+                    className="ka inline-flex items-center justify-center gap-2 bg-[#1C1C1E] text-white hover:bg-[#3A3A3A] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                  >
+                    {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
+                    <ArrowRight size={14} strokeWidth={2.25} />
+                  </button>
+                </div>
               </div>
             </div>
           </section>
