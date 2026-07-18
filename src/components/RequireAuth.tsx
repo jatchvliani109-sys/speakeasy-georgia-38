@@ -43,10 +43,10 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
     return (
       <Layout showLogout={false}>
         <div className="max-w-sm mx-auto py-10 text-center">
-          <span className="inline-flex w-14 h-14 rounded-full bg-[#3D1220] text-[#F8F5F0] items-center justify-center">
+          <span className="inline-flex w-14 h-14 rounded-full bg-[#111111] text-[#F5F4F2] items-center justify-center">
             <Mail className="w-6 h-6" />
           </span>
-          <h1 className="text-2xl font-extrabold ka text-[#3D1220] mt-4 tracking-tight">
+          <h1 className="text-2xl font-extrabold ka text-[#5C1A2E] mt-4 tracking-tight">
             დაადასტურეთ თქვენი ელ-ფოსტა
           </h1>
           <p className="text-sm text-[#4A4A4A] mt-3 ka leading-relaxed">
@@ -55,14 +55,14 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
           </p>
           {user.email && (
             <p className="text-xs text-[#6B6B6B] mt-2 ka">
-              გავაგზავნეთ: <span className="font-semibold text-[#3D1220]">{user.email}</span>
+              გავაგზავნეთ: <span className="font-semibold text-[#5C1A2E]">{user.email}</span>
             </p>
           )}
           <button
             type="button"
             onClick={resend}
             disabled={resending}
-            className="mt-6 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#3D1220] hover:bg-[#3D1220]/5 transition-colors disabled:opacity-60 ka"
+            className="mt-6 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#5C1A2E] hover:bg-[#111111]/5 transition-colors disabled:opacity-60 ka"
           >
             {resending ? "იგზავნება..." : "ხელახლა გაგზავნა"}
           </button>
@@ -72,7 +72,7 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
               await supabase.auth.signOut();
               window.location.href = "/auth";
             }}
-            className="mt-3 w-full text-center text-xs text-[#6B6B6B] hover:text-[#3D1220] ka"
+            className="mt-3 w-full text-center text-xs text-[#6B6B6B] hover:text-[#5C1A2E] ka"
           >
             გასვლა
           </button>

@@ -81,12 +81,12 @@ export default function OAuthConsent() {
           <div className="text-center text-[#4A4A4A] ka">იტვირთება…</div>
         )}
         {!error && details && (
-          <div className="p-6 rounded-2xl bg-[#F8F5F0] border border-[#E0D8D0] space-y-5">
+          <div className="p-6 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] space-y-5">
             <div>
               <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
                 Agent integration
               </div>
-              <h1 className="text-2xl font-extrabold ka text-[#3D1220] mt-2 tracking-tight">
+              <h1 className="text-2xl font-extrabold ka text-[#5C1A2E] mt-2 tracking-tight">
                 დაუკავშირდი {details.client?.name ?? "აპლიკაციას"}
               </h1>
               <p className="text-sm text-[#4A4A4A] mt-2 ka leading-relaxed">
@@ -98,14 +98,14 @@ export default function OAuthConsent() {
               <button
                 disabled={busy}
                 onClick={() => decide(true)}
-                className="flex-1 h-11 rounded-xl bg-[#3D1220] text-[#F8F5F0] text-sm font-semibold ka hover:bg-[#4A1525] transition-colors disabled:opacity-60"
+                className="flex-1 h-11 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold ka hover:bg-[#161616] transition-colors disabled:opacity-60"
               >
                 დაშვება
               </button>
               <button
                 disabled={busy}
                 onClick={() => decide(false)}
-                className="flex-1 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#3D1220] ka hover:bg-[#3D1220]/5 transition-colors disabled:opacity-60"
+                className="flex-1 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#5C1A2E] ka hover:bg-[#111111]/5 transition-colors disabled:opacity-60"
               >
                 უარყოფა
               </button>

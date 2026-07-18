@@ -173,7 +173,7 @@ export default function BusinessSetup() {
             }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-base"
+            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-base"
           />
           <div className="flex justify-end mt-6">
             <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
@@ -213,11 +213,11 @@ export default function BusinessSetup() {
                     className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                       on
                         ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                        : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                        : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                     }`}
                   >
                     <span className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                      style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E0D8D0" }} />
+                      style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E4E2DF" }} />
                     {GOAL_LABELS[g]}
                   </button>
                 );
@@ -238,7 +238,7 @@ export default function BusinessSetup() {
               }}
             />
             {intensity === "deadline" && (
-              <div className="mt-5 pt-5 border-t border-[#E0D8D0]">
+              <div className="mt-5 pt-5 border-t border-[#E4E2DF]">
                 <SingleSelect
                   title="როდის გჭირდება შედეგი?"
                   options={DEADLINE_KEYS.map((k) => ({ value: k, label: DEADLINE_LABELS[k] }))}
@@ -297,12 +297,12 @@ function SingleSelect<T extends string>({
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
                   ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                  : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                  : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
               }`}
             >
               <span
                 className="inline-block w-3.5 h-3.5 mr-2 rounded-full border align-middle"
-                style={{ background: on ? "#1C1C1E" : "transparent", borderColor: on ? "#1C1C1E" : "#E0D8D0" }}
+                style={{ background: on ? "#1C1C1E" : "transparent", borderColor: on ? "#1C1C1E" : "#E4E2DF" }}
               />
               {o.label}
             </button>
@@ -340,12 +340,12 @@ function MultiSelect<T extends string>({
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
                   ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                  : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                  : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
               }`}
             >
               <span
                 className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E0D8D0" }}
+                style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E4E2DF" }}
               />
               {o.label}
             </button>

@@ -91,7 +91,7 @@ export default function GlobalNav() {
               to={item.to!}
               className={`ka inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-[13px] font-semibold transition-colors ${
                 active
-                  ? "bg-[#5C1A2E] text-[#F0EBE3]"
+                  ? "bg-[#232323] text-[#F5F4F2]"
                   : "text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
               }`}
             >
@@ -103,7 +103,7 @@ export default function GlobalNav() {
         <button
           onClick={handleLogout}
           aria-label="გასვლა"
-          className="ka inline-flex items-center gap-1.5 px-3 py-2 ml-1 rounded-md text-[13px] font-semibold text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5 border-l border-[#E0D8D0]"
+          className="ka inline-flex items-center gap-1.5 px-3 py-2 ml-1 rounded-md text-[13px] font-semibold text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5 border-l border-[#E4E2DF]"
         >
           <LogOut size={14} strokeWidth={2.25} />
           გასვლა
@@ -125,9 +125,9 @@ export default function GlobalNav() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="w-[300px] sm:w-[340px] p-0 bg-[#F0EBE3] border-l border-[#E0D8D0]"
+            className="w-[300px] sm:w-[340px] p-0 bg-[#F5F4F2] border-l border-[#E4E2DF]"
           >
-            <SheetHeader className="px-5 pt-5 pb-4 border-b border-[#E0D8D0]">
+            <SheetHeader className="px-5 pt-5 pb-4 border-b border-[#E4E2DF]">
               <SheetTitle className="ka text-[#5C1A2E] text-base font-bold text-left">
                 {displayName ? `გამარჯობა, ${displayName}` : "ნავიგაცია"}
               </SheetTitle>
@@ -148,9 +148,9 @@ export default function GlobalNav() {
                     onClick={() => handleItem(item)}
                     className={`ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold transition-colors ${
                       isLogout
-                        ? "text-[#5C1A2E] hover:bg-[#5C1A2E]/5 mt-2 border-t border-[#E0D8D0] rounded-none pt-4"
+                        ? "text-[#5C1A2E] hover:bg-[#5C1A2E]/5 mt-2 border-t border-[#E4E2DF] rounded-none pt-4"
                         : active
-                        ? "bg-[#5C1A2E] text-[#F0EBE3]"
+                        ? "bg-[#232323] text-[#F5F4F2]"
                         : "text-[#1C1C1E] hover:bg-[#5C1A2E]/5 hover:text-[#5C1A2E]"
                     }`}
                   >

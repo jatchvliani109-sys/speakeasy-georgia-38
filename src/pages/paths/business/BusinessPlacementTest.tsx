@@ -299,7 +299,7 @@ export default function BusinessPlacementTest() {
             }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-base bg-white"
+            className="ka mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-base bg-white"
           />
           {nameError && <p className="ka text-xs text-red-700 mt-2">{nameError}</p>}
           <div className="mt-5 flex items-center justify-between gap-3">
@@ -382,7 +382,7 @@ export default function BusinessPlacementTest() {
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
                       ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                      : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                      : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                   }`}
                 >
                   {opt}
@@ -401,7 +401,7 @@ export default function BusinessPlacementTest() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
             <p className="ka text-xs text-[#4A4A4A] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.

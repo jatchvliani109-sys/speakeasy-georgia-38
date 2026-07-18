@@ -8,7 +8,7 @@ export default function TermsOfUse() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8F5F0",
+        background: "#F5F4F2",
         color: "#1C1C1E",
         padding: "24px 16px",
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
