@@ -19,6 +19,7 @@ import {
   SelfIntroPhrase,
   SELF_INTRO_PURPOSES,
   SELF_INTRO_STATUSES,
+  tryConsumeAiSession,
 } from "./lib/state";
 
 
@@ -50,7 +51,7 @@ const STRUCTURE_PARTS = [
   { en: "Current status", ka: "ვინ ხარ ახლა", exEn: "I am a Business Administration student.", exKa: "მე ვარ ბიზნეს ადმინისტრირების სტუდენტი." },
   { en: "Field / background", ka: "სფერო ან ბექგრაუნდი", exEn: "I study marketing and management.", exKa: "ვსწავლობ მარკეტინგსა და მენეჯმენტს." },
   { en: "Skills or interests", ka: "უნარები ან ინტერესები", exEn: "I am interested in customer communication.", exKa: "მე მაინტერესებს მომხმარებელთან კომუნიკაცია." },
-  { en: "Goal", ka: "მიზანი", exEn: "I want to improve my professional English.", exKa: "მინდა გავიუმჯობესო პროფესიული ინგლისური." },
+  { en: "Goal", ka: "მიზანი", exEn: "I want to improve my professional English.", exKa: "მინდა გავიუმჯობესო პროფესიონალური ინგლისური." },
 ];
 
 // Examples per purpose & tier
@@ -102,7 +103,7 @@ type Exercise =
 
 const EXERCISES: Exercise[] = [
   { kind: "fill", prompt: "My name ___ Nino.", promptKa: "ჩაწერე გამოტოვებული სიტყვა.", answer: "is", hintKa: "to be ფორმა" },
-  { kind: "choice", prompt: "Which is more professional?", promptKa: "რომელია უფრო პროფესიული?",
+  { kind: "choice", prompt: "Which is more professional?", promptKa: "რომელია უფრო პროფესიონალური?",
     options: ["I wanna work here.", "I'd like to work here.", "Gimme this job."], correct: 1 },
   { kind: "fill", prompt: "I am interested ___ marketing.", promptKa: "ჩაწერე სწორი წინდებული.", answer: "in", hintKa: "interested + ?" },
   { kind: "order", prompt: "Put the words in order:", promptKa: "დაალაგე სიტყვები სწორი თანმიმდევრობით.",
@@ -167,8 +168,17 @@ export default function SelfIntroduction() {
 
   const generate = async () => {
     if (!canGenerate) { toast.error("შეავსე ყველა აუცილებელი ველი"); return; }
+    if (!user) return;
     setLoading(true);
     try {
+      // One intro generation = one AI session from the weekly pool.
+      // (The rewrite buttons refine THIS session and don't consume more.)
+      const budget = await tryConsumeAiSession(user.id);
+      if (!budget.ok) {
+        toast.error("ამ კვირის AI სესიები ამოწურულია — ⭐ პრემიუმი გაძლევს 7-ს კვირაში.");
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase.functions.invoke("business-self-intro", {
         body: { ...inputs, level: biz?.level || "business_intermediate",
           businessPriority: biz?.mainPriority?.[0] || "general_business", variant: "all" },
@@ -213,33 +223,17 @@ export default function SelfIntroduction() {
     setStep(7);
   };
 
-  // OpenAI TTS read-aloud (cleans Georgian + emojis server-side). Cached per session.
-  const audioCache = useMemo(() => new Map<string, string>(), []);
+  // Device-voice read-aloud only (app-wide policy: no paid live TTS).
   const speak = async (text: string) => {
     if (!text) return;
-    try {
-      let url = audioCache.get(text);
-      if (!url) {
-        const { data, error } = await supabase.functions.invoke("openai-text-to-speech", {
-          body: { text },
-        });
-        if (error || !data) {
-          toast.message("No English audio available");
-          return;
-        }
-        const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: "audio/mpeg" });
-        if (!blob.type.startsWith("audio/")) { toast.message("No English audio available"); return; }
-        url = URL.createObjectURL(blob);
-        audioCache.set(text, url);
-      }
-      const audio = new Audio(url);
-      audio.playbackRate = 0.95;
-      await audio.play();
-    } catch {
+    {
       try {
+        const synth = window.speechSynthesis;
         const u = new SpeechSynthesisUtterance(text);
         u.lang = "en-US"; u.rate = 0.95;
-        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+        (window as any).__sbUtterance = u;
+        synth.cancel();
+        window.setTimeout(() => { try { synth.resume(); synth.speak(u); } catch {} }, 80);
       } catch {}
     }
   };
@@ -263,7 +257,7 @@ export default function SelfIntroduction() {
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
       <div className="mb-4">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">პირველი ნაბიჯი</p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი პროფესიული წარდგენა</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი პროფესიონალური წარდგენა</h1>
         <p className="ka text-xs text-[#4A4A4A] mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
           {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-[#5C1A2E]">{biz.level.replace("business_", "")}</span></span>}
@@ -285,13 +279,13 @@ export default function SelfIntroduction() {
       {/* STEP 0: Friendly intro */}
       {step === 0 && (
         <BizCard className="mb-4">
-          <h2 className="ka text-xl font-bold text-[#5C1A2E]">პირველი ნაბიჯი: პროფესიული წარდგენა</h2>
+          <h2 className="ka text-xl font-bold text-[#5C1A2E]">პირველი ნაბიჯი: პროფესიონალური წარდგენა</h2>
           <p className="ka text-sm text-[#1C1C1E] mt-2">
             სანამ ბიზნეს ინგლისურის გაკვეთილებზე გადავალთ, შევქმნათ შენი მოკლე და ძლიერი ინგლისური წარდგენა.
           </p>
           <div className="mt-4 space-y-2">
             <p className="ka text-sm text-[#5C1A2E]">
-              პროფესიული წარდგენა დაგჭირდება უნივერსიტეტში, გასაუბრებაზე, networking-ში, პრეზენტაციებზე და სამუშაო კომუნიკაციაში.
+              პროფესიონალური წარდგენა დაგჭირდება უნივერსიტეტში, გასაუბრებაზე, networking-ში, პრეზენტაციებზე და სამუშაო კომუნიკაციაში.
             </p>
             <p className="text-sm text-[#4A4A4A] italic">
               A strong introduction helps you present yourself clearly in interviews, university, networking, and professional settings.
@@ -322,7 +316,7 @@ export default function SelfIntroduction() {
       {step === 1 && (
         <BizCard className="mb-4">
           <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">ნაბიჯი 1</p>
-          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">როგორ ავაწყოთ პროფესიული წარდგენა?</h2>
+          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">როგორ ავაწყოთ პროფესიონალური წარდგენა?</h2>
           <p className="ka text-sm text-[#1C1C1E] mt-3">
             {isBeginner || isElementary
               ? "კარგი წარდგენა მოკლეა და მკაფიო. ის შედგება 5 ნაწილისგან. ჯერ წავიკითხოთ თითოეული."
@@ -450,7 +444,7 @@ export default function SelfIntroduction() {
         <div className="space-y-4">
           {(["short", "standard", "polished"] as const).map((v) => (
             <VersionCard key={v}
-              label={v === "short" ? "Short — 20-30 წამი" : v === "standard" ? "Standard — 45-60 წამი" : "Polished — პროფესიული"}
+              label={v === "short" ? "Short — 20-30 წამი" : v === "standard" ? "Standard — 45-60 წამი" : "Polished — პროფესიონალური"}
               version={result[v]} isSelected={selected === v} onSelect={() => setSelected(v)}
               speakText={result[v].en} onCopy={() => copyText(result[v].en)}
               onRewrite={(mode) => rewrite(v, mode)} rewritingKey={rewriting} vKey={v}
@@ -565,7 +559,7 @@ export default function SelfIntroduction() {
             <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#1C1C1E] font-semibold si-rise-1">დასრულდა</p>
             <h2 className="ka text-2xl font-bold text-[#5C1A2E] mt-2 si-rise-1">წარდგენა მზადაა</h2>
             <p className="ka text-sm text-[#4A4A4A] mt-3 max-w-md mx-auto si-rise-2">
-              ეს არის შენი პირადი პროფესიული წარდგენა — ინგლისურად, შენი ხმით.
+              ეს არის შენი პირადი პროფესიონალური წარდგენა — ინგლისურად, შენი ხმით.
               გამოიყენე გასაუბრებაზე, ქსელშეკრებებზე ან ნებისმიერ პროფესიულ გარემოში.
             </p>
           </div>

@@ -19,7 +19,18 @@ import {
   saveDocument,
   updateDocument,
 } from "./lib/docs";
-import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
+import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, tryConsumeAiSession, type BusinessState } from "./lib/state";
+
+// Every document generation draws one session from the unified weekly AI
+// budget (shared with interviews + self-introduction). Edits/deletes/library
+// views are free — only model calls consume.
+const AI_LIMIT_MSG =
+  "ამ კვირის AI სესიები ამოწურულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში — ორშაბათს განახლდება.";
+async function callDocsWithBudget(userId: string, body: Parameters<typeof callDocs>[0]) {
+  const budget = await tryConsumeAiSession(userId);
+  if (!budget.ok) throw new Error(AI_LIMIT_MSG);
+  return callDocs(body);
+}
 
 type View =
   | { kind: "home" }
@@ -66,7 +77,7 @@ export default function DocumentHelper() {
 
   if (!user || !profile) {
     return (
-      <BusinessShell seo={{ title: "დოკუმენტების ასისტენტი — SpeakBusy", description: "შექმენი და გააუმჯობესე პროფესიული დოკუმენტები AI-ის დახმარებით.", path: "/path/business/documents" }}>
+      <BusinessShell seo={{ title: "დოკუმენტების ასისტენტი — SpeakBusy", description: "შექმენი და გააუმჯობესე პროფესიონალური დოკუმენტები AI-ის დახმარებით.", path: "/path/business/documents" }}>
         <div className="ka text-[#4A4A4A]">იტვირთება...</div>
       </BusinessShell>
     );
@@ -80,7 +91,10 @@ export default function DocumentHelper() {
         </p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დოკუმენტების ასისტენტი</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
-          რეალური პროფესიული დოკუმენტები — შენი მონაცემებით, წამიერად.
+          რეალური პროფესიონალური დოკუმენტები — შენი მონაცემებით, წამიერად.
+        </p>
+        <p className="ka text-[11px] text-[#4A4A4A] mt-1">
+          ამ კვირაში დარჩა {aiSessionsRemaining(state)}/{aiWeeklyLimit(state)} AI სესია
         </p>
       </header>
 
@@ -147,11 +161,11 @@ function HomeView({
   onOpenDoc: (d: BusinessDocument) => void;
 }) {
   const tools: { id: DocType; title: string; subtitle: string }[] = [
-    { id: "email", title: "პროფესიული იმეილი", subtitle: "აღწერე რა გინდა გადასცე — მიიღე გაპრიალებული იმეილი." },
+    { id: "email", title: "პროფესიონალური იმეილი", subtitle: "აღწერე რა გინდა გადასცე — მიიღე გაპრიალებული იმეილი." },
     { id: "email_fix", title: "გაასწორე ჩემი ელ-ფოსტა", subtitle: "ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია + ახსნა." },
     { id: "cover_letter", title: "სამოტივაციო წერილი", subtitle: "შენი რეზიუმე + სამუშაო პოზიცია → მორგებული წერილი." },
     { id: "resume_improve", title: "რეზიუმეს გაუმჯობესება", subtitle: "კონკრეტული რჩევები — სუსტი ფრაზები, keywords, ტონი." },
-    { id: "bio", title: "პროფესიული ბიო", subtitle: "მოკლე, საშუალო, სრული — LinkedIn-ისთვის და სხვა." },
+    { id: "bio", title: "პროფესიონალური ბიო", subtitle: "მოკლე, საშუალო, სრული — LinkedIn-ისთვის და სხვა." },
   ];
 
   return (
@@ -402,7 +416,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
     if (!user) return;
     setLoading(true);
     try {
-      const r = await callDocs({
+      const r = await callDocsWithBudget(user.id, {
         action: "email_write",
         profile,
         intent,
@@ -413,7 +427,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
       });
       const doc = await saveDocument(user.id, {
         doc_type: "email",
-        title: r.title || "პროფესიული იმეილი",
+        title: r.title || "პროფესიონალური იმეილი",
         content: r.content || "",
         meta: { subject: r.subject || "" },
         inputs: { intent, recipient, relationship, outcome, tone },
@@ -429,7 +443,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული იმეილი</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიონალური იმეილი</h2>
       <p className="ka text-xs text-[#4A4A4A] mb-4">3 მოკლე კითხვა → დასრულებული იმეილი.</p>
 
       <ProgressDots total={4} current={step} />
@@ -495,7 +509,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
           <Label className="mt-4">ტონი</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
             {[
-              { id: "balanced professional", label: "დაბალანსებული პროფესიული" },
+              { id: "balanced professional", label: "დაბალანსებული პროფესიონალური" },
               { id: "formal", label: "ფორმალური" },
               { id: "friendly", label: "მეგობრული" },
               { id: "direct", label: "პირდაპირი" },
@@ -542,7 +556,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
     if (!user) return;
     setLoading(true);
     try {
-      const r = await callDocs({
+      const r = await callDocsWithBudget(user.id, {
         action: "email_fix",
         profile,
         original,
@@ -604,7 +618,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
         <Label className="mt-4">ტონი</Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
           {[
-            { id: "balanced professional", label: "დაბალანსებული პროფესიული" },
+            { id: "balanced professional", label: "დაბალანსებული პროფესიონალური" },
             { id: "formal", label: "ფორმალური" },
             { id: "friendly", label: "მეგობრული" },
             { id: "direct", label: "პირდაპირი" },
@@ -659,7 +673,7 @@ function CoverLetterFlow({
     if (!user) return;
     setLoading(true);
     try {
-      const r = await callDocs({
+      const r = await callDocsWithBudget(user.id, {
         action: "cover_letter",
         profile,
         jobTitle,
@@ -732,7 +746,7 @@ function ResumeImproveFlow({
     if (!user) return;
     setLoading(true);
     try {
-      const r = await callDocs({
+      const r = await callDocsWithBudget(user.id, {
         action: "resume_improve",
         profile,
         resumeText,
@@ -838,11 +852,11 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
     if (!user) return;
     setLoading(true);
     try {
-      const r = await callDocs({ action: "bio_write", profile, purpose, tone });
+      const r = await callDocsWithBudget(user.id, { action: "bio_write", profile, purpose, tone });
       const formatted = (r.medium || r.short || r.full || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "bio",
-        title: r.title || `პროფესიული ბიო — ${purpose}`,
+        title: r.title || `პროფესიონალური ბიო — ${purpose}`,
         content: formatted,
         meta: { short: r.short, medium: r.medium, full: r.full, purpose, tone },
         inputs: { purpose, tone },
@@ -858,7 +872,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
 
   return (
     <div>
-      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიული ბიო</h2>
+      <h2 className="ka text-xl font-bold text-[#5C1A2E] mb-1">პროფესიონალური ბიო</h2>
       <p className="ka text-xs text-[#4A4A4A] mb-4">სამი ვერსია: short, medium, full.</p>
       <BizCard>
         <Label>სად გამოიყენებ?</Label>
@@ -903,6 +917,7 @@ function DocView({
   onBack: () => void;
   onUpdated: (d: BusinessDocument) => void;
 }) {
+  const { user } = useAuth();
   const [adjusting, setAdjusting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(doc.content);
@@ -914,9 +929,10 @@ function DocView({
   };
 
   const adjust = async (adjustment: string) => {
+    if (!user) return;
     setAdjusting(true);
     try {
-      const r = await callDocs({
+      const r = await callDocsWithBudget(user.id, {
         action: "adjust",
         docType: doc.doc_type,
         content: doc.content,

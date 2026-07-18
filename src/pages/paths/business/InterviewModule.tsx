@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, pullBusinessFromSupabase } from "./lib/state";
+import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, tryConsumeAiSession } from "./lib/state";
 import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 import { randomRoleCard, type RoleCard } from "./lib/roleCards";
 
@@ -68,9 +68,6 @@ type DebriefData = {
 // aren't live it stays open with a premium badge; once subscriptions launch,
 // flip PAYMENTS_LIVE and it locks for free users automatically.
 const PAYMENTS_LIVE = true; // gating active (mock premium unlocks it)
-const REAL_MONTHLY_LIMIT = 5;      // real interviews per month (premium)
-const FREE_PRACTICE_LIMIT = 2;     // matched+random per month (free tier)
-const PREMIUM_PRACTICE_LIMIT = 20; // matched+random per month (premium fair use)
 
 type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
 type Mode = "real" | "matched" | "random";
@@ -92,16 +89,14 @@ export default function InterviewModule() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("loading");
   const [biz, setBiz] = useState<BusinessState | null>(null);
-  const [realThisMonth, setRealThisMonth] = useState(0);
-  const [practiceThisMonth, setPracticeThisMonth] = useState(0);
-  // Mock premium (placeholder until real payments).
+  // Unified weekly AI budget (shared with documents + self-intro).
   const isPaidUser = biz?.mockPro === true;
-  const realCapReached = isPaidUser && realThisMonth >= REAL_MONTHLY_LIMIT;
-  const practiceLimit = isPaidUser ? PREMIUM_PRACTICE_LIMIT : FREE_PRACTICE_LIMIT;
-  const practiceCapReached = practiceThisMonth >= practiceLimit;
-  const practiceLockedHint = isPaidUser
-    ? "ამ თვის ლიმიტი ამოწურულია — განახლდება შემდეგ თვეს"
-    : `ამ თვის ${FREE_PRACTICE_LIMIT} უფასო გასაუბრება ამოწურულია — ⭐ პრემიუმი`;
+  const aiRemaining = aiSessionsRemaining(biz);
+  const aiLimit = aiWeeklyLimit(biz);
+  const aiEmpty = aiRemaining <= 0;
+  const aiLockedHint = isPaidUser
+    ? "ამ კვირის AI სესიები ამოწურულია — ორშაბათს განახლდება"
+    : "ამ კვირის AI სესია გამოყენებულია — ⭐ პრემიუმი: 7/კვირაში";
   const [session, setSession] = useState<SessionData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -166,30 +161,6 @@ export default function InterviewModule() {
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
-        // Monthly AI-usage counters (every interview costs AI per turn, so
-        // ALL modes are capped: 5 real + 20 practice premium, 2 practice free).
-        // Only mode-stamped sessions count, so counters start fresh from the
-        // day this shipped — old test sessions don't lock anyone out.
-        const monthStart = new Date();
-        monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
-        const [{ count: realCount }, { count: stampedCount }] = await Promise.all([
-          supabase
-            .from("business_interview_sessions")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id)
-            .eq("session_data->>mode", "real")
-            .gte("created_at", monthStart.toISOString()),
-          supabase
-            .from("business_interview_sessions")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id)
-            .not("session_data->>mode", "is", null)
-            .gte("created_at", monthStart.toISOString()),
-        ]);
-        if (!cancelled) {
-          setRealThisMonth(realCount ?? 0);
-          setPracticeThisMonth(Math.max(0, (stampedCount ?? 0) - (realCount ?? 0)));
-        }
 
         const curStep = interviewStep(completed.length);
         setCurriculum(curStep);
@@ -227,6 +198,17 @@ export default function InterviewModule() {
     if (!user || starting) return;
     setStarting(true);
     setError(null);
+    // One interview = one AI session from the weekly pool (any mode: even
+    // random's replies + debrief hit the model).
+    const budget = await tryConsumeAiSession(user.id);
+    if (!budget.ok) {
+      setError(isPaidUser
+        ? "ამ კვირის 7 AI სესია ამოწურულია — ორშაბათს განახლდება."
+        : "ამ კვირის AI სესია გამოყენებულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში.");
+      setStarting(false);
+      return;
+    }
+    setBiz(await pullBusinessFromSupabase(user.id));
     setStep("loading");
     try {
       const cur = biz || (await pullBusinessFromSupabase(user.id));
@@ -536,9 +518,7 @@ export default function InterviewModule() {
               სამი გზა ვარჯიშისთვის — რეალური ვაკანსიიდან შემთხვევით სცენარამდე.
             </p>
             <p className="ka text-[11px] text-[#4A4A4A] mt-1.5">
-              {isPaidUser
-                ? `ამ თვეში: ${realThisMonth}/${REAL_MONTHLY_LIMIT} რეალური · ${practiceThisMonth}/${PREMIUM_PRACTICE_LIMIT} სავარჯიშო`
-                : `უფასოდ: ${FREE_PRACTICE_LIMIT} სავარჯიშო გასაუბრება თვეში (დარჩა ${Math.max(0, FREE_PRACTICE_LIMIT - practiceThisMonth)})`}
+              ამ კვირაში დარჩა {aiRemaining}/{aiLimit} AI სესია — გასაუბრებები, დოკუმენტები და წარდგენა ერთ ბიუჯეტს იზიარებენ.
             </p>
           </BizCard>
 
@@ -547,13 +527,13 @@ export default function InterviewModule() {
             badgeKa="⭐ პრემიუმ"
             descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოარგებს — სუსტ წერტილებზეც."
             emoji="🎯"
-            locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser) || realCapReached}
+            locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser) || aiEmpty}
             lockedHintKa={
               !hasResume
                 ? "ჯერ ატვირთე რეზიუმე"
-                : realCapReached
-                  ? `ამ თვის ${REAL_MONTHLY_LIMIT} გასაუბრება ამოწურულია`
-                  : "⭐ პრემიუმ ფუნქცია"
+                : PAYMENTS_LIVE && !isPaidUser
+                  ? "⭐ პრემიუმ ფუნქცია"
+                  : aiLockedHint
             }
             onClick={() => { setMode("real"); setStep("posting"); }}
             onLockedClick={() => {
@@ -565,8 +545,8 @@ export default function InterviewModule() {
             titleKa="მორგებული ვაკანსია"
             descKa="AI შექმნის რეალისტურ ვაკანსიას შენს რეზიუმეზე მორგებულს, ერთი საფეხურით მაღლა. წაიკითხავ და გაივლი გასაუბრებას."
             emoji="✨"
-            locked={!hasResume || practiceCapReached}
-            lockedHintKa={!hasResume ? "ჯერ ატვირთე რეზიუმე" : practiceLockedHint}
+            locked={!hasResume || aiEmpty}
+            lockedHintKa={!hasResume ? "ჯერ ატვირთე რეზიუმე" : aiLockedHint}
             onClick={() => { setMode("matched"); startSession("matched"); }}
             onLockedClick={() => {
               if (!hasResume) navigate("/path/business/resume");
@@ -577,8 +557,8 @@ export default function InterviewModule() {
             titleKa="შემთხვევითი გასაუბრება"
             descKa="მზა როლი — გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
             emoji="🎲"
-            locked={practiceCapReached}
-            lockedHintKa={practiceLockedHint}
+            locked={aiEmpty}
+            lockedHintKa={aiLockedHint}
             onClick={() => { setMode("random"); startSession("random"); }}
             onLockedClick={() => { if (!isPaidUser) navigate("/path/business/premium"); }}
           />
