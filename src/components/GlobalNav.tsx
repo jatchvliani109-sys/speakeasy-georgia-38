@@ -100,18 +100,12 @@ export default function GlobalNav() {
             </Link>
           );
         })}
-        <button
-          onClick={handleLogout}
-          aria-label="გასვლა"
-          className="ka inline-flex items-center gap-1.5 px-3 py-2 ml-1 rounded-md text-[13px] font-semibold text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5 border-l border-[#E4E2DF]"
-        >
-          <LogOut size={14} strokeWidth={2.25} />
-          გასვლა
-        </button>
       </nav>
 
-      {/* Mobile/Tablet: hamburger sheet */}
-      <div className="lg:hidden">
+      {/* Hamburger sheet — all breakpoints. On desktop it complements the
+          inline core links with the full feature list (documents tools,
+          premium, profile, logout — which can never be clipped here). */}
+      <div>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
