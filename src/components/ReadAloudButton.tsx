@@ -113,13 +113,34 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
       throw new Error("no stored audio");
     } catch (err) {
       try {
+        const synth = window.speechSynthesis;
+        if (!synth) throw new Error("speech unsupported");
         const u = new SpeechSynthesisUtterance(text);
         u.lang = "en-US";
         u.rate = 0.95;
         u.onend = () => setState("idle");
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(u);
+        u.onerror = () => setState("idle");
+        // Keep a global ref: Safari garbage-collects utterances mid-speech,
+        // which silently kills playback.
+        (window as any).__sbUtterance = u;
+        synth.cancel();
+        // iOS Safari drops an utterance queued in the same tick as cancel();
+        // resume() un-sticks a paused synth after backgrounding.
+        window.setTimeout(() => {
+          try {
+            synth.resume();
+            synth.speak(u);
+          } catch {
+            setState("idle");
+          }
+        }, 80);
         setState("playing");
+        // Safety net: if neither onend nor onerror ever fires (a known iOS
+        // quirk), reset the button so it never gets stuck.
+        const myToken2 = currentToken;
+        window.setTimeout(() => {
+          if (currentToken === myToken2 && !synth.speaking) setState("idle");
+        }, 15000);
       } catch (fallbackErr) {
         console.error("[ReadAloud] Fallback also failed:", fallbackErr);
         setState("idle");

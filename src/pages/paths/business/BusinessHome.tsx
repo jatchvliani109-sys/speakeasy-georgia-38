@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Award,
   BarChart2,
+  Briefcase,
   Clock,
   FileText,
   Library,
   RotateCcw,
-  Sparkles,
+  Star,
   Target,
   Check,
   ArrowRight,
@@ -21,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 import {
-  BUSINESS_MODULES,
   BusinessIntensity,
   BusinessState,
   LEVEL_LABELS,
@@ -29,7 +29,6 @@ import {
   resetBusiness,
   saveBusiness,
 } from "./lib/state";
-import { interviewStep } from "./lib/curriculum";
 import { computeStreakWithFreezes, loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
@@ -398,16 +397,15 @@ export default function BusinessHome() {
                     >
                       {streak}{" "}
                       <span className={`ka text-xs font-semibold ${streakDark ? "text-[#F8F5F0]/70" : "text-[#4A4A4A]"}`}>
-                        დღე ზედიზედ
+                        დღე ზედიზედ{freezesLeft > 0 ? ` · ❄${freezesLeft}` : ""}
                       </span>
                     </p>
                     <p className={`ka text-[10px] mt-0.5 font-semibold ${streakDark ? "text-[#C9A84C]" : "text-[#4A4A4A]"}`}>
                       {streakMsg}
                     </p>
-                    {freezesLeft > 0 && (
-                      <p className={`ka text-[9px] mt-0.5 ${streakDark ? "text-[#F8F5F0]/60" : "text-[#4A4A4A]"}`}>
-                        ❄ {freezesLeft} გაყინვა დაცულია
-                        {usedFreezeToday ? " · სერია გადარჩა!" : ""}
+                    {usedFreezeToday && (
+                      <p className={`ka text-[9px] mt-0.5 font-semibold ${streakDark ? "text-[#7FB2D9]" : "text-[#5C1A2E]"}`}>
+                        ❄ სერია გადარჩა!
                       </p>
                     )}
                   </div>
@@ -440,20 +438,14 @@ export default function BusinessHome() {
                   ))}
                 </div>
               </div>
-              <p className={`ka text-[10px] mt-3 ${streakDark ? "text-[#F8F5F0]/70" : "text-[#4A4A4A]"}`}>
-                {last7[6]?.done ? "დღევანდელი დღე ჩათვლილია ✓" : "ერთი სესია საკმარისია დღის ჩასათვლელად"}
-              </p>
               {nextMilestone !== null && (
-                <div className="mt-2">
+                <div className="mt-3">
                   <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-[#F8F5F0]/15" : "bg-[#F0EBE3]"}`}>
                     <div
                       className="h-full bg-[#C9A84C] rounded-full transition-all"
                       style={{ width: `${Math.min(100, Math.round((streak / nextMilestone) * 100))}%` }}
                     />
                   </div>
-                  <p className={`ka text-[9px] mt-1 ${streakDark ? "text-[#F8F5F0]/60" : "text-[#4A4A4A]"}`}>
-                    შემდეგი ნიშნული: {nextMilestone} დღე
-                  </p>
                 </div>
               )}
             </div>
@@ -629,71 +621,6 @@ export default function BusinessHome() {
             </BizCard>
           )}
 
-          {/* 4. Modules */}
-          <section className="mb-5">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
-              მოდულები
-            </p>
-            <div className="grid gap-2 md:grid-cols-2">
-              {[...BUSINESS_MODULES]
-                .sort((a, b) => {
-                  // VOCAB-FIRST: vocabulary leads, interview second.
-                  const r = (slug: string) => (slug === "vocabulary" ? 0 : slug === "interview" ? 1 : 2);
-                  return r(a.slug) - r(b.slug);
-                })
-                .map((m) => {
-                const count = progress[m.slug]?.count ?? 0;
-                const started = count > 0;
-                const cur = m.slug === "interview" ? interviewStep(count) : null;
-                const ModIcon = m.icon;
-
-                return (
-                  <Link
-                    key={m.slug}
-                    to={`/path/business/module/${m.slug}`}
-                    className="block bg-white border border-[#E0D8D0] rounded-lg p-4 hover:border-[#5C1A2E]/50 transition-colors"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="w-10 h-10 rounded-md bg-[#5C1A2E]/5 text-[#5C1A2E] border border-[#E0D8D0] grid place-items-center shrink-0">
-                        <ModIcon size={18} strokeWidth={2} />
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="ka font-semibold text-sm text-[#5C1A2E] break-words leading-snug">
-                            {m.title}
-                          </p>
-                          <span
-                            className={`ka text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${
-                              started
-                                ? "bg-[#5C1A2E]/8 text-[#5C1A2E]"
-                                : "text-[#4A4A4A] border border-[#E0D8D0]"
-                            }`}
-                          >
-                            {started ? `${count} სესია` : "ჯერ არ დაწყებულა"}
-                          </span>
-                        </div>
-                        <p className="ka text-[11px] text-[#4A4A4A] mt-1 line-clamp-2">
-                          {m.description}
-                        </p>
-                        {cur && (
-                          <p className="ka text-[10px] text-[#1C1C1E] mt-1.5 font-semibold">
-                            შემდეგი: ეტაპი {cur.step}/{cur.total} · {cur.titleKa}
-                          </p>
-                        )}
-                        <div className="mt-2 h-1 rounded-full bg-[#E0D8D0] overflow-hidden">
-                          <div
-                            className="h-full bg-[#5C1A2E] transition-all"
-                            style={{ width: `${Math.min(100, count * 10)}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-
           {/* 5. More — compact rows for everything that used to be big cards */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2 px-1">
@@ -701,10 +628,10 @@ export default function BusinessHome() {
             </p>
             <div className="bg-white border border-[#E0D8D0] rounded-lg divide-y divide-[#F0EBE3]">
               <MoreRow
-                icon={<Sparkles size={15} strokeWidth={2} />}
-                title="სცენარები"
-                sub="ყველა სამუშაო სიტუაციის დათვალიერება"
-                onClick={() => navigate("/path/business/scenarios")}
+                icon={<Briefcase size={15} strokeWidth={2} />}
+                title="გასაუბრება"
+                sub="ივარჯიშე შენს რეზიუმეზე მორგებულ კითხვებზე"
+                onClick={() => navigate("/path/business/module/interview")}
               />
               <MoreRow
                 icon={<FileText size={15} strokeWidth={2} />}
@@ -723,6 +650,12 @@ export default function BusinessHome() {
                 title="სრული გეგმა"
                 sub="შენი მიზნები, ინტენსივობა და სფეროები"
                 onClick={() => navigate("/path/business/plan")}
+              />
+              <MoreRow
+                icon={<Star size={15} strokeWidth={2} />}
+                title="⭐ პრემიუმი"
+                sub="ულიმიტო სესიები და რეალური გასაუბრებები"
+                onClick={() => navigate("/path/business/premium")}
               />
             </div>
           </section>
