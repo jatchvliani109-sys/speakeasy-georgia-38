@@ -22,9 +22,7 @@ export default function BusinessShell({
       <header className="border-b border-[#E4E2DF] bg-[#F5F4F2]/85 backdrop-blur sticky top-0 z-20">
         <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link to="/path/business/home" className="flex items-center gap-2 text-[#5C1A2E]">
-            <span className="w-7 h-7 rounded-md bg-[#232323] text-[#F5F4F2] grid place-items-center">
-              <Briefcase size={14} strokeWidth={2.25} />
-            </span>
+            <Logo size={28} />
             <span className="font-bold text-sm tracking-tight">SpeakBusy</span>
           </Link>
           <GlobalNav />
