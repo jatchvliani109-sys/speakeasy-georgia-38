@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
 import SEO from "@/components/SEO";
@@ -15,7 +15,6 @@ export default function BusinessShell({
   back?: { to: string; label: string };
   seo?: { title: string; description?: string; path: string };
 }) {
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#F5F4F2]">
       {seo && <SEO {...seo} />}
@@ -31,18 +30,10 @@ export default function BusinessShell({
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
-        {back ? (
+        {back && (
           <Link to={back.to} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3">
             <ArrowLeft size={13} strokeWidth={2.25} /> {back.label}
           </Link>
-        ) : (
-          <button
-            onClick={() => navigate(-1)}
-            className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3"
-            aria-label="უკან"
-          >
-            <ArrowLeft size={13} strokeWidth={2.25} /> უკან
-          </button>
         )}
         {children}
       </main>
