@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Briefcase } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
 import SEO from "@/components/SEO";
+import Logo from "@/components/Logo";
 
 // Shared shell for the Business English path.
 
