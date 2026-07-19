@@ -34,7 +34,7 @@ export type ReassessmentTest = {
 // All 5 tests use the same distribution so scores are directly comparable.
 
 const OPEN_PROMPT_KA =
-  "(არასავალდებულო) დაწერე 2–3 პროფესიული წინადადება ბიზნეს სიტუაციაზე ქვემოთ.";
+  "(არასავალდებულო) დაწერე 2–3 პროფესიონალური წინადადება ბიზნეს სიტუაციაზე ქვემოთ.";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TEST 1
@@ -46,8 +46,8 @@ const TEST_1: ReassessmentTest = {
     {
       type: "mcq", area: "emails", weight: 1,
       prompt: "Choose the most professional opening line for an email to a new client.",
-      promptKa: "აირჩიე ყველაზე პროფესიული მისალმება.",
-      options: ["Hey there!", "Dear Mr. Davis,", "Hi buddy,", "Yo team,"],
+      promptKa: "აირჩიე ყველაზე პროფესიონალური მისალმება.",
+      options: ["Hey there!", "Dear Mr. Davis,", "Dear friend,", "Hello Davis,"],
       correct: 1,
     },
     {
@@ -65,7 +65,7 @@ const TEST_1: ReassessmentTest = {
     {
       type: "mcq", area: "emails", weight: 3,
       prompt: "A client wrote: 'I'm a bit concerned about the timeline.' The best professional reply opens with:",
-      promptKa: "რომელია საუკეთესო პროფესიული პასუხი?",
+      promptKa: "რომელია საუკეთესო პროფესიონალური პასუხი?",
       options: [
         "Don't worry about it.",
         "Thank you for raising this — let me walk you through where we are and the next steps.",
@@ -116,7 +116,7 @@ const TEST_1: ReassessmentTest = {
       type: "mcq", area: "vocabulary", weight: 1,
       prompt: "'Revenue' most closely means:",
       promptKa: "რას ნიშნავს Revenue?",
-      options: ["Profit after costs", "Total income from sales", "Salary", "Tax"],
+      options: ["Profit after costs", "Total income from sales", "The company's total expenses", "Cash held in the bank"],
       correct: 1,
     },
     {
@@ -126,8 +126,8 @@ const TEST_1: ReassessmentTest = {
       options: [
         "Only an investor",
         "Anyone with an interest in the project's outcome",
-        "An external auditor",
-        "The CEO only",
+        "Anyone employed by the company",
+        "A shareholder with voting rights",
       ],
       correct: 1,
     },
@@ -136,10 +136,10 @@ const TEST_1: ReassessmentTest = {
       prompt: "'We need to leverage our existing partnerships.' 'Leverage' here means:",
       promptKa: "რას ნიშნავს leverage?",
       options: [
-        "End them",
+        "Renegotiate them formally",
         "Use strategically to gain advantage",
-        "Sell",
-        "Avoid",
+        "Report on them to investors",
+        "Gradually phase them out",
       ],
       correct: 1,
     },
@@ -176,7 +176,7 @@ const TEST_1: ReassessmentTest = {
         "Make the decision immediately.",
         "Postpone the discussion for later.",
         "Put it on the meeting agenda right now.",
-        "Cancel it permanently.",
+        "Escalate it to senior management.",
       ],
       correct: 1,
     },
@@ -201,7 +201,7 @@ const TEST_2: ReassessmentTest = {
       type: "mcq", area: "emails", weight: 1,
       prompt: "Best email sign-off for a formal client message:",
       promptKa: "აირჩიე ფორმალური დასასრული.",
-      options: ["Cheers!", "Talk soon", "Best regards,", "Bye!"],
+      options: ["Cheers!", "Talk soon", "Best regards,", "Yours faithfully,"],
       correct: 2,
     },
     {
@@ -209,10 +209,10 @@ const TEST_2: ReassessmentTest = {
       prompt: "Choose the clearest subject line for a follow-up after a meeting.",
       promptKa: "აირჩიე საუკეთესო subject line.",
       options: [
-        "Hi",
+        "Meeting notes",
         "Follow-up",
         "Follow-up: Q3 marketing plan — next steps",
-        "Important!!!",
+        "Q3 marketing plan",
       ],
       correct: 2,
     },
@@ -270,7 +270,7 @@ const TEST_2: ReassessmentTest = {
       type: "mcq", area: "vocabulary", weight: 1,
       prompt: "'Deadline' means:",
       promptKa: "რას ნიშნავს deadline?",
-      options: ["Start date", "Final date by which something must be done", "Salary day", "Holiday"],
+      options: ["Start date", "Final date by which something must be done", "The busiest day of a project", "The date a contract is signed"],
       correct: 1,
     },
     {
@@ -280,8 +280,8 @@ const TEST_2: ReassessmentTest = {
       options: [
         "A type of contract",
         "Key Performance Indicator — a measurable goal",
-        "A project manager",
-        "A budget line",
+        "A quarterly performance review",
+        "A key project milestone",
       ],
       correct: 1,
     },
@@ -292,7 +292,7 @@ const TEST_2: ReassessmentTest = {
       options: [
         "Without internet",
         "Outside this meeting, in a separate conversation",
-        "After the project ends",
+        "Once the system is back online",
         "In writing only",
       ],
       correct: 1,
@@ -330,7 +330,7 @@ const TEST_2: ReassessmentTest = {
         "Start a new project from scratch.",
         "Use what already exists instead of rebuilding it.",
         "Replace the whole system.",
-        "Change leadership.",
+        "Simplify the current process.",
       ],
       correct: 1,
     },
@@ -365,7 +365,7 @@ const TEST_3: ReassessmentTest = {
     {
       type: "mcq", area: "emails", weight: 2,
       prompt: "Which sentence sounds most professional in an apology email?",
-      promptKa: "ბოდიშის ყველაზე პროფესიული ფორმა.",
+      promptKa: "ბოდიშის ყველაზე პროფესიონალური ფორმა.",
       options: [
         "Sorry for the mess.",
         "I apologize for the inconvenience and appreciate your patience as we resolve this.",
@@ -428,7 +428,7 @@ const TEST_3: ReassessmentTest = {
       type: "mcq", area: "vocabulary", weight: 1,
       prompt: "'Budget' means:",
       promptKa: "რას ნიშნავს budget?",
-      options: ["Salary", "Plan for how money will be spent", "Profit", "Loan"],
+      options: ["The company's yearly profit", "Plan for how money will be spent", "A financial report", "Money owed to suppliers"],
       correct: 1,
     },
     {
@@ -436,10 +436,10 @@ const TEST_3: ReassessmentTest = {
       prompt: "To 'follow up' on something means to:",
       promptKa: "რას ნიშნავს follow up?",
       options: [
-        "Forget about it.",
+        "Summarize it for leadership.",
         "Check on its progress or continue a previous discussion.",
-        "Cancel it.",
-        "Begin from zero.",
+        "Postpone it to next week.",
+        "Assign it to someone else.",
       ],
       correct: 1,
     },
@@ -450,8 +450,8 @@ const TEST_3: ReassessmentTest = {
       options: [
         "Internet speed.",
         "Capacity or available time/energy to take on work.",
-        "Number of employees.",
-        "Office size.",
+        "The project's total budget.",
+        "The number of meetings scheduled.",
       ],
       correct: 1,
     },
@@ -487,8 +487,8 @@ const TEST_3: ReassessmentTest = {
       options: [
         "Promise more than we can deliver.",
         "Set realistic expectations so the client isn't disappointed.",
-        "Ignore the client.",
-        "Lower our quality.",
+        "Exceed every client request.",
+        "Renegotiate the contract terms.",
       ],
       correct: 1,
     },
@@ -512,7 +512,7 @@ const TEST_4: ReassessmentTest = {
       type: "mcq", area: "emails", weight: 1,
       prompt: "Most appropriate greeting when you don't know the recipient's name:",
       promptKa: "უცნობი ადრესატის მისალმება.",
-      options: ["Hey,", "To whom it may concern,", "Yo,", "Hello you,"],
+      options: ["Hey,", "To whom it may concern,", "Dear Mr. David,", "Dear all,"],
       correct: 1,
     },
     {
@@ -534,8 +534,8 @@ const TEST_4: ReassessmentTest = {
       options: [
         "Warm and friendly.",
         "Polite but signals slight frustration that the previous message wasn't acted on.",
-        "Excited.",
-        "Apologetic.",
+        "Formal and neutral, with no hidden meaning.",
+        "Apologetic about the earlier email.",
       ],
       correct: 1,
     },
@@ -581,7 +581,7 @@ const TEST_4: ReassessmentTest = {
       type: "mcq", area: "vocabulary", weight: 1,
       prompt: "'Client' most closely means:",
       promptKa: "რას ნიშნავს client?",
-      options: ["Boss", "A person or company that pays for your services", "Employee", "Vendor"],
+      options: ["A senior manager you report to", "A person or company that pays for your services", "A company that supplies you materials", "A colleague on another team"],
       correct: 1,
     },
     {
@@ -604,7 +604,7 @@ const TEST_4: ReassessmentTest = {
         "Reducing it.",
         "Growing/expanding it in a structured way.",
         "Measuring it.",
-        "Selling it.",
+        "Rebranding it for new audiences.",
       ],
       correct: 1,
     },
@@ -668,8 +668,8 @@ const TEST_5: ReassessmentTest = {
       options: [
         "Here is the thing.",
         "Please find the attached proposal for your review.",
-        "I send file.",
-        "File ready.",
+        "The document is somewhere in this email.",
+        "Attaching herewith the aforementioned documentation for perusal.",
       ],
       correct: 1,
     },
@@ -688,7 +688,7 @@ const TEST_5: ReassessmentTest = {
     {
       type: "mcq", area: "emails", weight: 3,
       prompt: "Choose the strongest rewrite of: 'You didn't reply to my last email.'",
-      promptKa: "ყველაზე პროფესიული გადაწერა.",
+      promptKa: "ყველაზე პროფესიონალური გადაწერა.",
       options: [
         "Why didn't you respond?",
         "Just floating this to the top of your inbox in case it got buried — happy to help with any open questions.",
@@ -718,7 +718,7 @@ const TEST_5: ReassessmentTest = {
         "A different company.",
         "Growth within the role and contributing at a senior level in this kind of work.",
         "Your own startup.",
-        "Retirement.",
+        "A higher salary at a bigger company.",
       ],
       correct: 1,
     },
@@ -740,7 +740,7 @@ const TEST_5: ReassessmentTest = {
       prompt: "'Invoice' means:",
       promptKa: "რას ნიშნავს invoice?",
       options: [
-        "A meeting note.",
+        "A monthly financial summary.",
         "A document requesting payment for goods or services.",
         "A receipt.",
         "A contract.",
@@ -752,10 +752,10 @@ const TEST_5: ReassessmentTest = {
       prompt: "To 'onboard' a new employee means to:",
       promptKa: "რას ნიშნავს onboard?",
       options: [
-        "Fire them.",
+        "Move them to a different department.",
         "Introduce them to the team, tools and processes when they start.",
-        "Promote them.",
-        "Send them on a trip.",
+        "Give them their first performance review.",
+        "Add them to the payroll system.",
       ],
       correct: 1,
     },
@@ -764,10 +764,10 @@ const TEST_5: ReassessmentTest = {
       prompt: "'Let's get buy-in from leadership before we move forward.' 'Buy-in' means:",
       promptKa: "რას ნიშნავს buy-in?",
       options: [
-        "Money.",
+        "An initial financial investment.",
         "Agreement and support from key people.",
         "A purchase.",
-        "Final signed contract.",
+        "A final signed contract.",
       ],
       correct: 1,
     },
@@ -801,10 +801,10 @@ const TEST_5: ReassessmentTest = {
       prompt: "A teammate writes: 'Let's take this offline and circle back EOD.' They mean:",
       promptKa: "რას ნიშნავს?",
       options: [
-        "Stop using the internet and never speak again.",
+        "Postpone it until tomorrow morning.",
         "Continue privately and reconnect by end of day.",
-        "Cancel the project.",
-        "Take a long break.",
+        "Move the discussion to email only.",
+        "Cancel the rest of today's meetings.",
       ],
       correct: 1,
     },

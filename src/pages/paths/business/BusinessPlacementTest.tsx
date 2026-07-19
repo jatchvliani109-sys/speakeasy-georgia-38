@@ -30,7 +30,7 @@ const QUESTIONS: Question[] = [
     weight: 1,
     prompt: "We need to ______ the meeting until next week because the client is unavailable.",
     promptKa: "შეავსე ხარვეზი.",
-    options: ["cancel", "postpone", "delay back", "remove"],
+    options: ["cancel", "postpone", "bring forward", "call off"],
     correct: 1,
   },
   {
@@ -49,8 +49,8 @@ const QUESTIONS: Question[] = [
     options: [
       "whenever you have time",
       "as soon as possible",
-      "after the next meeting",
-      "at a scheduled point",
+      "by tomorrow morning",
+      "before the next meeting",
     ],
     correct: 1,
   },
@@ -157,6 +157,23 @@ const QUESTIONS: Question[] = [
   },
 ];
 
+// Shuffle each MCQ's options at session start and remap the correct index.
+// Kills answer-position bias structurally: however the data is authored,
+// the rendered position of the correct answer is random every session.
+function shuffleMcq(q: Question): Question {
+  if (q.type !== "mcq" || !q.options) return q;
+  const order = q.options.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return {
+    ...q,
+    options: order.map((i) => q.options![i]),
+    correct: order.indexOf(q.correct),
+  };
+}
+
 const MAX_MCQ_SCORE = QUESTIONS.reduce(
   (s, q) => s + (q.type === "mcq" ? q.weight : 0),
   0,
@@ -214,7 +231,9 @@ export default function BusinessPlacementTest() {
     }
     navigate("/path/business/setup", { replace: true });
   };
-  const total = QUESTIONS.length;
+  // Per-session shuffled question set (options order randomized once).
+  const [questions] = useState<Question[]>(() => QUESTIONS.map(shuffleMcq));
+  const total = questions.length;
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<(number | string | null)[]>(() =>
     Array(total).fill(null),
@@ -223,7 +242,7 @@ export default function BusinessPlacementTest() {
   const [resultLevel, setResultLevel] = useState<BusinessLevel | null>(null);
   const [resultPct, setResultPct] = useState<number>(0);
 
-  const q = QUESTIONS[idx];
+  const q = questions[idx];
   const a = answers[idx];
 
   const isOpen = q.type === "open";
@@ -232,13 +251,13 @@ export default function BusinessPlacementTest() {
   const submit = () => {
     let raw = 0;
     answers.forEach((ans, i) => {
-      const qq = QUESTIONS[i];
+      const qq = questions[i];
       if (qq.type === "mcq" && ans === qq.correct) raw += qq.weight;
     });
     let pct = (raw / MAX_MCQ_SCORE) * 100;
 
     // Optional open answer = small upward-only bonus
-    const openIdx = QUESTIONS.findIndex((x) => x.type === "open");
+    const openIdx = questions.findIndex((x) => x.type === "open");
     const openAns = answers[openIdx];
     if (typeof openAns === "string") {
       const words = openAns.trim().split(/\s+/).filter(Boolean).length;
