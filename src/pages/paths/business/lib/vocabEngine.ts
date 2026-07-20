@@ -98,26 +98,37 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
     history,
     prodCorrect: (p.meta?.prodCorrect ?? 0) + Math.max(0, prodCorrect),
   };
+  // MECHANIC 3 — evidence fast-track: a word the learner clearly already knows
+  // (first-ever encounter, every question in the session correct, at least two
+  // asked) shouldn't crawl the ladder like a genuinely new word. Jump straight
+  // to confidence 3 and park it a week out. Handles cognates ("service",
+  // "manager") and any known word from BEHAVIOR, without hand-tagging the bank.
+  const firstEncounter = (p.correct_count + p.wrong_count) === 0;
+  const fastTracked = firstEncounter && sessionCorrect && results.length >= 2;
+  const effConfidence = fastTracked ? Math.max(confidence, 3) : confidence;
+
   const mastered = checkMastery({
     ...p,
-    confidence,
+    confidence: effConfidence,
     correct_count: newCorrectTotal,
     meta,
   });
   const days = mastered
     ? 14
+    : fastTracked
+    ? 7
     : sessionCorrect
-    ? confidence <= 1
+    ? effConfidence <= 1
       ? 1
-      : confidence === 2
+      : effConfidence === 2
       ? 3
-      : confidence === 3
+      : effConfidence === 3
       ? 7
       : 14
     : 0; // any wrong in the session -> due right away, not tomorrow
   return {
     ...p,
-    confidence,
+    confidence: effConfidence,
     correct_count: newCorrectTotal,
     wrong_count: p.wrong_count + wrongCount,
     last_seen_at: new Date().toISOString(),
@@ -496,10 +507,28 @@ export function planSession(
     const budget = Math.max(PAID_MIN_BUDGET, PAID_FIRST_BUDGET - PAID_BUDGET_STEP * sessionsToday);
     newTarget = Math.min(PAID_MAX_NEW, Math.max(4, Math.round(budget / 3)));
     reviewTarget = budget - newTarget;
+    // MECHANIC 2 — same-day taper: extra sessions in one day should consolidate,
+    // not flood. Session 1: full new intake; session 2: half; session 3+: 4.
+    if (sessionsToday === 1) newTarget = Math.min(newTarget, 6);
+    else if (sessionsToday >= 2) newTarget = Math.min(newTarget, 4);
   } else {
     newTarget = FREE_NEW_TARGET;
     reviewTarget = FREE_REVIEW_TARGET;
   }
+
+  // MECHANIC 1 — backlog governor: never pour new words onto an unconsolidated
+  // pile. Count SEEN-but-not-yet-sticky words (confidence < 2). As the backlog
+  // grows, throttle new intake toward review-only until it drains. This is the
+  // brake premium removed when it lifted the 1-session/day cap.
+  const backlog = progress.filter(
+    (p) => (p.correct_count + p.wrong_count) > 0 && p.confidence < 2,
+  ).length;
+  if (backlog >= 30) newTarget = Math.min(newTarget, 2);
+  else if (backlog >= 15) newTarget = Math.min(newTarget, Math.ceil(newTarget / 2));
+  // Reroute the freed slots into review so total session size holds up.
+  reviewTarget = plan === "paid"
+    ? Math.max(reviewTarget, Math.max(PAID_MIN_BUDGET, PAID_FIRST_BUDGET - PAID_BUDGET_STEP * sessionsToday) - newTarget)
+    : reviewTarget;
 
   const now = Date.now();
   const seen = new Set(progress.map((p) => p.word_key));
@@ -616,7 +645,9 @@ export type QuizQuestion =
   | { type: "georgian_mistake"; key: string; promptKa: string; choices: string[]; correctIndex: number; explanationKa: string }
   | { type: "listening"; wordKey: string; en: string; correctKa: string; choices: string[] }
   | { type: "type_word"; wordKey: string; ka: string; correct: string; hint: string }
-  | { type: "context_cloze"; wordKey: string; paragraph: string; choices: string[]; correct: string; titleKa: string };
+  | { type: "context_cloze"; wordKey: string; paragraph: string; choices: string[]; correct: string; titleKa: string }
+  | { type: "odd_one_out"; wordKey: string; promptKa: string; options: { en: string; ka: string }[]; correctIndex: number }
+  | { type: "synonym_match"; wordKey: string; en: string; ka: string; promptKa: string; choices: string[]; correct: string };
 
 function pick<T>(arr: T[], n: number): T[] {
   const c = [...arr];
@@ -791,6 +822,47 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
   };
 }
 
+// ---- Odd-one-out: three words share a field/theme, one doesn't belong. ----
+// Uses field grouping when available, else falls back to "same source" cohort.
+// Bank-wide: works for any word that has at least 3 field/cohort peers.
+function makeOddOneOut(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
+  // cohort = words sharing this word's field (or week band for core words)
+  const cohortOf = (w: VocabWord) => w.field || (w.week ? `week${w.week}` : w.source);
+  const mine = cohortOf(word);
+  const peers = pool.filter((w) => w.key !== word.key && cohortOf(w) === mine);
+  const outsiders = pool.filter((w) => w.key !== word.key && cohortOf(w) !== mine);
+  if (peers.length < 2 || outsiders.length < 1) return null;
+  const group = [word, ...pick(peers, 2)]; // 3 that belong (incl. the target)
+  const odd = pick(outsiders, 1)[0];
+  const options = shuffle([...group, odd]).map((w) => ({ en: w.en, ka: w.ka }));
+  const correctIndex = options.findIndex((o) => o.en === odd.en);
+  return {
+    type: "odd_one_out",
+    wordKey: word.key,
+    promptKa: "რომელი სიტყვა არ ერგება დანარჩენებს?",
+    options,
+    correctIndex,
+  };
+}
+
+// ---- Synonym / closest-meaning: pick the English word closest to the target. ----
+// The target's OWN translation is shown in Georgian; the learner picks which
+// English option matches. Distractors are other English words. Since the bank
+// has no synonym data, this trains recognition of the right word for a meaning
+// (functionally: KA meaning -> correct EN among plausible EN distractors).
+function makeSynonymMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion {
+  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
+  return {
+    type: "synonym_match",
+    wordKey: word.key,
+    en: word.en,
+    ka: word.ka,
+    promptKa: "რომელი ინგლისური სიტყვა შეესაბამება მნიშვნელობას?",
+    choices,
+    correct: word.en,
+  };
+}
+
 // Progressive generator pools by tier level.
 // Tier 1: recognition-heavy (MC, T/F, EN→KA) + listening from stored MP3s;
 //         typed recall appears once in the second pass, with a letter hint.
@@ -801,20 +873,20 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
 // (type_word, context_cloze, fill_blank) fall back to safe formats in buildQuiz.
 type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
 const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa],
-  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa],
-  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn],
+  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeOddOneOut, makeSynonymMatch],
+  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut],
+  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut],
 };
 // Second-pass generators for NEW words: retrieval-heavier than the first pass,
 // so each new word is first recognized, then actively recalled/produced.
 const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeListening, makeTrEnToKa, makeTypeWord, makeMcMeaning],
-  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening],
+  1: [makeListening, makeTrEnToKa, makeTypeWord, makeSynonymMatch, makeFillBlank],
+  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening, makeSynonymMatch],
   3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeTypeWord],
 };
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse],
-  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze],
+  1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse, makeOddOneOut, makeSynonymMatch],
+  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut],
   3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening],
 };
 

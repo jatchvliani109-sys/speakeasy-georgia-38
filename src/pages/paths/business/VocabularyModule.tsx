@@ -862,6 +862,10 @@ function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
       return normalizeTyped(String(selected)) === normalizeTyped(q.correct);
     case "context_cloze":
       return selected === q.correct;
+    case "odd_one_out":
+      return selected === q.correctIndex;
+    case "synonym_match":
+      return selected === q.correct;
   }
 }
 
@@ -985,6 +989,24 @@ function QuestionCard({
           {revealed && (
             <p className="ka text-xs text-[#4A4A4A] mt-3 italic">💡 {q.explanationKa}</p>
           )}
+        </div>
+      );
+    case "odd_one_out":
+      return (
+        <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
+          {renderChoices(
+            q.options.map((o, i) => ({ label: `${o.en} — ${o.ka}`, value: i })),
+            q.correctIndex,
+          )}
+        </div>
+      );
+    case "synonym_match":
+      return (
+        <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
+          <h3 className="ka text-2xl font-bold text-[#5C1A2E] mt-3">{q.ka}</h3>
+          {renderChoices(q.choices, q.correct)}
         </div>
       );
     case "listening":
@@ -1154,7 +1176,7 @@ function Results({
                 <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
               </p>
               <p className="ka text-[11px] text-[#F5F4F2]/80 mt-1">
-                {streakGrew ? "\u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0💪💪💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
+                {streakGrew ? "სერია გაიზარდა! ნუ გააჩერებ 💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
               </p>
             </div>
           </div>
