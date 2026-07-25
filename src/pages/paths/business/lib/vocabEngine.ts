@@ -647,7 +647,9 @@ export type QuizQuestion =
   | { type: "type_word"; wordKey: string; ka: string; correct: string; hint: string }
   | { type: "context_cloze"; wordKey: string; paragraph: string; choices: string[]; correct: string; titleKa: string }
   | { type: "odd_one_out"; wordKey: string; promptKa: string; options: { en: string; ka: string }[]; correctIndex: number }
-  | { type: "synonym_match"; wordKey: string; en: string; ka: string; promptKa: string; choices: string[]; correct: string };
+  | { type: "synonym_match"; wordKey: string; en: string; ka: string; promptKa: string; choices: string[]; correct: string }
+  | { type: "collocation"; wordKey: string; promptKa: string; phraseEn: string; blankIndex: number; choices: string[]; correct: string; hintKa: string }
+  | { type: "definition_match"; wordKey: string; promptKa: string; definitionKa: string; choices: string[]; correct: string };
 
 function pick<T>(arr: T[], n: number): T[] {
   const c = [...arr];
@@ -697,33 +699,45 @@ function makeMcMeaning(word: VocabWord, pool: VocabWord[]): QuizQuestion {
   return { type: "mc_meaning", wordKey: word.key, en: word.en, correctKa: word.ka, choices };
 }
 
+// Enrichment gave every word a second example. Alternating between them stops a
+// repeated word from always showing the SAME sentence — otherwise learners
+// memorise one sentence instead of the word. Returned in random order.
+function exampleCandidates(word: VocabWord): { en: string; ka: string }[] {
+  const list = [{ en: word.exampleEn, ka: word.exampleKa }];
+  if (word.example2En && word.example2En.trim()) {
+    list.push({ en: word.example2En, ka: word.example2Ka });
+  }
+  return shuffle(list);
+}
+
 function makeFillBlank(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
-  const sentence = word.exampleEn;
   const wordLower = word.en.toLowerCase();
   const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  // Try matching the full phrase first so multi-word terms like "engagement rate" work correctly.
-  const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
-  let re: RegExp;
-  if (fullRe.test(sentence)) {
-    re = fullRe;
-  } else {
-    // Fall back to matching just the first word.
-    const first = wordLower.split(" ")[0];
-    re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
-    if (!re.test(sentence)) return null;
+  // Try each example in random order; use the first that actually contains the word.
+  for (const cand of exampleCandidates(word)) {
+    const sentence = cand.en;
+    const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
+    let re: RegExp;
+    if (fullRe.test(sentence)) {
+      re = fullRe;
+    } else {
+      const first = wordLower.split(" ")[0];
+      re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
+      if (!re.test(sentence)) continue;
+    }
+    const masked = sentence.replace(re, "______");
+    const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
+    return {
+      type: "fill_blank",
+      wordKey: word.key,
+      sentence: masked,
+      correct: word.en,
+      choices,
+      ka: cand.ka,
+    };
   }
-
-  const masked = sentence.replace(re, "______");
-  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
-  return {
-    type: "fill_blank",
-    wordKey: word.key,
-    sentence: masked,
-    correct: word.en,
-    choices,
-    ka: word.exampleKa,
-  };
+  return null;
 }
 
 function makeTrEnToKa(word: VocabWord, pool: VocabWord[]): QuizQuestion {
@@ -743,12 +757,13 @@ function makeTrueFalse(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 }
 
 function makeSentenceCorrect(word: VocabWord): QuizQuestion {
+  const real = exampleCandidates(word)[0].en;
   const choices = shuffle([
-    word.exampleEn,
+    real,
     `I will ${word.en.toLowerCase()} my homework yesterday.`,
     `The ${word.en.toLowerCase()} is a small kitchen tool you buy at the store.`,
   ]);
-  const correctIndex = choices.indexOf(word.exampleEn);
+  const correctIndex = choices.indexOf(real);
   return {
     type: "sentence_correct",
     wordKey: word.key,
@@ -845,6 +860,38 @@ function makeOddOneOut(word: VocabWord, pool: VocabWord[]): QuizQuestion | null 
   };
 }
 
+// ---- Definition -> word: show the Georgian explanation, pick the English word. ----
+// Only possible now that all 980 words carry an authored explanationKa. Skips
+// words whose explanation is just the translation repeated (no information gain).
+function makeDefinitionMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
+  const def = (word.explanationKa || "").trim();
+  if (!def || def === word.ka.trim()) return null;
+  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
+  return {
+    type: "definition_match",
+    wordKey: word.key,
+    promptKa: "რომელ სიტყვას შეესაბამება ეს განმარტება?",
+    definitionKa: def,
+    choices,
+    correct: word.en,
+  };
+}
+
+// ---- Collocation: fill the missing word in a real business phrase. ----
+function makeCollocation(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
+  const colls = word.collocations;
+  if (!colls || colls.length === 0) return null;
+  const coll = pick(colls, 1)[0];
+  const enLower = word.en.toLowerCase();
+  const words = coll.en.split(" ");
+  const idx = words.findIndex((w) => w.toLowerCase().replace(/[^a-z]/g, "") === enLower);
+  if (idx === -1) return null;
+  const blanked = words.map((w, i) => (i === idx ? "___" : w)).join(" ");
+  const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
+  return { type: "collocation", wordKey: word.key, promptKa: "შეავსე გამოტოვებული სიტყვა",
+    phraseEn: blanked, blankIndex: idx, choices, correct: word.en, hintKa: coll.ka };
+}
+
 // ---- Synonym / closest-meaning: pick the English word closest to the target. ----
 // The target's OWN translation is shown in Georgian; the learner picks which
 // English option matches. Distractors are other English words. Since the bank
@@ -873,21 +920,21 @@ function makeSynonymMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 // (type_word, context_cloze, fill_blank) fall back to safe formats in buildQuiz.
 type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
 const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeOddOneOut, makeSynonymMatch],
-  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut],
-  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut],
+  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeOddOneOut, makeSynonymMatch, makeDefinitionMatch],
+  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut, makeCollocation, makeDefinitionMatch],
+  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut, makeCollocation, makeDefinitionMatch],
 };
 // Second-pass generators for NEW words: retrieval-heavier than the first pass,
 // so each new word is first recognized, then actively recalled/produced.
 const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeListening, makeTrEnToKa, makeTypeWord, makeSynonymMatch, makeFillBlank],
-  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening, makeSynonymMatch],
-  3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeTypeWord],
+  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening, makeSynonymMatch, makeCollocation, makeDefinitionMatch],
+  3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeCollocation],
 };
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse, makeOddOneOut, makeSynonymMatch],
-  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut],
-  3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening],
+  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut, makeCollocation, makeDefinitionMatch],
+  3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening, makeCollocation],
 };
 
 /**

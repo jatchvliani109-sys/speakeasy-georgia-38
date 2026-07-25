@@ -802,11 +802,18 @@ function WordCard({
         <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{word.explanationKa}</p>
       )}
 
-      {ctx && ctx.collocations.length > 0 && (
+      {(() => {
+        // Authored enrichment covers all 980 words; the older context file only
+        // covered 74. Prefer the word's own collocations, fall back to context.
+        const colls = (word.collocations && word.collocations.length > 0)
+          ? word.collocations
+          : (ctx?.collocations ?? []);
+        if (colls.length === 0) return null;
+        return (
         <div className="mt-4">
           <p className="ka text-[10px] uppercase tracking-wider text-[#4A4A4A] font-semibold">როგორ იყენებენ</p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {ctx.collocations.slice(0, 3).map((c) => (
+            {colls.slice(0, 3).map((c) => (
               <span
                 key={c.en}
                 title={c.ka}
@@ -817,19 +824,27 @@ function WordCard({
             ))}
           </div>
         </div>
-      )}
+        );
+      })()}
 
       <div className="mt-4">
         <div className="p-3 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
           <p className="text-sm text-[#5C1A2E]">"{word.exampleEn}"</p>
           <p className="ka text-xs text-[#4A4A4A] mt-1">{word.exampleKa}</p>
         </div>
-        {ctx && ctx.examples[0] && (
-          <div className="mt-2 p-3 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
-            <p className="text-sm text-[#5C1A2E]">"{ctx.examples[0].en}"</p>
-            <p className="ka text-xs text-[#4A4A4A] mt-1">{ctx.examples[0].ka}</p>
-          </div>
-        )}
+        {(() => {
+          // Second example: authored for all 980 words; context file is fallback.
+          const ex2 = (word.example2En && word.example2En.trim())
+            ? { en: word.example2En, ka: word.example2Ka }
+            : (ctx?.examples[0] ?? null);
+          if (!ex2) return null;
+          return (
+            <div className="mt-2 p-3 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
+              <p className="text-sm text-[#5C1A2E]">"{ex2.en}"</p>
+              <p className="ka text-xs text-[#4A4A4A] mt-1">{ex2.ka}</p>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
@@ -865,6 +880,10 @@ function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
     case "odd_one_out":
       return selected === q.correctIndex;
     case "synonym_match":
+      return selected === q.correct;
+    case "collocation":
+      return selected === q.correct;
+    case "definition_match":
       return selected === q.correct;
   }
 }
@@ -1006,6 +1025,23 @@ function QuestionCard({
         <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <h3 className="ka text-2xl font-bold text-[#5C1A2E] mt-3">{q.ka}</h3>
+          {renderChoices(q.choices, q.correct)}
+        </div>
+      );
+    case "definition_match":
+      return (
+        <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
+          <p className="ka text-base text-[#1C1C1E] mt-3 leading-relaxed">{q.definitionKa}</p>
+          {renderChoices(q.choices, q.correct)}
+        </div>
+      );
+    case "collocation":
+      return (
+        <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
+          <p className="text-2xl font-bold text-[#5C1A2E] mt-3 tracking-tight">{q.phraseEn}</p>
+          <p className="ka text-xs text-[#4A4A4A] mt-1">{q.hintKa}</p>
           {renderChoices(q.choices, q.correct)}
         </div>
       );
