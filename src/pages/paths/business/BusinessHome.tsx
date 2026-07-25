@@ -463,10 +463,10 @@ export default function BusinessHome() {
                     </span>
                   </div>
                   <h2 className="ka text-xl font-bold leading-snug">
-                    გილოცავ — დაასრულე პირველი დონე
+                    გილოცავ!
                   </h2>
                   <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7 სავარჯიშო სესია — ეს ნამდვილი ჩვევის დასაწყისია.
+                    შენ შეასრულე 7 სავარჯიშო სესია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-[#F5F4F2]/15 rounded-md px-2 py-3">
