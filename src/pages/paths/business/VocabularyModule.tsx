@@ -1200,8 +1200,8 @@ function Results({
   const addedToReview = needsReview.length + reviewCount;
 
   const message =
-    pct >= 90 ? "შესანიშნავია — ძალიან კარგად!" :
-    pct >= 70 ? "კარგი მუშაობაა. გააგრძელე ასე!" :
+    pct >= 90 ? "შესანიშნავია!" :
+    pct >= 70 ? "კარგია. ასე გააგრძელე!" :
     pct >= 50 ? "კარგი დასაწყისია — გავიმეოროთ ცოტა მეტი." :
                 "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
 
@@ -1219,7 +1219,7 @@ function Results({
                 <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
               </p>
               <p className="ka text-[11px] text-[#F5F4F2]/80 mt-1">
-                {streakGrew ? "სერია გაიზარდა! ნუ გააჩერებ 💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
+                {streakGrew ? "\u00a0💪💪💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
               </p>
             </div>
           </div>
