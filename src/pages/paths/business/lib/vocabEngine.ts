@@ -442,9 +442,14 @@ export type SessionPlan = {
 const FREE_NEW_TARGET = 6;      // free users: 6 new words per session
 const FREE_REVIEW_TARGET = 8;   // free users: up to 8 review words per session
 
-const PAID_FIRST_BUDGET = 30;   // paid: total words in the first session of the day
-const PAID_BUDGET_STEP = 5;     // ...dropping by 5 per extra session that day
-const PAID_MIN_BUDGET = 10;     // ...never below 10
+// Premium sessions keep a CONSISTENT length; what changes across the day is the
+// MIX (more review, fewer new), not the size. Previously the total shrank 30/25/20,
+// but because that was a cap rather than a target, session 1 came out small (little
+// due to review yet) and session 2 came out large (session 1's misses all requeued)
+// — the opposite of the intent.
+const PAID_SESSION_TARGET = 20; // paid: words per session, first and second of the day
+const PAID_BUDGET_STEP = 2;     // ...easing down slightly from the 3rd session on
+const PAID_MIN_BUDGET = 14;     // ...never below 14
 const PAID_MAX_NEW = 12;        // hard cap on NEW words — retention drops past ~10-12,
                                 // so bigger budgets buy more review, not more new words
 
@@ -503,15 +508,22 @@ export function planSession(
   // ---- Budgets per tier + session number ----
   let newTarget: number;
   let reviewTarget: number;
+  let sessionTarget: number;   // total words we aim to serve this session
+  let newCeiling: number;      // hard cap on new words (governor-limited)
   if (plan === "paid") {
-    const budget = Math.max(PAID_MIN_BUDGET, PAID_FIRST_BUDGET - PAID_BUDGET_STEP * sessionsToday);
-    newTarget = Math.min(PAID_MAX_NEW, Math.max(4, Math.round(budget / 3)));
-    reviewTarget = budget - newTarget;
-    // MECHANIC 2 — same-day taper: extra sessions in one day should consolidate,
-    // not flood. Session 1: full new intake; session 2: half; session 3+: 4.
-    if (sessionsToday === 1) newTarget = Math.min(newTarget, 6);
-    else if (sessionsToday >= 2) newTarget = Math.min(newTarget, 4);
+    sessionTarget = Math.max(
+      PAID_MIN_BUDGET,
+      PAID_SESSION_TARGET - PAID_BUDGET_STEP * Math.max(0, sessionsToday - 1),
+    );
+    newCeiling = PAID_MAX_NEW;
+    // MECHANIC 2 — same-day taper: later sessions shift toward consolidation.
+    // Session 1: full intake; session 2: 6; session 3+: 4. The freed slots become
+    // REVIEW, so the session stays the same length instead of shrinking.
+    newTarget = sessionsToday === 0 ? newCeiling : sessionsToday === 1 ? 6 : 4;
+    reviewTarget = sessionTarget - newTarget;
   } else {
+    sessionTarget = FREE_NEW_TARGET + FREE_REVIEW_TARGET;
+    newCeiling = FREE_NEW_TARGET;
     newTarget = FREE_NEW_TARGET;
     reviewTarget = FREE_REVIEW_TARGET;
   }
@@ -523,12 +535,11 @@ export function planSession(
   const backlog = progress.filter(
     (p) => (p.correct_count + p.wrong_count) > 0 && p.confidence < 2,
   ).length;
-  if (backlog >= 30) newTarget = Math.min(newTarget, 2);
-  else if (backlog >= 15) newTarget = Math.min(newTarget, Math.ceil(newTarget / 2));
-  // Reroute the freed slots into review so total session size holds up.
-  reviewTarget = plan === "paid"
-    ? Math.max(reviewTarget, Math.max(PAID_MIN_BUDGET, PAID_FIRST_BUDGET - PAID_BUDGET_STEP * sessionsToday) - newTarget)
-    : reviewTarget;
+  if (backlog >= 30) newCeiling = Math.min(newCeiling, 2);
+  else if (backlog >= 15) newCeiling = Math.min(newCeiling, Math.ceil(newCeiling / 2));
+  newTarget = Math.min(newTarget, newCeiling);
+  // Freed new-word slots become review, so the session keeps its length.
+  reviewTarget = Math.max(reviewTarget, sessionTarget - newTarget);
 
   const now = Date.now();
   const seen = new Set(progress.map((p) => p.word_key));
@@ -580,6 +591,13 @@ export function planSession(
       .map((p) => p.word_key);
     reviewKeys.push(...weakest);
   }
+
+  // If the review queue could not fill its share (common in the FIRST session of
+  // the day, when nothing has come due yet), top the session back up with new
+  // words — never past the governor ceiling. This is what stopped session 1 from
+  // being a 6-word stub while session 2 ballooned.
+  const shortfall = sessionTarget - (newTarget + reviewKeys.length);
+  if (shortfall > 0) newTarget = Math.min(newCeiling, newTarget + shortfall);
 
   // ---- New word selection in strict tier order ---------------------------
   const t1Unseen = t1.filter((w) => !seen.has(w.key));
