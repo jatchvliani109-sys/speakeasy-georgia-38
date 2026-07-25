@@ -94,6 +94,7 @@ export default function VocabularyModule() {
   const [streakOverlay, setStreakOverlay] = useState<null | "mid" | "mega">(null);
   const [streakN, setStreakN] = useState(0);
   const [progressPulse, setProgressPulse] = useState(0);
+  const [resumed, setResumed] = useState(false);
   const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
   const autoAdvanceRef = useRef<number | null>(null);
@@ -149,6 +150,24 @@ export default function VocabularyModule() {
       setReviewKeys(revK);
       setTierLevel(plan.tierLevel);
       setFormatTier(computeFormatTier(plan.tierLevel, recent));
+
+      // Resume an interrupted session rather than silently starting a new one.
+      const saved = loadSessionSnapshot(user.id);
+      if (saved) {
+        setQuiz(saved.quiz);
+        setQIdx(saved.qIdx);
+        setAnswers(saved.answers);
+        setNewWords(saved.newWords);
+        setFormatTier(saved.formatTier);
+        setReviewMode(saved.reviewMode);
+        setBestCombo(saved.bestCombo);
+        setSelected(null);
+        setRevealed(false);
+        setResumed(true);
+        setStage("quiz");
+        setLoading(false);
+        return;
+      }
       if (!newW.length && !revK.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
@@ -164,12 +183,31 @@ export default function VocabularyModule() {
     return () => { cancelled = true; };
   }, [user, scenarioId]);
 
+  // Snapshot the in-flight session so leaving the page doesn't discard it.
+  useEffect(() => {
+    if (stage !== "quiz" || !user || quiz.length === 0) return;
+    saveSessionSnapshot({
+      v: SESSION_VERSION,
+      userId: user.id,
+      savedAt: new Date().toISOString(),
+      quiz,
+      qIdx,
+      answers,
+      newWords,
+      formatTier,
+      reviewMode,
+      bestCombo,
+    });
+  }, [stage, quiz, qIdx, answers, user, newWords, formatTier, reviewMode, bestCombo]);
+
   // Mock premium (placeholder until real payments): unlocks unlimited sessions.
   const isPaidUser = state?.mockPro === true;
   const dailyLimitReached = !isPaidUser && sessionsToday >= FREE_DAILY_SESSIONS;
 
   const startSession = () => {
     if (dailyLimitReached) return;
+    clearSessionSnapshot();   // starting fresh on purpose
+    setResumed(false);
     // Resume audio on user gesture (browsers require it).
     try { (window as any).AudioContext && new (window as any).AudioContext().resume?.(); } catch {}
     masteredBaselineRef.current = progress.filter((p) => p.confidence >= 4).length;
@@ -291,6 +329,7 @@ export default function VocabularyModule() {
 
   const goNext = (ans: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
+    if (resumed) setResumed(false);
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
       setSelected(null);
@@ -394,6 +433,7 @@ export default function VocabularyModule() {
     }
 
     playComplete();
+    clearSessionSnapshot();   // completed — nothing left to resume
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };
@@ -636,6 +676,11 @@ export default function VocabularyModule() {
               🎬 {scenario.titleKa}
             </p>
           )}
+          {resumed && (
+            <p className="ka text-[11px] font-semibold text-[#5C1A2E] -mt-1">
+              ⏵ გაგრძელდა იქიდან, სადაც შეწყვიტე
+            </p>
+          )}
           {isRetry && (
             <p className="ka text-[11px] font-semibold text-[#C9A84C] -mt-1">
               🔁 გამეორება — ეს კითხვა ადრე გამოგრჩა
@@ -855,6 +900,53 @@ function WordCard({
       </div>
     </div>
   );
+}
+
+// ---- Interrupted-session persistence -------------------------------------
+// Leaving mid-session used to discard everything and rebuild a different
+// session on return. We snapshot the in-flight session locally so it can be
+// resumed exactly where it stopped. Local (not Supabase) on purpose: it needs
+// to survive a tab close, not sync across devices, and costs no round trip.
+const SESSION_KEY = "speakbusy:vocab-session";
+const SESSION_VERSION = 2;          // bump when QuizQuestion shape changes
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+type SavedSession = {
+  v: number;
+  userId: string;
+  savedAt: string;
+  quiz: QuizQuestion[];
+  qIdx: number;
+  answers: { wordKey: string; correct: boolean; production: boolean }[];
+  newWords: VocabWord[];
+  formatTier: 1 | 2 | 3;
+  reviewMode: boolean;
+  bestCombo: number;
+};
+
+function saveSessionSnapshot(s: SavedSession) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch { /* private mode / full */ }
+}
+
+function clearSessionSnapshot() {
+  try { localStorage.removeItem(SESSION_KEY); } catch { /* ignore */ }
+}
+
+function loadSessionSnapshot(userId: string): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as SavedSession;
+    // Ignore snapshots from another account, an older question format, or a
+    // stale day — resuming yesterday's half-session would be worse than a fresh one.
+    if (s.v !== SESSION_VERSION || s.userId !== userId) return null;
+    if (Date.now() - new Date(s.savedAt).getTime() > SESSION_MAX_AGE_MS) return null;
+    if (!Array.isArray(s.quiz) || s.quiz.length === 0) return null;
+    if (s.qIdx >= s.quiz.length) return null;   // was effectively finished
+    return s;
+  } catch {
+    return null;
+  }
 }
 
 // Typed answers: forgiving on case, extra spaces, and hyphen-vs-space
