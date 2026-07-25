@@ -43,8 +43,8 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
-    doneTitle: "ყოჩაღ — დღევანდელი ვარჯიში დასრულდა",
-    doneSubtitle: "სერია დაცულია 🔥 ხვალ ახალი სიტყვები გელოდება.",
+    doneTitle: "ყოჩაღ! დღევანდელი \"Streak\" დაცულია. ",
+    doneSubtitle: " ხვალ ახალი სიტყვები გელოდება.",
   },
 };
 
@@ -248,7 +248,7 @@ export default function BusinessHome() {
           : streakTier === 1
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
-              ? "კარგი დასაწყისია — გააგრძელე!"
+              ? "კარგია, ასე გააგრძელე!"
               : "დაიწყე დღეს — ერთი სესია საკმარისია";
   const streakDark = streakTier >= 3;
 
@@ -463,10 +463,10 @@ export default function BusinessHome() {
                     </span>
                   </div>
                   <h2 className="ka text-xl font-bold leading-snug">
-                    გილოცავ — დაასრულე პირველი დონე
+                    გილოცავ!
                   </h2>
                   <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7 სავარჯიშო სესია — ეს ნამდვილი ჩვევის დასაწყისია.
+                    შენ შეასრულე 7 სავარჯიშო სესია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-[#F5F4F2]/15 rounded-md px-2 py-3">
@@ -485,7 +485,7 @@ export default function BusinessHome() {
                     </div>
                   </div>
                   <p className="ka text-sm font-semibold text-[#F5F4F2]/85 mt-4">
-                    შეამოწმე რამდენად გაიზარდე — გაიარე ხელახალი შეფასება
+                    შეამოწმე რამდენად მოგემატა ცოდნა - გაიარე ხელახალი შეფასება(თუ არ გინდა გამოტოვე :), no pressure!)
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row gap-2">
                     <button
@@ -701,7 +701,7 @@ export default function BusinessHome() {
             </p>
             <BizCard>
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="🔥 სერია (დღე)" value={String(streak)} />
+                <Stat label="🔥 Streak" value={String(streak)} />
                 <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
                 <Stat label="გასაუბრებები" value={String(interviewCount)} />
                 <Stat label="სესიები სულ" value={String(interviewCount + (progress.vocabulary?.count ?? 0))} />
