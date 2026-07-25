@@ -43,8 +43,8 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
-    doneTitle: "ყოჩაღ — დღევანდელი ვარჯიში დასრულდა",
-    doneSubtitle: "სერია დაცულია 🔥 ხვალ ახალი სიტყვები გელოდება.",
+    doneTitle: "ყოჩაღ! დღევანდელი \"Streak\" დაცულია. ",
+    doneSubtitle: " ხვალ ახალი სიტყვები გელოდება.",
   },
 };
 
