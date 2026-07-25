@@ -701,7 +701,7 @@ export default function BusinessHome() {
             </p>
             <BizCard>
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="🔥 სერია (დღე)" value={String(streak)} />
+                <Stat label="🔥 Streak" value={String(streak)} />
                 <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
                 <Stat label="გასაუბრებები" value={String(interviewCount)} />
                 <Stat label="სესიები სულ" value={String(interviewCount + (progress.vocabulary?.count ?? 0))} />
