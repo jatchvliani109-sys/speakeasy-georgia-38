@@ -897,7 +897,7 @@ export const SITUATION_CLUSTERS: SituationCluster[] = [
     category: "meetings",
     scenarioKa: "წარმოიდგინე, რომ დღეს შენ უძღვები გუნდის შეხვედრას — ხსნი დღის წესრიგს, ინაწილებ დავალებებს და აჯამებ შედეგებს.",
     wordKeys: ["meeting", "agenda-item", "chair", "minute-taker", "action-item", "next-steps", "recap", "postpone"],
-    paragraphEn: "Nino is chairing today's team meeting. She opens with the agenda: three items, starting with the budget. Giorgi agrees to take the minutes. Halfway through, they decide to postpone the last item until next week. Before they wrap up, Nino captures the action items, assigns an owner to each, and gives a quick recap of the next steps.",
+    paragraphEn: "Nino is chairing today's team meeting. She opens with the agenda: three items, starting with the budget. Giorgi agrees to take the minutes. Halfway through, they decide to postpone the last item until next week. Before they wrap up, Nino captures the ______, assigns an owner to each, and gives a quick recap of the next steps.",
     paragraphKa: "ნინო დღეს გუნდის შეხვედრას უძღვება. ის იწყებს დღის წესრიგით: სამი პუნქტი, ბიუჯეტიდან. გიორგი თანხმდება, რომ ოქმს აწარმოებს. შუა გზაზე გადაწყვეტენ, რომ ბოლო პუნქტს მომავალ კვირამდე გადადებენ. დასრულებამდე ნინო ჩაიწერს სამოქმედო პუნქტებს, თითოეულს პასუხისმგებელს მიუჩენს და მოკლედ შეაჯამებს შემდეგ ნაბიჯებს.",
     dialogue: [
       { speaker: "ნინო", en: "Good morning everyone — let's get started. We have three agenda items today.", ka: "დილა მშვიდობისა ყველას — დავიწყოთ. დღეს დღის წესრიგში სამი პუნქტი გვაქვს." },
