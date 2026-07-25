@@ -485,7 +485,7 @@ export default function BusinessHome() {
                     </div>
                   </div>
                   <p className="ka text-sm font-semibold text-[#F5F4F2]/85 mt-4">
-                    შეამოწმე რამდენად გაიზარდე — გაიარე ხელახალი შეფასება
+                    შეამოწმე რამდენად მოგემატა ცოდნა - გაიარე ხელახალი შეფასება(თუ არ გინდა გამოტოვე :), no pressure!)
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row gap-2">
                     <button
