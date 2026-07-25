@@ -447,13 +447,6 @@ export default function VocabularyModule() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ლექსიკა
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
-          {stage === "results"
-            ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
-            : stage === "reviewIntro"
-            ? "გამეორების დღე"
-            : "დღევანდელი სიტყვები"}
-        </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
           <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#5C1A2E] underline underline-offset-2 inline-flex items-center gap-1">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეული
