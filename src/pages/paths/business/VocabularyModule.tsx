@@ -1219,7 +1219,7 @@ function Results({
                 <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
               </p>
               <p className="ka text-[11px] text-[#F5F4F2]/80 mt-1">
-                {streakGrew ? "სერია გაიზარდა! ნუ გააჩერებ 💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
+                {streakGrew ? "\u00a0💪💪💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
               </p>
             </div>
           </div>
