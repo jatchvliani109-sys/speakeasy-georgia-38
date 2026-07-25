@@ -232,6 +232,13 @@ export default function VocabularyModule() {
   // QUIZ — single click flow
   const currentQ = quiz[qIdx];
 
+  // Duolingo-style mistake requeue: a missed question is appended to the END of
+  // the session and must be answered again, so the session grows by one item per
+  // mistake. A question is a RETRY if the same item already appeared earlier in
+  // the queue — that also caps it at exactly one repeat (a retry never requeues).
+  const qid = (q: QuizQuestion) => `${q.type}:${"wordKey" in q ? q.wordKey : (q as any).key}`;
+  const isRetry = !!currentQ && quiz.slice(0, qIdx).some((q) => qid(q) === qid(currentQ));
+
   const triggerStreak = (n: number) => {
     setStreakN(n);
     if (n === 10 || (n > 10 && n % 10 === 0)) {
@@ -276,6 +283,8 @@ export default function VocabularyModule() {
     } else {
       setCombo(0);
       playWrong();
+      // Requeue the missed question once, at the end of this session.
+      if (!isRetry) setQuiz((qs) => [...qs, currentQ]);
       // Wrong: do not auto-advance — let user review and click next.
     }
   };
@@ -632,6 +641,11 @@ export default function VocabularyModule() {
           {scenario && (
             <p className="ka text-[11px] font-semibold text-[#5C1A2E] -mt-1">
               🎬 {scenario.titleKa}
+            </p>
+          )}
+          {isRetry && (
+            <p className="ka text-[11px] font-semibold text-[#C9A84C] -mt-1">
+              🔁 გამეორება — ეს კითხვა ადრე გამოგრჩა
             </p>
           )}
           <div key={qIdx} className="biz-question-slide">
@@ -1193,7 +1207,7 @@ function Results({
   const addedToReview = needsReview.length + reviewCount;
 
   const message =
-    pct >= 90 ? "შესანიშნავია!" :
+    pct >= 90 ? "შესანიშნავია — ძალიან კარგად!" :
     pct >= 70 ? "კარგი მუშაობაა. გააგრძელე ასე!" :
     pct >= 50 ? "კარგი დასაწყისია — გავიმეოროთ ცოტა მეტი." :
                 "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
