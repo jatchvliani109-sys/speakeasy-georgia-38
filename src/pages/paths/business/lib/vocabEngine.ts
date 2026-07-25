@@ -669,29 +669,72 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function distractorsKa(word: VocabWord, pool: VocabWord[], n: number): string[] {
-  const seen = new Set<string>([word.ka]);
-  const unique: string[] = [];
+// ---- Distractor quality --------------------------------------------------
+// Random distractors make the answer guessable by elimination: if the target is
+// "negotiate" and the options are "invoice", "Monday", "warehouse", you don't
+// need to know the word. Good distractors are PLAUSIBLE — same topic area,
+// similar shape — so the learner has to actually retrieve the meaning.
+
+const WORD_SUFFIXES = ["tion", "ment", "ing", "ity", "ance", "ence", "ness", "ship", "er", "or", "al", "ive"];
+
+function cohortKey(w: VocabWord): string {
+  return w.field || (w.week ? `week${w.week}` : w.source);
+}
+
+function suffixOf(en: string): string {
+  const low = en.toLowerCase();
+  return WORD_SUFFIXES.find((s) => low.endsWith(s)) || "";
+}
+
+// Higher = more plausible as a wrong answer next to `target`.
+function plausibility(target: VocabWord, cand: VocabWord): number {
+  let s = 0;
+  if (cohortKey(cand) === cohortKey(target)) s += 3;          // same topic area
+  const tSuf = suffixOf(target.en);
+  if (tSuf && suffixOf(cand.en) === tSuf) s += 3;             // same word class
+  if (Math.abs(cand.en.length - target.en.length) <= 3) s += 2; // no length tell
+  if (cand.en.split(" ").length === target.en.split(" ").length) s += 1;
+  return s;
+}
+
+// Rank by plausibility, then sample from the strongest band so repeat encounters
+// don't show an identical option set every time.
+function rankedDistractors<T>(
+  target: VocabWord,
+  pool: VocabWord[],
+  n: number,
+  exclude: (w: VocabWord) => boolean,
+  project: (w: VocabWord) => T,
+): T[] {
+  const seen = new Set<string>();
+  const scored: { w: VocabWord; score: number }[] = [];
   for (const w of pool) {
-    if (w.key === word.key) continue;
-    if (seen.has(w.ka)) continue;
-    seen.add(w.ka);
-    unique.push(w.ka);
+    if (w.key === target.key || exclude(w)) continue;
+    const dedupe = String(project(w)).toLowerCase();
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    scored.push({ w, score: plausibility(target, w) });
   }
-  return pick(unique, n);
+  scored.sort((a, b) => b.score - a.score);
+  // Sample from the top band (at least 4x what we need) for variety with quality.
+  const band = scored.slice(0, Math.max(n * 4, 12));
+  return pick(band.length >= n ? band : scored, n).map((x) => project(x.w));
+}
+
+function distractorsKa(word: VocabWord, pool: VocabWord[], n: number): string[] {
+  return rankedDistractors(word, pool, n, (w) => w.ka === word.ka, (w) => w.ka);
 }
 
 function distractorsEn(word: VocabWord, pool: VocabWord[], n: number): string[] {
-  const seen = new Set<string>([word.en.toLowerCase()]);
-  const unique: string[] = [];
-  for (const w of pool) {
-    if (w.key === word.key) continue;
-    const k = w.en.toLowerCase();
-    if (seen.has(k)) continue;
-    seen.add(k);
-    unique.push(w.en);
-  }
-  return pick(unique, n);
+  // COLLISION GUARD: never offer a word that shares the target's Georgian
+  // translation — otherwise a KA->EN question would have two correct answers.
+  return rankedDistractors(
+    word,
+    pool,
+    n,
+    (w) => w.en.toLowerCase() === word.en.toLowerCase() || w.ka.trim() === word.ka.trim(),
+    (w) => w.en,
+  );
 }
 
 function makeMcMeaning(word: VocabWord, pool: VocabWord[]): QuizQuestion {
@@ -881,12 +924,16 @@ function makeDefinitionMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion |
 function makeCollocation(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
   const colls = word.collocations;
   if (!colls || colls.length === 0) return null;
-  const coll = pick(colls, 1)[0];
+  // Multi-word terms ("Sales forecast") must blank the whole phrase, not one token.
   const enLower = word.en.toLowerCase();
-  const words = coll.en.split(" ");
-  const idx = words.findIndex((w) => w.toLowerCase().replace(/[^a-z]/g, "") === enLower);
-  if (idx === -1) return null;
-  const blanked = words.map((w, i) => (i === idx ? "___" : w)).join(" ");
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const phraseRe = new RegExp(`\\b${escapeRe(enLower)}\\b`, "i");
+  // Use a collocation that actually contains the target, not a random one.
+  const usable = colls.filter((c) => phraseRe.test(c.en));
+  if (usable.length === 0) return null;
+  const coll = pick(usable, 1)[0];
+  const blanked = coll.en.replace(phraseRe, "___");
+  const idx = coll.en.toLowerCase().indexOf(enLower);
   const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
   return { type: "collocation", wordKey: word.key, promptKa: "შეავსე გამოტოვებული სიტყვა",
     phraseEn: blanked, blankIndex: idx, choices, correct: word.en, hintKa: coll.ka };
