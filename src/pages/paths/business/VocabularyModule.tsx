@@ -93,6 +93,9 @@ export default function VocabularyModule() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [streakOverlay, setStreakOverlay] = useState<null | "mid" | "mega">(null);
   const [streakN, setStreakN] = useState(0);
+  // Chosen when the overlay fires — picking during render would reshuffle the
+  // text on every re-render while the overlay is on screen.
+  const [megaMsg, setMegaMsg] = useState(MSG_MEGA[0]);
   const [progressPulse, setProgressPulse] = useState(0);
   const [resumed, setResumed] = useState(false);
   const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
@@ -280,6 +283,7 @@ export default function VocabularyModule() {
   const triggerStreak = (n: number) => {
     setStreakN(n);
     if (n === 10 || (n > 10 && n % 10 === 0)) {
+      setMegaMsg(randomOf(MSG_MEGA));
       setStreakOverlay("mega");
       setScreenFlash("mega");
       setConfettiKey((k) => k + 1);
@@ -410,8 +414,14 @@ export default function VocabularyModule() {
 
     // Streak celebration: compute the streak as it was BEFORE today's session
     // vs. after, so the results screen can tick the flame up by one when today
-    // is the day that extended it.
-    try {
+    // is the day that extended it. ONLY for the first completed session of the
+    // day — the streak grows once per day, so later sessions repeating
+    // "the streak grew!" was both wrong and noisy. (`sessionsToday` here still
+    // holds the pre-increment closure value = sessions finished before this one.)
+    if (sessionsToday > 0) {
+      // Not the first session today — the streak already grew earlier.
+      setStreakCelebration(null);
+    } else try {
       const { supabase: sb } = await import("@/integrations/supabase/client");
       const { data: sessRows } = await sb
         .from("business_vocab_sessions")
@@ -487,6 +497,13 @@ export default function VocabularyModule() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ბიზნეს ლექსიკა
         </p>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
+          {stage === "results"
+            ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
+            : stage === "reviewIntro"
+            ? "გამეორების დღე"
+            : "დღევანდელი სიტყვები"}
+        </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
           <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-[#5C1A2E] underline underline-offset-2 inline-flex items-center gap-1">
             <BookOpen size={13} strokeWidth={2.25} /> ჩემი რვეული
@@ -535,7 +552,7 @@ export default function VocabularyModule() {
           <div className="absolute left-1/2 top-1/2 biz-mega-pop">
             <div className="ka px-8 py-6 rounded-3xl bg-gradient-to-br from-[#232323] via-[#111111] to-[#1C1C1E] text-[#F5F4F2] text-3xl font-extrabold shadow-2xl border-2 border-[#C9A84C] text-center max-w-[90vw]">
               <div className="text-4xl">⚡ <span className="text-[#C9A84C]">{streakN}</span> სწორი პასუხი!</div>
-              <div className="text-xl mt-1 text-[#E5D4A8]">გაუჩერებელი ხარ!</div>
+              <div className="text-xl mt-1 text-[#E5D4A8]">{megaMsg}</div>
             </div>
           </div>
         </div>
@@ -547,9 +564,9 @@ export default function VocabularyModule() {
         <>
           <div className="rounded-3xl p-6 text-center text-[#F5F4F2] bg-gradient-to-br from-[#232323] to-[#1C1C1E] shadow-lg">
             <div className="text-4xl">✓</div>
-            <h2 className="ka text-xl font-bold mt-2">დღევანდელი ვარჯიში შესრულებულია</h2>
+            <h2 className="ka text-xl font-bold mt-2">დღევანდელი ვარჯიში დასრულებულია</h2>
             <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
-              სერია დაცულია 🔥 ხვალ ახალი სიტყვები და გამეორება გელოდება.
+              "Streak" შენარჩუნებულია 🔥 ხვალ ახალი სიტყვები და გამეორება გელოდება.
             </p>
             <Link
               to="/path/business/home"
@@ -901,6 +918,65 @@ function WordCard({
     </div>
   );
 }
+
+// ---- Session-complete messages -------------------------------------------
+// Rotated at random so the results screen doesn't read like a script. The jokes
+// deliberately reuse vocabulary the app teaches (ROI, KPI, pipeline, backlog,
+// pivot, runway...), so the payoff doubles as revision.
+const MSG_EXCELLENT = [
+  "ROI 100% — ყოჩაღ! 📈",
+  "ეს კვარტალი მოგებით დახურე! 💰",
+  "KPI გადააჭარბე — პრომოუშენი გეკუთვნის!",
+  "შენი ლექსიკის აქციები მკვეთრად გაიზარდა 📈",
+  "win-win — სხვა არაფერი ითქმის! 🤝",
+  "Target-ს გადააჭარბე — bonus შენია! 💰",
+  "ეს იყო perfect pitch — ინვესტორი დარწმუნებული გყავს 🎯",
+  "Zero bugs, zero delays — ასე მუშაობენ პროფესიონალები!",
+  "Promotion-ს იმსახურებ — HR-ს ვეტყვი 😉",
+  "Board-ი ფეხზე დამდგარა 👏",
+];
+const MSG_GOOD = [
+  "კარგი Deal დადე - ხელს გართმევ! 🤝",
+  "სტაბილური ზრდაა — ინვესტორები კმაყოფილი იქნებოდნენ 📊",
+  "მოლაპარაკება მოიგე, ოღონდ მცირე დათმობით 😉",
+  "KPI შესრულებულია — ყოჩაღ!",
+  "Budget-ში ჩაეტიე და deadline-იც დაიცავი ✅",
+  "Solid quarter — ანალიტიკოსები კმაყოფილი არიან 📊",
+  "Client-ი კმაყოფილია — follow-up აღარ დაგჭირდება 😉",
+  "Meeting-ი ეფექტური იყო — 15 წუთით ადრე დასრულდა ⏱",
+  "Review გაიარე — feedback: \"კარგია, გააგრძელე\" ✅",
+];
+const MSG_MID = [
+  "ეს საპილოტე პროექტი იყო — ახლა მასშტაბირება მოდის 🚀",
+  "მცირე დეფიციტია, მაგრამ ბიუჯეტი კონტროლშია 📉",
+  "გამეორება საუკეთესო ინვესტიციაა — უკუგება გარანტირებულია",
+  "ეს სიტყვები ჯერ pipeline-შია — მალე დაიხურება 😉",
+  "შუალედური შედეგია — მომდევნო კვარტალი შენია 💪",
+  "Draft-ია ჯერ — final version ხვალ მოვა 📝",
+  "Beta ვერსიაა — bug-ები ჯერ კიდევ არის 🐞",
+  "Break-even-ს მიუახლოვდი — კიდევ ცოტა 📈",
+  "Feedback: \"აქვს პოტენციალი, სჭირდება მუშაობა\" 📋",
+  "Sprint დაასრულე, მაგრამ ზოგი task backlog-ში დარჩა",
+];
+const MSG_LOW = [
+  "რთული კვარტალი გამოდგა — ხვალ რესტრუქტურიზაცია 💪",
+  "ესეც ტექნიკური ვალია — ხვალ დავფარავთ 😅",
+  "ეს სიტყვები backlog-ში გადავიდა — ხვალ მოვაგვარებთ",
+  "ყოველი წარუმატებელი პიჩი გამოცდილებაა — გააგრძელე!",
+  "სტარტაპებიც ჯერ ცდებიან, მერე იზრდებიან 🚀",
+  "Postmortem-ის დროა — გავარკვიოთ, რა არ გამოვიდა 🔍",
+  "Deadline გაცდა, მაგრამ project ცოცხალია 💪",
+  "Pivot გვჭირდება — ხვალ ახალი სტრატეგიით 🔄",
+  "Cash flow უარყოფითია, მაგრამ runway ჯერ გვაქვს 😅",
+  "Q1 რთული იყო — Q2-ზე ვმუშაობთ 📅",
+];
+const MSG_MEGA = [
+  "შენ ხარ ამ კვარტლის MVP! 🏆",
+  "top performer ხარ! ⚡",
+  "Unicorn ხარ! 🦄",
+  "Scale-up mode ჩართულია! 🚀",
+];
+const randomOf = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
 // ---- Interrupted-session persistence -------------------------------------
 // Leaving mid-session used to discard everything and rebuild a different
@@ -1291,11 +1367,12 @@ function Results({
   const learnedToday = mastered.length;
   const addedToReview = needsReview.length + reviewCount;
 
-  const message =
-    pct >= 90 ? "შესანიშნავია!" :
-    pct >= 70 ? "კარგია. ასე გააგრძელე!" :
-    pct >= 50 ? "კარგი დასაწყისია — გავიმეოროთ ცოტა მეტი." :
-                "მთავარია სცადე — ხვალ უფრო ადვილი იქნება.";
+  // useMemo keeps the line stable while the score counters animate; without it
+  // every re-render would draw a different message.
+  const message = useMemo(
+    () => randomOf(pct >= 90 ? MSG_EXCELLENT : pct >= 70 ? MSG_GOOD : pct >= 50 ? MSG_MID : MSG_LOW),
+    [pct],
+  );
 
   const streakGrew = !!streakCelebration && streakCelebration.to > streakCelebration.from;
 
@@ -1311,7 +1388,7 @@ function Results({
                 <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
               </p>
               <p className="ka text-[11px] text-[#F5F4F2]/80 mt-1">
-                {streakGrew ? "\u00a0💪💪💪" : "სერია დაცულია — დაბრუნდი ხვალ 🔥"}
+                {streakGrew ? "\"Streak\" გაიზარდა — ასე განაგრძე! 💪" : "\"Streak\" შენარჩუნებულია — ხვალაც შემოიარე 🔥"}
               </p>
             </div>
           </div>
@@ -1373,7 +1450,7 @@ function Results({
         ) : (
           <div className="text-center space-y-1.5">
             <p className="ka text-xs text-[#4A4A4A]">
-              დღევანდელი ვარჯიში შესრულებულია — ხვალ ახალი სესია გელოდება 🔥
+              დღევანდელი ვარჯიში დასრულებულია — ხვალ ახალი სესია გელოდება 🔥
             </p>
             {!isPaid && (
               <Link to="/path/business/premium" className="ka block text-xs font-semibold text-[#5C1A2E] underline underline-offset-4">
