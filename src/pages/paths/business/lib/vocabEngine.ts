@@ -447,9 +447,17 @@ const FREE_REVIEW_TARGET = 8;   // free users: up to 8 review words per session
 // but because that was a cap rather than a target, session 1 came out small (little
 // due to review yet) and session 2 came out large (session 1's misses all requeued)
 // — the opposite of the intent.
-const PAID_SESSION_TARGET = 20; // paid: words per session, first and second of the day
+// Sessions are budgeted in QUESTIONS, not words. Each NEW word yields two
+// questions (encode + retrieve) and each review word one, so a fixed word count
+// still let the quiz swing between roughly 22 and 32 questions — which is what
+// the learner actually experiences.
+const QUESTIONS_PER_NEW = 2;
+const MISTAKE_ALLOWANCE = 2;    // buildQuiz adds 1-2 "common mistake" items
+const PAID_QUESTION_TARGET = 24;
 const PAID_BUDGET_STEP = 2;     // ...easing down slightly from the 3rd session on
-const PAID_MIN_BUDGET = 14;     // ...never below 14
+const PAID_MIN_QUESTIONS = 18;
+const PAID_NEW_FIRST = 8;       // new words in the day's first session
+const FREE_QUESTION_TARGET = 20;
 const PAID_MAX_NEW = 12;        // hard cap on NEW words — retention drops past ~10-12,
                                 // so bigger budgets buy more review, not more new words
 
@@ -512,21 +520,20 @@ export function planSession(
   let newCeiling: number;      // hard cap on new words (governor-limited)
   if (plan === "paid") {
     sessionTarget = Math.max(
-      PAID_MIN_BUDGET,
-      PAID_SESSION_TARGET - PAID_BUDGET_STEP * Math.max(0, sessionsToday - 1),
+      PAID_MIN_QUESTIONS,
+      PAID_QUESTION_TARGET - PAID_BUDGET_STEP * Math.max(0, sessionsToday - 1),
     );
     newCeiling = PAID_MAX_NEW;
     // MECHANIC 2 — same-day taper: later sessions shift toward consolidation.
-    // Session 1: full intake; session 2: 6; session 3+: 4. The freed slots become
-    // REVIEW, so the session stays the same length instead of shrinking.
-    newTarget = sessionsToday === 0 ? newCeiling : sessionsToday === 1 ? 6 : 4;
-    reviewTarget = sessionTarget - newTarget;
+    // Freed new-word slots become review, so the QUESTION COUNT stays steady.
+    newTarget = sessionsToday === 0 ? PAID_NEW_FIRST : sessionsToday === 1 ? 4 : 3;
   } else {
-    sessionTarget = FREE_NEW_TARGET + FREE_REVIEW_TARGET;
+    sessionTarget = FREE_QUESTION_TARGET;
     newCeiling = FREE_NEW_TARGET;
     newTarget = FREE_NEW_TARGET;
-    reviewTarget = FREE_REVIEW_TARGET;
   }
+  newTarget = Math.min(newTarget, newCeiling);
+  reviewTarget = Math.max(0, sessionTarget - MISTAKE_ALLOWANCE - QUESTIONS_PER_NEW * newTarget);
 
   // MECHANIC 1 — backlog governor: never pour new words onto an unconsolidated
   // pile. Count SEEN-but-not-yet-sticky words (confidence < 2). As the backlog
@@ -538,8 +545,8 @@ export function planSession(
   if (backlog >= 30) newCeiling = Math.min(newCeiling, 2);
   else if (backlog >= 15) newCeiling = Math.min(newCeiling, Math.ceil(newCeiling / 2));
   newTarget = Math.min(newTarget, newCeiling);
-  // Freed new-word slots become review, so the session keeps its length.
-  reviewTarget = Math.max(reviewTarget, sessionTarget - newTarget);
+  // Freed new-word slots become review questions, so the count holds up.
+  reviewTarget = Math.max(reviewTarget, sessionTarget - MISTAKE_ALLOWANCE - QUESTIONS_PER_NEW * newTarget);
 
   const now = Date.now();
   const seen = new Set(progress.map((p) => p.word_key));
@@ -596,8 +603,11 @@ export function planSession(
   // the day, when nothing has come due yet), top the session back up with new
   // words — never past the governor ceiling. This is what stopped session 1 from
   // being a 6-word stub while session 2 ballooned.
-  const shortfall = sessionTarget - (newTarget + reviewKeys.length);
-  if (shortfall > 0) newTarget = Math.min(newCeiling, newTarget + shortfall);
+  const questionsPlanned = MISTAKE_ALLOWANCE + QUESTIONS_PER_NEW * newTarget + reviewKeys.length;
+  if (questionsPlanned < sessionTarget) {
+    const extraNew = Math.ceil((sessionTarget - questionsPlanned) / QUESTIONS_PER_NEW);
+    newTarget = Math.min(newCeiling, newTarget + extraNew);
+  }
 
   // ---- New word selection in strict tier order ---------------------------
   const t1Unseen = t1.filter((w) => !seen.has(w.key));
@@ -902,11 +912,15 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
 // Uses field grouping when available, else falls back to "same source" cohort.
 // Bank-wide: works for any word that has at least 3 field/cohort peers.
 function makeOddOneOut(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
-  // cohort = words sharing this word's field (or week band for core words)
-  const cohortOf = (w: VocabWord) => w.field || (w.week ? `week${w.week}` : w.source);
-  const mine = cohortOf(word);
-  const peers = pool.filter((w) => w.key !== word.key && cohortOf(w) === mine);
-  const outsiders = pool.filter((w) => w.key !== word.key && cohortOf(w) !== mine);
+  // Only FIELD words carry a real semantic category (marketing, finance, hr...).
+  // Core words were previously grouped by curriculum WEEK, which means nothing
+  // semantically — that produced genuinely unanswerable sets such as
+  // "Next steps / Leverage point / Risk / Downsizing". Skip those entirely.
+  if (!word.field) return null;
+  const peers = pool.filter((w) => w.key !== word.key && w.field === word.field);
+  // The odd one must come from a DIFFERENT named field, so the contrast is
+  // category-vs-category rather than "one random word".
+  const outsiders = pool.filter((w) => w.field && w.field !== word.field);
   if (peers.length < 2 || outsiders.length < 1) return null;
   const group = [word, ...pick(peers, 2)]; // 3 that belong (incl. the target)
   const odd = pick(outsiders, 1)[0];
