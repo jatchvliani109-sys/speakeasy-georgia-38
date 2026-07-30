@@ -1,60 +1,50 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { Body, Head, Html, Preview } from 'npm:@react-email/components@0.0.22'
 
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
-
-interface ReauthenticationEmailProps {
-  token: string
+export const ReauthenticationEmail = ({ token }: { token: string }) => {
+  const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F5F0;margin:0;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#FFFFFF;border:1px solid #E4E2DF;border-radius:16px;overflow:hidden;">
+        <tr>
+          <td style="background-color:#5C1A2E;padding:22px 28px;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#F8F5F0;letter-spacing:0.5px;">SpeakBusy</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px;font-family:'Noto Sans Georgian',Arial,Helvetica,sans-serif;color:#1C1C1E;">
+            <h1 style="margin:0 0 12px;font-size:20px;line-height:1.4;font-weight:bold;color:#1C1C1E;">დადასტურების კოდი</h1>
+            <p style="margin:0 0 22px;font-size:15px;line-height:1.7;color:#4A4A4A;">
+              ვინაობის დასადასტურებლად გამოიყენე ეს კოდი:
+            </p>
+            <p style="margin:0 0 22px;font-family:Courier,monospace;font-size:26px;font-weight:bold;letter-spacing:4px;color:#5C1A2E;">${token}</p>
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#8A8A8A;">
+              კოდი შეზღუდული დროით მოქმედებს.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color:#F8F5F0;padding:16px 28px;border-top:1px solid #E4E2DF;">
+            <p style="margin:0;font-family:'Noto Sans Georgian',Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8A8A8A;">
+              SpeakBusy — ბიზნეს ინგლისური ქართველებისთვის
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`
+  return (
+    <Html lang="ka" dir="ltr">
+      <Head />
+      <Preview>დადასტურების კოდი — SpeakBusy</Preview>
+      <Body style={{ margin: 0, padding: 0, backgroundColor: '#F8F5F0' }}>
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </Body>
+    </Html>
+  )
 }
-
-export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Your verification code</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm reauthentication</Heading>
-        <Text style={text}>Use the code below to confirm your identity:</Text>
-        <Text style={codeStyle}>{token}</Text>
-        <Text style={footer}>
-          This code will expire shortly. If you didn't request this, you can
-          safely ignore this email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
 
 export default ReauthenticationEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const codeStyle = {
-  fontFamily: 'Courier, monospace',
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 30px',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
