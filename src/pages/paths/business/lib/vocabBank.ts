@@ -907,7 +907,7 @@ const TIER2: Mini[] = [
   ["debrief","Debrief","შედეგების განხილვა","Let's debrief after the call.","ზარის შემდეგ განვიხილოთ."],
   ["recap","Recap","მოკლე შეჯამება","Quick recap before we close.","სწრაფი შეჯამება დახურვამდე."],
   ["takeaway","Takeaway","მთავარი დასკვნა","Key takeaway?","მთავარი დასკვნა?"],
-  ["action-item","Action item","სამოქმედო პუნქტი","Three action items here.","აქ სამი სამოქმედო პუნქტია."],
+  ["action-item","Action","სამოქმედო პუნქტი","Three action items here.","აქ სამი სამოქმედო პუნქტია."],
   ["next-steps","Next steps","შემდეგი ნაბიჯები","What are the next steps?","რა შემდეგი ნაბიჯებია?"],
   ["touchpoint","Touchpoint","რეგულარული კონტაქტი","Schedule a weekly touchpoint.","ყოველკვირეული შეხვედრა დაგეგმე."],
   ["sync","Sync","სინქრონიზაცია / შეჯერება","Let's sync on Friday.","მოდი პარასკევს შევჯერდეთ."],
