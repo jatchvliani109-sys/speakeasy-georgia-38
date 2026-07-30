@@ -113,7 +113,7 @@ const WORDS: [string, string][] = [
   ["contingency", "Contingency"],["dependency", "Dependency"],["constraint", "Constraint"],["assumption", "Assumption"],
   ["hypothesis", "Hypothesis"],["insight", "Insight"],["data", "Data"],["analytics", "Analytics"],
   ["report-out", "Report out"],["debrief", "Debrief"],["recap", "Recap"],["takeaway", "Takeaway"],
-  ["action-item", "Action item"],["next-steps", "Next steps"],["touchpoint", "Touchpoint"],["sync", "Sync"],
+  ["action-item", "Action"],["next-steps", "Next steps"],["touchpoint", "Touchpoint"],["sync", "Sync"],
   ["check-in", "Check-in"],["one-on-one", "One-on-one"],["all-hands", "All-hands"],["townhall", "Townhall"],
   ["agenda-item", "Agenda item"],["minute-taker", "Minute-taker"],["chair", "Chair"],["consensus", "Consensus"],
   ["compromise", "Compromise"],["counteroffer", "Counteroffer"],["concession", "Concession"],["leverage-point", "Leverage point"],
