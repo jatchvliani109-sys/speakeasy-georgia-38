@@ -24,6 +24,7 @@ import {
   pickLowestConfidenceWords,
   planSession,
   progressToWord,
+  SESSION_QUESTION_TARGET,
   type ProgressRow,
   type QuizQuestion,
   upsertProgress,
@@ -237,7 +238,7 @@ export default function VocabularyModule() {
       playFlip();
       setStage("cards");
     } else {
-      setQuiz(buildQuiz([], reviewKeys, formatTier));
+      setQuiz(buildQuiz([], reviewKeys, formatTier, { targetQuestions: SESSION_QUESTION_TARGET }));
       setStage("quiz");
     }
   };
@@ -475,7 +476,7 @@ export default function VocabularyModule() {
     // skip the cards stage and go straight to quiz.
     setNewWords([]);
     setReviewKeys(pool.map((w) => w.key));
-    setQuiz(buildQuiz(pool, [], formatTier));
+    setQuiz(buildQuiz(pool, [], formatTier, { targetQuestions: SESSION_QUESTION_TARGET }));
     setQIdx(0);
     setAnswers([]);
     setSelected(null);

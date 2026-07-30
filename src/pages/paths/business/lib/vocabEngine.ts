@@ -1075,11 +1075,52 @@ const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
  * - No arbitrary length cap: the quiz fits the session plan's word budget.
  *   Pass opts.maxQuestions to cap explicitly if ever needed.
  */
+// A session must not collapse to a stub just because few WORDS are available.
+// The main path budgets questions properly, but secondary entry points (review
+// fallback, practice mode) build 1-2 questions per word with no floor — which is
+// how a 3-word review turned into a 6-question session. This tops a short quiz
+// back up by asking each word in additional FORMATS, capped so no single word is
+// drilled absurdly often.
+const MAX_QUESTIONS_PER_WORD = 3;
+export const SESSION_QUESTION_TARGET = 20;
+
+function topUpQuestions(
+  questions: QuizQuestion[],
+  words: VocabWord[],
+  pool: VocabWord[],
+  target: number,
+  generators: Generator[],
+): QuizQuestion[] {
+  if (!words.length) return questions;
+  const perWord = new Map<string, number>();
+  for (const q of questions) {
+    const k = (q as any).wordKey;
+    if (k) perWord.set(k, (perWord.get(k) ?? 0) + 1);
+  }
+  let gi = 0;
+  let guard = 0;
+  while (questions.length < target && guard++ < 300) {
+    let added = false;
+    for (const w of words) {
+      if (questions.length >= target) break;
+      if ((perWord.get(w.key) ?? 0) >= MAX_QUESTIONS_PER_WORD) continue;
+      const gen = generators[gi++ % generators.length];
+      const q = gen(w, pool);
+      if (!q) continue;
+      questions.push(q);
+      perWord.set(w.key, (perWord.get(w.key) ?? 0) + 1);
+      added = true;
+    }
+    if (!added) break;   // every word already at its cap
+  }
+  return questions;
+}
+
 export function buildQuiz(
   newWords: VocabWord[],
   reviewKeys: string[],
   tierLevel: 1 | 2 | 3 = 1,
-  opts: { maxQuestions?: number; claimedKeys?: string[] } = {},
+  opts: { maxQuestions?: number; claimedKeys?: string[]; targetQuestions?: number } = {},
 ): QuizQuestion[] {
   const pool = ALL_WORDS;
   const reviewWords = reviewKeys.map(findWord).filter(Boolean) as VocabWord[];
@@ -1121,6 +1162,13 @@ export function buildQuiz(
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
   });
+
+  // Top up short sessions before adding mistakes, so the floor applies to the
+  // vocabulary content rather than being padded out with grammar items.
+  if (opts.targetQuestions) {
+    const allWords = [...newWords, ...reviewWords];
+    topUpQuestions(questions, allWords, pool, opts.targetQuestions - (tierLevel === 1 ? 1 : 2), [...NEW_SECOND_PASS_BY_TIER[tierLevel], ...reviewGens]);
+  }
 
   // 1 mistake on tier 1 to keep things gentle, 2 on higher tiers.
   const mistakeCount = tierLevel === 1 ? 1 : 2;
@@ -1290,7 +1338,7 @@ export function dueToday(progress: ProgressRow[]): VocabWord[] {
  * Build a 15-20 question quiz using only the supplied review words. Generates
  * roughly 2 varied questions per word so even a 10-word pool reaches ~20 Qs.
  */
-export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
+export function buildReviewQuiz(words: VocabWord[], targetQuestions = SESSION_QUESTION_TARGET): QuizQuestion[] {
   if (!words.length) return [];
   const pool = ALL_WORDS;
   const generators: Generator[] = [makeMcMeaning, makeTrKaToEn, makeListening, makeFillBlank, makeTypeWord, makeTrEnToKa];
@@ -1309,6 +1357,8 @@ export function buildReviewQuiz(words: VocabWord[]): QuizQuestion[] {
     const q = gen(w, pool);
     questions.push(q || makeTrKaToEn(w, pool));
   });
+
+  topUpQuestions(questions, words, pool, targetQuestions, generators);
 
   // Avoid back-to-back same type
   let merged = shuffle(questions);
