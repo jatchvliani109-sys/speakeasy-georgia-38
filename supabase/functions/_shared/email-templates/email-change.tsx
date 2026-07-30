@@ -1,92 +1,60 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { Body, Head, Html, Preview } from 'npm:@react-email/components@0.0.22'
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
-
-interface EmailChangeEmailProps {
-  siteName: string
-  // oldEmail is the user's current address (HookData.OldEmail). For the
-  // NEW-recipient half of a secure email_change fanout, `email` equals the
-  // recipient (NEW), so the "from" line must render oldEmail to read
-  // "from OLD to NEW" instead of "from NEW to NEW".
-  oldEmail: string
-  email: string
-  newEmail: string
-  confirmationUrl: string
+// Georgian HTML supplied by the customer, kept verbatim.
+// Supabase syntax mapped: {{ .ConfirmationURL }} -> confirmationUrl (payload.data.url), {{ .NewEmail }} -> newEmail (payload.data.new_email)
+export const EmailChangeEmail = ({ confirmationUrl, newEmail }: { siteName?: string; oldEmail?: string; email?: string; newEmail?: string; confirmationUrl: string }) => {
+  const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F5F0;margin:0;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#FFFFFF;border:1px solid #E4E2DF;border-radius:16px;overflow:hidden;">
+        <tr>
+          <td style="background-color:#5C1A2E;padding:22px 28px;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#F8F5F0;letter-spacing:0.5px;">SpeakBusy</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px;font-family:'Noto Sans Georgian',Arial,Helvetica,sans-serif;color:#1C1C1E;">
+            <h1 style="margin:0 0 12px;font-size:20px;line-height:1.4;font-weight:bold;color:#1C1C1E;">ახალი ელფოსტის დადასტურება</h1>
+            <p style="margin:0 0 22px;font-size:15px;line-height:1.7;color:#4A4A4A;">
+              მოთხოვნილია ელფოსტის შეცვლა მისამართზე <strong style="color:#5C1A2E;">${newEmail ?? ''}</strong>. ცვლილების დასასრულებლად დაადასტურე ახალი მისამართი.
+            </p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;">
+              <tr>
+                <td align="center" style="background-color:#C9A84C;border-radius:999px;">
+                  <a href="${confirmationUrl}" style="display:inline-block;padding:14px 30px;font-family:'Noto Sans Georgian',Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#5C1A2E;text-decoration:none;">ახალი ელფოსტის დადასტურება</a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#4A4A4A;">თუ ღილაკი არ იხსნება, დააკოპირე ეს ბმული ბრაუზერში:</p>
+            <p style="margin:0 0 22px;font-size:12px;line-height:1.6;color:#5C1A2E;word-break:break-all;">${confirmationUrl}</p>
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#8A8A8A;">
+              თუ ეს ცვლილება შენ არ მოგითხოვია, არ დაადასტურო — ანგარიში ძველ მისამართზე დარჩება.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color:#F8F5F0;padding:16px 28px;border-top:1px solid #E4E2DF;">
+            <p style="margin:0;font-family:'Noto Sans Georgian',Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8A8A8A;">
+              SpeakBusy — ბიზნეს ინგლისური ქართველებისთვის
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`
+  return (
+    <Html lang="ka" dir="ltr">
+      <Head />
+      <Preview>ახალი ელფოსტის დადასტურება — SpeakBusy</Preview>
+      <Body style={{ margin: 0, padding: 0, backgroundColor: '#F8F5F0' }}>
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </Body>
+    </Html>
+  )
 }
-
-export const EmailChangeEmail = ({
-  siteName,
-  oldEmail,
-  newEmail,
-  confirmationUrl,
-}: EmailChangeEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{' '}
-          <Link href={`mailto:${oldEmail}`} style={link}>
-            {oldEmail}
-          </Link>{' '}
-          to{' '}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Text style={text}>
-          Click the button below to confirm this change:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Confirm Email Change
-        </Button>
-        <Text style={footer}>
-          If you didn't request this change, please secure your account
-          immediately.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
 
 export default EmailChangeEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
