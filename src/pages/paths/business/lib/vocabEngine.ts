@@ -677,7 +677,8 @@ export type QuizQuestion =
   | { type: "odd_one_out"; wordKey: string; promptKa: string; options: { en: string; ka: string }[]; correctIndex: number }
   | { type: "synonym_match"; wordKey: string; en: string; ka: string; promptKa: string; choices: string[]; correct: string }
   | { type: "collocation"; wordKey: string; promptKa: string; phraseEn: string; blankIndex: number; choices: string[]; correct: string; hintKa: string }
-  | { type: "definition_match"; wordKey: string; promptKa: string; definitionKa: string; choices: string[]; correct: string };
+  | { type: "definition_match"; wordKey: string; promptKa: string; definitionKa: string; choices: string[]; correct: string }
+  | { type: "sentence_definition"; wordKey: string; promptKa: string; before: string; target: string; after: string; choices: string[]; correct: string };
 
 function pick<T>(arr: T[], n: number): T[] {
   const c = [...arr];
@@ -935,6 +936,53 @@ function makeOddOneOut(word: VocabWord, pool: VocabWord[]): QuizQuestion | null 
   };
 }
 
+// ---- Sentence definition: infer meaning from CONTEXT. ----
+// Shows a real example sentence with the target word highlighted and asks which
+// Georgian explanation fits. Unlike definition_match (which shows the meaning and
+// asks for the word), this runs the other way and forces the learner to read the
+// sentence rather than recall a memorised pair. Splitting the sentence into
+// before/target/after lets the UI highlight without re-running a regex.
+function makeSentenceDefinition(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
+  const def = (word.explanationKa || "").trim();
+  if (!def || def === word.ka.trim()) return null;
+
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const phraseRe = new RegExp(`\\b${escapeRe(word.en.toLowerCase())}\\b`, "i");
+  let hit: { en: string; index: number; matched: string } | null = null;
+  for (const cand of exampleCandidates(word)) {
+    const m = phraseRe.exec(cand.en);
+    if (m) { hit = { en: cand.en, index: m.index, matched: m[0] }; break; }
+  }
+  if (!hit) return null;   // no example actually contains the word
+
+  // Rival explanations must be real, distinct, and not from a word sharing this
+  // word's Georgian translation (that would make two options defensible).
+  const wrong = rankedDistractors(
+    word,
+    pool,
+    3,
+    (w) =>
+      !w.explanationKa ||
+      !w.explanationKa.trim() ||
+      w.explanationKa.trim() === def ||
+      w.explanationKa.trim() === w.ka.trim() ||
+      w.ka.trim() === word.ka.trim(),
+    (w) => w.explanationKa.trim(),
+  );
+  if (wrong.length < 3) return null;
+
+  return {
+    type: "sentence_definition",
+    wordKey: word.key,
+    promptKa: "რას ნიშნავს გამოკვეთილი სიტყვა ამ წინადადებაში?",
+    before: hit.en.slice(0, hit.index),
+    target: hit.matched,
+    after: hit.en.slice(hit.index + hit.matched.length),
+    choices: shuffle([def, ...wrong]),
+    correct: def,
+  };
+}
+
 // ---- Definition -> word: show the Georgian explanation, pick the English word. ----
 // Only possible now that all 980 words carry an authored explanationKa. Skips
 // words whose explanation is just the translation repeated (no information gain).
@@ -1000,19 +1048,19 @@ function makeSynonymMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
 const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeOddOneOut, makeSynonymMatch, makeDefinitionMatch],
-  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut, makeCollocation, makeDefinitionMatch],
-  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut, makeCollocation, makeDefinitionMatch],
+  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
+  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
 };
 // Second-pass generators for NEW words: retrieval-heavier than the first pass,
 // so each new word is first recognized, then actively recalled/produced.
 const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeListening, makeTrEnToKa, makeTypeWord, makeSynonymMatch, makeFillBlank],
-  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening, makeSynonymMatch, makeCollocation, makeDefinitionMatch],
+  2: [makeTrKaToEn, makeTypeWord, makeContextCloze, makeFillBlank, makeListening, makeSentenceDefinition, makeCollocation, makeDefinitionMatch],
   3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeCollocation],
 };
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse, makeOddOneOut, makeSynonymMatch],
-  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut, makeCollocation, makeDefinitionMatch],
+  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut, makeCollocation, makeSentenceDefinition],
   3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening, makeCollocation],
 };
 

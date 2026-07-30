@@ -1060,6 +1060,8 @@ function checkAnswer(q: QuizQuestion, selected: string | number): boolean {
       return selected === q.correct;
     case "definition_match":
       return selected === q.correct;
+    case "sentence_definition":
+      return selected === q.correct;
   }
 }
 
@@ -1200,6 +1202,20 @@ function QuestionCard({
         <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <h3 className="ka text-2xl font-bold text-[#5C1A2E] mt-3">{q.ka}</h3>
+          {renderChoices(q.choices, q.correct)}
+        </div>
+      );
+    case "sentence_definition":
+      return (
+        <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+          <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
+          <p className="text-lg text-[#1C1C1E] mt-3 leading-relaxed">
+            {q.before}
+            <span className="font-bold text-[#5C1A2E] underline decoration-[#C9A84C] decoration-2 underline-offset-4">
+              {q.target}
+            </span>
+            {q.after}
+          </p>
           {renderChoices(q.choices, q.correct)}
         </div>
       );
