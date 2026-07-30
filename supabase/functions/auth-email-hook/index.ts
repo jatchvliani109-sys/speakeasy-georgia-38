@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'დაადასტურე შენი ელფოსტა — SpeakBusy',
+  invite: 'მოწვევა SpeakBusy-ში',
+  magiclink: 'შესვლის ბმული — SpeakBusy',
+  recovery: 'პაროლის აღდგენა — SpeakBusy',
+  email_change: 'ახალი ელფოსტის დადასტურება — SpeakBusy',
+  reauthentication: 'დადასტურების კოდი — SpeakBusy',
 }
 
 // Template mapping
@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "speak-easy-georgia"
+const SITE_NAME = "SpeakBusy"
 const SENDER_DOMAIN = "notify.speakbusy.com"
 const ROOT_DOMAIN = "speakbusy.com"
 const FROM_DOMAIN = "speakbusy.com" // Domain shown in From address (may be root or sender subdomain)
@@ -258,7 +258,7 @@ async function handleWebhook(req: Request): Promise<Response> {
       run_id,
       message_id: messageId,
       to: payload.data.email,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: `SpeakBusy <noreply@${FROM_DOMAIN}>`,
       sender_domain: SENDER_DOMAIN,
       subject: EMAIL_SUBJECTS[emailType] || 'Notification',
       html,
