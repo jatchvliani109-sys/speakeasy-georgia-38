@@ -307,6 +307,7 @@ async function upload(name: string, audio: ArrayBuffer) {
     method: "POST",
     headers: {
       Authorization: `Bearer ${SERVICE_KEY}`,
+      apikey: SERVICE_KEY,
       "Content-Type": "audio/mpeg",
       "x-upsert": "true",
     },
@@ -314,6 +315,7 @@ async function upload(name: string, audio: ArrayBuffer) {
   });
   if (!res.ok) throw new Error(`upload ${name} ${res.status}: ${(await res.text()).slice(0, 200)}`);
 }
+
 
 function page(body: string, refresh: boolean) {
   return new Response(
@@ -336,6 +338,29 @@ Deno.serve(async (req) => {
   }
   try {
     await ensureBucket();
+
+    // Targeted regeneration: ?keys=free,discount overwrites just those keys.
+    const keysParam = url.searchParams.get("keys");
+    if (keysParam) {
+      const wanted = new Set(keysParam.split(",").map((k) => k.trim()).filter(Boolean));
+      const targets = WORDS.filter(([key]) => wanted.has(key));
+      const results: string[] = [];
+      for (const [key, text] of targets) {
+        try {
+          const audio = await tts(text);
+          await upload(`${key}.mp3`, audio);
+          results.push(`${key}: ok (${audio.byteLength} bytes)`);
+        } catch (e) {
+          results.push(`${key}: ERROR ${(e as Error).message}`);
+        }
+      }
+      const notFound = [...wanted].filter((k) => !targets.some(([key]) => key === k));
+      return new Response(
+        JSON.stringify({ regenerated: results, notFound }, null, 2),
+        { headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     const existing = await listExisting();
     const missing = WORDS.filter(([key]) => !existing.has(`${key}.mp3`));
     const total = WORDS.length;
