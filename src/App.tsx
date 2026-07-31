@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -5,40 +6,65 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
+
+// ---------------------------------------------------------------------------
+// EAGER: public pages — the first paint for a new visitor, so they must not
+// wait on a chunk download.
+// ---------------------------------------------------------------------------
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import BusinessModulesList from "./pages/paths/business/BusinessModulesList";
-
-import BusinessGate from "./pages/paths/business/BusinessGate";
-import BusinessSetup from "./pages/paths/business/BusinessSetup";
-import BusinessPlacementTest from "./pages/paths/business/BusinessPlacementTest";
-import BusinessPlan from "./pages/paths/business/BusinessPlan";
-import BusinessHome from "./pages/paths/business/BusinessHome";
-import BusinessModule from "./pages/paths/business/BusinessModule";
-import MyLexicon from "./pages/paths/business/MyLexicon";
-import BusinessReassessment from "./pages/paths/business/BusinessReassessment";
-import SelfIntroduction from "./pages/paths/business/SelfIntroduction";
-import BusinessResumeUpload from "./pages/paths/business/BusinessResumeUpload";
-import DocumentHelper from "./pages/paths/business/DocumentHelper";
-import Scenarios from "./pages/paths/business/Scenarios";
-import BusinessPremium from "./pages/paths/business/BusinessPremium";
-import VocabularyModule from "./pages/paths/business/VocabularyModule";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import OAuthConsent from "./pages/OAuthConsent";
-
-import Lesson from "./pages/Lesson";
-import Summary from "./pages/Summary";
-import Vocabulary from "./pages/Vocabulary";
-import Mistakes from "./pages/Mistakes";
-import ProgressPage from "./pages/Progress";
 import NotFound from "./pages/NotFound";
 
+// ---------------------------------------------------------------------------
+// LAZY: everything behind auth.
+//
+// BusinessHome imports vocabEngine, which imports vocabBank — 700 KB of source,
+// ~144 KB gzipped. Importing these statically meant EVERY visitor downloaded the
+// whole vocabulary before the landing page could render, even if they never
+// signed in. Split this way, the bank is fetched only when a signed-in user
+// opens a screen that actually needs it.
+// ---------------------------------------------------------------------------
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const BusinessModulesList = lazy(() => import("./pages/paths/business/BusinessModulesList"));
+const BusinessGate = lazy(() => import("./pages/paths/business/BusinessGate"));
+const BusinessSetup = lazy(() => import("./pages/paths/business/BusinessSetup"));
+const BusinessPlacementTest = lazy(() => import("./pages/paths/business/BusinessPlacementTest"));
+const BusinessPlan = lazy(() => import("./pages/paths/business/BusinessPlan"));
+const BusinessHome = lazy(() => import("./pages/paths/business/BusinessHome"));
+const BusinessModule = lazy(() => import("./pages/paths/business/BusinessModule"));
+const MyLexicon = lazy(() => import("./pages/paths/business/MyLexicon"));
+const BusinessReassessment = lazy(() => import("./pages/paths/business/BusinessReassessment"));
+const SelfIntroduction = lazy(() => import("./pages/paths/business/SelfIntroduction"));
+const BusinessResumeUpload = lazy(() => import("./pages/paths/business/BusinessResumeUpload"));
+const DocumentHelper = lazy(() => import("./pages/paths/business/DocumentHelper"));
+const Scenarios = lazy(() => import("./pages/paths/business/Scenarios"));
+const BusinessPremium = lazy(() => import("./pages/paths/business/BusinessPremium"));
+const VocabularyModule = lazy(() => import("./pages/paths/business/VocabularyModule"));
+const Lesson = lazy(() => import("./pages/Lesson"));
+const Summary = lazy(() => import("./pages/Summary"));
+const Vocabulary = lazy(() => import("./pages/Vocabulary"));
+const Mistakes = lazy(() => import("./pages/Mistakes"));
+const ProgressPage = lazy(() => import("./pages/Progress"));
+
 const queryClient = new QueryClient();
+
+/** Shown briefly while a route chunk downloads. */
+function RouteFallback() {
+  return (
+    <div className="min-h-screen bg-[#F8F5F0] grid place-items-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-[#E4E2DF] border-t-[#5C1A2E] animate-spin" />
+        <p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p>
+      </div>
+    </div>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -47,6 +73,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -86,6 +113,7 @@ const App = () => (
             <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
