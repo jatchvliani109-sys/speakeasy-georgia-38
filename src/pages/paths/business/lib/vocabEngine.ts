@@ -771,6 +771,22 @@ function makeMcMeaning(word: VocabWord, pool: VocabWord[]): QuizQuestion {
   return { type: "mc_meaning", wordKey: word.key, en: word.en, correctKa: word.ka, choices };
 }
 
+// Matches the target phrase in a sentence, tolerating a normal inflected ending
+// on the FINAL word ("action item" -> "action items", "forecast" -> "forecasts").
+//
+// This replaces an earlier first-word fallback that caused a real bug: for
+// "Action item" the exact match failed on the plural "action items", so it
+// blanked only "action" and left "items" behind — giving
+// "captures the ______ items" with the answer "Action item", i.e.
+// "action item items". Matching the whole phrase (or nothing) avoids that.
+// The suffix list is deliberately narrow rather than \w*, so "lead" cannot
+// swallow "leadership".
+function targetPhraseRegex(en: string): RegExp {
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = en.toLowerCase().trim().split(/\s+/).map(escapeRe);
+  return new RegExp(`\\b${parts.join("\\s+")}(?:s|es|ed|ing|d)?\\b`, "i");
+}
+
 // Enrichment gave every word a second example. Alternating between them stops a
 // repeated word from always showing the SAME sentence — otherwise learners
 // memorise one sentence instead of the word. Returned in random order.
@@ -783,21 +799,14 @@ function exampleCandidates(word: VocabWord): { en: string; ka: string }[] {
 }
 
 function makeFillBlank(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
-  const wordLower = word.en.toLowerCase();
-  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = targetPhraseRegex(word.en);
 
-  // Try each example in random order; use the first that actually contains the word.
+  // Try each example in random order; use the first that actually contains the
+  // whole phrase. If none does, skip — a half-blanked sentence is worse than
+  // no question.
   for (const cand of exampleCandidates(word)) {
     const sentence = cand.en;
-    const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
-    let re: RegExp;
-    if (fullRe.test(sentence)) {
-      re = fullRe;
-    } else {
-      const first = wordLower.split(" ")[0];
-      re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
-      if (!re.test(sentence)) continue;
-    }
+    if (!re.test(sentence)) continue;
     const masked = sentence.replace(re, "______");
     const choices = shuffle([word.en, ...distractorsEn(word, pool, 3)]);
     return {
@@ -886,17 +895,8 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
   const cluster = clusterFor(word.key);
   if (!cluster) return null;
   const paragraph = cluster.paragraphEn;
-  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const wordLower = word.en.toLowerCase();
-  const fullRe = new RegExp(`\\b${escapeRe(wordLower)}\\b`, "i");
-  let re: RegExp;
-  if (fullRe.test(paragraph)) {
-    re = fullRe;
-  } else {
-    const first = wordLower.split(" ")[0];
-    re = new RegExp(`\\b${escapeRe(first)}\\w*`, "i");
-    if (!re.test(paragraph)) return null;
-  }
+  const re = targetPhraseRegex(word.en);
+  if (!re.test(paragraph)) return null;
   const masked = paragraph.replace(re, "______");
   const choices = shuffle([word.en, ...distractorsEn(word, ALL_WORDS, 3)]);
   return {
@@ -946,8 +946,7 @@ function makeSentenceDefinition(word: VocabWord, pool: VocabWord[]): QuizQuestio
   const def = (word.explanationKa || "").trim();
   if (!def || def === word.ka.trim()) return null;
 
-  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const phraseRe = new RegExp(`\\b${escapeRe(word.en.toLowerCase())}\\b`, "i");
+  const phraseRe = targetPhraseRegex(word.en);
   let hit: { en: string; index: number; matched: string } | null = null;
   for (const cand of exampleCandidates(word)) {
     const m = phraseRe.exec(cand.en);
