@@ -1,104 +1,127 @@
 # SpeakBusy — CLAUDE CONTEXT (authoritative status)
-Last updated: 2026-07-18. This file is the source of truth for any new Claude
-conversation. Older docs/messages contradict it → this wins.
+
+Last updated: 2026-07-31. Source of truth for any new Claude conversation.
+Where older docs or messages disagree, this wins.
 
 ## What SpeakBusy is
-Business-English learning app for Georgian professionals. **Vocab-first**:
-daily vocabulary sessions are the core loop; everything else supports it.
-Solo non-technical founder (Olegi), phone-based workflow:
-Claude writes complete file replacements → paste into GitHub → Lovable
-auto-deploys. **Edge functions need explicit Lovable redeploy.**
 
-## Stack
-- React/TS/Vite/Tailwind → Lovable Cloud. Repo: jatchvliani109-sys/speakeasy-georgia-38
-- Supabase (ref hmpwjhzrmfyapijikkuc): auth, DB, storage, edge functions
-- OpenAI API (gpt-4o everywhere; interview uses gpt-5.4 w/ gpt-4o fallback)
-- 980 word MP3s + 54 dialogue MP3s pre-generated in `word-audio` bucket
+Business-English learning app for Georgian professionals. **Vocab-first**: daily
+vocabulary sessions are the core loop, everything else supports it. Solo
+non-technical founder (Olegi), phone-based workflow: Claude writes complete file
+replacements → paste into GitHub → Lovable auto-deploys.
 
-## Design system — "quiet luxury" (repainted 2026-07-18)
-- Surfaces: neutral #F5F4F2 bg, white cards, #E4E2DF borders
-- Dark cards: #232323→#161616 gradients (mission, premium, milestone)
-- Burgundy #5C1A2E = TEXT/BORDER ACCENT ONLY (never large surfaces)
-- Gold #C9A84C = rewards, premium, CTAs on dark
-- Brand mark (logo/favicon/ads) stays burgundy+gold — intentional split
-- On dark cards: informational text = light #F5F4F2/70-85, celebratory = gold
+## Stack — IMPORTANT CORRECTION
+
+- React/TS/Vite/Tailwind. Repo: `jatchvliani109-sys/speakeasy-georgia-38`
+- **Backend is Lovable Cloud**, which provisions Supabase project
+  `hmpwjhzrmfyapijikkuc`. **Olegi has NO supabase.com dashboard access to it** —
+  the project belongs to Lovable's org, not his account. Everything (SQL editor,
+  users, logs, edge functions, secrets, emails, storage) is reached through
+  **Lovable → Cloud**. A personal Supabase project (`nlvjahbosrflbvryrecf`)
+  exists but is EMPTY and unused — a costly detour, do not configure it.
+- Edge functions require an explicit Lovable redeploy.
+- OpenAI via edge functions. 980 word MP3s + 54 dialogue MP3s in `word-audio`.
+- Auth email: **Lovable Emails**, sending from Olegi's own domain. Four Georgian
+  HTML templates installed (confirm signup, reset password, magic link, change
+  email). Resend account exists and is kept for future non-auth mail.
 
 ## GEORGIAN RULE (non-negotiable)
+
 "პროფესიული" is ALWAYS WRONG → "პროფესიონალური". Scan every file, every
-delivery. Also enforced inside AI prompts (business-docs, business-self-intro
-system prompts forbid it). 36+ instances eliminated to date.
+delivery. Also enforced inside AI prompts. The ONLY legitimate occurrence is
+inside the prohibition rule itself, which must name the word.
 
-## Monetization (MOCK ERA — real payments blocked on ინდ. მეწარმე registration)
-- Price: **8.99 GEL/month** (final; ad slides may still say 6.99 — Olegi updates)
-- Free forever: vocab 1 session/day, scenarios, notebook, streak (zero serve cost)
-- Premium: unlimited vocab + **7 AI sessions/week** unified pool
-- **Weekly AI budget**: ALL AI features share one pool (any interview mode,
-  any document generation, self-intro generation). Free = 1/week. Resets Monday.
-  Client-enforced via state blob (mock era); moves server-side at payments build.
-  Future tier idea (remembered): sell a bigger weekly pool.
-- Mock premium: `mockPro` flag in business state JSON; ⭐ page at
-  /path/business/premium with placeholder unlock. Real build swaps unlock for
-  payment + server `is_pro`; comp accounts for ~10 family/friends via is_pro.
-- Interview costs are the expensive unit (~$0.05-0.10); docs ~$0.02. 7/week
-  worst case ≈ $1.50-3/mo vs $3.33 revenue — safe. NO donate button (decided).
-- Trial: 7-day everything-unlocked planned; style (card vs account-age) TBD.
+Also settled: **"viral" → "პოპულარული (სწრაფად გავრცელებული)"**, never
+"ვირუსული" (the medical sense). Caught by Olegi; the bug was in the original
+bank, not just the enrichment.
 
-## Product state (all live unless noted)
-- **Vocab**: 990-word bank; free 6 new + ≤8 review, paid budget 30→floor 10,
-  new cap 12; question types incl. listening (reveals EN word after answer),
-  type_word, context_cloze; adaptive format tier; claim fast-track; mastery
-  needs 2+ production correct. **Wrong answers due IMMEDIATELY** (same-day
-  repeat sessions drill mistakes first).
-- **Scenario-of-the-day**: every 2nd completed session auto-themed
-  (totalCompleted % 2 === 1), curriculum order, themed-review fallback.
-  UI: gold-bordered intro block + persistent 🎬 chip during quiz + dashboard
-  preview (incl. done-state for premium). Browse page exists but UNLINKED
-  (paradox of choice) — route /path/business/scenarios alive for deep links.
-- **Streak**: 5-tier escalating card; freeze system (2 banked, auto-consume,
-  +1 per 7 days cap 2, persisted in state JSON incl. freezeDays); ❄ markers;
-  decluttered card (number, msg, dots, bar, tiny ❄N suffix).
-- **Session-complete celebration**: StreakTick banner, honest before/after calc.
-- **Interview**: 3 modes; real = premium-gated; realism via two-stage plan
-  extraction; all modes consume AI budget at startSession; sessions stamp mode.
-- **Documents assistant**: 5 tools (email, email_fix, cover_letter,
-  resume_improve, bio) + AI adjust on saved docs — all budget-gated via
-  callDocsWithBudget. ?tool= deep links from menu. Resume prefills from
-  profile.rawResumeText.
-- **Self-intro**: generation consumes budget (rewrites ride free); device-voice
-  TTS only.
-- **Audio policy**: NO paid live TTS anywhere. Stored MP3 → device
-  SpeechSynthesis (iOS-hardened: delayed speak, global utterance ref, resume,
-  safety timeout). openai-text-to-speech fn orphaned.
-- **Nav**: GlobalNav = core four inline (desktop) + hamburger on ALL
-  breakpoints with full list (6 features, premium, profile, logout). Dashboard:
-  no modules section; მეტი rows: გასაუბრება, documents, assessment, plan,
-  premium. Premium banner above daily focus (hidden when premium). Premium
-  users get "კიდევ ერთი სესია ⭐" on done mission card.
-- **Notebook (MyLexicon)**: answered-only visibility (phantom-word root cause
-  ingestExternalPhrases email branch REMOVED), mastery tabs w/ counts.
-- **Landing (Index)**: vocab-first hero "დღეში 5 წუთში", 6-feature grid.
-- **Onboarding**: placement test → name step (auto-username filtered) → plan.
+## Vocabulary system (the core product)
 
-## Edge functions (supabase/functions)
-- business-interview: gpt-5.4→gpt-4o fallback, interviewPlan realism. LIVE.
-- business-docs: gpt-4o, 6 actions, Georgian rule in prompt. NO fallback (queued).
-- business-self-intro: gpt-4o, Georgian rule in prompt. NO fallback (queued).
-- business-resume-parse: gpt-4o + Lovable gemini fallback. Outside AI budget.
-- Orphan suspects (verify refs then delete): ai-tutor, level-reaction, tts,
-  business-emails, openai-text-to-speech; speech-to-text maybe used by SpeakButton.
+- **980 words**, all enriched: second example (EN+KA), Georgian explanation, and
+  two collocations each. 100% coverage, no gaps.
+- **14 question types**: mc_meaning, fill_blank, tr_en_to_ka, tr_ka_to_en,
+  true_false, sentence_correct, georgian_mistake, listening, type_word,
+  context_cloze, odd_one_out, synonym_match, collocation, definition_match,
+  sentence_definition.
+- **Sessions are budgeted in QUESTIONS, not words** (~21–23 premium, ~19 free).
+  A new word yields 2 questions and a review word 1, so a fixed word count still
+  swung the quiz between 22 and 32.
+- **Generator pools rotate from a random offset.** Previously indexed by word
+  position, so generators past index (wordCount−1) never fired —
+  sentence_definition was effectively unreachable.
+- **Distractors are plausibility-ranked** (same topic cohort, word class, length)
+  with a KA-collision guard so two options can never share a Georgian meaning.
+- **Blanking uses EXACT word forms**; highlighting (sentence_definition) uses an
+  inflection-tolerant matcher. Mixing these caused two shipped bugs:
+  "action item items" and "Nino is chair today's meeting".
+- Duolingo-style **mistake requeue**: a missed question is appended to the end of
+  the session exactly once; the progress bar grows with it.
+- **Session resume** via localStorage snapshot (24h expiry, version-stamped),
+  cleared only when results actually save.
+- Rotating **business-pun results messages** (43 across four score tiers). Streak
+  banner fires only on the first completed session of the day.
+- Progress saving **retries once and shows a Georgian toast on failure**; the
+  resume snapshot survives a failed save.
 
-## Emails module: FULLY REMOVED (UI, routing, queries, ingestion). Only the
-dev RESET handler touches business_email_sessions (intentional).
+## Security / infrastructure (audited 2026-07-31)
+
+- **RLS verified on all 22 tables**, each with at least one policy.
+- Indexes added on `user_id` for the five tables that lacked them.
+- **Account deletion** (`delete-account` edge function) clears **21 locations**
+  plus the auth user, verified with zero orphans. `suppressed_emails` is
+  deliberately RETAINED — deleting it would let a bounced or complained address
+  be emailed again.
+- **AI quota is server-enforced**: `consume_ai_session` / `refund_ai_session` SQL
+  functions (SECURITY DEFINER, row-locking, service_role only). Edge functions
+  claim before generating and refund on failure. The client copy in `state.ts` is
+  now READ-ONLY — if it also incremented, every use would cost two sessions.
+  Client and server week keys must produce identical strings or the counter
+  resets forever; verified hourly across 14 days.
+- **Code splitting**: public pages eager, all authenticated routes lazy. The
+  vocab bank (144 KB gzipped) previously downloaded for every visitor because
+  BusinessHome imports vocabEngine.
+- Seven word MP3s were silently empty (byte-identical at 5,760 bytes) and were
+  regenerated. Future bulk generation should reject files under ~8 KB.
+
+## Monetization (MOCK ERA — blocked on ინდ. მეწარმე registration)
+
+- Price 8.99 GEL/month. Free: 1 AI session/week. Premium: 7/week, unified pool,
+  Monday reset.
+- `mockPro` flag in business state. **Premium cancel is still a mock** — it flips
+  the local flag and must reach the payment provider once payments exist.
 
 ## Pending board
-1. Olegi confirmations: scenario 🎬 in 1 of 2 back-to-back sessions; sounds
-   audible; read-aloud stable; resume prefill filled; sister palette verdict;
-   landing page ACTUALLY deployed (was silently missed once).
-2. Lovable searches: project-wide პროფესიული; orphan fn references; auth
-   autocomplete prompt.
-3. Buildable: gpt-4o fallback for business-docs + business-self-intro.
-4. Batch D (post-registration): processor (Georgia availability UNVERIFIED —
-   check early), server is_pro, real trial, comp accounts, server-side AI
-   budget, Privacy/Terms entity + payments section.
-5. Native phase (archived): Capacitor wrap, stores ($25/$99), push notifications.
-6. **Dev RESET button removal — ABSOLUTELY LAST.**
+
+1. **Payments** — processor availability in Georgia still UNVERIFIED.
+2. **Legal** — Privacy/Terms need the registered entity name and a real
+   payments/subscription section. Georgian convention: "წესები და პირობები",
+   "კონფიდენციალობის პოლიტიკა".
+3. **Login/signup checkbox rendering bug** — `Auth.tsx` not yet reviewed.
+4. **Add-to-home-screen prompt** for mobile (iOS + Android, mobile-only, hidden
+   once installed).
+5. **Borrowing terms awaiting Olegi's verdict**: ჰედჰანთინგი, ფრიმიუმ,
+   ინფლუენსერი, ფიშინგი, სპრინტი, სტენდაპი, ფლაივილი, კოჰორტი, სქრამი, კანბანი,
+   პაიპლაინი, ცივი ზარი / თბილი ლიდი.
+6. **Favicon** — SVG delivered, still needs PNG sizes.
+7. Error handling on remaining write paths (InterviewModule has ~12 unchecked
+   Supabase calls).
+8. **Dev RESET button removal — ABSOLUTELY LAST.**
+
+## Removed 2026-07-31
+
+Legacy routes from the pre-SpeakBusy lesson app deleted from `App.tsx`:
+`/lesson`, `/summary/:id`, `/vocabulary`, `/mistakes`, `/progress`. Nothing
+linked to them and nothing writes to the `lessons` table they read. The page
+files remain in the repo but are unrouted. `/dashboard` was KEPT — it is a live
+redirect to `/path/business`.
+
+## Working style that has proven necessary
+
+- Verify against the schema, not against frontend code. The first
+  `delete-account` covered 10 tables because that is all the frontend
+  referenced; the schema had 21.
+- Claims need measurement. "113,680 questions, zero issues" was inflated and
+  masked four untested question types; a corrected audit (9,207 distinct
+  type × word combinations) found the real bug.
+- Olegi finds real bugs by using the app. Take those reports seriously and look
+  for the whole class, not the single instance.

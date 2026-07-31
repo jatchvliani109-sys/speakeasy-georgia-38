@@ -46,11 +46,6 @@ const DocumentHelper = lazy(() => import("./pages/paths/business/DocumentHelper"
 const Scenarios = lazy(() => import("./pages/paths/business/Scenarios"));
 const BusinessPremium = lazy(() => import("./pages/paths/business/BusinessPremium"));
 const VocabularyModule = lazy(() => import("./pages/paths/business/VocabularyModule"));
-const Lesson = lazy(() => import("./pages/Lesson"));
-const Summary = lazy(() => import("./pages/Summary"));
-const Vocabulary = lazy(() => import("./pages/Vocabulary"));
-const Mistakes = lazy(() => import("./pages/Mistakes"));
-const ProgressPage = lazy(() => import("./pages/Progress"));
 
 const queryClient = new QueryClient();
 
@@ -104,13 +99,6 @@ const App = () => (
             <Route path="/path/business/scenarios" element={<RequireAuth><Scenarios /></RequireAuth>} />
             <Route path="/path/business/premium" element={<RequireAuth><BusinessPremium /></RequireAuth>} />
             <Route path="/path/business/vocabulary" element={<RequireAuth><VocabularyModule /></RequireAuth>} />
-
-            
-            <Route path="/lesson" element={<RequireAuth><Lesson /></RequireAuth>} />
-            <Route path="/summary/:id" element={<RequireAuth><Summary /></RequireAuth>} />
-            <Route path="/vocabulary" element={<RequireAuth><Vocabulary /></RequireAuth>} />
-            <Route path="/mistakes" element={<RequireAuth><Mistakes /></RequireAuth>} />
-            <Route path="/progress" element={<RequireAuth><ProgressPage /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>
