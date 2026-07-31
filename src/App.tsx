@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
+import AddToHomeScreen from "@/components/AddToHomeScreen";
 
 // ---------------------------------------------------------------------------
 // EAGER: public pages — the first paint for a new visitor, so they must not
@@ -102,6 +103,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>
+          <AddToHomeScreen />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
