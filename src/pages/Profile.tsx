@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./paths/business/BusinessShell";
@@ -26,6 +26,15 @@ export default function Profile() {
   const [goals, setGoals] = useState<BusinessPriority[]>([]);
   const [fields, setFields] = useState<BusinessField[]>([]);
   const [saving, setSaving] = useState(false);
+  // Password change
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwBusy, setPwBusy] = useState(false);
+  // Account deletion
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -100,6 +109,59 @@ export default function Profile() {
     }
   };
 
+  const handlePasswordChange = async () => {
+    if (pwBusy) return;
+    if (newPassword.length < 8) {
+      toast.error("პაროლი უნდა შეიცავდეს მინიმუმ 8 სიმბოლოს");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("პაროლები არ ემთხვევა");
+      return;
+    }
+    setPwBusy(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setNewPassword("");
+      setConfirmPassword("");
+      toast.success("პაროლი შეიცვალა");
+    } catch (e: any) {
+      toast.error(e?.message ?? "პაროლის შეცვლა ვერ მოხერხდა");
+    } finally {
+      setPwBusy(false);
+    }
+  };
+
+  // Deletion runs through an edge function: removing the auth account needs the
+  // service role key, which cannot live in the browser.
+  const handleDeleteAccount = async () => {
+    if (deleting) return;
+    if (deleteConfirm.trim() !== "წაშლა") {
+      toast.error("დასადასტურებლად ჩაწერე: წაშლა");
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) throw new Error("სესია ვერ მოიძებნა — გამოდი და თავიდან შედი");
+
+      const { data, error } = await supabase.functions.invoke("delete-account", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      await supabase.auth.signOut();
+      toast.success("ანგარიში წაშლილია");
+      navigate("/", { replace: true });
+    } catch (e: any) {
+      toast.error(e?.message ?? "წაშლა ვერ მოხერხდა — დაგვიკავშირდი");
+      setDeleting(false);
+    }
+  };
+
   if (!user || !s) {
     return (
       <BusinessShell>
@@ -109,7 +171,7 @@ export default function Profile() {
   }
 
   return (
-    <BusinessShell seo={{ title: "ჩემი პროფილი — SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიული ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
+    <BusinessShell seo={{ title: "ჩემი პროფილი — SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიონალური ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
       <header className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
           ანგარიში
@@ -243,6 +305,109 @@ export default function Profile() {
             );
           })}
         </div>
+      </BizCard>
+
+      <BizCard className="mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <KeyRound size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
+          <h2 className="ka font-bold text-[#5C1A2E] text-sm">პაროლის შეცვლა</h2>
+        </div>
+        <div className="space-y-2">
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="ახალი პაროლი"
+            autoComplete="new-password"
+            className="ka w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+          />
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="გაიმეორე ახალი პაროლი"
+            autoComplete="new-password"
+            className="ka w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+          />
+          <button
+            onClick={handlePasswordChange}
+            disabled={pwBusy || !newPassword || !confirmPassword}
+            className="ka w-full px-3 py-2 rounded-md bg-[#232323] text-[#F5F4F2] text-xs font-semibold disabled:opacity-40"
+          >
+            {pwBusy ? "ინახება..." : "პაროლის განახლება"}
+          </button>
+        </div>
+      </BizCard>
+
+      <BizCard className="mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
+          <h2 className="ka font-bold text-[#5C1A2E] text-sm">დახმარება და პირობები</h2>
+        </div>
+        <div className="flex flex-col gap-2">
+          <a
+            href="mailto:support@speakbusy.ge"
+            className="ka inline-flex items-center gap-2 text-sm text-[#5C1A2E] font-semibold"
+          >
+            <LifeBuoy size={13} strokeWidth={2.25} />
+            დახმარება — დაგვიკავშირდი
+          </a>
+          <Link to="/privacy" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
+            კონფიდენციალურობის პოლიტიკა
+          </Link>
+          <Link to="/terms" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
+            მოხმარების პირობები
+          </Link>
+        </div>
+      </BizCard>
+
+      <BizCard className="mb-4 border-[#C0392B]/30">
+        <div className="flex items-center gap-2 mb-2">
+          <AlertTriangle size={14} strokeWidth={2.25} className="text-[#C0392B]" />
+          <h2 className="ka font-bold text-[#C0392B] text-sm">ანგარიშის წაშლა</h2>
+        </div>
+        <p className="ka text-xs text-[#4A4A4A] mb-3 leading-relaxed">
+          წაშლა საბოლოოა. წაიშლება შენი პროფილი, ნასწავლი სიტყვები, პროგრესი, რეზიუმე და
+          ყველა სესია. დაბრუნება შეუძლებელია.
+        </p>
+        {!deleteOpen ? (
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5"
+          >
+            <Trash2 size={12} strokeWidth={2.25} />
+            ანგარიშის წაშლა
+          </button>
+        ) : (
+          <div className="space-y-2">
+            <p className="ka text-xs text-[#1C1C1E] font-semibold">
+              დასადასტურებლად ჩაწერე სიტყვა: წაშლა
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="წაშლა"
+              className="ka w-full px-3 py-2 rounded-md border border-[#C0392B]/40 focus:border-[#C0392B] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleting || deleteConfirm.trim() !== "წაშლა"}
+                className="ka flex-1 px-3 py-2 rounded-md bg-[#C0392B] text-white text-xs font-bold disabled:opacity-40"
+              >
+                {deleting ? "იშლება..." : "საბოლოოდ წაშლა"}
+              </button>
+              <button
+                onClick={() => { setDeleteOpen(false); setDeleteConfirm(""); }}
+                disabled={deleting}
+                className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold"
+              >
+                გაუქმება
+              </button>
+            </div>
+          </div>
+        )}
       </BizCard>
 
       <div className="sticky bottom-4 flex justify-end">
