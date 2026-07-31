@@ -307,6 +307,7 @@ async function upload(name: string, audio: ArrayBuffer) {
     method: "POST",
     headers: {
       Authorization: `Bearer ${SERVICE_KEY}`,
+      apikey: SERVICE_KEY,
       "Content-Type": "audio/mpeg",
       "x-upsert": "true",
     },
@@ -314,6 +315,7 @@ async function upload(name: string, audio: ArrayBuffer) {
   });
   if (!res.ok) throw new Error(`upload ${name} ${res.status}: ${(await res.text()).slice(0, 200)}`);
 }
+
 
 function page(body: string, refresh: boolean) {
   return new Response(
