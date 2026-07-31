@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { requireUser } from "../_shared/auth.ts";
+import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
@@ -79,9 +80,19 @@ Return JSON:
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  let _claimedWeek: string | null = null;   // set once a session is claimed
+  let _userId: string | null = null;
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
+    _userId = _auth.user.id;
+
+    // Claim a weekly AI session BEFORE generating. Enforced server-side because
+    // the browser check can be skipped by calling this function directly.
+    const quota = await consumeAiSession(_auth.user.id);
+    if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
+    _claimedWeek = quota.week;
+
     const body = (await req.json()) as Body;
     const isRewrite = body.variant && body.variant !== "all" && body.baseText;
     const userPrompt = isRewrite ? rewritePrompt(body) : buildPrompt(body);
@@ -104,6 +115,8 @@ Deno.serve(async (req) => {
 
     if (!res.ok) {
       const txt = await res.text();
+      // Generation never happened — return the session to the user.
+      if (_userId && _claimedWeek) await refundAiSession(_userId, _claimedWeek);
       return new Response(JSON.stringify({ error: `AI gateway ${res.status}`, detail: txt }), {
         status: res.status === 429 || res.status === 402 ? res.status : 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -119,6 +132,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
+    if (_userId && _claimedWeek) {
+      try { await refundAiSession(_userId, _claimedWeek); } catch (_i) { /* best effort */ }
+    }
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
