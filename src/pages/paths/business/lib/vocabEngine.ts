@@ -787,6 +787,22 @@ function targetPhraseRegex(en: string): RegExp {
   return new RegExp(`\\b${parts.join("\\s+")}(?:s|es|ed|ing|d)?\\b`, "i");
 }
 
+// EXACT form only — no inflected ending.
+//
+// Blanking questions must use this, because the answer OPTIONS are base forms.
+// The inflection-tolerant matcher above would blank "chairing" in "Nino is
+// chairing today's meeting" and offer "Chair" as the answer, producing
+// "Nino is chair today's team meeting". Matching only the exact form means such
+// a sentence is skipped instead of asked ungrammatically.
+//
+// Highlighting questions (sentence_definition) should still use the tolerant
+// one: there the word is only underlined, never substituted.
+function exactPhraseRegex(en: string): RegExp {
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = en.toLowerCase().trim().split(/\s+/).map(escapeRe);
+  return new RegExp(`\\b${parts.join("\\s+")}\\b`, "i");
+}
+
 // Enrichment gave every word a second example. Alternating between them stops a
 // repeated word from always showing the SAME sentence — otherwise learners
 // memorise one sentence instead of the word. Returned in random order.
@@ -799,7 +815,7 @@ function exampleCandidates(word: VocabWord): { en: string; ka: string }[] {
 }
 
 function makeFillBlank(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
-  const re = targetPhraseRegex(word.en);
+  const re = exactPhraseRegex(word.en);
 
   // Try each example in random order; use the first that actually contains the
   // whole phrase. If none does, skip — a half-blanked sentence is worse than
@@ -895,7 +911,7 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
   const cluster = clusterFor(word.key);
   if (!cluster) return null;
   const paragraph = cluster.paragraphEn;
-  const re = targetPhraseRegex(word.en);
+  const re = exactPhraseRegex(word.en);   // substitution: exact form only
   if (!re.test(paragraph)) return null;
   const masked = paragraph.replace(re, "______");
   const choices = shuffle([word.en, ...distractorsEn(word, ALL_WORDS, 3)]);
