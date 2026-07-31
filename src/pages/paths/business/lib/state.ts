@@ -537,11 +537,18 @@ export function aiSessionsRemaining(s: BusinessState | null | undefined, now: Da
 export async function tryConsumeAiSession(
   userId: string,
 ): Promise<{ ok: boolean; remaining: number; limit: number }> {
+  // READ-ONLY as of the server-side quota migration.
+  //
+  // The authoritative counter now lives in the database and is claimed by the
+  // edge functions (consume_ai_session). This function must NOT increment, or
+  // every generation would cost two sessions — one here and one on the server.
+  //
+  // It stays as a pre-flight check so the UI can block and explain before
+  // spending a request; the server is what actually enforces the limit.
   const s = await pullBusinessFromSupabase(userId);
   const limit = aiWeeklyLimit(s);
   const week = currentAiWeekKey();
   const used = s?.aiWeekKey === week ? (s?.aiUsedWeek ?? 0) : 0;
   if (used >= limit) return { ok: false, remaining: 0, limit };
-  await saveBusiness(userId, { aiWeekKey: week, aiUsedWeek: used + 1 });
-  return { ok: true, remaining: limit - used - 1, limit };
+  return { ok: true, remaining: limit - used, limit };
 }
