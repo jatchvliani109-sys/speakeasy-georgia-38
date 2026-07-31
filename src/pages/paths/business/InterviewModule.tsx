@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -241,7 +242,7 @@ export default function InterviewModule() {
           tomorrowTeaseKa: "შემდეგი სესია კიდევ უფრო საინტერესო იქნება.",
         } as SessionData;
         setSession(s);
-        const { data: inserted } = await supabase
+        const { data: inserted, error: insErr } = await supabase
           .from("business_interview_sessions")
           .insert({
             user_id: user.id,
@@ -253,7 +254,13 @@ export default function InterviewModule() {
           })
           .select("id")
           .single();
-        if (inserted) setSessionId(inserted.id);
+        // Without an id the final save is skipped silently and the whole
+        // interview is lost — say so now rather than at the end.
+        if (insErr || !inserted) {
+          toast.error("სესია ვერ შეიქმნა — შეამოწმე ინტერნეტი და სცადე ხელახლა");
+        } else {
+          setSessionId(inserted.id);
+        }
         setStep("briefing");
         return;
       }
@@ -297,7 +304,7 @@ export default function InterviewModule() {
       if (!s?.briefing) throw new Error("Invalid session");
       setSession(s);
 
-      const { data: inserted } = await supabase
+      const { data: inserted, error: insErr } = await supabase
         .from("business_interview_sessions")
         .insert({
           user_id: user.id,
@@ -309,7 +316,11 @@ export default function InterviewModule() {
         })
         .select("id")
         .single();
-      if (inserted) setSessionId(inserted.id);
+      if (insErr || !inserted) {
+        toast.error("სესია ვერ შეიქმნა — შეამოწმე ინტერნეტი და სცადე ხელახლა");
+      } else {
+        setSessionId(inserted.id);
+      }
 
       // Matched mode: show the invented posting first, then briefing.
       if (chosen === "matched" && s.jobPostingEn) {
@@ -473,17 +484,33 @@ export default function InterviewModule() {
         verdict: verdict?.verdict,
         headlineKa: verdict?.headlineKa,
       };
-      await supabase
-        .from("business_interview_sessions")
-        .update({
-          completed: true,
-          completed_at: new Date().toISOString(),
-          transcript: history as any,
-          result: verdict?.verdict || null,
-          debrief: debrief as any,
-          session_data: enrichedSession as any,
-        })
-        .eq("id", sessionId);
+      // This is the expensive write: an interview consumes one of the weekly AI
+      // sessions, so losing it silently costs the user something they paid for.
+      // Retry once before giving up, then tell them.
+      const saveInterview = async () =>
+        supabase
+          .from("business_interview_sessions")
+          .update({
+            completed: true,
+            completed_at: new Date().toISOString(),
+            transcript: history as any,
+            result: verdict?.verdict || null,
+            debrief: debrief as any,
+            session_data: enrichedSession as any,
+          })
+          .eq("id", sessionId);
+
+      let { error: upErr } = await saveInterview();
+      if (upErr) {
+        await new Promise((r) => setTimeout(r, 1200));
+        ({ error: upErr } = await saveInterview());
+      }
+      if (upErr) {
+        toast.error("შედეგები ვერ შეინახა — გადაუღე ეკრანს სურათი, სანამ დახურავ");
+      }
+    } else {
+      // No session id means the initial insert failed — results have nowhere to go.
+      toast.error("სესია ვერ შეინახა — შედეგები მხოლოდ ამ ეკრანზეა");
     }
     setStep("done");
   }
