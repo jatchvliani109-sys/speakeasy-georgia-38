@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
@@ -15,6 +16,20 @@ import {
   maxMcqScore,
   pickNextTestVersion,
 } from "./lib/reassessmentTests";
+
+// Shuffle each MCQ's options and remap the correct index — the rendered
+// position of the correct answer is random every session, so answer-position
+// bias in the authored data can never leak through. (Same fix as the
+// placement test.)
+function shuffleMcq<T extends { type: string; options?: string[]; correct?: number }>(q: T): T {
+  if (q.type !== "mcq" || !q.options || typeof q.correct !== "number") return q;
+  const order = q.options.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return { ...q, options: order.map((i) => q.options![i]), correct: order.indexOf(q.correct) };
+}
 
 const LEVEL_RANK: Record<BusinessLevel, number> = {
   business_beginner: 1,
@@ -69,7 +84,7 @@ export default function BusinessReassessment() {
       if (cancelled) return;
       const next = pickNextTestVersion((last?.test_version as number | null) ?? null);
       const t = REASSESSMENT_TESTS.find((x) => x.version === next) || REASSESSMENT_TESTS[0];
-      setTest(t);
+      setTest({ ...t, questions: t.questions.map(shuffleMcq) } as ReassessmentTest);
       setAnswers(Array(t.questions.length).fill(null));
       setLevelBefore(cur.level ?? null);
       setLoading(false);
@@ -128,18 +143,21 @@ export default function BusinessReassessment() {
     setWeakAreas(weak);
     setDone(true);
 
-    // Persist
-    try {
-      await supabase.from("business_reassessments").insert({
-        user_id: user.id,
-        test_version: test.version,
-        score_pct: pctRounded,
-        level_before: levelBefore,
-        level_after: newLevel,
-        answers: answers as any,
-        open_text: openText,
-      });
-    } catch {}
+    // Persist. NOTE: supabase-js does not THROW on query errors — it returns
+    // { error }. The previous try/catch therefore never fired, and an empty
+    // catch discarded it anyway: a failed save looked identical to a success.
+    const { error: saveErr } = await supabase.from("business_reassessments").insert({
+      user_id: user.id,
+      test_version: test.version,
+      score_pct: pctRounded,
+      level_before: levelBefore,
+      level_after: newLevel,
+      answers: answers as any,
+      open_text: openText,
+    });
+    if (saveErr) {
+      toast.error("შეფასების შედეგი ვერ შეინახა — დონე განახლდა, ისტორია არა");
+    }
 
     // Save new level — always update; preserves all other progress.
     saveBusiness(user.id, { level: newLevel });
