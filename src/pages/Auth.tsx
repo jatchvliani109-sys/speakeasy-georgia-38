@@ -15,7 +15,7 @@ const loginSchema = z.object({
   password: z.string().min(6, "მინიმუმ 6 სიმბოლო").max(72),
 });
 const signupSchema = loginSchema.extend({
-  termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ პირობებს და პოლიტიკას" }),
+  termsAccepted: z.boolean().refine((v) => v === true, { message: "გთხოვთ, დაეთანხმოთ წესებს, პირობებს და კონფიდენციალობის პოლიტიკას" }),
 });
 
 export default function Auth() {
@@ -71,7 +71,19 @@ export default function Auth() {
         window.location.href = afterAuthAbsolute;
       }
     } catch (err: any) {
-      toast.error(err.message ?? "შეცდომა");
+      // Supabase returns these in English; the common ones deserve Georgian.
+      const raw = String(err?.message ?? "");
+      const ka =
+        /already registered|already exists/i.test(raw)
+          ? "ეს ელ-ფოსტა უკვე დარეგისტრირებულია — სცადე შესვლა"
+          : /invalid login credentials/i.test(raw)
+          ? "ელ-ფოსტა ან პაროლი არასწორია"
+          : /rate limit|too many/i.test(raw)
+          ? "ძალიან ბევრი მცდელობა — სცადე ცოტა ხანში"
+          : /network|fetch/i.test(raw)
+          ? "კავშირი ვერ დამყარდა — შეამოწმე ინტერნეტი"
+          : raw || "შეცდომა";
+      toast.error(ka);
     } finally {
       setLoading(false);
     }
@@ -217,20 +229,25 @@ export default function Auth() {
           </div>
           {mode === "signup" && (
             <div className="flex items-start gap-3">
+              {/* shrink-0: without it the flex row squashes the box into a
+                  sliver next to the long Georgian label on narrow phones.
+                  Border darkened — #E4E2DF on the #F5F4F2 form background was
+                  almost invisible, so users could not see what was blocking
+                  the disabled submit button. */}
               <Checkbox
                 id="terms"
                 checked={termsAccepted}
                 onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                className="mt-0.5 border-[#E4E2DF] data-[state=checked]:bg-[#111111] data-[state=checked]:text-[#F5F4F2]"
+                className="mt-0.5 shrink-0 h-5 w-5 border-2 border-[#5C1A2E]/40 data-[state=checked]:bg-[#5C1A2E] data-[state=checked]:border-[#5C1A2E] data-[state=checked]:text-[#F5F4F2]"
               />
               <Label htmlFor="terms" className="text-xs text-[#4A4A4A] ka leading-relaxed cursor-pointer">
                 ვეთანხმები{" "}
                 <Link to="/terms" className="underline hover:text-[#5C1A2E] transition-colors">
-                  მომსახურების პირობებს
+                  წესებს და პირობებს
                 </Link>{" "}
                 და{" "}
                 <Link to="/privacy" className="underline hover:text-[#5C1A2E] transition-colors">
-                  კონფიდენციალურობის პოლიტიკას
+                  კონფიდენციალობის პოლიტიკას
                 </Link>
               </Label>
             </div>
@@ -260,11 +277,11 @@ export default function Auth() {
 
         <div className="flex items-center justify-center gap-4 mt-6 text-xs text-[#6B6B6B] ka">
           <Link to="/privacy" className="hover:text-[#5C1A2E] transition-colors">
-            კონფიდენციალურობა
+            კონფიდენციალობის პოლიტიკა
           </Link>
           <span className="text-[#E4E2DF]">|</span>
           <Link to="/terms" className="hover:text-[#5C1A2E] transition-colors">
-            მომსახურების პირობები
+            წესები და პირობები
           </Link>
         </div>
       </div>
