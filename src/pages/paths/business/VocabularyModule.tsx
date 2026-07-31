@@ -4,6 +4,7 @@ import { BookOpen, Volume2, VolumeX } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { toast } from "sonner";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
   applyKnownWordFastTrack,
@@ -375,7 +376,13 @@ export default function VocabularyModule() {
         : applySessionResults(row, results, prodCorrect);
       updated.push(row);
     }
-    await upsertProgress(user.id, updated);
+    // A dropped connection here used to lose the whole session silently — the
+    // results screen appeared as if everything had saved. Tell the user instead,
+    // and keep the session snapshot so nothing is thrown away.
+    const saveRes = await upsertProgress(user.id, updated);
+    if (!saveRes.ok) {
+      toast.error("პროგრესი ვერ შეინახა — შეამოწმე ინტერნეტი და სცადე ხელახლა");
+    }
     // Update local progress + total vocab counter
     const newProgress = [...progress];
     updated.forEach((row) => {
@@ -444,7 +451,8 @@ export default function VocabularyModule() {
     }
 
     playComplete();
-    clearSessionSnapshot();   // completed — nothing left to resume
+    // Only discard the resume snapshot if the results actually reached the server.
+    if (saveRes.ok) clearSessionSnapshot();
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };

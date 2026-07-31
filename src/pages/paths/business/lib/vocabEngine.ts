@@ -217,8 +217,18 @@ export async function loadProgress(userId: string): Promise<ProgressRow[]> {
   return (data || []) as any;
 }
 
-export async function upsertProgress(userId: string, rows: ProgressRow[]) {
-  if (!rows.length) return;
+export type SaveResult = { ok: boolean; error?: string };
+
+/**
+ * Saves session progress.
+ *
+ * Previously this awaited the upsert and discarded the result, so a dropped
+ * mobile connection lost a whole session silently — the user saw the results
+ * screen and assumed it had saved. It now reports failure and retries once,
+ * since most failures here are a brief loss of signal.
+ */
+export async function upsertProgress(userId: string, rows: ProgressRow[]): Promise<SaveResult> {
+  if (!rows.length) return { ok: true };
   const payload = rows.map((r) => ({
     user_id: userId,
     word_key: r.word_key,
@@ -233,7 +243,19 @@ export async function upsertProgress(userId: string, rows: ProgressRow[]) {
     meta: r.meta || {},
     updated_at: new Date().toISOString(),
   }));
-  await supabase.from("business_vocab_progress").upsert(payload, { onConflict: "user_id,word_key" });
+  const attempt = async (): Promise<SaveResult> => {
+    const { error } = await supabase
+      .from("business_vocab_progress")
+      .upsert(payload, { onConflict: "user_id,word_key" });
+    return error ? { ok: false, error: error.message } : { ok: true };
+  };
+
+  let res = await attempt();
+  if (!res.ok) {
+    await new Promise((r) => setTimeout(r, 1200));   // one retry for a blip
+    res = await attempt();
+  }
+  return res;
 }
 
 export function emptyProgressFor(w: VocabWord): ProgressRow {
