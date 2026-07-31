@@ -875,6 +875,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_ai_session: {
+        Args: { p_limit: number; p_user_id: string; p_week: string }
+        Returns: Json
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -900,6 +904,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      refund_ai_session: {
+        Args: { p_user_id: string; p_week: string }
+        Returns: undefined
       }
     }
     Enums: {
