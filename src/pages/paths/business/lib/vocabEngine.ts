@@ -1141,6 +1141,11 @@ export function buildQuiz(
   const reviewWords = reviewKeys.map(findWord).filter(Boolean) as VocabWord[];
   const claimedSet = new Set(opts.claimedKeys ?? []);
 
+  // Generators were picked as gens[i % gens.length] with i = word position, so a
+  // session with 8 words could only ever reach the first 8 generators — the tail
+  // of each pool (e.g. sentence_definition in tier 2) never fired. A random
+  // offset per session rotates which slice of the pool is used.
+  const genOffset = Math.floor(Math.random() * 97);
   const newGens = NEW_GENERATORS_BY_TIER[tierLevel];
   const secondGens = NEW_SECOND_PASS_BY_TIER[tierLevel];
   const reviewGens = REVIEW_GENERATORS_BY_TIER[tierLevel];
@@ -1154,7 +1159,7 @@ export function buildQuiz(
       questions.push(makeTypeWord(w) || makeTrKaToEn(w, pool));
       return;
     }
-    const gen = newGens[i % newGens.length];
+    const gen = newGens[(i + genOffset) % newGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
@@ -1164,7 +1169,7 @@ export function buildQuiz(
   // Claimed words skip this: one proof is enough.
   newWords.forEach((w, i) => {
     if (claimedSet.has(w.key)) return;
-    const gen = secondGens[i % secondGens.length];
+    const gen = secondGens[(i + genOffset + 1) % secondGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeTrEnToKa(w, pool));
@@ -1172,7 +1177,7 @@ export function buildQuiz(
 
   // Review words: one question each.
   reviewWords.forEach((w, i) => {
-    const gen = reviewGens[i % reviewGens.length];
+    const gen = reviewGens[(i + genOffset) % reviewGens.length];
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
