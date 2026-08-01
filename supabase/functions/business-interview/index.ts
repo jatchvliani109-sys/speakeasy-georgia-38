@@ -144,7 +144,14 @@ plannedQuestions: 6-8 questions spread across the stages, each explicitly ground
 const SYSTEM_REPLY = `You are an interviewer in a job interview roleplay. STAY 100% IN CHARACTER — never reveal you are AI, never give feedback, never speak Georgian.
 - Speak ONLY in natural professional English. 2-4 sentences max per turn.
 - Adapt to the candidate's last answer: ask a relevant follow-up, push back gently when answers are vague ("interesting — can you give me a specific example?"), or move forward when they did well.
-- Stay in the requested stage (small_talk, background, situational, curveball, closing). CLOSING STAGE has 2 turns: on the FIRST closing turn invite their questions ("do you have any questions for us?") and STOP — do not wrap up yet; on the LAST closing turn (remainingQuestions <= 1) answer/acknowledge whatever they asked briefly and close the interview warmly. For other stages, when remainingQuestions <= 1, wrap up that stage cleanly.
+- Stay in the requested stage. PER-STAGE INSTRUCTIONS (follow exactly):
+  * small_talk: brief friendly welcome / easy warm-up question. No deep probing.
+  * background: ask about their experience, roles, career story, gaps, claims on the resume.
+  * situational: give a concrete work scenario and ask how they would handle it.
+  * curveball: an unexpected, harder or pressure question; push back on weak answers.
+  * closing, FIRST turn (remainingQuestions >= 2): thank the candidate for their time, briefly signal the interview is wrapping up, then invite THEIR questions — e.g. "Do you have any questions for me about the role or the company?". DO NOT ask another competency, behavioural, technical or situational question. This turn's ONLY question must be an invitation for their questions.
+  * closing, FINAL turn (remainingQuestions <= 1): answer/acknowledge whatever they asked, then close warmly — thank them, explain next steps and timeline, and say goodbye. This turn MUST NOT contain any question at all, and must not end with a question mark, because the interview ends immediately after it.
+- For non-closing stages, when remainingQuestions <= 1, wrap up that stage cleanly and move the conversation forward.
 - Level adapts complexity: beginner/elementary = simpler vocabulary, slower pace; intermediate/advanced = nuanced situational/curveball questions.
 - If briefing.interviewPlan exists: prefer its plannedQuestions for the CURRENT stage — ask them adapted naturally to the conversation flow, referencing the concrete facts they're grounded in (company names, durations, posting requirements). Ask one follow-up on the candidate's answer before moving to the next planned question. NEVER invent resume or posting facts that aren't in interviewPlan.
 
@@ -328,9 +335,16 @@ Include exactly ${intensity === "light" ? 2 : 3} warmUp items.`;
 }
 
 function replyPrompt(b: ReplyBody) {
+  const isClosing = b.stage === "closing";
+  const isFinal = (b.remainingQuestions ?? 0) <= 1;
+  const directive = isClosing
+    ? isFinal
+      ? `\nMANDATORY FOR THIS TURN (closing, FINAL turn): respond to whatever the candidate just asked or said, then close the interview warmly — thank them, state the next steps and timeline, and say goodbye. Do NOT ask any question. Your text must contain no question mark. The interview ends right after this line.`
+      : `\nMANDATORY FOR THIS TURN (closing, FIRST turn): thank the candidate for their time and invite THEIR questions, e.g. "Before we finish — do you have any questions for me about the role or the team?". Do NOT ask any competency, behavioural, technical or situational question.`
+    : "";
   return `Learner level: ${b.level || "business_intermediate"}
 Interview stage: ${b.stage}
-Remaining interviewer turns planned in this stage: ${b.remainingQuestions}
+Remaining interviewer turns planned in this stage: ${b.remainingQuestions}${directive}
 
 Briefing context:
 ${JSON.stringify(b.briefing)}
@@ -358,9 +372,16 @@ function debriefPrompt(b: DebriefBody) {
   const focus = b.briefing?.focusAreasEn?.length
     ? `\nRequired competencies for this role (assess whether they were shown): ${b.briefing.focusAreasEn.join(", ")}`
     : "";
+  const lastTwo = b.history.filter((t) => t.role === "candidate").slice(-2);
+  const askedQuestions = lastTwo.some((t) => t.text.includes("?"));
+  const invited = b.history
+    .filter((t) => t.role === "interviewer")
+    .slice(-2)
+    .some((t) => /question/i.test(t.text));
+  const closingNote = `\nClosing-stage fact (computed from the transcript, trust it): the candidate ${askedQuestions ? "DID ask the interviewer question(s) at the end — credit this in wentWell and comment on their relevance; do NOT say they should have asked questions" : invited ? "was invited to ask questions but asked none — you may mention this once in hurtChances" : "was never clearly invited to ask questions — do NOT criticise them for not asking"}.`;
   return `Learner level: ${b.level || "business_intermediate"}
 Mode: ${b.mode || "matched"}
-Verdict: ${b.verdict}${focus}
+Verdict: ${b.verdict}${focus}${closingNote}
 
 Briefing:
 ${JSON.stringify(b.briefing)}
