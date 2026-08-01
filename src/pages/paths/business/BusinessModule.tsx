@@ -9,7 +9,7 @@ export default function BusinessModule() {
   const { slug } = useParams();
   const mod = BUSINESS_MODULES.find((m) => m.slug === slug);
 
-  if (slug === "emails") return <EmailsModule />;
+  
   if (slug === "interview") return <InterviewModule />;
   if (slug === "vocabulary") return <VocabularyModule />;
 
