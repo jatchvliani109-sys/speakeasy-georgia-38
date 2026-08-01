@@ -479,9 +479,11 @@ export default function InterviewModule() {
       });
       if (error) throw error;
       const r = data as ReplyData;
-      setScore((s) => s + (r.scoreDelta || 0));
+      const nextScore = score + (r.scoreDelta || 0);
+      setScore(nextScore);
+      const nextHighlights = r.phraseHighlight ? [...highlights, r.phraseHighlight] : highlights;
       if (r.phraseHighlight) {
-        setHighlights((h) => [...h, r.phraseHighlight!]);
+        setHighlights(nextHighlights);
         setActiveHighlight(r.phraseHighlight);
         setTimeout(() => setActiveHighlight(null), 3200);
       }
@@ -493,16 +495,24 @@ export default function InterviewModule() {
         setQuizChoice(null);
       }
 
+      const isLastTurn = willEndStage && stageIdx + 1 >= stages.length;
+      const nextStageIdx = willEndStage && !isLastTurn ? stageIdx + 1 : stageIdx;
+      const nextTurnInStage = willEndStage ? 1 : turnInStage + 1;
+
+      // Checkpoint before the (slow) verdict call, so an interruption there
+      // still leaves a fully resumable transcript.
+      await persistTurn(after, nextStageIdx, nextTurnInStage, nextScore, nextHighlights);
+
       if (willEndStage) {
-        if (stageIdx + 1 >= stages.length) {
+        if (isLastTurn) {
           // interview done — go to verdict
           await getVerdict(after);
         } else {
-          setStageIdx((i) => i + 1);
+          setStageIdx(nextStageIdx);
           setTurnInStage(1);
         }
       } else {
-        setTurnInStage((t) => t + 1);
+        setTurnInStage(nextTurnInStage);
       }
     } catch (e: any) {
       setError(e?.message || "ვერ მოვიდა პასუხი. სცადე ისევ.");
