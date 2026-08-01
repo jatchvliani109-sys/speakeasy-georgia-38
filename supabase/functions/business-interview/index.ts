@@ -415,18 +415,34 @@ async function callAI(system: string, user: string, model = "gpt-4o") {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   let _claimedWeek: string | null = null;   // set once a session is claimed
+  let _chargedSessionId: string | null = null; // interview row that holds the charge
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
 
-    // One interview = one weekly AI session. Only the "session" action (which
-    // starts a new interview) claims quota; reply/verdict/debrief are follow-up
-    // turns inside an already-paid interview and must stay free.
-    if (body.action === "session") {
-      const quota = await consumeAiSession(_auth.user.id);
-      if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
-      _claimedWeek = quota.week;
+    // One interview = one weekly AI session, charged on the FIRST reply (not on
+    // "session"), so abandoning at the briefing costs nothing and random mode —
+    // which skips the "session" call entirely — is covered too. "First" is
+    // decided by the persisted quota_charged flag, never by the client.
+    if (body.action === "reply") {
+      const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
+      if (!sessionId) {
+        return new Response(JSON.stringify({ error: "missing sessionId" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const claimed = await claimInterviewCharge(_auth.user.id, sessionId);
+      if (claimed) {
+        _chargedSessionId = sessionId;
+        const quota = await consumeAiSession(_auth.user.id);
+        if (!quota.ok) {
+          await releaseInterviewCharge(_auth.user.id, sessionId);
+          return quotaExceededResponse(quota, corsHeaders);
+        }
+        _claimedWeek = quota.week;
+      }
     }
 
     let r;
@@ -440,6 +456,7 @@ Deno.serve(async (req) => {
       r = await callAI(SYSTEM_DEBRIEF, debriefPrompt(body as unknown as DebriefBody), MODEL_DEBRIEF);
     } else {
       if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
+      if (_chargedSessionId) await releaseInterviewCharge(_auth.user.id, _chargedSessionId);
       return new Response(JSON.stringify({ error: "unknown action" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -448,11 +465,13 @@ Deno.serve(async (req) => {
     if (!r.ok) {
       // AI call failed — the learner never got an interview, give the session back.
       if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
+      if (_chargedSessionId) await releaseInterviewCharge(_auth.user.id, _chargedSessionId);
       return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
         status: r.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
     return new Response(JSON.stringify(r.parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
