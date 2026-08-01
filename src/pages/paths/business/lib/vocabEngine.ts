@@ -1245,6 +1245,106 @@ export function buildQuiz(
  * Pull vocab/phrases saved from other Business modules and ensure they exist
  * as progress rows so they enter the spaced repetition system.
  */
+// ---- Saved phrases: opt-in practice pool -------------------------------
+//
+// Phrases captured from a user's own interview/meeting sessions. These are
+// AI-generated and NOT reviewed, so they are kept strictly OUT of the curated
+// 980-word bank:
+//
+//   * stored under a `saved:` key prefix, never mixed into ALL_WORDS
+//   * never used as distractors for bank words (they would be unvetted wrong
+//     answers attached to vetted questions)
+//   * practised in their own session, not the daily vocab session
+//   * only the question types their data can actually support
+//
+// An earlier version auto-ingested these into normal progress. It shipped a
+// broken question ("explore" with mismatched Georgian) because the engine
+// treated unreviewed AI output as if it were curated content. Opt-in per
+// phrase is the guard: the user saw it in their own conversation and chose it.
+
+export const SAVED_PREFIX = "saved:";
+
+export type SavedPhrase = {
+  key: string;          // saved:<slug>
+  en: string;
+  ka: string;
+  exampleEn?: string;
+  exampleKa?: string;
+  sourceKind?: string;  // interview | meeting
+  sourceTitle?: string;
+};
+
+export function savedPhraseKey(en: string): string {
+  return SAVED_PREFIX + String(en).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60);
+}
+
+export function isSavedPhraseKey(key: string): boolean {
+  return key.startsWith(SAVED_PREFIX);
+}
+
+/** Turn a saved phrase into the shape the quiz generators expect. */
+function savedToWord(p: SavedPhrase): VocabWord {
+  return {
+    key: p.key,
+    en: p.en,
+    ka: p.ka,
+    explanationKa: "",          // no authored explanation — types requiring it are skipped
+    pronunciation: "",
+    exampleEn: p.exampleEn || "",
+    exampleKa: p.exampleKa || "",
+    example2En: "",
+    example2Ka: "",
+    source: "field",
+    field: "saved",
+  };
+}
+
+/**
+ * Builds a practice quiz from saved phrases ONLY.
+ *
+ * Restricted to the five types these phrases can genuinely support:
+ * EN->KA, KA->EN, fill-blank, type-the-word, true/false. Listening needs a
+ * pre-generated MP3; collocation, definition_match and sentence_definition all
+ * need authored data that saved phrases do not have. Letting the normal pools
+ * run would silently skip most types and produce a thin, repetitive session.
+ *
+ * Distractors are drawn from the OTHER saved phrases, never from the bank, so
+ * unreviewed content can never contaminate a curated question.
+ */
+export function buildSavedPhraseQuiz(phrases: SavedPhrase[], targetQuestions = 12): QuizQuestion[] {
+  const words = phrases.map(savedToWord);
+  if (words.length < 4) return [];   // need enough for a 4-option question
+
+  const gens: Generator[] = [makeTrEnToKa, makeTrKaToEn, makeFillBlank, makeTypeWord, makeTrueFalse];
+  const questions: QuizQuestion[] = [];
+  const offset = Math.floor(Math.random() * 97);
+
+  shuffle(words).forEach((w, i) => {
+    if (questions.length >= targetQuestions) return;
+    const gen = gens[(i + offset) % gens.length];
+    const q = gen(w, words);          // pool = saved phrases only
+    if (q) questions.push(q);
+    else {
+      const fb = makeTrKaToEn(w, words);
+      if (fb) questions.push(fb);
+    }
+  });
+
+  // Second pass in a different format if the pool is small.
+  if (questions.length < targetQuestions) {
+    shuffle(words).forEach((w, i) => {
+      if (questions.length >= targetQuestions) return;
+      const gen = gens[(i + offset + 2) % gens.length];
+      const q = gen(w, words);
+      if (q && !questions.some((x) => (x as any).wordKey === w.key && x.type === q.type)) {
+        questions.push(q);
+      }
+    });
+  }
+
+  return shuffle(questions);
+}
+
 export async function ingestExternalPhrases(userId: string, existing: ProgressRow[]): Promise<ProgressRow[]> {
   const have = new Set(existing.map((p) => p.word_key));
   const newRows: ProgressRow[] = [];
