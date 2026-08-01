@@ -877,11 +877,26 @@ function makeTrueFalse(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 
 function makeSentenceCorrect(word: VocabWord): QuizQuestion {
   const real = exampleCandidates(word)[0].en;
-  const choices = shuffle([
-    real,
-    `I will ${word.en.toLowerCase()} my homework yesterday.`,
-    `The ${word.en.toLowerCase()} is a small kitchen tool you buy at the store.`,
-  ]);
+  const w = word.en.toLowerCase();
+
+  // The wrong options used to be two fixed templates built around the target.
+  // For single words they read as plausible misuse, but for multi-word business
+  // terms they collapse into nonsense — "I will action item my homework
+  // yesterday", "The action item is a small kitchen tool". The learner then
+  // picks the right answer by spotting gibberish rather than by knowing the
+  // word. Multi-word terms get noun-shaped distractors instead.
+  const multi = w.includes(" ");
+  const wrong = multi
+    ? [
+        `We need to ${w} the meeting before Friday.`,
+        `She is very ${w} about the new project.`,
+      ]
+    : [
+        `I will ${w} my homework yesterday.`,
+        `The ${w} is a small kitchen tool you buy at the store.`,
+      ];
+
+  const choices = shuffle([real, ...wrong]);
   const correctIndex = choices.indexOf(real);
   return {
     type: "sentence_correct",
