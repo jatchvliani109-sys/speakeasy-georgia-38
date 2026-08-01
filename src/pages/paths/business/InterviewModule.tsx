@@ -647,6 +647,42 @@ export default function InterviewModule() {
 
   const b = session?.briefing as any;
 
+  // ---- Resume offer ----
+  if (step === "resumeOffer" && resumable) {
+    const rb = resumable.session_data?.briefing;
+    const answered = (resumable.transcript || []).filter((t) => t.role === "candidate").length;
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <div className="space-y-3">
+          <BizCard>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+              დაუსრულებელი გასაუბრება
+            </p>
+            <h2 className="ka text-lg font-bold text-[#1C1C1E] mt-1">
+              {rb?.roleTitleKa || rb?.roleTitle}
+              {rb?.companyName ? ` · ${rb.companyName}` : ""}
+            </h2>
+            <p className="ka text-sm text-[#4A4A4A] mt-2">
+              ბოლო გასაუბრება შეწყდა {answered} პასუხის შემდეგ. შეგიძლია იქიდან
+              გააგრძელო, სადაც გაჩერდი — ახალი AI სესია არ დაგეხარჯება.
+            </p>
+            <div className="mt-4 space-y-2">
+              <BizButton onClick={() => resumeSession(resumable)}>
+                გააგრძელე გასაუბრება
+              </BizButton>
+              <button
+                onClick={discardResumable}
+                className="ka w-full text-sm font-semibold text-[#5C1A2E] underline underline-offset-4 py-2"
+              >
+                ახლიდან დაწყება
+              </button>
+            </div>
+          </BizCard>
+        </div>
+      </BusinessShell>
+    );
+  }
+
   // ---- Mode picker ----
   if (step === "picker") {
     return (
