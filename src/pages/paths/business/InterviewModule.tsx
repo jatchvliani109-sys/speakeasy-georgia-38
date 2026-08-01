@@ -199,9 +199,11 @@ export default function InterviewModule() {
     if (!user || starting) return;
     setStarting(true);
     setError(null);
-    // One interview = one AI session from the weekly pool (any mode: even
-    // random's replies + debrief hit the model).
+    // Read-only budget check for the UI. The actual weekly session is charged
+    // server-side on the FIRST reply of the interview, so backing out at the
+    // briefing costs nothing.
     const budget = await tryConsumeAiSession(user.id);
+
     if (!budget.ok) {
       setError(isPaidUser
         ? "ამ კვირის 7 AI სესია ამოწურულია — ორშაბათს განახლდება."
