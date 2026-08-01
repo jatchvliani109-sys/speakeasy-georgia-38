@@ -2,6 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 // @ts-ignore - jszip via npm
 import JSZip from "npm:jszip@3.10.1";
 import { requireUser } from "../_shared/auth.ts";
+import { checkResumeParseLimit, resumeRateLimitResponse } from "../_shared/resumeRateLimit.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
