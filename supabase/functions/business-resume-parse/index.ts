@@ -204,6 +204,12 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Abuse guard only — CV parsing stays outside the weekly AI budget because
+    // it is a one-time onboarding step. Checked AFTER validation so a rejected
+    // file type or oversized upload never burns an allowance.
+    const rate = await checkResumeParseLimit(_auth.user.id);
+    if (!rate.ok) return resumeRateLimitResponse(rate, corsHeaders);
+
     let rawText = "";
     let aiContent = "";
 
