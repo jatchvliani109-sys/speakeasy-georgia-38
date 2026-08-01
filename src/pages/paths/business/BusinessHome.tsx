@@ -374,8 +374,8 @@ export default function BusinessHome() {
       {levelUnmeasured && (
         <BizCard className="mb-4 border-l-2 border-l-[#C9A84C]">
           <p className="ka text-sm text-[#1C1C1E]">
-            შენი დონე სავარაუდოდ არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი
-            (თუ არ გინდა გამოტოვე :), no pressure!)
+            შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი
+            (თუ არ გინდა გამოტოვე :)&nbsp; no pressure!)
           </p>
           <div className="mt-3">
             <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>
