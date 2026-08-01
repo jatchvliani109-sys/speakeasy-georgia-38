@@ -107,7 +107,7 @@ export default function BusinessSetup() {
       // buildPlan needs a goal, an intensity, a field and a level. Skipped
       // answers get defaults so the plan can still be built; the user can
       // refine them later from the dashboard.
-      const effectiveGoals = goals.length ? goals : (["vocabulary"] as BusinessGoal[]);
+      const effectiveGoals = goals.length ? goals : (["business_vocab"] as BusinessGoal[]);
       const effectiveIntensity = intensity ?? ("steady" as BusinessIntensity);
 
       const saved = await saveBusinessAsync(user.id, {
