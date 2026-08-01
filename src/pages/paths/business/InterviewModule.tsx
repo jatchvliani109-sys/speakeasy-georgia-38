@@ -353,6 +353,10 @@ export default function InterviewModule() {
 
   async function submitAnswer() {
     if (!session || !candidateText.trim() || thinking) return;
+    if (!sessionId) {
+      setError("სესია ვერ შეინახა — დაბრუნდი და დაიწყე ხელახლა.");
+      return;
+    }
     const answer = candidateText.trim();
     const next: Turn[] = [...history, { role: "candidate", text: answer }];
     setHistory(next);
@@ -368,7 +372,11 @@ export default function InterviewModule() {
       const { data, error } = await supabase.functions.invoke("business-interview", {
         body: {
           action: "reply",
+          // Required: the server charges the weekly session on the first reply,
+          // gated by this row's persisted quota_charged flag.
+          sessionId,
           level: biz?.plan?.level || biz?.level || "business_intermediate",
+
           briefing: session.briefing,
           stage: stageForCall,
           history: next,
