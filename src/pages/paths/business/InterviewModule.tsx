@@ -378,6 +378,72 @@ export default function InterviewModule() {
     setStep("interview");
   }
 
+  // ---- Resume ----
+  // Rehydrates an interrupted interview straight into the interview step. No
+  // AI call happens here, and no quota is claimed: the row already carries
+  // quota_charged = true from its first reply, and the server's conditional
+  // UPDATE (... AND quota_charged = false) will simply match zero rows on the
+  // next reply, so a resumed interview never costs a second weekly session.
+  function resumeSession(row: ResumableRow) {
+    const sd = row.session_data;
+    setSession(sd as SessionData);
+    setSessionId(row.id);
+    setMode((sd.mode as Mode) || "random");
+    setHistory(Array.isArray(row.transcript) ? row.transcript : []);
+    setStageIdx(typeof sd.stageIdx === "number" ? sd.stageIdx : 0);
+    setTurnInStage(typeof sd.turnInStage === "number" ? sd.turnInStage : 1);
+    setScore(typeof sd.score === "number" ? sd.score : 0);
+    setHighlights(Array.isArray(sd.highlights) ? sd.highlights : []);
+    setResumable(null);
+    setStep("interview");
+  }
+
+  // Starting fresh marks the old row abandoned so it is never offered again.
+  // We do NOT set completed = true — stats and curriculum count completed rows,
+  // and an abandoned interview must not inflate them.
+  async function discardResumable() {
+    const row = resumable;
+    setResumable(null);
+    setStep("picker");
+    if (row && user) {
+      await supabase
+        .from("business_interview_sessions")
+        .update({ abandoned: true })
+        .eq("id", row.id)
+        .eq("user_id", user.id);
+    }
+  }
+
+  // One cheap UPDATE per turn so an interrupted interview can be picked up
+  // exactly where it stopped, including the turns before the interruption.
+  async function persistTurn(
+    turns: Turn[],
+    nextStageIdx: number,
+    nextTurnInStage: number,
+    nextScore: number,
+    nextHighlights: PhraseHighlight[],
+  ) {
+    if (!sessionId || !session) return;
+    try {
+      await supabase
+        .from("business_interview_sessions")
+        .update({
+          transcript: turns as any,
+          session_data: {
+            ...session,
+            mode,
+            stageIdx: nextStageIdx,
+            turnInStage: nextTurnInStage,
+            score: nextScore,
+            highlights: nextHighlights,
+          } as any,
+        })
+        .eq("id", sessionId);
+    } catch {
+      // Non-fatal: losing one checkpoint only costs resume precision.
+    }
+  }
+
   async function submitAnswer() {
     if (!session || !candidateText.trim() || thinking) return;
     if (!sessionId) {
