@@ -70,7 +70,25 @@ type DebriefData = {
 // flip PAYMENTS_LIVE and it locks for free users automatically.
 const PAYMENTS_LIVE = true; // gating active (mock premium unlocks it)
 
-type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+type Step = "loading" | "resumeOffer" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+
+// A row is only worth offering as "continue" if it is unfinished, not
+// explicitly abandoned, has at least one real turn, and is fresh. Resuming a
+// two-week-old interview is worse than starting clean.
+const RESUME_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+type ResumableRow = {
+  id: string;
+  created_at: string;
+  transcript: Turn[];
+  session_data: SessionData & {
+    mode?: Mode;
+    stageIdx?: number;
+    turnInStage?: number;
+    score?: number;
+    highlights?: PhraseHighlight[];
+  };
+};
 type Mode = "real" | "matched" | "random";
 
 // How many interviewer turns per stage by intensity
@@ -109,6 +127,7 @@ export default function InterviewModule() {
   const [mode, setMode] = useState<Mode | null>(null);
   const [hasResume, setHasResume] = useState(false);
   const [resume, setResume] = useState<any | null>(null);
+  const [resumable, setResumable] = useState<ResumableRow | null>(null);
   const [jobPosting, setJobPosting] = useState("");
   const [matchedPostingText, setMatchedPostingText] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -154,11 +173,14 @@ export default function InterviewModule() {
 
         const { data: recent } = await supabase
           .from("business_interview_sessions")
-          .select("role_title, completed, session_data")
+          .select("id, created_at, role_title, completed, abandoned, transcript, session_data")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(20);
 
+        // Stats + curriculum count ONLY genuinely finished interviews. Resumed
+        // or half-finished rows never reach this filter (completed stays false
+        // until completeSession runs).
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
@@ -167,6 +189,14 @@ export default function InterviewModule() {
         setCurriculum(curStep);
         const lastCompleted = completed[0] || null;
         setPreviouslyLearned(extractPreviouslyLearned(lastCompleted, curStep.titleKa));
+
+        const resumableRow = (recent || []).find((r: any) => {
+          if (r.completed || r.abandoned) return false;
+          if (!Array.isArray(r.transcript) || r.transcript.length < 1) return false;
+          if (!r.session_data?.briefing) return false;
+          return Date.now() - new Date(r.created_at).getTime() < RESUME_MAX_AGE_MS;
+        }) as unknown as ResumableRow | undefined;
+        if (!cancelled) setResumable(resumableRow || null);
 
         // Load latest resume (for real/matched modes)
         const { data: resumeRow } = await supabase
@@ -181,7 +211,7 @@ export default function InterviewModule() {
           setHasResume(!!resumeRow);
         }
 
-        if (!cancelled) setStep("picker");
+        if (!cancelled) setStep(resumableRow ? "resumeOffer" : "picker");
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || "ჩატვირთვა ვერ მოხერხდა.");
@@ -199,9 +229,6 @@ export default function InterviewModule() {
     if (!user || starting) return;
     setStarting(true);
     setError(null);
-    // Read-only budget check for the UI. The actual weekly session is charged
-    // server-side on the FIRST reply of the interview, so backing out at the
-    // briefing costs nothing.
     const budget = await tryConsumeAiSession(user.id);
 
     if (!budget.ok) {
@@ -351,6 +378,72 @@ export default function InterviewModule() {
     setStep("interview");
   }
 
+  // ---- Resume ----
+  // Rehydrates an interrupted interview straight into the interview step. No
+  // AI call happens here, and no quota is claimed: the row already carries
+  // quota_charged = true from its first reply, and the server's conditional
+  // UPDATE (... AND quota_charged = false) will simply match zero rows on the
+  // next reply, so a resumed interview never costs a second weekly session.
+  function resumeSession(row: ResumableRow) {
+    const sd = row.session_data;
+    setSession(sd as SessionData);
+    setSessionId(row.id);
+    setMode((sd.mode as Mode) || "random");
+    setHistory(Array.isArray(row.transcript) ? row.transcript : []);
+    setStageIdx(typeof sd.stageIdx === "number" ? sd.stageIdx : 0);
+    setTurnInStage(typeof sd.turnInStage === "number" ? sd.turnInStage : 1);
+    setScore(typeof sd.score === "number" ? sd.score : 0);
+    setHighlights(Array.isArray(sd.highlights) ? sd.highlights : []);
+    setResumable(null);
+    setStep("interview");
+  }
+
+  // Starting fresh marks the old row abandoned so it is never offered again.
+  // We do NOT set completed = true — stats and curriculum count completed rows,
+  // and an abandoned interview must not inflate them.
+  async function discardResumable() {
+    const row = resumable;
+    setResumable(null);
+    setStep("picker");
+    if (row && user) {
+      await supabase
+        .from("business_interview_sessions")
+        .update({ abandoned: true })
+        .eq("id", row.id)
+        .eq("user_id", user.id);
+    }
+  }
+
+  // One cheap UPDATE per turn so an interrupted interview can be picked up
+  // exactly where it stopped, including the turns before the interruption.
+  async function persistTurn(
+    turns: Turn[],
+    nextStageIdx: number,
+    nextTurnInStage: number,
+    nextScore: number,
+    nextHighlights: PhraseHighlight[],
+  ) {
+    if (!sessionId || !session) return;
+    try {
+      await supabase
+        .from("business_interview_sessions")
+        .update({
+          transcript: turns as any,
+          session_data: {
+            ...session,
+            mode,
+            stageIdx: nextStageIdx,
+            turnInStage: nextTurnInStage,
+            score: nextScore,
+            highlights: nextHighlights,
+          } as any,
+        })
+        .eq("id", sessionId);
+    } catch {
+      // Non-fatal: losing one checkpoint only costs resume precision.
+    }
+  }
+
   async function submitAnswer() {
     if (!session || !candidateText.trim() || thinking) return;
     if (!sessionId) {
@@ -386,9 +479,11 @@ export default function InterviewModule() {
       });
       if (error) throw error;
       const r = data as ReplyData;
-      setScore((s) => s + (r.scoreDelta || 0));
+      const nextScore = score + (r.scoreDelta || 0);
+      setScore(nextScore);
+      const nextHighlights = r.phraseHighlight ? [...highlights, r.phraseHighlight] : highlights;
       if (r.phraseHighlight) {
-        setHighlights((h) => [...h, r.phraseHighlight!]);
+        setHighlights(nextHighlights);
         setActiveHighlight(r.phraseHighlight);
         setTimeout(() => setActiveHighlight(null), 3200);
       }
@@ -400,16 +495,24 @@ export default function InterviewModule() {
         setQuizChoice(null);
       }
 
+      const isLastTurn = willEndStage && stageIdx + 1 >= stages.length;
+      const nextStageIdx = willEndStage && !isLastTurn ? stageIdx + 1 : stageIdx;
+      const nextTurnInStage = willEndStage ? 1 : turnInStage + 1;
+
+      // Checkpoint before the (slow) verdict call, so an interruption there
+      // still leaves a fully resumable transcript.
+      await persistTurn(after, nextStageIdx, nextTurnInStage, nextScore, nextHighlights);
+
       if (willEndStage) {
-        if (stageIdx + 1 >= stages.length) {
+        if (isLastTurn) {
           // interview done — go to verdict
           await getVerdict(after);
         } else {
-          setStageIdx((i) => i + 1);
+          setStageIdx(nextStageIdx);
           setTurnInStage(1);
         }
       } else {
-        setTurnInStage((t) => t + 1);
+        setTurnInStage(nextTurnInStage);
       }
     } catch (e: any) {
       setError(e?.message || "ვერ მოვიდა პასუხი. სცადე ისევ.");
@@ -543,6 +646,42 @@ export default function InterviewModule() {
   }
 
   const b = session?.briefing as any;
+
+  // ---- Resume offer ----
+  if (step === "resumeOffer" && resumable) {
+    const rb = resumable.session_data?.briefing;
+    const answered = (resumable.transcript || []).filter((t) => t.role === "candidate").length;
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <div className="space-y-3">
+          <BizCard>
+            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+              დაუსრულებელი გასაუბრება
+            </p>
+            <h2 className="ka text-lg font-bold text-[#1C1C1E] mt-1">
+              {rb?.roleTitleKa || rb?.roleTitle}
+              {rb?.companyName ? ` · ${rb.companyName}` : ""}
+            </h2>
+            <p className="ka text-sm text-[#4A4A4A] mt-2">
+              ბოლო გასაუბრება შეწყდა {answered} პასუხის შემდეგ. შეგიძლია იქიდან
+              გააგრძელო, სადაც გაჩერდი — ახალი AI სესია არ დაგეხარჯება.
+            </p>
+            <div className="mt-4 space-y-2">
+              <BizButton onClick={() => resumeSession(resumable)}>
+                გააგრძელე გასაუბრება
+              </BizButton>
+              <button
+                onClick={discardResumable}
+                className="ka w-full text-sm font-semibold text-[#5C1A2E] underline underline-offset-4 py-2"
+              >
+                ახლიდან დაწყება
+              </button>
+            </div>
+          </BizCard>
+        </div>
+      </BusinessShell>
+    );
+  }
 
   // ---- Mode picker ----
   if (step === "picker") {
