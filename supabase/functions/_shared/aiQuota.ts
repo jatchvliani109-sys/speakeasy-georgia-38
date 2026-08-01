@@ -76,7 +76,21 @@ export async function consumeAiSession(userId: string): Promise<QuotaResult> {
   }
 
   const r = data as { ok: boolean; remaining: number; limit: number };
-  return { ok: !!r?.ok, remaining: r?.remaining ?? 0, limit: r?.limit ?? limit, week };
+  const result = { ok: !!r?.ok, remaining: r?.remaining ?? 0, limit: r?.limit ?? limit, week };
+
+  if (!result.ok) {
+    // Fire-and-forget: logging must never block or fail the quota response.
+    try {
+      void db
+        .from("analytics_events")
+        .insert({ user_id: userId, event: "ai_quota_exhausted", props: { limit: result.limit } })
+        .then(() => {}, () => {});
+    } catch (_e) {
+      // ignored
+    }
+  }
+
+  return result;
 }
 
 /** Returns the session if generation failed, so an error costs the user nothing. */
