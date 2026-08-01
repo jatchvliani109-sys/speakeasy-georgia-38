@@ -1,8 +1,46 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireUser } from "../_shared/auth.ts";
 import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+
+function adminDb() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    { auth: { autoRefreshToken: false, persistSession: false } },
+  );
+}
+
+/**
+ * Atomically marks an interview row as "quota charged". Returns true only for
+ * the caller that flipped the flag — a conditional UPDATE on quota_charged =
+ * false, so two rapid replies can never both claim.
+ */
+async function claimInterviewCharge(userId: string, sessionId: string): Promise<boolean> {
+  const { data, error } = await adminDb()
+    .from("business_interview_sessions")
+    .update({ quota_charged: true })
+    .eq("id", sessionId)
+    .eq("user_id", userId)
+    .eq("quota_charged", false)
+    .select("id");
+  if (error) return false;
+  return Array.isArray(data) && data.length > 0;
+}
+
+/** Releases the marker when the quota claim or the AI call failed. */
+async function releaseInterviewCharge(userId: string, sessionId: string): Promise<void> {
+  try {
+    await adminDb()
+      .from("business_interview_sessions")
+      .update({ quota_charged: false })
+      .eq("id", sessionId)
+      .eq("user_id", userId);
+  } catch (_e) { /* best-effort */ }
+}
+
 
 // Model split (email-module economics): high quality only where it's felt.
 const MODEL_SESSION = "gpt-5.4";  // briefing/warm-ups — Georgian quality matters
