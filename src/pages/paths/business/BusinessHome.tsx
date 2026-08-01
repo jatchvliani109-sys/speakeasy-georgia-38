@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Award,
@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -57,6 +58,16 @@ const todayIso = () => {
 
 export default function BusinessHome() {
   const { user } = useAuth();
+
+  // Funnel endpoint: the user got past onboarding into the app. Guarded so a
+  // re-render or a not-yet-loaded user cannot double-count.
+  const trackedArrival = useRef(false);
+  useEffect(() => {
+    if (user && !trackedArrival.current) {
+      trackedArrival.current = true;
+      track("reached_dashboard");
+    }
+  }, [user]);
   const navigate = useNavigate();
   const { displayName: profileName, loaded: nameLoaded, save: saveName } = useDisplayName();
   const [nameDialogOpen, setNameDialogOpen] = useState(false);
