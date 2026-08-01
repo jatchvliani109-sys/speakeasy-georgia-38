@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import {
   BusinessIntensity,
   BusinessState,
+  buildPlan,
   LEVEL_LABELS,
   pullBusinessFromSupabase,
   resetBusiness,
@@ -265,8 +266,27 @@ export default function BusinessHome() {
     );
   }
 
-  const incomplete = !s.setupCompleted || !s.testCompleted || !s.plan;
-  const plan = s.plan;
+  // The dashboard body is gated on `plan`. A user who skipped the placement
+  // test has no level, so buildPlan() returned null and the whole page rendered
+  // empty behind a "finish setup" card — which then bounced them straight back
+  // here, since setup was in fact complete. Build the plan on the fly with a
+  // seeded level so the app works immediately; the test stays available.
+  let plan = s.plan;
+  if (!plan && s.setupCompleted) {
+    const seeded: BusinessState = {
+      ...s,
+      level: s.level ?? ("business_elementary" as any),
+    };
+    plan = buildPlan(seeded);
+    if (plan && user) {
+      // Persist so this runs once, not on every dashboard load.
+      saveBusiness(user.id, { plan, level: seeded.level, levelEstimated: !s.level } as any);
+    }
+  }
+
+  // Nudge only about the TEST, and only when the level was never measured.
+  // Setup cannot be incomplete here — the gate requires it.
+  const levelUnmeasured = !s.testCompleted;
   const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
   const focusCopy = MODULE_FOCUS.vocabulary;
@@ -351,14 +371,16 @@ export default function BusinessHome() {
         </div>
       </header>
 
-      {incomplete && (
-        <BizCard className="mb-4 border-l-2 border-l-[#1C1C1E]">
-          <p className="ka text-sm text-[#5C1A2E]">
-            სრული პერსონალიზაციისთვის გირჩევთ დაასრულოთ Business setup და ტესტი.
+      {levelUnmeasured && (
+        <BizCard className="mb-4 border-l-2 border-l-[#C9A84C]">
+          <p className="ka text-sm text-[#1C1C1E]">
+            შენი დონე სავარაუდოდ არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი
+            (თუ არ გინდა გამოტოვე :), no pressure!)
           </p>
-          <div className="mt-3 flex gap-2 flex-wrap">
-            <BizButton onClick={() => navigate("/path/business/setup")}>Setup-ის დასრულება</BizButton>
-            <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>ტესტი</BizButton>
+          <div className="mt-3">
+            <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>
+              დონის შეფასება
+            </BizButton>
           </div>
         </BizCard>
       )}
