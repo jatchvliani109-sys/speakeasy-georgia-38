@@ -938,6 +938,126 @@ function WordCard({
             </div>
           );
         })()}
+
+        <ReportWordButton word={word} />
+      </div>
+    </div>
+  );
+}
+
+// ---- Content error reporting ---------------------------------------------
+//
+// Every content bug found so far was found by the founder using the app:
+// "ვირუსული" for viral, "action item items", a silent MP3, AI phrases that
+// bypassed review. Real users will find more and currently have no way to say
+// so — they just trust the app less. This closes that loop.
+
+const REPORT_REASONS: { key: string; label: string }[] = [
+  { key: "translation", label: "თარგმანი არასწორია" },
+  { key: "example", label: "მაგალითი უცნაურია ან არასწორი" },
+  { key: "audio", label: "აუდიო არ მუშაობს ან არასწორია" },
+  { key: "other", label: "სხვა" },
+];
+
+function ReportWordButton({ word }: { word: VocabWord }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  // Reset when the card changes to a different word.
+  useEffect(() => {
+    setOpen(false); setReason(null); setNote(""); setSent(false);
+  }, [word.key]);
+
+  const submit = async () => {
+    if (!user || !reason || sending) return;
+    setSending(true);
+    try {
+      // This file imports supabase dynamically elsewhere; match that pattern
+      // rather than adding a top-level import for one call.
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase.from("word_reports" as any).insert({
+        user_id: user.id,
+        word_key: word.key,
+        word_en: word.en,
+        word_ka: word.ka,
+        reason,
+        note: note.trim() || null,
+      });
+      if (error) throw error;
+      setSent(true);
+      setOpen(false);
+    } catch {
+      toast.error("გაგზავნა ვერ მოხერხდა — სცადე მოგვიანებით");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <p className="ka text-[11px] text-[#5A8A6A] mt-4">
+        ✓ მადლობა — შევამოწმებთ.
+      </p>
+    );
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="ka text-[11px] text-[#8A8A8A] hover:text-[#5C1A2E] mt-4 underline underline-offset-2"
+      >
+        რაღაც არასწორია?
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-4 pt-3 border-t border-[#E4E2DF]">
+      <p className="ka text-[11px] text-[#4A4A4A] font-semibold mb-2">რა არის არასწორი?</p>
+      <div className="flex flex-wrap gap-1.5">
+        {REPORT_REASONS.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setReason(r.key)}
+            className={`ka text-[11px] px-2.5 py-1.5 rounded-md border transition-colors ${
+              reason === r.key
+                ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E] font-semibold"
+                : "border-[#E4E2DF] text-[#4A4A4A] hover:border-[#5C1A2E]/40"
+            }`}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
+      {reason && (
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+          maxLength={300}
+          placeholder="დამატებითი დეტალი (არასავალდებულო)"
+          className="ka mt-2 w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-xs bg-white resize-none"
+        />
+      )}
+      <div className="flex items-center gap-2 mt-2">
+        <button
+          onClick={submit}
+          disabled={!reason || sending}
+          className="ka px-3 py-1.5 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-[11px] font-semibold disabled:opacity-40"
+        >
+          {sending ? "იგზავნება..." : "გაგზავნა"}
+        </button>
+        <button
+          onClick={() => { setOpen(false); setReason(null); setNote(""); }}
+          className="ka text-[11px] text-[#8A8A8A]"
+        >
+          გაუქმება
+        </button>
       </div>
     </div>
   );
