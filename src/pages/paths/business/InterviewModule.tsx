@@ -195,7 +195,7 @@ export default function InterviewModule() {
           if (!Array.isArray(r.transcript) || r.transcript.length < 1) return false;
           if (!r.session_data?.briefing) return false;
           return Date.now() - new Date(r.created_at).getTime() < RESUME_MAX_AGE_MS;
-        }) as ResumableRow | undefined;
+        }) as unknown as ResumableRow | undefined;
         if (!cancelled) setResumable(resumableRow || null);
 
         // Load latest resume (for real/matched modes)
