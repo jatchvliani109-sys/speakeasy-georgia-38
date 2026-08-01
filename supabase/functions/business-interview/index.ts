@@ -479,7 +479,9 @@ Deno.serve(async (req) => {
     try {
       const a = await requireUser(req);
       if (!a.error && _claimedWeek) await refundAiSession(a.user.id, _claimedWeek);
+      if (!a.error && _chargedSessionId) await releaseInterviewCharge(a.user.id, _chargedSessionId);
     } catch (_ignored) { /* refund is best-effort */ }
+
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
