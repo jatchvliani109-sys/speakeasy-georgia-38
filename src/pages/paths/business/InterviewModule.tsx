@@ -70,7 +70,25 @@ type DebriefData = {
 // flip PAYMENTS_LIVE and it locks for free users automatically.
 const PAYMENTS_LIVE = true; // gating active (mock premium unlocks it)
 
-type Step = "loading" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+type Step = "loading" | "resumeOffer" | "picker" | "posting" | "matchedPosting" | "briefing" | "warmup" | "interview" | "verdict" | "debrief" | "done";
+
+// A row is only worth offering as "continue" if it is unfinished, not
+// explicitly abandoned, has at least one real turn, and is fresh. Resuming a
+// two-week-old interview is worse than starting clean.
+const RESUME_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+type ResumableRow = {
+  id: string;
+  created_at: string;
+  transcript: Turn[];
+  session_data: SessionData & {
+    mode?: Mode;
+    stageIdx?: number;
+    turnInStage?: number;
+    score?: number;
+    highlights?: PhraseHighlight[];
+  };
+};
 type Mode = "real" | "matched" | "random";
 
 // How many interviewer turns per stage by intensity
@@ -109,6 +127,7 @@ export default function InterviewModule() {
   const [mode, setMode] = useState<Mode | null>(null);
   const [hasResume, setHasResume] = useState(false);
   const [resume, setResume] = useState<any | null>(null);
+  const [resumable, setResumable] = useState<ResumableRow | null>(null);
   const [jobPosting, setJobPosting] = useState("");
   const [matchedPostingText, setMatchedPostingText] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -154,11 +173,14 @@ export default function InterviewModule() {
 
         const { data: recent } = await supabase
           .from("business_interview_sessions")
-          .select("role_title, completed, session_data")
+          .select("id, created_at, role_title, completed, abandoned, transcript, session_data")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(20);
 
+        // Stats + curriculum count ONLY genuinely finished interviews. Resumed
+        // or half-finished rows never reach this filter (completed stays false
+        // until completeSession runs).
         const completed = (recent || []).filter((r: any) => r.completed);
         setStats({ total: completed.length });
 
@@ -167,6 +189,14 @@ export default function InterviewModule() {
         setCurriculum(curStep);
         const lastCompleted = completed[0] || null;
         setPreviouslyLearned(extractPreviouslyLearned(lastCompleted, curStep.titleKa));
+
+        const resumableRow = (recent || []).find((r: any) => {
+          if (r.completed || r.abandoned) return false;
+          if (!Array.isArray(r.transcript) || r.transcript.length < 1) return false;
+          if (!r.session_data?.briefing) return false;
+          return Date.now() - new Date(r.created_at).getTime() < RESUME_MAX_AGE_MS;
+        }) as ResumableRow | undefined;
+        if (!cancelled) setResumable(resumableRow || null);
 
         // Load latest resume (for real/matched modes)
         const { data: resumeRow } = await supabase
@@ -181,7 +211,7 @@ export default function InterviewModule() {
           setHasResume(!!resumeRow);
         }
 
-        if (!cancelled) setStep("picker");
+        if (!cancelled) setStep(resumableRow ? "resumeOffer" : "picker");
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || "ჩატვირთვა ვერ მოხერხდა.");
@@ -199,9 +229,6 @@ export default function InterviewModule() {
     if (!user || starting) return;
     setStarting(true);
     setError(null);
-    // Read-only budget check for the UI. The actual weekly session is charged
-    // server-side on the FIRST reply of the interview, so backing out at the
-    // briefing costs nothing.
     const budget = await tryConsumeAiSession(user.id);
 
     if (!budget.ok) {
