@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { toast } from "sonner";
+import { track } from "@/lib/track";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
   applyKnownWordFastTrack,
@@ -253,6 +254,7 @@ export default function VocabularyModule() {
   };
 
   const beginQuiz = () => {
+    track("vocab_session_started");
     setQuiz(buildQuiz(newWords, reviewKeys, formatTier, { claimedKeys: Array.from(claimed) }));
     setQIdx(0);
     setAnswers([]);
@@ -458,6 +460,11 @@ export default function VocabularyModule() {
       setStreakCelebration(null);
     }
 
+    track("vocab_session_completed", {
+      questions: finalAnswers.length,
+      correct: finalAnswers.filter((a) => a.correct).length,
+      new_words: newWords.length,
+    });
     playComplete();
     // Only discard the resume snapshot if the results actually reached the server.
     if (saveRes.ok) clearSessionSnapshot();

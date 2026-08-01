@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { toast } from "sonner";
+import { track } from "@/lib/track";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
   BusinessDeadline,
@@ -43,6 +44,10 @@ export default function BusinessSetup() {
   useEffect(() => {
     if (nameLoaded && displayName) setNameInput(displayName);
   }, [nameLoaded, displayName]);
+
+  useEffect(() => {
+    track("setup_started");
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -110,6 +115,11 @@ export default function BusinessSetup() {
       const effectiveGoals = goals.length ? goals : (["business_vocab"] as BusinessGoal[]);
       const effectiveIntensity = intensity ?? ("steady" as BusinessIntensity);
 
+      track("setup_completed", {
+        goals_chosen: goals.length,
+        intensity_chosen: intensity !== null,
+        fields_chosen: field.length,
+      });
       const saved = await saveBusinessAsync(user.id, {
         goals: effectiveGoals,
         mainPriority: effectiveGoals,
@@ -274,7 +284,10 @@ export default function BusinessSetup() {
           <div className="flex items-center gap-3">
             {isOptionalStep && (
               <button
-                onClick={() => setStep((st) => (st + 1) as Step)}
+                onClick={() => {
+                  track("setup_step_skipped", { step });
+                  setStep((st) => (st + 1) as Step);
+                }}
                 className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
               >
                 მოგვიანებით

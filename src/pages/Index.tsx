@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -12,6 +13,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import Wordmark from "@/components/Wordmark";
 import SEO from "@/components/SEO";
+import { track } from "@/lib/track";
 
 /* ─────────────── decorative shapes ─────────────── */
 const Dots = ({ className = "" }: { className?: string }) => (
@@ -115,6 +117,12 @@ const modules = [
 /* ─────────────── page ─────────────── */
 const Index = () => {
   const { user, loading } = useAuth();
+
+  // Top of the funnel. Fires for anonymous visitors too — that is the point:
+  // the biggest drop-off is between landing and signup, and no table can see it.
+  useEffect(() => {
+    track("landing_viewed");
+  }, []);
 
   if (loading)
     return (

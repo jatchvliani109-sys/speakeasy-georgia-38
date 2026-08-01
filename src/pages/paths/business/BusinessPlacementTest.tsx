@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessLevel, LEVEL_LABELS, pullBusinessFromSupabase, saveBusiness } from "./lib/state";
+import { track } from "@/lib/track";
 
 
 
@@ -194,6 +195,10 @@ export default function BusinessPlacementTest() {
   const q = QUESTIONS[idx];
   const a = answers[idx];
 
+  useEffect(() => {
+    track("placement_test_started");
+  }, []);
+
   const isOpen = q.type === "open";
   const canNext = isOpen ? true : typeof a === "number"; // open is optional
 
@@ -218,6 +223,7 @@ export default function BusinessPlacementTest() {
     setResultLevel(level);
     setResultPct(Math.round(pct));
     setDone(true);
+    track("placement_test_completed", { score_pct: Math.round(pct), level });
     if (user) {
       saveBusiness(user.id, { level, testCompleted: true });
     }

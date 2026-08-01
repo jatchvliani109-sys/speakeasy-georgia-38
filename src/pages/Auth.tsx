@@ -9,6 +9,7 @@ import SEO from "@/components/SEO";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
+import { track, resetTrackedUser } from "@/lib/track";
 
 const loginSchema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
@@ -45,6 +46,7 @@ export default function Auth() {
       return;
     }
     setLoading(true);
+    if (mode === "signup") track("signup_started");
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -53,6 +55,8 @@ export default function Auth() {
           options: { emailRedirectTo: afterAuthAbsolute },
         });
         if (error) throw error;
+        resetTrackedUser();          // a new account exists — re-resolve the id
+        track("signup_completed");
         if (!data.session) {
           setPendingEmail(email);
         } else {
