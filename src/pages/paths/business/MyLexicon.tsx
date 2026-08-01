@@ -203,10 +203,10 @@ function PhrasesTab() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="ka text-[11px] uppercase tracking-wider text-[#E5D4A8] font-semibold">
-              სულ {totalPhrases} ფრაზა შენახულია
+              სულ {totalPhrases} ფრაზაა შენახული
             </p>
             <p className="ka text-[11px] text-[#F0EBE3]/70 mt-1">
-              {rows.length} სესია დასრულებული
+              {rows.length} სესია
             </p>
           </div>
           <div className="text-4xl font-bold leading-none">{totalPhrases}</div>
