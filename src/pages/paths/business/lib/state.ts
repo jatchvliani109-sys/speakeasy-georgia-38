@@ -61,7 +61,16 @@ export type BusinessState = {
   businessResumeUploaded?: boolean;
   businessResumeSkipped?: boolean;
   firstMilestoneAcknowledged?: boolean;
+  /** Mock premium flag until real payments launch. */
+  mockPro?: boolean;
+  /** Streak freezes banked, and the days they covered. */
+  streakFreezes?: number;
+  freezeDays?: string[];
+  /** Weekly AI budget bookkeeping (mirrors the server-side counter). */
+  aiWeekKey?: string;
+  aiUsedWeek?: number;
 };
+
 
 const KEY = (uid: string) => `business_state_${uid}`;
 
