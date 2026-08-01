@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import BusinessShell, { BizCard } from "./BusinessShell";
 import { BUSINESS_MODULES } from "./lib/state";
-import EmailsModule from "./EmailsModule";
+
 import InterviewModule from "./InterviewModule";
 import VocabularyModule from "./VocabularyModule";
 
