@@ -122,7 +122,15 @@ export default function VocabularyModule() {
       if (cancelled) return;
       setState(s);
       let p = await loadProgress(user.id);
-      p = await ingestExternalPhrases(user.id, p);
+      // DISABLED 2026-08-01. This pulled AI-generated phrases out of interview
+      // and meeting transcripts and wrote them into vocabulary progress as
+      // `interview:*` / `meeting:*` rows whose EN/KA live in a meta blob rather
+      // than the curated bank. They bypass every quality gate: unreviewed
+      // Georgian, no enrichment, no collocations — and they produced real
+      // nonsense questions in production ("explore" paired with wrong Georgian).
+      // 35 such rows were purged. Re-enable only if these phrases go through
+      // the same review the 980-word bank did.
+      // p = await ingestExternalPhrases(user.id, p);
       if (cancelled) return;
       const plan = planSession(p, s.field || [], s.mainPriority || []);
       const recent = await loadRecentSessions(user.id);
