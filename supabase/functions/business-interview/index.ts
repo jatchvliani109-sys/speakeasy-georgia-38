@@ -335,9 +335,16 @@ Include exactly ${intensity === "light" ? 2 : 3} warmUp items.`;
 }
 
 function replyPrompt(b: ReplyBody) {
+  const isClosing = b.stage === "closing";
+  const isFinal = (b.remainingQuestions ?? 0) <= 1;
+  const directive = isClosing
+    ? isFinal
+      ? `\nMANDATORY FOR THIS TURN (closing, FINAL turn): respond to whatever the candidate just asked or said, then close the interview warmly — thank them, state the next steps and timeline, and say goodbye. Do NOT ask any question. Your text must contain no question mark. The interview ends right after this line.`
+      : `\nMANDATORY FOR THIS TURN (closing, FIRST turn): thank the candidate for their time and invite THEIR questions, e.g. "Before we finish — do you have any questions for me about the role or the team?". Do NOT ask any competency, behavioural, technical or situational question.`
+    : "";
   return `Learner level: ${b.level || "business_intermediate"}
 Interview stage: ${b.stage}
-Remaining interviewer turns planned in this stage: ${b.remainingQuestions}
+Remaining interviewer turns planned in this stage: ${b.remainingQuestions}${directive}
 
 Briefing context:
 ${JSON.stringify(b.briefing)}
