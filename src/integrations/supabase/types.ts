@@ -103,6 +103,7 @@ export type Database = {
           created_at: string
           debrief: Json | null
           id: string
+          quota_charged: boolean
           result: string | null
           role_title: string
           scenario_key: string
@@ -118,6 +119,7 @@ export type Database = {
           created_at?: string
           debrief?: Json | null
           id?: string
+          quota_charged?: boolean
           result?: string | null
           role_title: string
           scenario_key: string
@@ -133,6 +135,7 @@ export type Database = {
           created_at?: string
           debrief?: Json | null
           id?: string
+          quota_charged?: boolean
           result?: string | null
           role_title?: string
           scenario_key?: string
