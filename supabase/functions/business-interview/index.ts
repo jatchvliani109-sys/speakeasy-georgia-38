@@ -372,9 +372,16 @@ function debriefPrompt(b: DebriefBody) {
   const focus = b.briefing?.focusAreasEn?.length
     ? `\nRequired competencies for this role (assess whether they were shown): ${b.briefing.focusAreasEn.join(", ")}`
     : "";
+  const lastTwo = b.history.filter((t) => t.role === "candidate").slice(-2);
+  const askedQuestions = lastTwo.some((t) => t.text.includes("?"));
+  const invited = b.history
+    .filter((t) => t.role === "interviewer")
+    .slice(-2)
+    .some((t) => /question/i.test(t.text));
+  const closingNote = `\nClosing-stage fact (computed from the transcript, trust it): the candidate ${askedQuestions ? "DID ask the interviewer question(s) at the end — credit this in wentWell and comment on their relevance; do NOT say they should have asked questions" : invited ? "was invited to ask questions but asked none — you may mention this once in hurtChances" : "was never clearly invited to ask questions — do NOT criticise them for not asking"}.`;
   return `Learner level: ${b.level || "business_intermediate"}
 Mode: ${b.mode || "matched"}
-Verdict: ${b.verdict}${focus}
+Verdict: ${b.verdict}${focus}${closingNote}
 
 Briefing:
 ${JSON.stringify(b.briefing)}
