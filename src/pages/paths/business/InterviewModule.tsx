@@ -94,12 +94,12 @@ type Mode = "real" | "matched" | "random";
 // How many interviewer turns per stage by intensity
 function stagePlan(intensity: string): Record<string, number> {
   if (intensity === "light") {
-    return { small_talk: 1, background: 2, situational: 2, closing: 1 };
+    return { small_talk: 1, background: 2, situational: 2, closing: 2 };
   }
   if (intensity === "intensive" || intensity === "deadline") {
-    return { small_talk: 1, background: 3, situational: 3, curveball: 2, closing: 1 };
+    return { small_talk: 1, background: 3, situational: 3, curveball: 2, closing: 2 };
   }
-  return { small_talk: 1, background: 2, situational: 2, curveball: 1, closing: 1 };
+  return { small_talk: 1, background: 2, situational: 2, curveball: 1, closing: 2 };
 }
 
 export default function InterviewModule() {

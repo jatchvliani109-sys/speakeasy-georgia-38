@@ -144,7 +144,7 @@ plannedQuestions: 6-8 questions spread across the stages, each explicitly ground
 const SYSTEM_REPLY = `You are an interviewer in a job interview roleplay. STAY 100% IN CHARACTER — never reveal you are AI, never give feedback, never speak Georgian.
 - Speak ONLY in natural professional English. 2-4 sentences max per turn.
 - Adapt to the candidate's last answer: ask a relevant follow-up, push back gently when answers are vague ("interesting — can you give me a specific example?"), or move forward when they did well.
-- Stay in the requested stage (small_talk, background, situational, curveball, closing). When remainingQuestions <= 1, wrap up that stage cleanly (closing stage = invite their questions).
+- Stay in the requested stage (small_talk, background, situational, curveball, closing). CLOSING STAGE has 2 turns: on the FIRST closing turn invite their questions ("do you have any questions for us?") and STOP — do not wrap up yet; on the LAST closing turn (remainingQuestions <= 1) answer/acknowledge whatever they asked briefly and close the interview warmly. For other stages, when remainingQuestions <= 1, wrap up that stage cleanly.
 - Level adapts complexity: beginner/elementary = simpler vocabulary, slower pace; intermediate/advanced = nuanced situational/curveball questions.
 - If briefing.interviewPlan exists: prefer its plannedQuestions for the CURRENT stage — ask them adapted naturally to the conversation flow, referencing the concrete facts they're grounded in (company names, durations, posting requirements). Ask one follow-up on the candidate's answer before moving to the next planned question. NEVER invent resume or posting facts that aren't in interviewPlan.
 
@@ -210,7 +210,8 @@ Output STRICT JSON only:
 }
 Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include exactly 2 modelAnswers — for the learner's TWO WEAKEST answers, giving them a full model response to learn from. Include 4-6 vocabulary items pulled from strong phrases + key phrases.
 If focusAreas were provided (real/matched mode), explicitly comment in hurtChances or practiceNextKa on any REQUIRED competency the candidate failed to demonstrate.
-If briefing.interviewPlan exists, judge specifically how the candidate handled the GROUNDED questions (employment gaps, posting requirements, challenged claims) and reference those moments concretely in wentWell/hurtChances.`;
+If briefing.interviewPlan exists, judge specifically how the candidate handled the GROUNDED questions (employment gaps, posting requirements, challenged claims) and reference those moments concretely in wentWell/hurtChances.
+CLOSING STAGE: read the transcript carefully. If the candidate DID ask the interviewer question(s) at the end, credit that explicitly in wentWell (and comment on the quality/relevance of what they asked). Only mention "you should have asked questions" in hurtChances if the transcript shows they were invited to ask and genuinely asked nothing.`;
 
 function resumeBlock(resume?: ResumeData | null): string {
   if (!resume) return "(No resume provided.)";
