@@ -1,8 +1,46 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireUser } from "../_shared/auth.ts";
 import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+
+function adminDb() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    { auth: { autoRefreshToken: false, persistSession: false } },
+  );
+}
+
+/**
+ * Atomically marks an interview row as "quota charged". Returns true only for
+ * the caller that flipped the flag — a conditional UPDATE on quota_charged =
+ * false, so two rapid replies can never both claim.
+ */
+async function claimInterviewCharge(userId: string, sessionId: string): Promise<boolean> {
+  const { data, error } = await adminDb()
+    .from("business_interview_sessions")
+    .update({ quota_charged: true })
+    .eq("id", sessionId)
+    .eq("user_id", userId)
+    .eq("quota_charged", false)
+    .select("id");
+  if (error) return false;
+  return Array.isArray(data) && data.length > 0;
+}
+
+/** Releases the marker when the quota claim or the AI call failed. */
+async function releaseInterviewCharge(userId: string, sessionId: string): Promise<void> {
+  try {
+    await adminDb()
+      .from("business_interview_sessions")
+      .update({ quota_charged: false })
+      .eq("id", sessionId)
+      .eq("user_id", userId);
+  } catch (_e) { /* best-effort */ }
+}
+
 
 // Model split (email-module economics): high quality only where it's felt.
 const MODEL_SESSION = "gpt-5.4";  // briefing/warm-ups — Georgian quality matters
@@ -48,6 +86,8 @@ type SessionBody = {
 
 type ReplyBody = {
   action: "reply";
+  sessionId: string;             // business_interview_sessions.id — gates the charge
+
   level?: string;
   briefing: any;
   stage: string; // small_talk | background | situational | curveball | closing
@@ -377,18 +417,34 @@ async function callAI(system: string, user: string, model = "gpt-4o") {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   let _claimedWeek: string | null = null;   // set once a session is claimed
+  let _chargedSessionId: string | null = null; // interview row that holds the charge
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
 
-    // One interview = one weekly AI session. Only the "session" action (which
-    // starts a new interview) claims quota; reply/verdict/debrief are follow-up
-    // turns inside an already-paid interview and must stay free.
-    if (body.action === "session") {
-      const quota = await consumeAiSession(_auth.user.id);
-      if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
-      _claimedWeek = quota.week;
+    // One interview = one weekly AI session, charged on the FIRST reply (not on
+    // "session"), so abandoning at the briefing costs nothing and random mode —
+    // which skips the "session" call entirely — is covered too. "First" is
+    // decided by the persisted quota_charged flag, never by the client.
+    if (body.action === "reply") {
+      const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
+      if (!sessionId) {
+        return new Response(JSON.stringify({ error: "missing sessionId" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const claimed = await claimInterviewCharge(_auth.user.id, sessionId);
+      if (claimed) {
+        _chargedSessionId = sessionId;
+        const quota = await consumeAiSession(_auth.user.id);
+        if (!quota.ok) {
+          await releaseInterviewCharge(_auth.user.id, sessionId);
+          return quotaExceededResponse(quota, corsHeaders);
+        }
+        _claimedWeek = quota.week;
+      }
     }
 
     let r;
@@ -402,6 +458,7 @@ Deno.serve(async (req) => {
       r = await callAI(SYSTEM_DEBRIEF, debriefPrompt(body as unknown as DebriefBody), MODEL_DEBRIEF);
     } else {
       if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
+      if (_chargedSessionId) await releaseInterviewCharge(_auth.user.id, _chargedSessionId);
       return new Response(JSON.stringify({ error: "unknown action" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -410,11 +467,13 @@ Deno.serve(async (req) => {
     if (!r.ok) {
       // AI call failed — the learner never got an interview, give the session back.
       if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
+      if (_chargedSessionId) await releaseInterviewCharge(_auth.user.id, _chargedSessionId);
       return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
         status: r.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
     return new Response(JSON.stringify(r.parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -422,7 +481,9 @@ Deno.serve(async (req) => {
     try {
       const a = await requireUser(req);
       if (!a.error && _claimedWeek) await refundAiSession(a.user.id, _claimedWeek);
+      if (!a.error && _chargedSessionId) await releaseInterviewCharge(a.user.id, _chargedSessionId);
     } catch (_ignored) { /* refund is best-effort */ }
+
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

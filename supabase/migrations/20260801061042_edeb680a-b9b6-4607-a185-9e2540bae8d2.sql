@@ -1,0 +1,1 @@
+ALTER TABLE public.business_interview_sessions ADD COLUMN IF NOT EXISTS quota_charged boolean NOT NULL DEFAULT false;

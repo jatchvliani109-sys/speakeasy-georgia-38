@@ -199,9 +199,11 @@ export default function InterviewModule() {
     if (!user || starting) return;
     setStarting(true);
     setError(null);
-    // One interview = one AI session from the weekly pool (any mode: even
-    // random's replies + debrief hit the model).
+    // Read-only budget check for the UI. The actual weekly session is charged
+    // server-side on the FIRST reply of the interview, so backing out at the
+    // briefing costs nothing.
     const budget = await tryConsumeAiSession(user.id);
+
     if (!budget.ok) {
       setError(isPaidUser
         ? "ამ კვირის 7 AI სესია ამოწურულია — ორშაბათს განახლდება."
@@ -351,6 +353,10 @@ export default function InterviewModule() {
 
   async function submitAnswer() {
     if (!session || !candidateText.trim() || thinking) return;
+    if (!sessionId) {
+      setError("სესია ვერ შეინახა — დაბრუნდი და დაიწყე ხელახლა.");
+      return;
+    }
     const answer = candidateText.trim();
     const next: Turn[] = [...history, { role: "candidate", text: answer }];
     setHistory(next);
@@ -366,7 +372,11 @@ export default function InterviewModule() {
       const { data, error } = await supabase.functions.invoke("business-interview", {
         body: {
           action: "reply",
+          // Required: the server charges the weekly session on the first reply,
+          // gated by this row's persisted quota_charged flag.
+          sessionId,
           level: biz?.plan?.level || biz?.level || "business_intermediate",
+
           briefing: session.briefing,
           stage: stageForCall,
           history: next,
