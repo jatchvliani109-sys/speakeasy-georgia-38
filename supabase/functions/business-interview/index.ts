@@ -211,7 +211,7 @@ Output STRICT JSON only:
 Include 2-3 items each in wentWell/hurtChances. Include 3 keyPhrases. Include exactly 2 modelAnswers — for the learner's TWO WEAKEST answers, giving them a full model response to learn from. Include 4-6 vocabulary items pulled from strong phrases + key phrases.
 If focusAreas were provided (real/matched mode), explicitly comment in hurtChances or practiceNextKa on any REQUIRED competency the candidate failed to demonstrate.
 If briefing.interviewPlan exists, judge specifically how the candidate handled the GROUNDED questions (employment gaps, posting requirements, challenged claims) and reference those moments concretely in wentWell/hurtChances.
-CLOSING STAGE: read the transcript carefully. If the candidate DID ask the interviewer question(s) at the end, credit that explicitly in wentWell (and comment on the quality/relevance of what they asked). Only mention "you should have asked questions" in hurtChances if the transcript shows they were invited to ask and genuinely asked nothing.\`;
+CLOSING STAGE: read the transcript carefully. If the candidate DID ask the interviewer question(s) at the end, credit that explicitly in wentWell (and comment on the quality/relevance of what they asked). Only mention "you should have asked questions" in hurtChances if the transcript shows they were invited to ask and genuinely asked nothing.`;
 
 function resumeBlock(resume?: ResumeData | null): string {
   if (!resume) return "(No resume provided.)";
