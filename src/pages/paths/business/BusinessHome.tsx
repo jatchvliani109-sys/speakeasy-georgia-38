@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+aimport { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Award,
@@ -7,7 +7,6 @@ import {
   Clock,
   FileText,
   Library,
-  RotateCcw,
   Star,
   Target,
   Check,
@@ -27,7 +26,6 @@ import {
   buildPlan,
   LEVEL_LABELS,
   pullBusinessFromSupabase,
-  resetBusiness,
   saveBusiness,
 } from "./lib/state";
 import { computeStreakWithFreezes, loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
@@ -344,30 +342,6 @@ export default function BusinessHome() {
               {LEVEL_LABELS[plan.level]}
             </span>
           )}
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            title="Dev: reset all business progress"
-            onClick={async () => {
-              if (!user) return;
-              if (!confirm("Reset ALL Business English progress for this account? (dev only)")) return;
-              try {
-                const patch = { completed: false, completed_at: null } as any;
-                await Promise.all([
-                  supabase.from("business_email_sessions").update(patch).eq("user_id", user.id),
-                  supabase.from("business_interview_sessions").update(patch).eq("user_id", user.id),
-                  supabase.from("business_vocab_sessions").update(patch).eq("user_id", user.id),
-                ]);
-              } catch {}
-              resetBusiness(user.id);
-              window.location.reload();
-            }}
-            className="font-mono text-[10px] uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#E4E2DF] text-[#4A4A4A] hover:bg-white hover:text-[#5C1A2E] transition"
-          >
-            <RotateCcw size={11} strokeWidth={2.25} /> reset
-          </button>
-          
         </div>
       </header>
 
