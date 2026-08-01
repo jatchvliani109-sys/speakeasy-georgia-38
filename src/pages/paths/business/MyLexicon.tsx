@@ -386,7 +386,7 @@ function WordsTab() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="ka text-[11px] uppercase tracking-wider text-[#E5D4A8] font-semibold">
-              სულ {counts.total} სიტყვა შესწავლილია
+              ჯერჯერობით {counts.total}&nbsp;სიტყვას "ვებრძვით" :)
             </p>
             <p className="ka text-[11px] text-[#F0EBE3]/70 mt-1">
               {counts.learned} ვიცი · {counts.learning} ვსწავლობ · {counts.fresh} ახალი
