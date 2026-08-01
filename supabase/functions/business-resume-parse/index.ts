@@ -2,6 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 // @ts-ignore - jszip via npm
 import JSZip from "npm:jszip@3.10.1";
 import { requireUser } from "../_shared/auth.ts";
+import { checkResumeParseLimit, resumeRateLimitResponse } from "../_shared/resumeRateLimit.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -202,6 +203,12 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Abuse guard only — CV parsing stays outside the weekly AI budget because
+    // it is a one-time onboarding step. Checked AFTER validation so a rejected
+    // file type or oversized upload never burns an allowance.
+    const rate = await checkResumeParseLimit(_auth.user.id);
+    if (!rate.ok) return resumeRateLimitResponse(rate, corsHeaders);
 
     let rawText = "";
     let aiContent = "";
