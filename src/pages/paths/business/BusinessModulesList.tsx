@@ -29,12 +29,12 @@ export default function BusinessModulesList() {
   }, [user]);
 
   const orderedModules = useMemo(() => {
-    // VOCAB-FIRST pivot: vocabulary leads, interview second, emails demoted
-    // to the end; goal ranking breaks ties for anything in between.
+    // VOCAB-FIRST pivot: vocabulary leads, interview second; goal ranking
+    // breaks ties for anything in between.
     const ranking = rankedModuleSlugs(goals);
     const goalRank = (slug: string) => (ranking ? ranking.indexOf(slug) : 0);
     const pivotRank = (slug: string) =>
-      slug === "vocabulary" ? 0 : slug === "interview" ? 1 : slug === "emails" ? 3 : 2;
+      slug === "vocabulary" ? 0 : slug === "interview" ? 1 : 2;
     return [...BUSINESS_MODULES].sort(
       (a, b) =>
         pivotRank(a.slug) - pivotRank(b.slug) || goalRank(a.slug) - goalRank(b.slug),

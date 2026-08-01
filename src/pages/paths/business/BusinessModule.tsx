@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import BusinessShell, { BizCard } from "./BusinessShell";
 import { BUSINESS_MODULES } from "./lib/state";
-import EmailsModule from "./EmailsModule";
+
 import InterviewModule from "./InterviewModule";
 import VocabularyModule from "./VocabularyModule";
 
@@ -9,7 +9,7 @@ export default function BusinessModule() {
   const { slug } = useParams();
   const mod = BUSINESS_MODULES.find((m) => m.slug === slug);
 
-  if (slug === "emails") return <EmailsModule />;
+  
   if (slug === "interview") return <InterviewModule />;
   if (slug === "vocabulary") return <VocabularyModule />;
 
