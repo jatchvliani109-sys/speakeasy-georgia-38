@@ -97,6 +97,7 @@ export type Database = {
       }
       business_interview_sessions: {
         Row: {
+          abandoned: boolean
           company_type: string
           completed: boolean
           completed_at: string | null
@@ -113,6 +114,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          abandoned?: boolean
           company_type: string
           completed?: boolean
           completed_at?: string | null
@@ -129,6 +131,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          abandoned?: boolean
           company_type?: string
           completed?: boolean
           completed_at?: string | null
