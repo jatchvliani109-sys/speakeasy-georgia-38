@@ -52,13 +52,7 @@ export default function BusinessSetup() {
       if (cancelled) return;
       // If setup already completed, do not show the questions again — route forward.
       if (cur.setupCompleted) {
-        if (!cur.testCompleted) navigate("/path/business/test", { replace: true });
-        else if (!cur.plan) navigate("/path/business/plan", { replace: true });
-        else if (!cur.businessResumeUploaded && !cur.businessResumeSkipped)
-          navigate("/path/business/resume", { replace: true });
-        else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped)
-          navigate("/path/business/self-introduction", { replace: true });
-        else navigate("/path/business/home", { replace: true });
+        navigate("/path/business/home", { replace: true });
         return;
       }
       setGoals(cur.goals ?? []);
@@ -75,10 +69,16 @@ export default function BusinessSetup() {
   const toggleField = (f: BusinessField) =>
     setField((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
 
+  // Only the FIELD question is required — it is the one answer that materially
+  // changes what content the user sees. Goals and intensity shape the plan
+  // screen and can be answered later from the dashboard, so they are skippable
+  // with sensible defaults rather than blocking the way in.
   const canNext =
-    (step === 0 && goals.length > 0) ||
-    (step === 1 && !!intensity && (intensity !== "deadline" || !!deadline)) ||
+    (step === 0) ||
+    (step === 1) ||
     (step === 2 && field.length > 0);
+
+  const isOptionalStep = step === 0 || step === 1;
 
 
   const next = async () => {
@@ -88,7 +88,7 @@ export default function BusinessSetup() {
     }
     if (!user) {
       console.warn("[setup] no user — navigating to plan anyway");
-      navigate("/path/business/plan", { replace: true });
+      navigate("/path/business/home", { replace: true });
       return;
     }
 
@@ -96,19 +96,25 @@ export default function BusinessSetup() {
 
     // Safety net: never let the user stay stuck on this screen.
     const failsafe = setTimeout(() => {
-      console.warn("[setup] failsafe fired — forcing navigation to plan");
-      navigate("/path/business/plan", { replace: true });
+      console.warn("[setup] failsafe fired — forcing navigation to home");
+      navigate("/path/business/home", { replace: true });
     }, 6000);
 
     try {
       // Save + await remote write so the plan page guard sees the latest state.
       // mainPriority mirrors goals since the standalone priority question was removed —
       // downstream logic (plan, curriculum, vocab, docs) still reads mainPriority.
+      // buildPlan needs a goal, an intensity, a field and a level. Skipped
+      // answers get defaults so the plan can still be built; the user can
+      // refine them later from the dashboard.
+      const effectiveGoals = goals.length ? goals : (["vocabulary"] as BusinessGoal[]);
+      const effectiveIntensity = intensity ?? ("steady" as BusinessIntensity);
+
       const saved = await saveBusinessAsync(user.id, {
-        goals,
-        mainPriority: goals,
-        intensity,
-        deadline: intensity === "deadline" ? deadline : null,
+        goals: effectiveGoals,
+        mainPriority: effectiveGoals,
+        intensity: effectiveIntensity,
+        deadline: effectiveIntensity === "deadline" ? deadline : null,
         field,
         setupCompleted: true,
       });
@@ -126,8 +132,9 @@ export default function BusinessSetup() {
       console.error("[setup] save error — continuing to plan", e);
     } finally {
       clearTimeout(failsafe);
-      console.log("[setup] navigating to /path/business/plan");
-      navigate("/path/business/plan", { replace: true });
+      // Straight into the app. The plan screen is reachable from the dashboard.
+      console.log("[setup] navigating to /path/business/home");
+      navigate("/path/business/home", { replace: true });
     }
   };
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);
@@ -264,9 +271,19 @@ export default function BusinessSetup() {
           <BizButton variant="ghost" onClick={back} disabled={step === 0}>
             უკან
           </BizButton>
-          <BizButton onClick={next} disabled={!canNext}>
-            {step < 2 ? "შემდეგი" : "გეგმის ნახვა"}
-          </BizButton>
+          <div className="flex items-center gap-3">
+            {isOptionalStep && (
+              <button
+                onClick={() => setStep((st) => (st + 1) as Step)}
+                className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
+              >
+                მოგვიანებით
+              </button>
+            )}
+            <BizButton onClick={next} disabled={!canNext}>
+              {step < 2 ? "შემდეგი" : "დაწყება"}
+            </BizButton>
+          </div>
         </div>
       </BizCard>
     </BusinessShell>

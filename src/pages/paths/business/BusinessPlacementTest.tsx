@@ -283,8 +283,6 @@ export default function BusinessPlacementTest() {
       if (cancelled || done) return;
       if (cur.testCompleted && cur.level) {
         if (!cur.setupCompleted) navigate("/path/business/setup", { replace: true });
-        else if (!cur.plan) navigate("/path/business/plan", { replace: true });
-        else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped) navigate("/path/business/self-introduction", { replace: true });
         else navigate("/path/business/home", { replace: true });
       }
     })();
@@ -365,9 +363,24 @@ export default function BusinessPlacementTest() {
     );
   }
 
+  // Skipping the test is allowed. The vocab engine already infers level from
+  // performance (tier unlocking, evidence fast-track), so a mandatory test in
+  // front of it asks for effort before showing any value. We seed a middle
+  // level and let the first sessions correct it.
+  const skipTest = () => {
+    if (!user) return;
+    saveBusiness(user.id, {
+      level: "business_elementary" as BusinessLevel,
+      testCompleted: true,
+      levelEstimated: true,
+    } as any);
+    navigate("/path/business/setup", { replace: true });
+  };
+
   return (
     <BusinessShell>
       <div className="mb-6">
+        <div className="flex items-start justify-between gap-3">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           კითხვა {idx + 1} / {total}
           {q.type === "mcq" && (
@@ -376,6 +389,14 @@ export default function BusinessPlacementTest() {
             </span>
           )}
         </p>
+          <button
+            type="button"
+            onClick={skipTest}
+            className="ka shrink-0 text-[11px] text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
+          >
+            ტესტის გამოტოვება
+          </button>
+        </div>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           ბიზნეს ინგლისურის მოკლე ტესტი
         </h1>
