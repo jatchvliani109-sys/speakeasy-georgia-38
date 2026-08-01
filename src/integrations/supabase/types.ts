@@ -918,6 +918,42 @@ export type Database = {
           },
         ]
       }
+      word_reports: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          reason: string
+          status: string
+          user_id: string | null
+          word_en: string | null
+          word_ka: string | null
+          word_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason: string
+          status?: string
+          user_id?: string | null
+          word_en?: string | null
+          word_ka?: string | null
+          word_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason?: string
+          status?: string
+          user_id?: string | null
+          word_en?: string | null
+          word_ka?: string | null
+          word_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
