@@ -86,6 +86,8 @@ type SessionBody = {
 
 type ReplyBody = {
   action: "reply";
+  sessionId: string;             // business_interview_sessions.id — gates the charge
+
   level?: string;
   briefing: any;
   stage: string; // small_talk | background | situational | curveball | closing
