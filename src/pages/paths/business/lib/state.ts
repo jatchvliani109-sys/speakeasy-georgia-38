@@ -136,6 +136,51 @@ export function resetBusiness(uid: string) {
   });
 }
 
+// --- Weekly AI budget (client-side UI hint; the server enforces the real limit) ---
+
+export const FREE_WEEKLY_AI = 1;
+export const PREMIUM_WEEKLY_AI = 7;
+
+/** Monday of the current Tbilisi week — must match the server's currentAiWeekKey(). */
+export function currentAiWeekKey(now: Date = new Date()): string {
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const t = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  const day = t.getUTCDay();
+  const diff = day === 0 ? 6 : day - 1;
+  t.setUTCDate(t.getUTCDate() - diff);
+  t.setUTCHours(0, 0, 0, 0);
+  return `${DAYS[t.getUTCDay()]} ${MONTHS[t.getUTCMonth()]} ${String(t.getUTCDate()).padStart(2, "0")} ${t.getUTCFullYear()}`;
+}
+
+export function aiWeeklyLimit(state: BusinessState | null | undefined): number {
+  return state?.mockPro === true ? PREMIUM_WEEKLY_AI : FREE_WEEKLY_AI;
+}
+
+export function aiSessionsRemaining(state: BusinessState | null | undefined): number {
+  const limit = aiWeeklyLimit(state);
+  if (!state) return limit;
+  const used = state.aiWeekKey === currentAiWeekKey() ? state.aiUsedWeek ?? 0 : 0;
+  return Math.max(0, limit - used);
+}
+
+/**
+ * Optimistically claims one weekly AI session locally so the UI can block
+ * ahead of the model call. The authoritative check runs in the edge function.
+ */
+export async function tryConsumeAiSession(
+  uid: string,
+): Promise<{ ok: boolean; remaining: number; limit: number }> {
+  const state = await pullBusinessFromSupabase(uid).catch(() => loadBusiness(uid));
+  const limit = aiWeeklyLimit(state);
+  const week = currentAiWeekKey();
+  const used = state?.aiWeekKey === week ? state?.aiUsedWeek ?? 0 : 0;
+  if (used >= limit) return { ok: false, remaining: 0, limit };
+  await saveBusinessAsync(uid, { aiWeekKey: week, aiUsedWeek: used + 1 });
+  return { ok: true, remaining: limit - used - 1, limit };
+}
+
+
 // --- Supabase sync ---
 
 async function pushBusinessRemote(uid: string, state: BusinessState) {
