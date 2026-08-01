@@ -65,7 +65,7 @@ const EXAMPLES: Record<string, Record<LevelTier, Example>> = {
   },
   interview: {
     beginner: { en: "My name is Nino. I have one year of customer service experience. I want to work in your team.", ka: "მე მქვია ნინო. მაქვს ერთი წლის გამოცდილება customer service-ში. მინდა ვიმუშაო თქვენს გუნდში." },
-    elementary: { en: "I'm Nino. I have one year of customer service experience and good communication skills. I'd like to grow in a professional team.", ka: "ნინო ვარ. მაქვს 1 წლის გამოცდილება customer service-ში და კარგი კომუნიკაცია. მინდა გავიზარდო პროფესიულ გუნდში." },
+    elementary: { en: "I'm Nino. I have one year of customer service experience and good communication skills. I'd like to grow in a professional team.", ka: "ნინო ვარ. მაქვს 1 წლის გამოცდილება customer service-ში და კარგი კომუნიკაცია. მინდა გავიზარდო პროფესიონალურ გუნდში." },
     intermediate: { en: "I'm Nino. For the past year I've worked in customer service, where I learned how to handle clients calmly and clearly. I'm looking for a role where I can grow.", ka: "ნინო ვარ. ბოლო ერთი წელია ვმუშაობ customer service-ში — ვისწავლე კლიენტებთან მუშაობა მშვიდად და ნათლად." },
     advanced: { en: "I'm Nino. Over the past year in customer service I learned how to stay calm under pressure and turn difficult conversations into solutions. I'm now looking for a role where I can take more ownership.", ka: "ნინო ვარ. ერთი წლის განმავლობაში customer service-ში ვისწავლე როგორ მოვაგვარო რთული საუბრები.", note: "Tone: calm, ownership-focused." },
   },
@@ -90,7 +90,7 @@ const EXAMPLES: Record<string, Record<LevelTier, Example>> = {
   general: {
     beginner: { en: "Hi, I'm Nino. I work in marketing. I want to learn more English for my job.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში. მინდა ვისწავლო მეტი ინგლისური სამსახურისთვის." },
     elementary: { en: "Hi, I'm Nino. I work in marketing and I'm improving my English to communicate better at work.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვიუმჯობესებ ინგლისურს სამსახურისთვის." },
-    intermediate: { en: "Hi, I'm Nino. I work in marketing and I'm focused on building stronger professional English for daily work and emails.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვაუმჯობესებ პროფესიულ ინგლისურს ყოველდღიური სამუშაოსთვის." },
+    intermediate: { en: "Hi, I'm Nino. I work in marketing and I'm focused on building stronger professional English for daily work and emails.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვაუმჯობესებ პროფესიონალურ ინგლისურს ყოველდღიური სამუშაოსთვის." },
     advanced: { en: "Hi, I'm Nino — I work in marketing and I'm sharpening my professional English to communicate more clearly in meetings and writing.", ka: "გამარჯობა, ნინო ვარ — ვმუშაობ მარკეტინგში და ვაუმჯობესებ ინგლისურს შეხვედრებსა და წერაში.", note: "Tone: concise, professional." },
   },
 };
@@ -560,7 +560,7 @@ export default function SelfIntroduction() {
             <h2 className="ka text-2xl font-bold text-[#5C1A2E] mt-2 si-rise-1">წარდგენა მზადაა</h2>
             <p className="ka text-sm text-[#4A4A4A] mt-3 max-w-md mx-auto si-rise-2">
               ეს არის შენი პირადი პროფესიონალური წარდგენა — ინგლისურად, შენი ხმით.
-              გამოიყენე გასაუბრებაზე, ქსელშეკრებებზე ან ნებისმიერ პროფესიულ გარემოში.
+              გამოიყენე გასაუბრებაზე, ქსელშეკრებებზე ან ნებისმიერ პროფესიონალურ გარემოში.
             </p>
           </div>
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { BusinessLevel, LEVEL_LABELS, pullBusinessFromSupabase, saveBusiness } from "./lib/state";
 
@@ -30,7 +29,7 @@ const QUESTIONS: Question[] = [
     weight: 1,
     prompt: "We need to ______ the meeting until next week because the client is unavailable.",
     promptKa: "შეავსე ხარვეზი.",
-    options: ["cancel", "postpone", "bring forward", "call off"],
+    options: ["cancel", "postpone", "delay back", "remove"],
     correct: 1,
   },
   {
@@ -49,8 +48,8 @@ const QUESTIONS: Question[] = [
     options: [
       "whenever you have time",
       "as soon as possible",
-      "by tomorrow morning",
-      "before the next meeting",
+      "after the next meeting",
+      "at a scheduled point",
     ],
     correct: 1,
   },
@@ -157,23 +156,6 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// Shuffle each MCQ's options at session start and remap the correct index.
-// Kills answer-position bias structurally: however the data is authored,
-// the rendered position of the correct answer is random every session.
-function shuffleMcq(q: Question): Question {
-  if (q.type !== "mcq" || !q.options) return q;
-  const order = q.options.map((_, i) => i);
-  for (let i = order.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
-  }
-  return {
-    ...q,
-    options: order.map((i) => q.options![i]),
-    correct: order.indexOf(q.correct),
-  };
-}
-
 const MAX_MCQ_SCORE = QUESTIONS.reduce(
   (s, q) => s + (q.type === "mcq" ? q.weight : 0),
   0,
@@ -200,40 +182,7 @@ const LEVEL_BLURB: Record<BusinessLevel, string> = {
 export default function BusinessPlacementTest() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { displayName, loaded: nameLoaded, save: saveName } = useDisplayName();
-  const [askName, setAskName] = useState(false);
-  const [nameInput, setNameInput] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [savingName, setSavingName] = useState(false);
-
-  // After the result screen: ask the name once (warm moment, right after the
-  // level reveal). Users who already have a saved name skip straight to setup.
-  const continueAfterResult = () => {
-    if (nameLoaded && !displayName) {
-      setAskName(true);
-      return;
-    }
-    navigate("/path/business/setup", { replace: true });
-  };
-
-  const submitNameAndContinue = async () => {
-    const clean = nameInput.trim();
-    if (!clean) {
-      setNameError("გთხოვ, შეიყვანე შენი სახელი");
-      return;
-    }
-    setSavingName(true);
-    const res = await saveName(clean);
-    setSavingName(false);
-    if (!res.ok) {
-      setNameError("სახელის შენახვა ვერ მოხერხდა — სცადე თავიდან");
-      return;
-    }
-    navigate("/path/business/setup", { replace: true });
-  };
-  // Per-session shuffled question set (options order randomized once).
-  const [questions] = useState<Question[]>(() => QUESTIONS.map(shuffleMcq));
-  const total = questions.length;
+  const total = QUESTIONS.length;
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<(number | string | null)[]>(() =>
     Array(total).fill(null),
@@ -242,7 +191,7 @@ export default function BusinessPlacementTest() {
   const [resultLevel, setResultLevel] = useState<BusinessLevel | null>(null);
   const [resultPct, setResultPct] = useState<number>(0);
 
-  const q = questions[idx];
+  const q = QUESTIONS[idx];
   const a = answers[idx];
 
   const isOpen = q.type === "open";
@@ -251,13 +200,13 @@ export default function BusinessPlacementTest() {
   const submit = () => {
     let raw = 0;
     answers.forEach((ans, i) => {
-      const qq = questions[i];
+      const qq = QUESTIONS[i];
       if (qq.type === "mcq" && ans === qq.correct) raw += qq.weight;
     });
     let pct = (raw / MAX_MCQ_SCORE) * 100;
 
     // Optional open answer = small upward-only bonus
-    const openIdx = questions.findIndex((x) => x.type === "open");
+    const openIdx = QUESTIONS.findIndex((x) => x.type === "open");
     const openAns = answers[openIdx];
     if (typeof openAns === "string") {
       const words = openAns.trim().split(/\s+/).filter(Boolean).length;
@@ -283,58 +232,14 @@ export default function BusinessPlacementTest() {
       if (cancelled || done) return;
       if (cur.testCompleted && cur.level) {
         if (!cur.setupCompleted) navigate("/path/business/setup", { replace: true });
+        else if (!cur.plan) navigate("/path/business/plan", { replace: true });
+        else if (!cur.businessSelfIntroductionCompleted && !cur.businessSelfIntroductionSkipped) navigate("/path/business/self-introduction", { replace: true });
         else navigate("/path/business/home", { replace: true });
       }
     })();
     return () => { cancelled = true; };
   }, [user, navigate, done]);
 
-
-  if (done && askName) {
-    return (
-      <BusinessShell>
-        <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
-            გაცნობა
-          </p>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
-            სანამ დავიწყებთ — რა გქვია?
-          </h1>
-          <p className="ka text-sm text-[#4A4A4A] mt-2 leading-relaxed">
-            ამ სახელით მოგმართავთ აპლიკაციაში — მისალმებაში, გაკვეთილებში და შედეგებში.
-          </p>
-          <input
-            autoFocus
-            type="text"
-            value={nameInput}
-            onChange={(e) => {
-              setNameInput(e.target.value);
-              if (nameError) setNameError("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") submitNameAndContinue();
-            }}
-            maxLength={60}
-            placeholder="მაგ. ნინო"
-            className="ka mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-base bg-white"
-          />
-          {nameError && <p className="ka text-xs text-red-700 mt-2">{nameError}</p>}
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => navigate("/path/business/setup", { replace: true })}
-              className="ka text-xs text-[#4A4A4A] underline underline-offset-2"
-            >
-              ახლა გამოვტოვებ
-            </button>
-            <BizButton onClick={submitNameAndContinue} disabled={savingName || !nameInput.trim()}>
-              {savingName ? "ინახება..." : "შენახვა და გაგრძელება"}
-            </BizButton>
-          </div>
-        </BizCard>
-      </BusinessShell>
-    );
-  }
 
   if (done && resultLevel) {
     return (
@@ -354,7 +259,7 @@ export default function BusinessPlacementTest() {
             {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
-            <BizButton onClick={continueAfterResult}>
+            <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>
               გაგრძელება
             </BizButton>
           </div>
@@ -363,24 +268,9 @@ export default function BusinessPlacementTest() {
     );
   }
 
-  // Skipping the test is allowed. The vocab engine already infers level from
-  // performance (tier unlocking, evidence fast-track), so a mandatory test in
-  // front of it asks for effort before showing any value. We seed a middle
-  // level and let the first sessions correct it.
-  const skipTest = () => {
-    if (!user) return;
-    saveBusiness(user.id, {
-      level: "business_elementary" as BusinessLevel,
-      testCompleted: true,
-      levelEstimated: true,
-    } as any);
-    navigate("/path/business/setup", { replace: true });
-  };
-
   return (
     <BusinessShell>
       <div className="mb-6">
-        <div className="flex items-start justify-between gap-3">
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           კითხვა {idx + 1} / {total}
           {q.type === "mcq" && (
@@ -389,14 +279,6 @@ export default function BusinessPlacementTest() {
             </span>
           )}
         </p>
-          <button
-            type="button"
-            onClick={skipTest}
-            className="ka shrink-0 text-[11px] text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
-          >
-            ტესტის გამოტოვება
-          </button>
-        </div>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
           ბიზნეს ინგლისურის მოკლე ტესტი
         </h1>
@@ -422,7 +304,7 @@ export default function BusinessPlacementTest() {
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
                       ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                      : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                      : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
                   }`}
                 >
                   {opt}
@@ -441,7 +323,7 @@ export default function BusinessPlacementTest() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
             />
             <p className="ka text-xs text-[#4A4A4A] mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.

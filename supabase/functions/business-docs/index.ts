@@ -1,6 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { requireUser } from "../_shared/auth.ts";
-import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
@@ -32,8 +31,7 @@ Rules:
 - Add 3-6 "highlights": short phrases from the document with a 1-line Georgian explanation of WHY they work. These are subtle learning moments.
 - Tone: professional, natural, modern (not stiff, not corporate-cliche).
 - Use the user's profile/resume context to personalize specifics (industry, role, skills).
-- Never invent fake credentials or specific employer names not in the profile.
-- GEORGIAN LANGUAGE RULE (strict): never write the word "პროფესიული" in any Georgian text — always use "პროფესიონალური" instead. All Georgian must be natural and grammatically correct.`;
+- Never invent fake credentials or specific employer names not in the profile.`;
 
 function profileBlock(p: Profile) {
   return `
@@ -230,18 +228,9 @@ async function callAI(system: string, user: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  let _claimedWeek: string | null = null;   // set once a session is claimed
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
-
-    // Claim a weekly AI session BEFORE generating. Enforced here rather than in
-    // the browser, where the check can simply be skipped by calling this
-    // function directly.
-    const quota = await consumeAiSession(_auth.user.id);
-    if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
-    _claimedWeek = quota.week;
-
     const body = (await req.json()) as { action: Action; profile?: Profile } & Record<string, any>;
     const profile = body.profile || {};
     let r;
@@ -258,7 +247,6 @@ Deno.serve(async (req) => {
     } else if (body.action === "adjust") {
       r = await callAI(SYSTEM_BASE, adjustPrompt(body));
     } else {
-      await refundAiSession(_auth.user.id, quota.week);
       return new Response(JSON.stringify({ error: "unknown action" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -274,11 +262,6 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    // Generation failed after the session was claimed — give it back.
-    try {
-      const a = await requireUser(req);
-      if (!a.error && _claimedWeek) await refundAiSession(a.user.id, _claimedWeek);
-    } catch (_ignored) { /* refund is best-effort */ }
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

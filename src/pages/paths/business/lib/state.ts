@@ -61,22 +61,6 @@ export type BusinessState = {
   businessResumeUploaded?: boolean;
   businessResumeSkipped?: boolean;
   firstMilestoneAcknowledged?: boolean;
-  // Streak freeze: auto-consumed protection so one missed day doesn't reset
-  // the streak. `streakFreezes` = how many are banked; `freezeDays` = the
-  // toDateString() days a freeze has already been spent to cover (so a spent
-  // freeze can't be reused on later loads).
-  streakFreezes?: number;
-  freezeDays?: string[];
-  // MOCK premium flag — placeholder until real payments (post-registration).
-  // Flipped by the premium page's unlock button; replaced by server-side
-  // is_pro / subscription status in the payments build.
-  mockPro?: boolean;
-  // Unified weekly AI budget: EVERY AI-powered session (any interview mode,
-  // any document generation, self-introduction) draws from one weekly pool.
-  // Spend all 7 in one day if you like — resets Monday. A future higher tier
-  // can simply sell a bigger weekly pool.
-  aiWeekKey?: string;
-  aiUsedWeek?: number;
 };
 
 const KEY = (uid: string) => `business_state_${uid}`;
@@ -96,11 +80,6 @@ const empty = (): BusinessState => ({
   businessResumeUploaded: false,
   businessResumeSkipped: false,
   firstMilestoneAcknowledged: false,
-  streakFreezes: 2,
-  freezeDays: [],
-  mockPro: false,
-  aiWeekKey: undefined,
-  aiUsedWeek: 0,
 });
 
 export function loadBusiness(uid: string): BusinessState {
@@ -279,7 +258,7 @@ export const LEVEL_LABELS: Record<BusinessLevel, string> = {
 
 // Modules
 
-import { Briefcase, BookOpen, type LucideIcon } from "lucide-react";
+import { Briefcase, Mail, BookOpen, type LucideIcon } from "lucide-react";
 
 export type BusinessModule = {
   slug: string;
@@ -296,6 +275,12 @@ export const BUSINESS_MODULES: BusinessModule[] = [
     icon: Briefcase,
   },
   {
+    slug: "emails",
+    title: "იმეილები და პროფესიონალური წერა",
+    description: "დაწერე უფრო სწორი, თავაზიანი და პროფესიონალური იმეილები.",
+    icon: Mail,
+  },
+  {
     slug: "vocabulary",
     title: "ბიზნეს ლექსიკა",
     description: "ისწავლე სიტყვები მაგალითებით, ქართული ახსნებით და პრაქტიკით.",
@@ -307,9 +292,9 @@ export const BUSINESS_MODULES: BusinessModule[] = [
 const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
   university: "interview",
   job_interview: "interview",
-  work_communication: "vocabulary",
-  remote_work: "vocabulary",
-  emails_writing: "vocabulary",
+  work_communication: "emails",
+  remote_work: "emails",
+  emails_writing: "emails",
   business_vocab: "vocabulary",
   general_business: "interview",
 };
@@ -318,11 +303,11 @@ const PRIORITY_TO_MODULE: Record<BusinessPriority, string> = {
 export const PRIORITY_TO_MODULES: Record<BusinessPriority, string[]> = {
   university: ["interview", "vocabulary"],
   job_interview: ["interview", "vocabulary"],
-  work_communication: ["vocabulary", "interview"],
-  remote_work: ["vocabulary", "interview"],
-  emails_writing: ["vocabulary"],
+  work_communication: ["emails", "vocabulary"],
+  remote_work: ["emails", "vocabulary"],
+  emails_writing: ["emails"],
   business_vocab: ["vocabulary"],
-  general_business: ["vocabulary", "interview"],
+  general_business: ["vocabulary", "interview", "emails"],
 };
 
 /**
@@ -409,9 +394,7 @@ export function buildPlan(s: BusinessState): BusinessPlan | null {
   const primaryGoal = s.mainPriority?.[0];
   if (!primaryGoal || !s.intensity || !s.field?.length || !s.level) return null;
   const moduleSlug = PRIORITY_TO_MODULE[primaryGoal];
-  const mod =
-    BUSINESS_MODULES.find((m) => m.slug === moduleSlug) ||
-    BUSINESS_MODULES.find((m) => m.slug === "vocabulary")!;
+  const mod = BUSINESS_MODULES.find((m) => m.slug === moduleSlug)!;
   return {
     mainGoals: s.mainPriority,
     level: s.level,
@@ -499,56 +482,3 @@ export const SELF_INTRO_STATUSES: { id: string; label: string }[] = [
   { id: "freelancer", label: "ფრილანსერი" },
   { id: "other", label: "სხვა" },
 ];
-
-
-// ---------------------------------------------------------------------------
-// Weekly AI budget (mock-premium era). One pool for ALL AI features.
-// Swap the limits/source for server-side enforcement in the payments build.
-// ---------------------------------------------------------------------------
-export const FREE_WEEKLY_AI = 1;
-export const PREMIUM_WEEKLY_AI = 7;
-
-/** Monday-anchored key for the current week (local time). */
-export function currentAiWeekKey(now: Date = new Date()): string {
-  const d = new Date(now);
-  const day = d.getDay(); // 0 Sun ... 6 Sat
-  const diff = day === 0 ? 6 : day - 1; // days since Monday
-  d.setDate(d.getDate() - diff);
-  d.setHours(0, 0, 0, 0);
-  return d.toDateString();
-}
-
-export function aiWeeklyLimit(s: BusinessState | null | undefined): number {
-  return s?.mockPro === true ? PREMIUM_WEEKLY_AI : FREE_WEEKLY_AI;
-}
-
-export function aiSessionsRemaining(s: BusinessState | null | undefined, now: Date = new Date()): number {
-  const limit = aiWeeklyLimit(s);
-  if (!s) return limit;
-  if (s.aiWeekKey !== currentAiWeekKey(now)) return limit; // new week -> full pool
-  return Math.max(0, limit - (s.aiUsedWeek ?? 0));
-}
-
-/**
- * Atomically-ish consume one AI session: pulls fresh state, checks the pool,
- * increments, persists. Returns ok=false (and consumes nothing) if the pool
- * is empty. All AI features call this before their first model call.
- */
-export async function tryConsumeAiSession(
-  userId: string,
-): Promise<{ ok: boolean; remaining: number; limit: number }> {
-  // READ-ONLY as of the server-side quota migration.
-  //
-  // The authoritative counter now lives in the database and is claimed by the
-  // edge functions (consume_ai_session). This function must NOT increment, or
-  // every generation would cost two sessions — one here and one on the server.
-  //
-  // It stays as a pre-flight check so the UI can block and explain before
-  // spending a request; the server is what actually enforces the limit.
-  const s = await pullBusinessFromSupabase(userId);
-  const limit = aiWeeklyLimit(s);
-  const week = currentAiWeekKey();
-  const used = s?.aiWeekKey === week ? (s?.aiUsedWeek ?? 0) : 0;
-  if (used >= limit) return { ok: false, remaining: 0, limit };
-  return { ok: true, remaining: limit - used, limit };
-}
