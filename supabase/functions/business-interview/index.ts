@@ -376,10 +376,21 @@ async function callAI(system: string, user: string, model = "gpt-4o") {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  let _claimedWeek: string | null = null;   // set once a session is claimed
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
+
+    // One interview = one weekly AI session. Only the "session" action (which
+    // starts a new interview) claims quota; reply/verdict/debrief are follow-up
+    // turns inside an already-paid interview and must stay free.
+    if (body.action === "session") {
+      const quota = await consumeAiSession(_auth.user.id);
+      if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
+      _claimedWeek = quota.week;
+    }
+
     let r;
     if (body.action === "session") {
       r = await callAI(SYSTEM_SESSION, sessionPrompt(body as unknown as SessionBody), MODEL_SESSION);
@@ -390,12 +401,15 @@ Deno.serve(async (req) => {
     } else if (body.action === "debrief") {
       r = await callAI(SYSTEM_DEBRIEF, debriefPrompt(body as unknown as DebriefBody), MODEL_DEBRIEF);
     } else {
+      if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
       return new Response(JSON.stringify({ error: "unknown action" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     if (!r.ok) {
+      // AI call failed — the learner never got an interview, give the session back.
+      if (_claimedWeek) await refundAiSession(_auth.user.id, _claimedWeek);
       return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
         status: r.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -405,6 +419,10 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
+    try {
+      const a = await requireUser(req);
+      if (!a.error && _claimedWeek) await refundAiSession(a.user.id, _claimedWeek);
+    } catch (_ignored) { /* refund is best-effort */ }
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
