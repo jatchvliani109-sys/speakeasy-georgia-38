@@ -259,6 +259,13 @@ export default function BusinessResumeUpload() {
           ატვირთე შენი რეზიუმე და ჩვენ მოვარგებთ ყველა გაკვეთილს შენს პროფესიულ
           გამოცდილებას. ასევე გამოგადგება Cover Letter-ების და ელ-ფოსტების დასაწერად.
         </p>
+        {/* Uploading a CV sends personal data to a third-party AI provider
+            outside Georgia. The user is entitled to know that BEFORE choosing
+            to upload, not afterwards in a policy page. */}
+        <p className="ka text-[11px] text-[#8A8A8A] mt-2 leading-relaxed">
+          რეზიუმეს ტექსტი მუშავდება ხელოვნური ინტელექტის სერვისით, რომ ავტომატურად
+          ამოვიღოთ შენი გამოცდილება და უნარები. ეს ნაბიჯი არჩევითია.
+        </p>
       </div>
 
       {/* Existing resume view */}

@@ -346,17 +346,17 @@ export default function Profile() {
         </div>
         <div className="flex flex-col gap-2">
           <a
-            href="mailto:support@speakbusy.ge"
+            href="mailto:jatchvliani109@gmail.com"
             className="ka inline-flex items-center gap-2 text-sm text-[#5C1A2E] font-semibold"
           >
             <LifeBuoy size={13} strokeWidth={2.25} />
             დახმარება — დაგვიკავშირდი
           </a>
           <Link to="/privacy" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
-            კონფიდენციალურობის პოლიტიკა
+            კონფიდენციალობის პოლიტიკა
           </Link>
           <Link to="/terms" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
-            მოხმარების პირობები
+            წესები და პირობები
           </Link>
         </div>
       </BizCard>

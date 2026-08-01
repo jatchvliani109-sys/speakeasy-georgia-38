@@ -1093,6 +1093,14 @@ function DocView({
               dangerouslySetInnerHTML={{ __html: highlightText(doc.content, doc.highlights || []) }}
             />
           )}
+
+          {/* AI output can contain invented claims about the user's own
+              experience. They may send this to an employer, so the warning
+              belongs next to the text, not buried in the Terms. */}
+          <p className="ka text-[11px] text-[#8A8A8A] mt-4 pt-3 border-t border-[#E4E2DF] leading-relaxed">
+            ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ — გამოყენებამდე წაიკითხე და
+            გადაამოწმე, რომ ყველა ფაქტი შენს რეალურ გამოცდილებას შეესაბამება.
+          </p>
         </article>
       )}
 
