@@ -232,6 +232,72 @@ function PhrasesTab() {
     setOpen(next);
   }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (practice) {
+    const q = practice.questions[practice.idx];
+    const done = practice.idx >= practice.questions.length;
+    if (done) {
+      const right = practice.answers.filter(Boolean).length;
+      const pct = Math.round((right / practice.answers.length) * 100);
+      return (
+        <div className="p-6 rounded-2xl bg-white border border-[#E4E2DF] text-center">
+          <p className="text-4xl font-extrabold text-[#5C1A2E]">{pct}%</p>
+          <p className="ka text-sm text-[#4A4A4A] mt-2">
+            {right} სწორი {practice.answers.length}-დან
+          </p>
+          <p className="ka text-xs text-[#8A8A8A] mt-3 leading-relaxed">
+            ეს ვარჯიში შენი სესიის ფრაზებზეა და ლექსიკის პროგრესზე გავლენას არ ახდენს.
+          </p>
+          <button
+            onClick={() => setPractice(null)}
+            className="ka mt-5 px-5 py-2.5 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-sm font-bold"
+          >
+            დახურვა
+          </button>
+        </div>
+      );
+    }
+    const prompt =
+      q.type === "tr_en_to_ka" ? q.en
+      : q.type === "tr_ka_to_en" ? q.ka
+      : q.type === "fill_blank" ? q.sentence
+      : q.type === "true_false" ? `${q.en} — ${q.ka}`
+      : q.ka;
+    const choices: string[] = q.choices ?? ["სწორია", "არასწორია"];
+    const answer = (choice: string) => {
+      const ok =
+        q.type === "true_false"
+          ? (choice === "სწორია") === q.isCorrect
+          : choice === q.correct;
+      setPractice((p) =>
+        p ? { ...p, idx: p.idx + 1, answers: [...p.answers, ok], selected: null } : p,
+      );
+    };
+    return (
+      <div className="p-5 rounded-2xl bg-white border border-[#E4E2DF]">
+        <div className="flex items-center justify-between mb-3">
+          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            {practice.idx + 1}/{practice.questions.length}
+          </p>
+          <button onClick={() => setPractice(null)} className="ka text-xs text-[#8A8A8A]">
+            შეწყვეტა
+          </button>
+        </div>
+        <p className="text-lg text-[#1C1C1E] leading-relaxed">{prompt}</p>
+        <div className="mt-4 space-y-2">
+          {choices.map((c) => (
+            <button
+              key={c}
+              onClick={() => answer(c)}
+              className="ka w-full text-left px-4 py-3 rounded-xl border border-[#E4E2DF] bg-white hover:border-[#5C1A2E]/40 text-sm text-[#1C1C1E]"
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <BizCard className="mb-3 bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] border-transparent">
@@ -562,71 +628,6 @@ function SearchInput({
   onChange: (v: string) => void;
   placeholder: string;
 }) {
-  if (practice) {
-    const q = practice.questions[practice.idx];
-    const done = practice.idx >= practice.questions.length;
-    if (done) {
-      const right = practice.answers.filter(Boolean).length;
-      const pct = Math.round((right / practice.answers.length) * 100);
-      return (
-        <div className="p-6 rounded-2xl bg-white border border-[#E4E2DF] text-center">
-          <p className="text-4xl font-extrabold text-[#5C1A2E]">{pct}%</p>
-          <p className="ka text-sm text-[#4A4A4A] mt-2">
-            {right} სწორი {practice.answers.length}-დან
-          </p>
-          <p className="ka text-xs text-[#8A8A8A] mt-3 leading-relaxed">
-            ეს ვარჯიში შენი სესიის ფრაზებზეა და ლექსიკის პროგრესზე გავლენას არ ახდენს.
-          </p>
-          <button
-            onClick={() => setPractice(null)}
-            className="ka mt-5 px-5 py-2.5 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-sm font-bold"
-          >
-            დახურვა
-          </button>
-        </div>
-      );
-    }
-    const prompt =
-      q.type === "tr_en_to_ka" ? q.en
-      : q.type === "tr_ka_to_en" ? q.ka
-      : q.type === "fill_blank" ? q.sentence
-      : q.type === "true_false" ? `${q.en} — ${q.ka}`
-      : q.ka;
-    const choices: string[] = q.choices ?? ["სწორია", "არასწორია"];
-    const answer = (choice: string) => {
-      const ok =
-        q.type === "true_false"
-          ? (choice === "სწორია") === q.isCorrect
-          : choice === q.correct;
-      setPractice((p) =>
-        p ? { ...p, idx: p.idx + 1, answers: [...p.answers, ok], selected: null } : p,
-      );
-    };
-    return (
-      <div className="p-5 rounded-2xl bg-white border border-[#E4E2DF]">
-        <div className="flex items-center justify-between mb-3">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
-            {practice.idx + 1}/{practice.questions.length}
-          </p>
-          <button onClick={() => setPractice(null)} className="ka text-xs text-[#8A8A8A]">
-            შეწყვეტა
-          </button>
-        </div>
-        <p className="text-lg text-[#1C1C1E] leading-relaxed">{prompt}</p>
-        <div className="mt-4 space-y-2">
-          {choices.map((c) => (
-            <button
-              key={c}
-              onClick={() => answer(c)}
-              className="ka w-full text-left px-4 py-3 rounded-xl border border-[#E4E2DF] bg-white hover:border-[#5C1A2E]/40 text-sm text-[#1C1C1E]"
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative mb-4">
