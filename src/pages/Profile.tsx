@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle } from "lucide-react";
+import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle, Download, AtSign } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./paths/business/BusinessShell";
@@ -30,6 +30,11 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pwBusy, setPwBusy] = useState(false);
+  // Data export (right to portability)
+  const [exporting, setExporting] = useState(false);
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
   // Account deletion
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -106,6 +111,78 @@ export default function Profile() {
       toast.error(e?.message ?? "შენახვა ვერ მოხერხდა");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Right to data portability. RLS guarantees a user can only read their own
+  // rows, so this runs client-side — no edge function or elevated key needed.
+  // The table list mirrors delete-account, so "what you can export" and "what
+  // gets deleted" can never drift apart.
+  const EXPORT_TABLES = [
+    "business_vocab_progress", "business_vocab_sessions", "business_interview_sessions",
+    "business_meeting_sessions", "business_presentation_sessions", "business_email_sessions",
+    "business_documents", "business_reassessments", "business_resumes", "business_state",
+    "vocabulary", "lessons", "level_test_results", "mistakes", "onboarding_answers",
+    "pronunciation_attempts", "speaking_scenario_progress",
+  ];
+
+  const handleExport = async () => {
+    if (!user || exporting) return;
+    setExporting(true);
+    try {
+      const bundle: Record<string, unknown> = {
+        exportedAt: new Date().toISOString(),
+        account: { id: user.id, email: user.email, createdAt: (user as any).created_at ?? null },
+      };
+      for (const table of EXPORT_TABLES) {
+        const { data, error } = await supabase.from(table as any).select("*").eq("user_id", user.id);
+        // A table that does not exist in this project is skipped, not fatal.
+        if (!error) bundle[table] = data ?? [];
+      }
+      const { data: prof } = await supabase.from("profiles").select("*").eq("id", user.id);
+      bundle["profiles"] = prof ?? [];
+
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `speakbusy-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("მონაცემები ჩამოიტვირთა");
+    } catch (e: any) {
+      toast.error(e?.message ?? "ჩამოტვირთვა ვერ მოხერხდა");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Email change. Supabase sends a confirmation to the NEW address; the change
+  // only takes effect once that link is clicked, so the old address stays
+  // active until then.
+  const handleEmailChange = async () => {
+    if (emailBusy) return;
+    const clean = newEmail.trim();
+    if (!clean || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) {
+      toast.error("შეიყვანე სწორი ელფოსტა");
+      return;
+    }
+    if (clean.toLowerCase() === (user?.email ?? "").toLowerCase()) {
+      toast.error("ეს უკვე შენი ელფოსტაა");
+      return;
+    }
+    setEmailBusy(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ email: clean });
+      if (error) throw error;
+      setNewEmail("");
+      toast.success("დადასტურების ბმული გაიგზავნა ახალ ელფოსტაზე");
+    } catch (e: any) {
+      toast.error(e?.message ?? "ელფოსტის შეცვლა ვერ მოხერხდა");
+    } finally {
+      setEmailBusy(false);
     }
   };
 
@@ -203,6 +280,34 @@ export default function Profile() {
             <div className="flex items-center gap-2 text-[#4A4A4A]">
               <Mail size={13} strokeWidth={2.25} className="shrink-0" />
               <span className="text-sm break-all min-w-0">{email}</span>
+            </div>
+            <div>
+              <label htmlFor="new-email" className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold flex items-center gap-1.5">
+                <AtSign size={12} strokeWidth={2.25} />
+                ელფოსტის შეცვლა
+              </label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  id="new-email"
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="ახალი ელფოსტა"
+                  autoComplete="email"
+                  className="ka flex-1 min-w-0 px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+                />
+                <button
+                  onClick={handleEmailChange}
+                  disabled={emailBusy || !newEmail.trim()}
+                  className="ka shrink-0 px-3 py-2 rounded-md bg-[#232323] text-[#F5F4F2] text-xs font-semibold disabled:opacity-40"
+                >
+                  {emailBusy ? "..." : "შეცვლა"}
+                </button>
+              </div>
+              <p className="ka text-[11px] text-[#8A8A8A] mt-1 leading-relaxed">
+                დადასტურების ბმული გაიგზავნება ახალ მისამართზე. ცვლილება ძალაში შევა
+                მხოლოდ ბმულზე დაჭერის შემდეგ.
+              </p>
             </div>
           </div>
         </div>
@@ -359,6 +464,25 @@ export default function Profile() {
             წესები და პირობები
           </Link>
         </div>
+      </BizCard>
+
+      <BizCard className="mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Download size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
+          <h2 className="ka font-bold text-[#5C1A2E] text-sm">ჩემი მონაცემების ჩამოტვირთვა</h2>
+        </div>
+        <p className="ka text-xs text-[#4A4A4A] mb-3 leading-relaxed">
+          ჩამოტვირთე ყველა შენი მონაცემი — პროფილი, პროგრესი, სესიები და შენახული
+          დოკუმენტები — JSON ფაილად.
+        </p>
+        <button
+          onClick={handleExport}
+          disabled={exporting}
+          className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 disabled:opacity-40"
+        >
+          <Download size={12} strokeWidth={2.25} />
+          {exporting ? "მზადდება..." : "ჩამოტვირთვა"}
+        </button>
       </BizCard>
 
       <BizCard className="mb-4 border-[#C0392B]/30">
