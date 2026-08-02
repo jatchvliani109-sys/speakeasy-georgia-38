@@ -451,7 +451,7 @@ export default function Profile() {
         </div>
         <div className="flex flex-col gap-2">
           <a
-            href="mailto:jatchvliani109@gmail.com"
+            href="mailto:speakbusy@gmail.com"
             className="ka inline-flex items-center gap-2 text-sm text-[#5C1A2E] font-semibold"
           >
             <LifeBuoy size={13} strokeWidth={2.25} />

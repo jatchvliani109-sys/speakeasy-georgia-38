@@ -127,7 +127,7 @@ export default function TermsOfUse() {
         <Section title="12. კონტაქტი">
           კითხვების შემთხვევაში, მოგვწერეთ:
           <br />
-          <b>jatchvliani109@gmail.com</b>
+          <b>speakbusy@gmail.com</b>
         </Section>
 
         <div style={{ height: 40 }} />

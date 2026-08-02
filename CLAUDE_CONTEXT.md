@@ -248,7 +248,7 @@ planning work — they are more detailed than this summary.
 ### Done today
 - **Tier 1** — dev RESET button removed · all 22 routes click-verified by Olegi ·
   monitoring queries · AI disclosure written AND wired into the product ·
-  real support address (jatchvliani109@gmail.com) everywhere.
+  real support address (speakbusy@gmail.com) everywhere.
 - **Tier 3** — data export (right to portability) · change-email UI ·
   `DATA_PROTECTION_RECORDS.md` (processing record + breach procedure).
 - **Tier 4** — first-party analytics live end to end · content error reporting
