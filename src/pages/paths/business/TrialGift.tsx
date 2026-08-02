@@ -201,7 +201,7 @@ export default function TrialGift() {
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
               title="ყველა ფუნქცია ღიაა"
-              sub="სცენარები, ლექსიკონი, სერია — ყველაფერი"
+              sub="სცენარები, ლექსიკონი, - ყველაფერი"
               last
             />
 
