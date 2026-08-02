@@ -1,5 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { requireUser } from "../_shared/auth.ts";
+import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
+
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
