@@ -19,7 +19,7 @@ import {
   saveDocument,
   updateDocument,
 } from "./lib/docs";
-import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, tryConsumeAiSession, type BusinessState } from "./lib/state";
+import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 
 // Every document generation draws one session from the unified weekly AI
 // budget (shared with interviews + self-introduction). Edits/deletes/library
