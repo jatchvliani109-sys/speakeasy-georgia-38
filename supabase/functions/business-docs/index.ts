@@ -1,5 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { requireUser } from "../_shared/auth.ts";
+import { consumeAiSession, refundAiSession, quotaExceededResponse } from "../_shared/aiQuota.ts";
+
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 
@@ -228,11 +230,30 @@ async function callAI(system: string, user: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  let claimedUserId: string | null = null;
+  let claimedWeek: string | null = null;
   try {
     const _auth = await requireUser(req);
     if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action; profile?: Profile } & Record<string, any>;
     const profile = body.profile || {};
+
+    const KNOWN: Action[] = [
+      "email_write", "email_fix", "cover_letter", "resume_improve", "bio_write", "adjust",
+    ];
+    if (!KNOWN.includes(body.action)) {
+      return new Response(JSON.stringify({ error: "unknown action" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Server-side weekly AI cap — the client check is only a UI hint.
+    const quota = await consumeAiSession(_auth.user.id);
+    if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
+    claimedUserId = _auth.user.id;
+    claimedWeek = quota.week;
+
     let r;
     if (body.action === "email_write") {
       r = await callAI(SYSTEM_BASE, emailPrompt(body, profile));
@@ -244,27 +265,28 @@ Deno.serve(async (req) => {
       r = await callAI(SYSTEM_BASE, resumeImprovePrompt(body, profile));
     } else if (body.action === "bio_write") {
       r = await callAI(SYSTEM_BASE, bioPrompt(body, profile));
-    } else if (body.action === "adjust") {
-      r = await callAI(SYSTEM_BASE, adjustPrompt(body));
     } else {
-      return new Response(JSON.stringify({ error: "unknown action" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      r = await callAI(SYSTEM_BASE, adjustPrompt(body));
     }
     if (!r.ok) {
+      // A failed generation must not cost the user a session.
+      if (claimedUserId && claimedWeek) await refundAiSession(claimedUserId, claimedWeek);
       return new Response(JSON.stringify({ error: r.error, detail: r.detail }), {
         status: r.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    return new Response(JSON.stringify(r.parsed), {
+    return new Response(JSON.stringify({ ...r.parsed, aiRemaining: quota.remaining }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
+    if (claimedUserId && claimedWeek) {
+      try { await refundAiSession(claimedUserId, claimedWeek); } catch (_i) { /* best effort */ }
+    }
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
 });

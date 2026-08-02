@@ -19,18 +19,31 @@ import {
   saveDocument,
   updateDocument,
 } from "./lib/docs";
-import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, tryConsumeAiSession, type BusinessState } from "./lib/state";
+import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, type BusinessState } from "./lib/state";
 
 // Every document generation draws one session from the unified weekly AI
 // budget (shared with interviews + self-introduction). Edits/deletes/library
 // views are free — only model calls consume.
 const AI_LIMIT_MSG =
   "ამ კვირის AI სესიები ამოწურულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში — ორშაბათს განახლდება.";
+// The weekly cap is enforced SERVER-SIDE inside the business-docs edge function
+// (consume_ai_session / refund_ai_session under the service role). The client
+// no longer decrements the counter itself — it just calls, and re-reads the
+// authoritative state afterwards so the UI shows the right remaining count.
 async function callDocsWithBudget(userId: string, body: Parameters<typeof callDocs>[0]) {
-  const budget = await tryConsumeAiSession(userId);
-  if (!budget.ok) throw new Error(AI_LIMIT_MSG);
-  return callDocs(body);
+  try {
+    return await callDocs(body);
+  } catch (e: any) {
+    const msg = String(e?.message || e || "");
+    if (msg.includes("ai_quota_exceeded") || msg.includes("429") || /non-2xx/i.test(msg)) {
+      throw new Error(AI_LIMIT_MSG);
+    }
+    throw e;
+  } finally {
+    try { await pullBusinessFromSupabase(userId); } catch (_e) { /* best effort */ }
+  }
 }
+
 
 type View =
   | { kind: "home" }
