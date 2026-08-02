@@ -47,7 +47,8 @@ export default function Auth() {
       return;
     }
     setLoading(true);
-    if (mode === "signup") track("signup_started");
+    if (mode === "signup") track("signup_started", { method: "email" });
+    else track("login_started", { method: "email" });
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -281,8 +282,15 @@ export default function Auth() {
 
         <button
           type="button"
-          disabled={loading}
+          disabled={loading || (mode === "signup" && !termsAccepted)}
           onClick={async () => {
+            // Legal gate: consent must be given before an account can exist,
+            // regardless of which provider creates it.
+            if (mode === "signup" && !termsAccepted) {
+              toast.error("გთხოვთ, დაეთანხმოთ წესებს, პირობებს და კონფიდენციალობის პოლიტიკას");
+              return;
+            }
+            track(mode === "signup" ? "signup_started" : "login_started", { method: "google" });
             setLoading(true);
             try {
               const result = await lovable.auth.signInWithOAuth("google", {
