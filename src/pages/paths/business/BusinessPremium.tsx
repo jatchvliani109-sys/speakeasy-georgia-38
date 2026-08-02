@@ -75,7 +75,7 @@ export default function BusinessPremium() {
           <Star size={22} className="text-[#C9A84C] fill-[#C9A84C]" /> პრემიუმი
         </h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
-          ერთი ფასი. ყველაფერი ღია.
+          ერთი ფასი. ყველაფერი ხელმისაწვდომი.
         </p>
       </div>
 
