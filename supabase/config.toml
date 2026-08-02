@@ -3,7 +3,5 @@ project_id = "hmpwjhzrmfyapijikkuc"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
-  [functions.generate-word-audio]
-    verify_jwt = false
   [functions.process-email-queue]
     verify_jwt = true
