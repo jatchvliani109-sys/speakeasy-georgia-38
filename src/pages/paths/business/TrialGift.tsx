@@ -169,12 +169,12 @@ export default function TrialGift() {
                 საჩუქარი
               </p>
               <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2">
-                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღე
+                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღის
                 <br />
-                <span className="text-[#C9A84C]">პრემიუმია — ჩვენგან</span>
+                <span className="text-[#C9A84C]">პრემიუმი ჩვენგან</span>
               </h1>
               <p className="ka text-[13px] text-[#F8F5F0]/70 mt-3 leading-relaxed">
-                გვინდა ნახო, რისი შეთავაზება შეგვიძლია — ვალდებულების გარეშე.
+                გინდა ნახო, რას გთავაზობს ჩვენი პრემიუმ სერვისი თანხის გადახდამდე?
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function TrialGift() {
             <Perk
               icon={<InfinityIcon size={16} strokeWidth={2.25} />}
               title="ულიმიტო ლექსიკის სესიები"
-              sub={`${TRIAL_DAYS} დღის განმავლობაში — დღიური ლიმიტის გარეშე`}
+              sub={`${TRIAL_DAYS} დღის განმავლობაში - დღიური ლიმიტის გარეშე`}
             />
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
@@ -201,7 +201,7 @@ export default function TrialGift() {
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
               title="ყველა ფუნქცია ღიაა"
-              sub="სცენარები, ლექსიკონი, სერია — ყველაფერი"
+              sub="სცენარები, ლექსიკონი - ყველაფერი"
               last
             />
 
@@ -230,14 +230,14 @@ export default function TrialGift() {
                 className="ka w-full h-14 rounded-2xl bg-[#5C1A2E] text-[#F8F5F0] text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-[#6B1F36] transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
-                {busy ? "ირთვება..." : "მადლობა, ვიღებ"}
+                {busy ? "ირთვება..." : "მადლობა"}
               </button>
               <button
                 onClick={() => setConfirmDecline(true)}
                 disabled={busy}
                 className="ka w-full mt-3 h-11 text-[13px] text-[#8A8A8A] hover:text-[#5C1A2E] transition-colors"
               >
-                არა, გმადლობთ — უფასო ვერსიით დავიწყებ
+                არა, მადლობა — უფასო ვერსიით დავიწყებ
               </button>
             </>
           ) : (
