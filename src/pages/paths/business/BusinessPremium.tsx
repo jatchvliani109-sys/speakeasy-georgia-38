@@ -12,13 +12,17 @@ import { Check, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { pullBusinessFromSupabase, saveBusiness } from "./lib/state";
+import { pullBusinessFromSupabase, saveBusinessAsync } from "./lib/state";
 
-const PRICE_GEL = "8.99";
+// Priced against measured cost: ~4.7c per AI interview, 7/week worst case
+// ≈ 5 GEL/month, plus ~5% payment fees. 13.99 keeps a healthy margin even for
+// a maximum-usage subscriber, and testers consistently read 8.99 as too low
+// for a career-advancement product.
+const PRICE_GEL = "13.99";
 
 const FEATURES: { titleKa: string; subKa: string }[] = [
   { titleKa: "ულიმიტო ლექსიკის სესიები", subKa: "იმდენი სესია დღეში, რამდენიც გინდა — ლიმიტის გარეშე" },
-  { titleKa: "რეალური გასაუბრებები", subKa: "თვეში 5 გასაუბრება ნამდვილ ვაკანსიაზე + 20 სავარჯიშო" },
+  { titleKa: "AI სესიები — კვირაში 7", subKa: "გასაუბრებები, დოკუმენტები და თვითპრეზენტაცია — ერთი საერთო ლიმიტი" },
   { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და სერია — რჩება" },
 ];
 
@@ -42,7 +46,9 @@ export default function BusinessPremium() {
     if (!user || busy) return;
     setBusy(true);
     try {
-      await saveBusiness(user.id, { mockPro: true });
+      // Awaited remote write: pages that pull from Supabase right after
+      // (vocab, interview) must see the flag immediately, not stale state.
+      await saveBusinessAsync(user.id, { mockPro: true });
       setIsPro(true);
       toast.success("პრემიუმი ჩართულია ⭐");
     } finally {
@@ -54,7 +60,7 @@ export default function BusinessPremium() {
     if (!user || busy) return;
     setBusy(true);
     try {
-      await saveBusiness(user.id, { mockPro: false });
+      await saveBusinessAsync(user.id, { mockPro: false });
       setIsPro(false);
       toast("პრემიუმი გამორთულია");
     } finally {
