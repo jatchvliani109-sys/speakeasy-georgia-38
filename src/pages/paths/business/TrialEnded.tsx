@@ -117,7 +117,7 @@ export default function TrialEnded() {
           >
             <p className="ka text-sm text-[#1C1C1E] leading-relaxed">
               პრემიუმის ვადა ამოიწურა. <b>შენი პროგრესი არსად წასულა</b> — ყველა ნასწავლი
-              სიტყვა, სერია და ლექსიკონი შენთან რჩება.
+              სიტყვა, "streak-ი" და ლექსიკონი შენთან რჩება.
             </p>
             <p className="ka text-sm text-[#4A4A4A] leading-relaxed mt-3">
               უფასო ვერსიით აგრძელებ ყოველდღიურ სესიებს. თუ გინდა ულიმიტო სესიები და
