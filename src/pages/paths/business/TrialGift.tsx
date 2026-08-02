@@ -168,13 +168,13 @@ export default function TrialGift() {
               <p className="ka text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mt-5">
                 საჩუქარი
               </p>
-              <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2">
-                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღე
-                <br />
-                <span className="text-[#C9A84C]">პრემიუმია — ჩვენგან</span>
+              <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2 whitespace-pre-line">
+                {displayName ? `${displayName}, ჩვენგან\u00A0` : "ჩვენგან\u00A0"}პირველი\u00A0
+                {TRIAL_DAYS} დღე
+                {"\n"}\u00A0პრემიუმი საჩუქრად
               </h1>
               <p className="ka text-[13px] text-[#F8F5F0]/70 mt-3 leading-relaxed">
-                გვინდა ნახო, რისი შეთავაზება შეგვიძლია — ვალდებულების გარეშე.
+                გინდა ნახო, რას გთავაზობს პრემიუმ სერვისი თანხის გადახდის გარეშე?
               </p>
             </div>
           </div>
