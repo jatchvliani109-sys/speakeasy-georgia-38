@@ -168,13 +168,13 @@ export default function TrialGift() {
               <p className="ka text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mt-5">
                 საჩუქარი
               </p>
-              <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2">
-                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღე
-                <br />
-                <span className="text-[#C9A84C]">პრემიუმია — ჩვენგან</span>
+              <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2 whitespace-pre-line">
+                {displayName ? `${displayName}, ჩვენგან\u00A0` : "ჩვენგან\u00A0"}პირველი\u00A0
+                {TRIAL_DAYS} დღე
+                {"\n"}\u00A0პრემიუმი საჩუქრად
               </h1>
               <p className="ka text-[13px] text-[#F8F5F0]/70 mt-3 leading-relaxed">
-                გვინდა ნახო, რისი შეთავაზება შეგვიძლია — ვალდებულების გარეშე.
+                გინდა ნახო, რას გთავაზობს პრემიუმ სერვისი თანხის გადახდის გარეშე?
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function TrialGift() {
             <Perk
               icon={<InfinityIcon size={16} strokeWidth={2.25} />}
               title="ულიმიტო ლექსიკის სესიები"
-              sub={`${TRIAL_DAYS} დღის განმავლობაში — დღიური ლიმიტის გარეშე`}
+              sub={`${TRIAL_DAYS} დღის განმავლობაში - დღიური ლიმიტის გარეშე`}
             />
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
@@ -201,7 +201,7 @@ export default function TrialGift() {
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
               title="ყველა ფუნქცია ღიაა"
-              sub="სცენარები, ლექსიკონი, სერია — ყველაფერი"
+              sub="სცენარები, ლექსიკონი, - ყველაფერი"
               last
             />
 
@@ -230,7 +230,7 @@ export default function TrialGift() {
                 className="ka w-full h-14 rounded-2xl bg-[#5C1A2E] text-[#F8F5F0] text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-[#6B1F36] transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
-                {busy ? "ირთვება..." : "მადლობა, ვიღებ"}
+                {busy ? "ირთვება..." : "მადლობა"}
               </button>
               <button
                 onClick={() => setConfirmDecline(true)}
