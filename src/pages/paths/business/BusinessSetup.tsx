@@ -101,8 +101,8 @@ export default function BusinessSetup() {
 
     // Safety net: never let the user stay stuck on this screen.
     const failsafe = setTimeout(() => {
-      console.warn("[setup] failsafe fired — forcing navigation to home");
-      navigate("/path/business/home", { replace: true });
+      console.warn("[setup] failsafe fired — forcing navigation to gift");
+      navigate("/path/business/gift", { replace: true });
     }, 6000);
 
     try {
@@ -142,9 +142,10 @@ export default function BusinessSetup() {
       console.error("[setup] save error — continuing to plan", e);
     } finally {
       clearTimeout(failsafe);
-      // Straight into the app. The plan screen is reachable from the dashboard.
-      console.log("[setup] navigating to /path/business/home");
-      navigate("/path/business/home", { replace: true });
+      // Setup done -> the gift. This is the moment it lands best: they have
+      // just invested effort, so the reward arrives against that effort.
+      console.log("[setup] navigating to /path/business/gift");
+      navigate("/path/business/gift", { replace: true });
     }
   };
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);

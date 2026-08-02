@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { ensureTrialStarted, pullBusinessFromSupabase } from "./lib/state";
+import { pullBusinessFromSupabase, shouldOfferTrial } from "./lib/state";
 
 export default function BusinessGate() {
   const { user } = useAuth();
@@ -14,10 +14,7 @@ export default function BusinessGate() {
       const s = await pullBusinessFromSupabase(user.id);
       if (cancelled) return;
 
-      // Start the 7-day premium trial on first arrival. Idempotent: it only
-      // writes trialStartedAt if it is absent, so passing through the gate
-      // again — or after the trial expires — never restarts it.
-      ensureTrialStarted(user.id, s);
+
       // ONBOARDING GATE — deliberately short.
       //
       // This used to force six screens before a user could reach the app:
@@ -29,6 +26,8 @@ export default function BusinessGate() {
       // and the placement test is skippable. Plan, resume and self-introduction
       // are all reachable from the dashboard, so deferring them orphans nothing.
       if (!s.setupCompleted) navigate("/path/business/setup", { replace: true });
+      // The gift is offered once, immediately after setup, before the dashboard.
+      else if (shouldOfferTrial(s)) navigate("/path/business/gift", { replace: true });
       else navigate("/path/business/home", { replace: true });
     })();
     return () => { cancelled = true; };

@@ -40,6 +40,9 @@ export type TrackEvent =
   | "self_intro_generated"
   | "resume_uploaded"
   // monetisation
+  | "trial_gift_shown"
+  | "trial_accepted"
+  | "trial_declined"
   | "premium_viewed"
   | "premium_activated"
   | "premium_cancelled"

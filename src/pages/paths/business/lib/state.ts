@@ -73,6 +73,10 @@ export type BusinessState = {
   trialStartedAt?: string;
   /** AI sessions consumed during the trial. A TOTAL, not a weekly figure. */
   trialAiUsed?: number;
+  /** The gift screen has been shown and answered (accepted OR declined). */
+  trialOffered?: boolean;
+  /** They turned the gift down. Deliberately irreversible. */
+  trialDeclined?: boolean;
 };
 
 
@@ -106,15 +110,22 @@ export function loadBusiness(uid: string): BusinessState {
 }
 
 /**
- * Starts the 7-day trial if it has not started yet. Called once when a user
- * first reaches the app. Never restarts an expired trial — trialStartedAt is
- * written once and then left alone, so re-running this is harmless.
+ * Should the gift screen be shown?
+ *
+ * The trial is no longer switched on silently — it is offered once, as a gift,
+ * and starts only when accepted. Something you choose to accept is valued
+ * differently from something granted by default, and that difference is the
+ * whole point of the screen.
+ *
+ * Shown only to a user who has finished setup, has not already answered, and
+ * is not already paying.
  */
-export function ensureTrialStarted(uid: string, state: BusinessState): BusinessState {
-  if (state.trialStartedAt || state.mockPro === true) return state;
-  const started = new Date().toISOString();
-  saveBusiness(uid, { trialStartedAt: started, trialAiUsed: 0 });
-  return { ...state, trialStartedAt: started, trialAiUsed: 0 };
+export function shouldOfferTrial(state: BusinessState | null | undefined): boolean {
+  if (!state) return false;
+  if (state.mockPro === true) return false;
+  if (state.trialOffered) return false;      // already accepted or declined
+  if (state.trialStartedAt) return false;    // legacy: trial already running
+  return state.setupCompleted === true;
 }
 
 export function saveBusiness(uid: string, patch: Partial<BusinessState>) {

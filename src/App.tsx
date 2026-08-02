@@ -38,6 +38,7 @@ const BusinessSetup = lazy(() => import("./pages/paths/business/BusinessSetup"))
 const BusinessPlacementTest = lazy(() => import("./pages/paths/business/BusinessPlacementTest"));
 const BusinessPlan = lazy(() => import("./pages/paths/business/BusinessPlan"));
 const BusinessHome = lazy(() => import("./pages/paths/business/BusinessHome"));
+const TrialGift = lazy(() => import("./pages/paths/business/TrialGift"));
 const BusinessModule = lazy(() => import("./pages/paths/business/BusinessModule"));
 const MyLexicon = lazy(() => import("./pages/paths/business/MyLexicon"));
 const BusinessReassessment = lazy(() => import("./pages/paths/business/BusinessReassessment"));
@@ -89,6 +90,7 @@ const App = () => (
             <Route path="/path/business/test" element={<RequireAuth><BusinessPlacementTest /></RequireAuth>} />
             <Route path="/path/business/plan" element={<RequireAuth><BusinessPlan /></RequireAuth>} />
             <Route path="/path/business/home" element={<RequireAuth><BusinessHome /></RequireAuth>} />
+            <Route path="/path/business/gift" element={<RequireAuth><TrialGift /></RequireAuth>} />
             <Route path="/path/business/resume" element={<RequireAuth><BusinessResumeUpload /></RequireAuth>} />
             <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />
