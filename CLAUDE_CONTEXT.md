@@ -1,6 +1,6 @@
 # SpeakBusy — CLAUDE CONTEXT (authoritative status)
 
-Last updated: 2026-08-01. Source of truth for any new Claude conversation.
+Last updated: 2026-08-01 (end of a long working day). Source of truth for any new Claude conversation.
 Where older docs, messages or memory disagree, **this wins**.
 
 ---
@@ -59,11 +59,28 @@ stops the app using it; the key itself keeps working.
 
 ## 3. GEORGIAN LANGUAGE RULES (non-negotiable)
 
-**"პროფესიული" is ALWAYS WRONG → "პროფესიონალური".** Scan every file, every
-delivery, including AI prompts inside edge functions. The ONLY legitimate
-occurrence anywhere is inside the prohibition rule itself, which must name the
-word in order to ban it. A naive grep will flag those — check the line before
-reporting a violation.
+**This is NOT a find-and-replace rule.** It was treated as one for months and
+that was wrong.
+
+**პროფესიული is a real Georgian word** meaning *profession-related* (as in
+პროფესიული განათლება, vocational education). It is only incorrect when used to
+mean *professional* in the polished / skilled sense — there the word is
+**პროფესიონალური**.
+
+Judge each instance in context, and when unsure ASK OLEGI — he is the native
+speaker and the final authority.
+
+Examples he approved as CORRECT and which must not be "fixed":
+  "500+ პროფესიული სიტყვა და ფრაზა"  ·  "პროფესიული ლექსიკა"
+  "შენს პროფესიულ გამოცდილებას"      ·  "პროფესიული ინტერესები"
+
+Examples that were genuinely wrong (now fixed):
+  "აირჩიე ყველაზე პროფესიული პასუხი" (= most polished answer)
+  "პროფესიული ტონი"  ·  "პროფესიული ბიო"  ·  "პროფესიული წერა"
+
+Also: a naive grep for the exact string misses every declined form
+(პროფესიულ, პროფესიულად). Search the STEM. Olegi has since said this is low
+priority and not worth stressing over — do not re-litigate it unprompted.
 
 **"viral" → "პოპულარული (სწრაფად გავრცელებული)", never "ვირუსული"** (that is
 the medical sense). Caught by Olegi. The bug was in the ORIGINAL bank, not just
@@ -222,28 +239,54 @@ bank is 144 KB gzipped and previously downloaded for EVERY visitor, because
 
 ---
 
-## 7. Pending board
+## 7. Where things stand (end of 2026-08-01)
 
-1. **Payments** — blocked on registration; processor availability unverified.
-2. **Legal** — Privacy/Terms need the registered entity name (currently
-   "ფიზიკური პირი (რეგისტრაცია მიმდინარეობს)") and a real payments/subscription
-   section. Georgian naming convention now used in the app:
-   **"წესები და პირობები"** and **"კონფიდენციალობის პოლიტიკა"** — the legal
-   pages' own titles should be aligned to match.
-3. **Borrowing terms awaiting Olegi's verdict**: ჰედჰანთინგი, ფრიმიუმ,
-   ინფლუენსერი, ფიშინგი, სპრინტი, სტენდაპი, ფლაივილი, კოჰორტი, სქრამი,
-   კანბანი, პაიპლაინი, ცივი ზარი / თბილი ლიდი, ქოუჩინგი.
-4. **Manual verification pass** — most of the recent work has never been clicked
-   through by a human. Lazy-loading touched every route, so each needs a visit.
-   The app is mobile-first in design and should also be checked on a phone.
-5. Legacy tables `lessons` (54 rows), `mistakes` (44), `vocabulary` (186) hold
-   data from the pre-SpeakBusy app. Harmless; drop post-launch if desired.
-6. Deferred feature: **saved-phrase practice**. Built and reverted 2026-08-01 —
-   the isolation logic was sound (zero contamination in testing) but the UI
-   jammed into MyLexicon came out broken. A proper version needs its own screen.
-7. **Dev RESET button removal — ABSOLUTELY LAST.**
+A full requirements audit exists in `APP_REQUIREMENTS.md` (174 requirements) and
+`REQUIREMENTS_AUDIT.md` (graded, with a 5-tier build order). Read those before
+planning work — they are more detailed than this summary.
 
----
+### Done today
+- **Tier 1** — dev RESET button removed · all 22 routes click-verified by Olegi ·
+  monitoring queries · AI disclosure written AND wired into the product ·
+  real support address (jatchvliani109@gmail.com) everywhere.
+- **Tier 3** — data export (right to portability) · change-email UI ·
+  `DATA_PROTECTION_RECORDS.md` (processing record + breach procedure).
+- **Tier 4** — first-party analytics live end to end · content error reporting
+  ("რაღაც არასწორია?" on every word card) · uptime monitoring on the app URL.
+- **Onboarding rebuilt**: was 6 mandatory screens (test → setup → plan → resume
+  → self-intro → home), now 1. Placement test skippable; only the FIELD question
+  is required. BusinessHome self-heals a missing plan with a seeded level.
+
+### Deliberately NOT done
+- **PITR backups** — $100/month minimum. Not sensible at this size. Revisit when
+  losing a day of data would mean refunding real customers.
+- **Third-party analytics (PostHog etc.)** — would add a processor to disclose,
+  a privacy-policy entry and a consent question. First-party events chosen
+  instead; upgrade path stays open.
+- **Saved-phrase practice** — built and reverted; isolation logic was sound but
+  the UI was wrong. Needs its own screen, not a panel inside MyLexicon.
+
+### Known operational limits
+- **Olegi cannot restore his own database.** Only Lovable support can, and the
+  best case is yesterday's daily snapshot (7-day retention). Manual pre-migration
+  export query is in the conversation and in
+  `docs/support-backup-restore-template.md` in the repo.
+- **Placement test is genuinely optional and needs no skip button.** Olegi
+  confirmed 08-01: nothing forces the test. It surfaces only as a friendly
+  dashboard nudge — "შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის
+  გაიარე მოკლე ტესტი (თუ არ გინდა გამოტოვე :) no pressure!)" with a
+  "დონის შეფასება" button. This is the intended design; do not add a skip
+  control or otherwise "fix" it.
+
+### Next up
+1. **Blocked on ინდ. მეწარმე registration**: payments (processor availability in
+   Georgia still UNVERIFIED — the biggest open unknown), the 15 subscription-law
+   requirements, legal entity in Privacy/Terms, real premium cancel.
+2. **Tier 5 growth**: social sign-in (biggest signup-friction win) · offline
+   tolerance · re-engagement email · referrals · accessibility audit.
+3. **Analytics review** — once events accumulate, run `ANALYTICS_QUERIES.sql`.
+   The key question: did shortening onboarding actually work?
+4. Ask a Georgian lawyer the six questions in `DATA_PROTECTION_RECORDS.md` §5.
 
 ## 8. Removed / deleted (2026-07-31 → 08-01)
 
