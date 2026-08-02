@@ -21,6 +21,7 @@ export type TrackEvent =
   // acquisition / onboarding funnel
   | "landing_viewed"
   | "signup_started"
+  | "login_started"
   | "signup_completed"
   | "setup_started"
   | "setup_step_skipped"
