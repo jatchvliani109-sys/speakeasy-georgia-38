@@ -191,7 +191,7 @@ export default function TrialGift() {
             <Perk
               icon={<InfinityIcon size={16} strokeWidth={2.25} />}
               title="ულიმიტო ლექსიკის სესიები"
-              sub={`${TRIAL_DAYS} დღის განმავლობაში — დღიური ლიმიტის გარეშე`}
+              sub={`${TRIAL_DAYS} დღის განმავლობაში - დღიური ლიმიტის გარეშე`}
             />
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
