@@ -874,6 +874,24 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_claims: {
+        Row: {
+          claimed_at: string
+          declined: boolean
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          declined?: boolean
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          declined?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       vocabulary: {
         Row: {
           created_at: string
@@ -959,6 +977,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_trial: { Args: { p_declined?: boolean }; Returns: Json }
       consume_ai_session: {
         Args: { p_limit: number; p_user_id: string; p_week: string }
         Returns: Json
@@ -972,6 +991,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      has_claimed_trial: { Args: never; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
