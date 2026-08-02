@@ -230,7 +230,7 @@ export default function TrialGift() {
                 className="ka w-full h-14 rounded-2xl bg-[#5C1A2E] text-[#F8F5F0] text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-[#6B1F36] transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
-                {busy ? "ირთვება..." : "მადლობა, ვიღებ"}
+                {busy ? "ირთვება..." : "მადლობა"}
               </button>
               <button
                 onClick={() => setConfirmDecline(true)}
