@@ -11,6 +11,7 @@ import {
   Target,
   Check,
   ArrowRight,
+  Instagram,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
@@ -758,6 +759,8 @@ export default function BusinessHome() {
               </Link>
             </BizCard>
           </section>
+
+          <SocialRow />
         </>
       )}
     </BusinessShell>
@@ -790,6 +793,56 @@ function MoreRow({
       </span>
       <ArrowRight size={14} strokeWidth={2.25} className="text-[#4A4A4A] shrink-0" />
     </button>
+  );
+}
+
+// Rotating social prompts. A single fixed line stops being seen after about a
+// week — the eye learns to skip it. Rotating gives the same slot several
+// reasons to be noticed, without ever nagging.
+const SOCIAL_PROMPTS = [
+  "მოგვწერე, რას ფიქრობ",
+  "გამოგვიწერე სოციალურ ქსელებში",
+  "ნახე სიახლეები სოციალურ ქსელებში",
+  "იდეა გაქვს? გაგვიზიარე",
+  "რა უნდა გავაუმჯობესოთ?",
+  "შემოგვიერთდი სოციალურ ქსელებში",
+];
+
+function SocialRow() {
+  // useMemo keyed to nothing: chosen once per mount, so a re-render mid-session
+  // cannot swap the text under the user mid-glance.
+  const prompt = useMemo(
+    () => SOCIAL_PROMPTS[Math.floor(Math.random() * SOCIAL_PROMPTS.length)],
+    [],
+  );
+  return (
+    <div className="mt-6 pt-5 border-t border-[#E4E2DF] flex flex-col items-center gap-3">
+      <p className="ka text-[12px] text-[#4A4A4A] text-center">{prompt}</p>
+      <div className="flex items-center gap-2">
+        <a
+          href="https://www.instagram.com/speakbusy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="SpeakBusy Instagram-ზე"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E4E2DF] bg-white text-[#5C1A2E] text-xs font-semibold hover:border-[#5C1A2E]/40 transition-colors"
+        >
+          <Instagram size={14} strokeWidth={2.25} />
+          Instagram
+        </a>
+        <a
+          href="https://www.tiktok.com/@speakbusy"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="SpeakBusy TikTok-ზე"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E4E2DF] bg-white text-[#5C1A2E] text-xs font-semibold hover:border-[#5C1A2E]/40 transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.7a5.66 5.66 0 0 0-.77-.05 5.68 5.68 0 1 0 5.68 5.68V8.99a7.35 7.35 0 0 0 4.29 1.37V7.27a4.29 4.29 0 0 1-3.23-1.45z" />
+          </svg>
+          TikTok
+        </a>
+      </div>
+    </div>
   );
 }
 
