@@ -246,7 +246,7 @@ export default function TrialGift() {
                 დარწმუნებული ხარ?
               </p>
               <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
-                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება — მოგვიანებით ვეღარ გაააქტიურებ.
+                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება - მოგვიანებით ვეღარ გაააქტიურებ.
               </p>
               <div className="flex gap-2 mt-4">
                 <button
@@ -254,7 +254,7 @@ export default function TrialGift() {
                   disabled={busy}
                   className="ka flex-1 h-11 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-[13px] font-bold"
                 >
-                  დავბრუნდე
+                  არა, უკან დამაბრუნე
                 </button>
                 <button
                   onClick={decline}
