@@ -69,6 +69,10 @@ export type BusinessState = {
   /** Weekly AI budget bookkeeping (mirrors the server-side counter). */
   aiWeekKey?: string;
   aiUsedWeek?: number;
+  /** ISO timestamp when the 7-day premium trial began (set at signup). */
+  trialStartedAt?: string;
+  /** AI sessions consumed during the trial. A TOTAL, not a weekly figure. */
+  trialAiUsed?: number;
 };
 
 
@@ -99,6 +103,18 @@ export function loadBusiness(uid: string): BusinessState {
   } catch {
     return empty();
   }
+}
+
+/**
+ * Starts the 7-day trial if it has not started yet. Called once when a user
+ * first reaches the app. Never restarts an expired trial — trialStartedAt is
+ * written once and then left alone, so re-running this is harmless.
+ */
+export function ensureTrialStarted(uid: string, state: BusinessState): BusinessState {
+  if (state.trialStartedAt || state.mockPro === true) return state;
+  const started = new Date().toISOString();
+  saveBusiness(uid, { trialStartedAt: started, trialAiUsed: 0 });
+  return { ...state, trialStartedAt: started, trialAiUsed: 0 };
 }
 
 export function saveBusiness(uid: string, patch: Partial<BusinessState>) {
@@ -153,31 +169,76 @@ export function currentAiWeekKey(now: Date = new Date()): string {
   return `${DAYS[t.getUTCDay()]} ${MONTHS[t.getUTCMonth()]} ${String(t.getUTCDate()).padStart(2, "0")} ${t.getUTCFullYear()}`;
 }
 
+// ---- Trial -----------------------------------------------------------------
+//
+// New users get 7 days of premium features. The AI allowance during the trial
+// is a small FIXED TOTAL rather than the premium weekly rate, because AI output
+// (a generated CV, an interview transcript) is kept by the user and has no
+// switching cost — so a full premium allowance would reward re-registering with
+// a fresh email. Vocabulary progress has the opposite property, which is why
+// unlimited vocab during the trial is safe.
+//
+// A total (not weekly) allowance is also simpler: no week key, no reset, and
+// none of the client/server week-mismatch risk that the weekly quota carries.
+
+export const TRIAL_DAYS = 7;
+export const TRIAL_AI_TOTAL = 3;
+
+export function trialEndsAt(state: BusinessState | null | undefined): Date | null {
+  if (!state?.trialStartedAt) return null;
+  const start = new Date(state.trialStartedAt);
+  if (isNaN(start.getTime())) return null;
+  return new Date(start.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+}
+
+/** True while the trial window is open AND the user has not already paid. */
+export function isTrialActive(state: BusinessState | null | undefined, now: Date = new Date()): boolean {
+  if (state?.mockPro === true) return false;   // paid users are not on trial
+  const ends = trialEndsAt(state);
+  return !!ends && now < ends;
+}
+
+export function trialDaysLeft(state: BusinessState | null | undefined, now: Date = new Date()): number {
+  const ends = trialEndsAt(state);
+  if (!ends) return 0;
+  return Math.max(0, Math.ceil((ends.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)));
+}
+
+/** Unlimited vocabulary sessions: premium OR trial. */
+export function hasUnlimitedVocab(state: BusinessState | null | undefined): boolean {
+  return state?.mockPro === true || isTrialActive(state);
+}
+
 export function aiWeeklyLimit(state: BusinessState | null | undefined): number {
-  return state?.mockPro === true ? PREMIUM_WEEKLY_AI : FREE_WEEKLY_AI;
+  if (state?.mockPro === true) return PREMIUM_WEEKLY_AI;
+  if (isTrialActive(state)) return TRIAL_AI_TOTAL;   // total for the whole trial
+  return FREE_WEEKLY_AI;
 }
 
 export function aiSessionsRemaining(state: BusinessState | null | undefined): number {
   const limit = aiWeeklyLimit(state);
   if (!state) return limit;
+  // During the trial the counter is a running total that never resets.
+  if (isTrialActive(state)) return Math.max(0, limit - (state.trialAiUsed ?? 0));
   const used = state.aiWeekKey === currentAiWeekKey() ? state.aiUsedWeek ?? 0 : 0;
   return Math.max(0, limit - used);
 }
 
 /**
- * Optimistically claims one weekly AI session locally so the UI can block
- * ahead of the model call. The authoritative check runs in the edge function.
+ * READ-ONLY pre-flight check so the UI can block before spending a request.
+ *
+ * It must NOT increment. The authoritative counter lives in the database and is
+ * claimed by the edge functions (consume_ai_session). While this function also
+ * incremented, every AI use cost TWO sessions — one here and one on the server.
  */
 export async function tryConsumeAiSession(
   uid: string,
 ): Promise<{ ok: boolean; remaining: number; limit: number }> {
   const state = await pullBusinessFromSupabase(uid).catch(() => loadBusiness(uid));
   const limit = aiWeeklyLimit(state);
-  const week = currentAiWeekKey();
-  const used = state?.aiWeekKey === week ? state?.aiUsedWeek ?? 0 : 0;
-  if (used >= limit) return { ok: false, remaining: 0, limit };
-  await saveBusinessAsync(uid, { aiWeekKey: week, aiUsedWeek: used + 1 });
-  return { ok: true, remaining: limit - used - 1, limit };
+  const remaining = aiSessionsRemaining(state);
+  if (remaining <= 0) return { ok: false, remaining: 0, limit };
+  return { ok: true, remaining, limit };
 }
 
 
