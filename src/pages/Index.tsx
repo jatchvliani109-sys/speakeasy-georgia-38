@@ -9,6 +9,7 @@ import {
   Briefcase,
   Users,
   GraduationCap,
+  Instagram,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Wordmark from "@/components/Wordmark";
@@ -115,6 +116,15 @@ const modules = [
 ];
 
 /* ─────────────── page ─────────────── */
+/** lucide-react has no TikTok icon; this matches the Instagram glyph's weight. */
+function TikTokIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.7a5.66 5.66 0 0 0-.77-.05 5.68 5.68 0 1 0 5.68 5.68V8.99a7.35 7.35 0 0 0 4.29 1.37V7.27a4.29 4.29 0 0 1-3.23-1.45z" />
+    </svg>
+  );
+}
+
 const Index = () => {
   const { user, loading } = useAuth();
 
@@ -301,21 +311,64 @@ const Index = () => {
 
         {/* ═══════════════ FOOTER ═══════════════ */}
         <footer className="bg-[#1C1C1E] text-[#B8B0A8]">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-[#F8F5F0]">
-              <Wordmark size="md" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            {/* Feedback invitation. Placed above the legal row because it is an
+                invitation, not fine print — and social is where a Georgian
+                audience will actually reply. */}
+            <div className="text-center pb-9 border-b border-white/10">
+              <p className="ka text-[15px] font-bold text-[#F8F5F0]">
+                გვითხარი, რას ფიქრობ
+              </p>
+              <p className="ka text-[13px] text-[#B8B0A8] mt-1.5 leading-relaxed max-w-md mx-auto">
+                SpeakBusy ჯერ ახალია და შენი აზრი ნამდვილად გვჭირდება — მოგვწერე
+                სოციალურ ქსელებში ან ელფოსტაზე.
+              </p>
+              <div className="flex items-center justify-center gap-3 mt-5">
+                <a
+                  href="https://www.instagram.com/speakbusy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="SpeakBusy Instagram-ზე"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-[#F8F5F0] text-sm font-semibold hover:bg-white/5 hover:border-[#C9A84C]/50 transition-colors"
+                >
+                  <Instagram size={16} strokeWidth={2} />
+                  Instagram
+                </a>
+                <a
+                  href="https://www.tiktok.com/@speakbusy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="SpeakBusy TikTok-ზე"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-[#F8F5F0] text-sm font-semibold hover:bg-white/5 hover:border-[#C9A84C]/50 transition-colors"
+                >
+                  <TikTokIcon />
+                  TikTok
+                </a>
+              </div>
+              <a
+                href="mailto:speakbusy@gmail.com"
+                className="ka inline-block mt-4 text-[13px] text-[#B8B0A8] hover:text-[#C9A84C] transition-colors underline underline-offset-4"
+              >
+                speakbusy@gmail.com
+              </a>
             </div>
-            <div className="flex items-center gap-4 text-xs ka tracking-wide">
-              <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
-                კონფიდენციალურობა
-              </Link>
-              <Link to="/terms" className="hover:text-[#F8F5F0] transition-colors">
-                მომსახურების პირობები
-              </Link>
+
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-[#F8F5F0]">
+                <Wordmark size="md" />
+              </div>
+              <div className="flex items-center gap-4 text-xs ka tracking-wide">
+                <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
+                  კონფიდენციალობის პოლიტიკა
+                </Link>
+                <Link to="/terms" className="hover:text-[#F8F5F0] transition-colors">
+                  წესები და პირობები
+                </Link>
+              </div>
+              <p className="text-xs ka tracking-wide">
+                © 2026 SpeakBusy. ყველა უფლება დაცულია.
+              </p>
             </div>
-            <p className="text-xs ka tracking-wide">
-              © 2026 SpeakBusy. ყველა უფლება დაცულია.
-            </p>
           </div>
         </footer>
       </main>

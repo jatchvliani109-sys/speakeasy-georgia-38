@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle, Download, AtSign } from "lucide-react";
+import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle, Download, AtSign, Instagram, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./paths/business/BusinessShell";
@@ -457,6 +457,37 @@ export default function Profile() {
             <LifeBuoy size={13} strokeWidth={2.25} />
             დახმარება — დაგვიკავშირდი
           </a>
+
+          {/* Feedback is invited explicitly. A user who is already in their
+              profile is the one most likely to have an opinion worth hearing. */}
+          <div className="pt-3 mt-1 border-t border-[#E4E2DF]">
+            <p className="ka text-xs text-[#4A4A4A] leading-relaxed">
+              <MessageCircle size={12} strokeWidth={2.25} className="inline -mt-0.5 mr-1 text-[#5C1A2E]" />
+              აპლიკაცია ჯერ ახალია — თუ რამე გაწუხებს ან იდეა გაქვს, აუცილებლად მოგვწერე.
+            </p>
+            <div className="flex items-center gap-2 mt-2.5">
+              <a
+                href="https://www.instagram.com/speakbusy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 transition-colors"
+              >
+                <Instagram size={13} strokeWidth={2.25} />
+                Instagram
+              </a>
+              <a
+                href="https://www.tiktok.com/@speakbusy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 transition-colors"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.7a5.66 5.66 0 0 0-.77-.05 5.68 5.68 0 1 0 5.68 5.68V8.99a7.35 7.35 0 0 0 4.29 1.37V7.27a4.29 4.29 0 0 1-3.23-1.45z" />
+                </svg>
+                TikTok
+              </a>
+            </div>
+          </div>
           <Link to="/privacy" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
             კონფიდენციალობის პოლიტიკა
           </Link>
