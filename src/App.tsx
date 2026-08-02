@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+appimport { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -39,6 +39,7 @@ const BusinessPlacementTest = lazy(() => import("./pages/paths/business/Business
 const BusinessPlan = lazy(() => import("./pages/paths/business/BusinessPlan"));
 const BusinessHome = lazy(() => import("./pages/paths/business/BusinessHome"));
 const TrialGift = lazy(() => import("./pages/paths/business/TrialGift"));
+const TrialEnded = lazy(() => import("./pages/paths/business/TrialEnded"));
 const BusinessModule = lazy(() => import("./pages/paths/business/BusinessModule"));
 const MyLexicon = lazy(() => import("./pages/paths/business/MyLexicon"));
 const BusinessReassessment = lazy(() => import("./pages/paths/business/BusinessReassessment"));
@@ -91,6 +92,7 @@ const App = () => (
             <Route path="/path/business/plan" element={<RequireAuth><BusinessPlan /></RequireAuth>} />
             <Route path="/path/business/home" element={<RequireAuth><BusinessHome /></RequireAuth>} />
             <Route path="/path/business/gift" element={<RequireAuth><TrialGift /></RequireAuth>} />
+            <Route path="/path/business/trial-ended" element={<RequireAuth><TrialEnded /></RequireAuth>} />
             <Route path="/path/business/resume" element={<RequireAuth><BusinessResumeUpload /></RequireAuth>} />
             <Route path="/path/business/self-introduction" element={<RequireAuth><SelfIntroduction /></RequireAuth>} />
             <Route path="/path/business/module/:slug" element={<RequireAuth><BusinessModule /></RequireAuth>} />

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { pullBusinessFromSupabase, shouldOfferTrial } from "./lib/state";
+import { pullBusinessFromSupabase, shouldOfferTrial, shouldShowTrialEnd } from "./lib/state";
 
 export default function BusinessGate() {
   const { user } = useAuth();
@@ -28,6 +28,8 @@ export default function BusinessGate() {
       if (!s.setupCompleted) navigate("/path/business/setup", { replace: true });
       // The gift is offered once, immediately after setup, before the dashboard.
       else if (shouldOfferTrial(s)) navigate("/path/business/gift", { replace: true });
+      // Trial ran out and they have not been told yet.
+      else if (shouldShowTrialEnd(s)) navigate("/path/business/trial-ended", { replace: true });
       else navigate("/path/business/home", { replace: true });
     })();
     return () => { cancelled = true; };

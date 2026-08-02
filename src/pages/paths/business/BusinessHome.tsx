@@ -29,6 +29,7 @@ import {
   pullBusinessFromSupabase,
   saveBusiness,
   isTrialActive,
+  trialEndingSoon,
   trialDaysLeft,
   aiSessionsRemaining,
 } from "./lib/state";
@@ -530,16 +531,22 @@ export default function BusinessHome() {
           {s && isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
-              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#5C1A2E] to-[#4A1526] text-left shadow-sm hover:opacity-95 transition-opacity mb-4"
+              className={`w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#5C1A2E] to-[#4A1526] text-left shadow-sm hover:opacity-95 transition-opacity mb-4 ${
+                trialEndingSoon(s) ? "ring-1 ring-[#C9A84C]/60" : ""
+              }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
                 <div className="min-w-0">
                   <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">
-                    პრემიუმი გააქტიურებულია — დარჩა {trialDaysLeft(s)} დღე
+                    {trialEndingSoon(s)
+                      ? `პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
+                      : `პრემიუმი გააქტიურებულია — დარჩა ${trialDaysLeft(s)} დღე`}
                   </p>
                   <p className="ka text-[11px] text-[#F5F4F2]/70 truncate">
-                    ულიმიტო სესიები · {aiSessionsRemaining(s)} AI სესია დარჩა
+                    {trialEndingSoon(s)
+                      ? "შეინარჩუნე ულიმიტო წვდომა — ნახე პრემიუმი"
+                      : `ულიმიტო სესიები · ${aiSessionsRemaining(s)} AI სესია დარჩა`}
                   </p>
                 </div>
               </div>

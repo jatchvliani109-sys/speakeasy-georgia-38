@@ -77,6 +77,8 @@ export type BusinessState = {
   trialOffered?: boolean;
   /** They turned the gift down. Deliberately irreversible. */
   trialDeclined?: boolean;
+  /** The end-of-trial screen has been shown, so it only appears once. */
+  trialEndSeen?: boolean;
 };
 
 
@@ -218,6 +220,27 @@ export function trialDaysLeft(state: BusinessState | null | undefined, now: Date
 /** Unlimited vocabulary sessions: premium OR trial. */
 export function hasUnlimitedVocab(state: BusinessState | null | undefined): boolean {
   return state?.mockPro === true || isTrialActive(state);
+}
+
+/** True in the last stretch of the trial, when the banner should escalate. */
+export function trialEndingSoon(state: BusinessState | null | undefined): boolean {
+  return isTrialActive(state) && trialDaysLeft(state) <= 2;
+}
+
+/**
+ * Should the end-of-trial screen be shown?
+ *
+ * Only for someone who ACCEPTED the gift and has now run out of days — not for
+ * a user who declined (they never had it) and not for a paying user. Shown once,
+ * then flagged, because a farewell that reappears is nagging rather than a moment.
+ */
+export function shouldShowTrialEnd(state: BusinessState | null | undefined, now: Date = new Date()): boolean {
+  if (!state) return false;
+  if (state.mockPro === true) return false;
+  if (!state.trialStartedAt) return false;      // never accepted
+  if (state.trialEndSeen) return false;         // already said goodbye
+  const ends = trialEndsAt(state);
+  return !!ends && now >= ends;
 }
 
 export function aiWeeklyLimit(state: BusinessState | null | undefined): number {
