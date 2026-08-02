@@ -9,6 +9,7 @@ import {
   TRIAL_DAYS,
   pullBusinessFromSupabase,
   saveBusinessAsync,
+  shouldOfferTrial,
 } from "./lib/state";
 
 /**
@@ -33,12 +34,44 @@ export default function TrialGift() {
   const { displayName } = useDisplayName();
   const navigate = useNavigate();
 
+  // ELIGIBILITY GUARD.
+  //
+  // The route is reached through BusinessGate in normal use, but the page must
+  // defend itself: anyone can type /path/business/gift. Without this, a user
+  // who declined could come back and take it, and — worse — someone whose
+  // trial had EXPIRED could restart it by revisiting the URL, indefinitely.
+  //
+  // Checked against the server copy of state, not local, so clearing
+  // localStorage cannot fake eligibility.
+  const [eligible, setEligible] = useState<boolean | null>(null);
+
   const [busy, setBusy] = useState(false);
   const [confirmDecline, setConfirmDecline] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
   // Staged entrance. Each element waits its turn so the moment builds rather
   // than arriving all at once.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const st = await pullBusinessFromSupabase(user.id);
+        if (cancelled) return;
+        const ok = shouldOfferTrial(st);
+        setEligible(ok);
+        if (!ok) navigate("/path/business/home", { replace: true });
+      } catch {
+        // Cannot verify -> do not hand out a trial.
+        if (!cancelled) {
+          setEligible(false);
+          navigate("/path/business/home", { replace: true });
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, navigate]);
+
   const [stage, setStage] = useState(0);
   useEffect(() => {
     const timers = [
@@ -67,15 +100,33 @@ export default function TrialGift() {
 
   const finish = () => navigate("/path/business/home", { replace: true });
 
+  // Nothing renders until the server confirms eligibility — otherwise the gift
+  // would flash on screen for an ineligible user before redirecting.
+  if (eligible !== true && !accepted) {
+    return <div className="min-h-screen bg-[#F8F5F0]" />;
+  }
+
   const accept = async () => {
     if (!user || busy) return;
     setBusy(true);
     try {
-      await saveBusinessAsync(user.id, {
-        trialStartedAt: new Date().toISOString(),
-        trialAiUsed: 0,
-        trialOffered: true,
-      });
+      // Re-check immediately before writing. The guard above ran on mount;
+      // this closes the gap between mount and click.
+      const fresh = await pullBusinessFromSupabase(user.id);
+      if (!shouldOfferTrial(fresh)) {
+        navigate("/path/business/home", { replace: true });
+        return;
+      }
+      // claim_trial is the authority: it records the claim in a table the
+      // client cannot write, so clearing localStorage or editing business_state
+      // cannot produce a second trial. It also mirrors the flags into
+      // business_state so existing client logic keeps working unchanged.
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: claim } = await supabase.rpc("claim_trial", { p_declined: false });
+      if (claim && (claim as any).ok === false) {
+        navigate("/path/business/home", { replace: true });
+        return;
+      }
       track("trial_accepted");
       setAccepted(true);
       window.setTimeout(finish, 1600);
@@ -89,7 +140,8 @@ export default function TrialGift() {
     if (!user || busy) return;
     setBusy(true);
     try {
-      await saveBusinessAsync(user.id, { trialOffered: true, trialDeclined: true });
+      const { supabase } = await import("@/integrations/supabase/client");
+      await supabase.rpc("claim_trial", { p_declined: true });
       track("trial_declined");
     } catch {
       /* proceed regardless */
@@ -169,12 +221,12 @@ export default function TrialGift() {
                 საჩუქარი
               </p>
               <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2">
-                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღის
+                {displayName ? `${displayName}, ` : ""}პირველი {TRIAL_DAYS} დღე
                 <br />
-                <span className="text-[#C9A84C]">პრემიუმი ჩვენგან</span>
+                <span className="text-[#C9A84C]">პრემიუმია — ჩვენგან</span>
               </h1>
               <p className="ka text-[13px] text-[#F8F5F0]/70 mt-3 leading-relaxed">
-                გინდა ნახო, რას გთავაზობს ჩვენი პრემიუმ სერვისი თანხის გადახდამდე?
+                გვინდა ნახო, რისი შეთავაზება შეგვიძლია — ვალდებულების გარეშე.
               </p>
             </div>
           </div>
@@ -191,7 +243,7 @@ export default function TrialGift() {
             <Perk
               icon={<InfinityIcon size={16} strokeWidth={2.25} />}
               title="ულიმიტო ლექსიკის სესიები"
-              sub={`${TRIAL_DAYS} დღის განმავლობაში - დღიური ლიმიტის გარეშე`}
+              sub={`${TRIAL_DAYS} დღის განმავლობაში — დღიური ლიმიტის გარეშე`}
             />
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
@@ -201,7 +253,7 @@ export default function TrialGift() {
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
               title="ყველა ფუნქცია ღიაა"
-              sub="სცენარები, ლექსიკონი - ყველაფერი"
+              sub="სცენარები, ლექსიკონი, სერია — ყველაფერი"
               last
             />
 
@@ -230,14 +282,14 @@ export default function TrialGift() {
                 className="ka w-full h-14 rounded-2xl bg-[#5C1A2E] text-[#F8F5F0] text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-[#6B1F36] transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
-                {busy ? "ირთვება..." : "მადლობა"}
+                {busy ? "ირთვება..." : "მადლობა, ვიღებ"}
               </button>
               <button
                 onClick={() => setConfirmDecline(true)}
                 disabled={busy}
                 className="ka w-full mt-3 h-11 text-[13px] text-[#8A8A8A] hover:text-[#5C1A2E] transition-colors"
               >
-                არა, მადლობა — უფასო ვერსიით დავიწყებ
+                არა, გმადლობთ — უფასო ვერსიით დავიწყებ
               </button>
             </>
           ) : (
@@ -246,7 +298,7 @@ export default function TrialGift() {
                 დარწმუნებული ხარ?
               </p>
               <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
-                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება - მოგვიანებით ვეღარ გაააქტიურებ.
+                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება — მოგვიანებით ვეღარ გაააქტიურებ.
               </p>
               <div className="flex gap-2 mt-4">
                 <button
@@ -254,7 +306,7 @@ export default function TrialGift() {
                   disabled={busy}
                   className="ka flex-1 h-11 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-[13px] font-bold"
                 >
-                  არა, უკან დამაბრუნე
+                  დავბრუნდე
                 </button>
                 <button
                   onClick={decline}

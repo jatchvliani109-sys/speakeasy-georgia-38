@@ -5,7 +5,12 @@ import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { track } from "@/lib/track";
 import { loadProgress } from "./lib/vocabEngine";
-import { TRIAL_DAYS, saveBusinessAsync } from "./lib/state";
+import {
+  TRIAL_DAYS,
+  pullBusinessFromSupabase,
+  saveBusinessAsync,
+  shouldShowTrialEnd,
+} from "./lib/state";
 
 /**
  * The end of the trial.
@@ -29,11 +34,37 @@ export default function TrialEnded() {
   const { displayName } = useDisplayName();
   const navigate = useNavigate();
 
+  // Same self-defence as the gift page: this route can be typed directly.
+  // Showing a "your trial ended" screen to someone mid-trial, or to a paying
+  // subscriber, would be confusing and would look broken.
+  const [eligible, setEligible] = useState<boolean | null>(null);
+
   const [words, setWords] = useState<number | null>(null);
   const [known, setKnown] = useState(0);
   const [stage, setStage] = useState(0);
 
   useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const st = await pullBusinessFromSupabase(user.id);
+        if (cancelled) return;
+        const ok = shouldShowTrialEnd(st);
+        setEligible(ok);
+        if (!ok) navigate("/path/business/home", { replace: true });
+      } catch {
+        if (!cancelled) {
+          setEligible(false);
+          navigate("/path/business/home", { replace: true });
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (eligible !== true) return;
     track("trial_ended_shown");
     const timers = [
       window.setTimeout(() => setStage(1), 100),
@@ -41,7 +72,7 @@ export default function TrialEnded() {
       window.setTimeout(() => setStage(3), 850),
     ];
     return () => timers.forEach(window.clearTimeout);
-  }, []);
+  }, [eligible]);
 
   // What they actually did during the trial — the whole point of the screen.
   useEffect(() => {
@@ -67,6 +98,10 @@ export default function TrialEnded() {
     }
     navigate(to, { replace: true });
   };
+
+  if (eligible !== true) {
+    return <div className="min-h-screen bg-[#F8F5F0]" />;
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F5F0] flex items-center justify-center px-4 py-10">
@@ -117,7 +152,7 @@ export default function TrialEnded() {
           >
             <p className="ka text-sm text-[#1C1C1E] leading-relaxed">
               პრემიუმის ვადა ამოიწურა. <b>შენი პროგრესი არსად წასულა</b> — ყველა ნასწავლი
-              სიტყვა, "streak-ი" და ლექსიკონი შენთან რჩება.
+              სიტყვა, სერია და ლექსიკონი შენთან რჩება.
             </p>
             <p className="ka text-sm text-[#4A4A4A] leading-relaxed mt-3">
               უფასო ვერსიით აგრძელებ ყოველდღიურ სესიებს. თუ გინდა ულიმიტო სესიები და
