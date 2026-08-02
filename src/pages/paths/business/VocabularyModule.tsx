@@ -31,7 +31,9 @@ import {
   type QuizQuestion,
   upsertProgress,
 } from "./lib/vocabEngine";
-import { pullBusinessFromSupabase, type BusinessState } from "./lib/state";
+import { pullBusinessFromSupabase, type BusinessState,
+  hasUnlimitedVocab,
+} from "./lib/state";
 import { findWord, type VocabWord } from "./lib/vocabBank";
 import { clusterById, getContext, type SituationCluster } from "./lib/vocabContext";
 import {
@@ -215,7 +217,9 @@ export default function VocabularyModule() {
   }, [stage, quiz, qIdx, answers, user, newWords, formatTier, reviewMode, bestCombo]);
 
   // Mock premium (placeholder until real payments): unlocks unlimited sessions.
-  const isPaidUser = state?.mockPro === true;
+  // Trial users get premium session behaviour too, so this must not test
+  // mockPro directly — that would promise unlimited sessions and then deny them.
+  const isPaidUser = hasUnlimitedVocab(state);
   const dailyLimitReached = !isPaidUser && sessionsToday >= FREE_DAILY_SESSIONS;
 
   const startSession = () => {

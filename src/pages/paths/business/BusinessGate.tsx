@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { pullBusinessFromSupabase } from "./lib/state";
+import { ensureTrialStarted, pullBusinessFromSupabase } from "./lib/state";
 
 export default function BusinessGate() {
   const { user } = useAuth();
@@ -13,6 +13,11 @@ export default function BusinessGate() {
     (async () => {
       const s = await pullBusinessFromSupabase(user.id);
       if (cancelled) return;
+
+      // Start the 7-day premium trial on first arrival. Idempotent: it only
+      // writes trialStartedAt if it is absent, so passing through the gate
+      // again — or after the trial expires — never restarts it.
+      ensureTrialStarted(user.id, s);
       // ONBOARDING GATE — deliberately short.
       //
       // This used to force six screens before a user could reach the app:

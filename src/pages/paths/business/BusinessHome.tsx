@@ -28,6 +28,9 @@ import {
   LEVEL_LABELS,
   pullBusinessFromSupabase,
   saveBusiness,
+  isTrialActive,
+  trialDaysLeft,
+  aiSessionsRemaining,
 } from "./lib/state";
 import { computeStreakWithFreezes, loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
@@ -521,8 +524,31 @@ export default function BusinessHome() {
             </section>
           )}
 
-          {/* Premium banner — persistent, small, gone once premium */}
-          {s && !s.mockPro && (
+          {/* Trial banner — shown INSTEAD of the upgrade prompt while the trial
+              is live. Framed around what they currently have, not what they are
+              about to lose; the countdown supplies the urgency on its own. */}
+          {s && isTrialActive(s) && (
+            <button
+              onClick={() => navigate("/path/business/premium")}
+              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#5C1A2E] to-[#4A1526] text-left shadow-sm hover:opacity-95 transition-opacity mb-4"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-[#C9A84C] shrink-0"><Star size={16} className="fill-[#C9A84C]" /></span>
+                <div className="min-w-0">
+                  <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">
+                    პრემიუმი გააქტიურებულია — დარჩა {trialDaysLeft(s)} დღე
+                  </p>
+                  <p className="ka text-[11px] text-[#F5F4F2]/70 truncate">
+                    ულიმიტო სესიები · {aiSessionsRemaining(s)} AI სესია დარჩა
+                  </p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#C9A84C] shrink-0" />
+            </button>
+          )}
+
+          {/* Premium banner — persistent, small, gone once premium or on trial */}
+          {s && !s.mockPro && !isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
               className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-[#232323] to-[#1C1C1E] text-left shadow-sm hover:opacity-95 transition-opacity"
@@ -565,7 +591,7 @@ export default function BusinessHome() {
                 <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
-                {focusDoneToday && s?.mockPro && scenarioToday && (
+                {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
                   <p className="ka text-[11px] font-semibold text-[#E5D4A8] mt-2">
                     🎬 შემდეგი სესია — სცენარი: {scenarioToday.titleKa}
                   </p>
@@ -591,7 +617,7 @@ export default function BusinessHome() {
                 )}
                 <div className="mt-5 flex flex-col sm:flex-row gap-2">
                   {/* Premium: the day is never "over" — offer the next session. */}
-                  {focusDoneToday && s?.mockPro && (
+                  {focusDoneToday && (s?.mockPro || isTrialActive(s)) && (
                     <button
                       onClick={() => navigate("/path/business/module/vocabulary")}
                       className="ka inline-flex items-center justify-center gap-2 bg-[#C9A84C] text-[#1C1C1E] hover:bg-[#D4B560] transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
