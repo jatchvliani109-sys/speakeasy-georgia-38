@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -29,6 +29,10 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
+  // A disabled button explains nothing — the user is blocked with no idea why.
+  // Both buttons now stay clickable and POINT AT the reason instead.
+  const [termsShake, setTermsShake] = useState(false);
+  const termsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // Preserve return target (used by /.lovable/oauth/consent redirect flow).
@@ -37,8 +41,24 @@ export default function Auth() {
   const afterAuthAbsolute = `${window.location.origin}${nextPath}`;
 
 
+  /**
+   * Called when someone tries to continue without accepting the terms.
+   * Draws the eye to the checkbox rather than silently refusing: scrolls it
+   * into view, shakes it, flashes the border red, and says why.
+   * Returns true if the attempt was blocked.
+   */
+  const blockedByTerms = (): boolean => {
+    if (mode !== "signup" || termsAccepted) return false;
+    termsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTermsShake(true);
+    window.setTimeout(() => setTermsShake(false), 600);
+    toast.error("გთხოვთ, დაეთანხმოთ წესებს, პირობებს და კონფიდენციალობის პოლიტიკას");
+    return true;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (blockedByTerms()) return;
     const parsed = mode === "signup"
       ? signupSchema.safeParse({ email, password, termsAccepted })
       : loginSchema.safeParse({ email, password });
@@ -47,8 +67,7 @@ export default function Auth() {
       return;
     }
     setLoading(true);
-    if (mode === "signup") track("signup_started", { method: "email" });
-    else track("login_started", { method: "email" });
+    if (mode === "signup") track("signup_started");
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -169,6 +188,20 @@ export default function Auth() {
 
   return (
     <Layout showLogout={false}>
+      {/* Named keyframes: Tailwind cannot generate an arbitrary animation
+          without config, so it is defined here alongside its only user. */}
+      <style>{`
+        @keyframes termsShake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-5px); }
+          40% { transform: translateX(5px); }
+          60% { transform: translateX(-3px); }
+          80% { transform: translateX(3px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-terms-row] { animation: none !important; }
+        }
+      `}</style>
       <SEO
         title={mode === "signup" ? "რეგისტრაცია — SpeakBusy" : "შესვლა — SpeakBusy"}
         description={
@@ -234,7 +267,13 @@ export default function Auth() {
             />
           </div>
           {mode === "signup" && (
-            <div className="flex items-start gap-3">
+            <div
+              ref={termsRef}
+              data-terms-row
+              className={`flex items-start gap-3 rounded-lg -mx-2 px-2 py-1.5 transition-colors ${
+                termsShake ? "animate-[termsShake_.5s_ease-in-out] bg-[#C0392B]/5" : ""
+              }`}
+            >
               {/* shrink-0: without it the flex row squashes the box into a
                   sliver next to the long Georgian label on narrow phones.
                   Border darkened — #E4E2DF on the #F5F4F2 form background was
@@ -244,7 +283,9 @@ export default function Auth() {
                 id="terms"
                 checked={termsAccepted}
                 onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                className="mt-0.5 shrink-0 h-5 w-5 border-2 border-[#5C1A2E]/40 data-[state=checked]:bg-[#5C1A2E] data-[state=checked]:border-[#5C1A2E] data-[state=checked]:text-[#F5F4F2]"
+                className={`mt-0.5 shrink-0 h-5 w-5 border-2 transition-colors data-[state=checked]:bg-[#5C1A2E] data-[state=checked]:border-[#5C1A2E] data-[state=checked]:text-[#F5F4F2] ${
+                  termsShake ? "border-[#C0392B]" : "border-[#5C1A2E]/40"
+                }`}
               />
               <Label htmlFor="terms" className="text-xs text-[#4A4A4A] ka leading-relaxed cursor-pointer">
                 ვეთანხმები{" "}
@@ -258,9 +299,13 @@ export default function Auth() {
               </Label>
             </div>
           )}
+          {/* aria-disabled rather than disabled: the button stays clickable so it
+              can explain WHY it is blocked, while screen readers still announce
+              it as unavailable. A plain disabled button tells the user nothing. */}
           <button
             type="submit"
-            disabled={loading || (mode === "signup" && !termsAccepted)}
+            disabled={loading}
+            aria-disabled={mode === "signup" && !termsAccepted}
             className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold tracking-wide ka hover:bg-[#161616] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
@@ -282,15 +327,10 @@ export default function Auth() {
 
         <button
           type="button"
-          disabled={loading || (mode === "signup" && !termsAccepted)}
+          disabled={loading}
+          aria-disabled={mode === "signup" && !termsAccepted}
           onClick={async () => {
-            // Legal gate: consent must be given before an account can exist,
-            // regardless of which provider creates it.
-            if (mode === "signup" && !termsAccepted) {
-              toast.error("გთხოვთ, დაეთანხმოთ წესებს, პირობებს და კონფიდენციალობის პოლიტიკას");
-              return;
-            }
-            track(mode === "signup" ? "signup_started" : "login_started", { method: "google" });
+            if (blockedByTerms()) return;
             setLoading(true);
             try {
               const result = await lovable.auth.signInWithOAuth("google", {
