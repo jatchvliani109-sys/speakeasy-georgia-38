@@ -56,6 +56,26 @@ export default function TrialGift() {
     let cancelled = false;
     (async () => {
       try {
+        const { supabase } = await import("@/integrations/supabase/client");
+
+        // AUTHORITATIVE CHECK. shouldOfferTrial() reads business_state, which
+        // the browser can write — so clearing trialStartedAt locally made the
+        // page believe the user was eligible. has_claimed_trial() reads
+        // trial_claims, a table the client cannot write at all.
+        const { data: claimed } = await supabase.rpc("has_claimed_trial");
+        if (cancelled) return;
+
+        if (claimed === true) {
+          // Their state was cleared but the server remembers. Repair the local
+          // copy so the rest of the app stops believing a trial is available.
+          await saveBusinessAsync(user.id, { trialOffered: true });
+          setEligible(false);
+          navigate("/path/business/home", { replace: true });
+          return;
+        }
+
+        // Server says no claim on record — now the ordinary checks apply
+        // (setup finished, not already paying).
         const st = await pullBusinessFromSupabase(user.id);
         if (cancelled) return;
         const ok = shouldOfferTrial(st);
@@ -110,8 +130,15 @@ export default function TrialGift() {
     if (!user || busy) return;
     setBusy(true);
     try {
-      // Re-check immediately before writing. The guard above ran on mount;
-      // this closes the gap between mount and click.
+      // Re-check against the server, not local state — same reason as the
+      // mount guard. This also closes the gap between mount and click.
+      const { supabase: sb } = await import("@/integrations/supabase/client");
+      const { data: alreadyClaimed } = await sb.rpc("has_claimed_trial");
+      if (alreadyClaimed === true) {
+        await saveBusinessAsync(user.id, { trialOffered: true });
+        navigate("/path/business/home", { replace: true });
+        return;
+      }
       const fresh = await pullBusinessFromSupabase(user.id);
       if (!shouldOfferTrial(fresh)) {
         navigate("/path/business/home", { replace: true });
