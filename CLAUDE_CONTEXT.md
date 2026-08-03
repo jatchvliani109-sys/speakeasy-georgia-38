@@ -1,6 +1,6 @@
 # SpeakBusy — CLAUDE CONTEXT (authoritative status)
 
-Last updated: 2026-08-01 (end of a long working day). Source of truth for any new Claude conversation.
+Last updated: 2026-08-03. Source of truth for any new Claude conversation.
 Where older docs, messages or memory disagree, **this wins**.
 
 ---
@@ -225,9 +225,42 @@ bank is 144 KB gzipped and previously downloaded for EVERY visitor, because
 
 ---
 
-## 6. Monetization (MOCK ERA — blocked on ინდ. მეწარმე registration)
+## 6. Legal entity — READ THIS BEFORE TOUCHING THE LEGAL PAGES
 
-- Price **8.99 GEL/month**.
+**Registered 2026-08-03 as ინდივიდუალური მეწარმე ნინო ჯაჭვლიანი**, ID
+62009004530, ქ. თბილისი, ეკა ბეჟანიშვილის ქუჩა №104. Nino is a co-creator; she
+is the registered entrepreneur.
+
+**An ინდივიდუალური მეწარმე is NOT a legal person** (მეწარმეთა შესახებ, art. 2).
+There is no company. Earlier versions of these documents said "replace the
+placeholder with the registered entity name once registration completes" — that
+instruction was **wrong**, because no entity name exists. The correct
+identification is the individual's name + "ინდივიდუალური მეწარმე" + ID number,
+and that is what now appears in `PrivacyPolicy.tsx` and `TermsOfUse.tsx`.
+
+"SpeakBusy" is a **trade name** (სავაჭრო სახელწოდება), not a registered entity.
+Never write "SpeakBusy LLC" or "შპს SpeakBusy" anywhere — it would name a
+company that does not exist.
+
+Two consequences worth carrying forward:
+
+- **Personal, unlimited liability.** An ინდ. მეწარმე answers for business
+  obligations with all personal property. Given the app stores CVs, takes
+  consumer payments and sends data abroad, converting to an შპს becomes worth
+  pricing once there is real revenue.
+- **Small business status (1% turnover tax) is a SEPARATE application** to the
+  Revenue Service, capped at 500,000 GEL/yr. Registration alone does not grant
+  it; without it the rate is 20%. VAT registration becomes mandatory above
+  100,000 GEL of taxable turnover in any rolling 12 months.
+
+Full research: `IE_LEGAL_ALIGNMENT.md`.
+
+## 7. Monetization (MOCK ERA — payments still blocked)
+
+- Price **13.99 GEL/month** — raised from 8.99 on 2026-08-02 after measuring
+  real cost: ~4.7c per AI interview, so a maximum-usage subscriber costs roughly
+  5 GEL/month against 13.99 revenue. Testers consistently read 8.99 as too low
+  for a career-advancement product.
 - Free: 1 AI session/week. Premium: 7/week, unified pool across all AI features,
   Monday reset (Tbilisi time).
 - `mockPro` flag in `business_state.state` JSON.
@@ -239,7 +272,7 @@ bank is 144 KB gzipped and previously downloaded for EVERY visitor, because
 
 ---
 
-## 7. Where things stand (end of 2026-08-01)
+## 8. Where things stand
 
 A full requirements audit exists in `APP_REQUIREMENTS.md` (174 requirements) and
 `REQUIREMENTS_AUDIT.md` (graded, with a 5-tier build order). Read those before
@@ -279,16 +312,17 @@ planning work — they are more detailed than this summary.
   control or otherwise "fix" it.
 
 ### Next up
-1. **Blocked on ინდ. მეწარმე registration**: payments (processor availability in
-   Georgia still UNVERIFIED — the biggest open unknown), the 15 subscription-law
-   requirements, legal entity in Privacy/Terms, real premium cancel.
+1. **Payments — the only thing on the critical path.** Whether recurring GEL
+   billing is available to an ინდ. მეწარმე in Georgia is STILL UNVERIFIED and is
+   not a coding task. Everything else is polish until this is answered. Real
+   premium cancel must reach the processor once it exists.
 2. **Tier 5 growth**: social sign-in (biggest signup-friction win) · offline
    tolerance · re-engagement email · referrals · accessibility audit.
 3. **Analytics review** — once events accumulate, run `ANALYTICS_QUERIES.sql`.
    The key question: did shortening onboarding actually work?
 4. Ask a Georgian lawyer the six questions in `DATA_PROTECTION_RECORDS.md` §5.
 
-## 8. Removed / deleted (2026-07-31 → 08-01)
+## 9. Removed / deleted (2026-07-31 → 08-01)
 
 **Legacy routes** from the pre-SpeakBusy lesson app: `/lesson`, `/summary/:id`,
 `/vocabulary`, `/mistakes`, `/progress`. `/dashboard` was KEPT — it is a live
@@ -317,7 +351,7 @@ but is unused.
 
 ---
 
-## 9. Live edge functions
+## 10. Live edge functions
 
 `business-docs` · `business-self-intro` · `business-interview` —
 requireUser ✅ quota ✅
@@ -330,7 +364,7 @@ Every function that spends money is authenticated and metered.
 
 ---
 
-## 10. Working principles that have proven necessary
+## 11. Working principles that have proven necessary
 
 **Verify against the schema, not the frontend.** The first `delete-account`
 covered 10 tables because that is all the frontend referenced. The schema had 21.
