@@ -49,11 +49,12 @@ underlying registrar record:
    of speakbusy.com and the registration date.
 
 Account / ownership context:
-- The account that originally purchased/connected this domain was registered
-  with jatchvliani109@gmail.com. I later changed the account email address
-  to speakbusy@gmail.com, which is now my active email on this account.
-- Both addresses belong to me; please use speakbusy@gmail.com for all
-  correspondence and document delivery.
+- My Google/Gmail account was originally jatchvliani109@gmail.com and I
+  later renamed it to speakbusy@gmail.com. It is the same account;
+  only the email address changed.
+- Your records (and possibly the registrar/payment-provider records) may
+  still reference jatchvliani109@gmail.com. Both addresses belong to me.
+- Please use speakbusy@gmail.com for all correspondence and document delivery.
 
 Project: SpeakBusy
 Lovable preview URL: https://id-preview--7f677a42-56d3-481d-b312-41dc7928c609.lovable.app
