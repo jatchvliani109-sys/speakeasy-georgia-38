@@ -398,21 +398,53 @@ export async function countCompletedSessions(userId: string): Promise<number> {
  * back as a themed review. Returns null on regular days or when all scenario
  * material is mastered.
  */
+/**
+ * Picks the themed session for today, or null for an ordinary session.
+ *
+ * Previously this used SITUATION_CLUSTERS.find(), which returns the FIRST
+ * cluster in array order that still has an unmastered word. Since mastery needs
+ * correct answers across 3+ separate days, cluster 1 ("შეხვედრის გაძღოლა", 8
+ * words) stayed selected for weeks — and scenario sessions only ever draw from
+ * that one cluster's words. Result: every other session was the same 8 words,
+ * over and over, which reads as broken.
+ *
+ * Now it ROTATES: clusters are ranked by how much unlearned material they hold,
+ * and the session index picks among them, so consecutive themed sessions differ.
+ */
 export function pickDailyScenario(
   progress: ProgressRow[],
   totalCompletedSessions: number,
 ): SituationCluster | null {
   if (totalCompletedSessions % 2 !== 1) return null;
+
   const seen = new Set(progress.map((p) => p.word_key));
-  const withUnseen = SITUATION_CLUSTERS.find((c) =>
-    c.wordKeys.some((k) => !seen.has(k)),
+  const mastered = new Set(
+    progress.filter((p) => p.confidence >= 4 || p.manual_label === "easy").map((p) => p.word_key),
   );
-  if (withUnseen) return withUnseen;
-  const mastered = new Set(progress.filter(checkMastery).map((p) => p.word_key));
-  return (
-    SITUATION_CLUSTERS.find((c) => c.wordKeys.some((k) => !mastered.has(k))) ??
-    null
-  );
+
+  // Score each cluster by remaining value: unseen words are worth most,
+  // seen-but-unmastered still worth something, mastered worth nothing.
+  const scored = SITUATION_CLUSTERS.map((c) => {
+    let unseen = 0, learning = 0;
+    for (const k of c.wordKeys) {
+      if (!seen.has(k)) unseen++;
+      else if (!mastered.has(k)) learning++;
+    }
+    return { cluster: c, score: unseen * 3 + learning, unseen };
+  }).filter((x) => x.score > 0);
+
+  if (!scored.length) return null;   // everything mastered — no themed session
+
+  // Prefer clusters with genuinely new material; fall back to partly-learned.
+  const withUnseen = scored.filter((x) => x.unseen > 0);
+  const pool = withUnseen.length ? withUnseen : scored;
+
+  // Rotate through the pool rather than always taking the first. Using the
+  // session counter keeps it deterministic for a given session number, so the
+  // dashboard preview and the session itself always agree.
+  pool.sort((a, b) => b.score - a.score);
+  const themedIndex = Math.floor(totalCompletedSessions / 2);
+  return pool[themedIndex % pool.length].cluster;
 }
 
 /** Completed vocab sessions since local midnight — powers the free daily cap. */

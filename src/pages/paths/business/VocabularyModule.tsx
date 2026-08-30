@@ -164,16 +164,42 @@ export default function VocabularyModule() {
       let newW = plan.newWords;
       let revK = plan.reviewKeys;
       if (sc) {
-        // Scenario session: only this scenario's words. Unseen ones are
-        // taught as new; already-studied ones come back as review.
+        // Themed session: the scenario's words LEAD, but the session is topped
+        // up from the normal plan.
+        //
+        // This previously used ONLY the cluster's words — and clusters hold 6-9
+        // words. Once those were seen, every themed session was the same handful
+        // repeating, with no new material at all. A theme should colour a
+        // session, not cap it at eight words.
         setScenario(sc);
         const words = sc.wordKeys.map(findWord).filter(Boolean) as VocabWord[];
         const seenKeys = new Set(p.map((r) => r.word_key));
-        newW = words.filter((w) => !seenKeys.has(w.key)).slice(0, 8);
-        revK = words
-          .filter((w) => seenKeys.has(w.key))
-          .map((w) => w.key)
-          .slice(0, 8);
+        const mastered = new Set(
+          p.filter((r) => r.confidence >= 4 || r.manual_label === "easy").map((r) => r.word_key),
+        );
+
+        // Scenario words the user has not met yet lead the new-word list.
+        const scenarioNew = words.filter((w) => !seenKeys.has(w.key));
+        // Scenario words still being learned come back for review — but NOT
+        // ones already mastered, which is what made it feel repetitive.
+        const scenarioReview = words
+          .filter((w) => seenKeys.has(w.key) && !mastered.has(w.key))
+          .map((w) => w.key);
+
+        // Top up from the ordinary plan so the session is a full length and
+        // still introduces new vocabulary.
+        const planNewFiltered = plan.newWords.filter(
+          (w) => !scenarioNew.some((s2) => s2.key === w.key),
+        );
+        const planReviewFiltered = plan.reviewKeys.filter(
+          (k) => !scenarioReview.includes(k),
+        );
+
+        newW = [...scenarioNew, ...planNewFiltered].slice(0, Math.max(8, plan.newWords.length));
+        revK = [...scenarioReview, ...planReviewFiltered].slice(
+          0,
+          Math.max(8, plan.reviewKeys.length),
+        );
       }
       setNewWords(newW);
       setReviewKeys(revK);
