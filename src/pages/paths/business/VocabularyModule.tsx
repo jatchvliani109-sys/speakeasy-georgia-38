@@ -781,9 +781,6 @@ function IntroCard({
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {newWords.length} ახალი სიტყვა · {reviewCount} გასამეორებელი
         </h2>
-        <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
-          ჯერ ვისწავლი ახალ სიტყვებს ბარათების სახით. შემდეგ — მოკლე ქვიზი ნასწავლის შესამოწმებლად.
-        </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           <Mini label="ბარათები" value={`${newWords.length}`} />
           <Mini label="გასამეორებელი" value={`${reviewCount}`} />
