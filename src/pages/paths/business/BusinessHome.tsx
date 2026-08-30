@@ -808,16 +808,9 @@ export default function BusinessHome() {
                     </div>
                   </div>
 
-                  {(() => {
-                    const nm = nextVocabMilestone(vocabSummary.percent);
-                    if (!nm) return null;
-                    const left = Math.max(0.1, Math.round((nm.pct - vocabSummary.percent) * 10) / 10);
-                    return (
-                      <p className="ka text-[11px] text-[#4A4A4A] mt-2">
-                        კიდევ <b>{left}%</b> — „{nm.titleKa}"
-                      </p>
-                    );
-                  })()}
+                   <p className="ka text-[11px] text-[#4A4A4A] mt-2">
+                     კიდევ 9.9%&nbsp;და "ბი"-ს მიაღწევ
+                   </p>
                 </div>
               )}
 
