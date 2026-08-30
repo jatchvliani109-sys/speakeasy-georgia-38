@@ -916,7 +916,7 @@ const TIER2: Mini[] = [
   ["all-hands","All-hands","საერთო შეხვედრა","All-hands is Thursday.","საერთო შეხვედრა ხუთშაბათს."],
   ["townhall","Townhall","ღია სხდომა","Townhall is on Zoom.","ღია სხდომა Zoom-ში."],
   ["agenda-item","Agenda item","დღის წესრიგის პუნქტი","Add it as an agenda item.","დღის წესრიგში დაამატე."],
-  ["minute-taker","Minute-taker","ოქმის წარმოება","Who's the minute-taker?","ვინ აწერს ოქმს?"],
+  ["minute-taker","Minute-taker","ოქმის წარმოება","Who's the minute-taker?","ვინ წერს ოქმს?"],
   ["chair","Chair","თავმჯდომარე","She'll chair the meeting.","ის წაუძღვება შეხვედრას."],
   ["consensus","Consensus","კონსენსუსი","Reach consensus first.","ჯერ კონსენსუსამდე მიდი."],
   ["compromise","Compromise","კომპრომისი","Find a compromise.","კომპრომისი იპოვე."],
