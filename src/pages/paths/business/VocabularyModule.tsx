@@ -358,7 +358,23 @@ export default function VocabularyModule() {
     if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     setReviewIdx(qIdx > 0 ? qIdx - 1 : 0);
   };
-  const exitReview = () => setReviewIdx(null);
+  /**
+   * Leave review and resume the normal flow.
+   *
+   * Entering review cancels the pending auto-advance. If the live question was
+   * answered CORRECTLY, that timer was the only thing moving the session on —
+   * so without restarting it the user is stranded on an answered question.
+   * (The manual "შემდეგი" button is also shown as a fallback.)
+   */
+  const exitReview = () => {
+    setReviewIdx(null);
+    const answeredCorrectly =
+      revealed && selected !== null && liveQ && checkAnswer(liveQ, selected);
+    if (answeredCorrectly) {
+      if (autoAdvanceRef.current) window.clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = window.setTimeout(() => goNextRef.current(), 1200);
+    }
+  };
 
   // Duolingo-style mistake requeue: a missed question is appended to the END of
   // the session and must be answered again, so the session grows by one item per
@@ -422,6 +438,10 @@ export default function VocabularyModule() {
     }
   };
 
+  // Ref so exitReview (declared earlier) can call goNext without a forward
+  // reference. Kept in sync on every render.
+  const goNextRef = useRef<() => void>(() => {});
+
   const goNext = (ans: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     // Never advance while the user is looking back at an earlier question.
@@ -435,6 +455,10 @@ export default function VocabularyModule() {
       finishSession(ans);
     }
   };
+
+  // Keep the ref pointing at the current closure so exitReview's timer calls
+  // the live version with the latest answers.
+  goNextRef.current = () => goNext(answers);
 
 
   const finishSession = async (finalAnswers: { wordKey: string; correct: boolean; production: boolean }[]) => {
@@ -864,9 +888,10 @@ export default function VocabularyModule() {
             )}
           </div>
 
-          {/* Review navigation. Only offered once at least one question has been
-              answered — there is nothing to look back at before that. */}
-          {(isReviewing || (qIdx > 0 && revealed)) && (
+          {/* Review navigation. Available whenever there is history to look at —
+              the first version required `revealed`, so the arrow only existed in
+              the ~1.5s between answering and auto-advance, which is unusable. */}
+          {(isReviewing || qIdx > 0) && (
             <div className="mt-3 flex items-center justify-between">
               <button
                 onClick={() => {
@@ -898,7 +923,7 @@ export default function VocabularyModule() {
               )}
             </div>
           )}
-          {!isReviewing && revealed && selected !== null && !checkAnswer(liveQ, selected) && (
+          {!isReviewing && revealed && selected !== null && (
             <div className="mt-4 flex justify-end animate-[bizFade_.3s_ease-out_both]">
               <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
