@@ -793,7 +793,7 @@ function IntroCard({
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
         <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
-          დღევანდელი სესია
+          შემდეგი სესია
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {newWords.length} ახალი სიტყვა · {reviewCount} გასამეორებელი
