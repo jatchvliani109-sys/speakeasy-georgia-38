@@ -34,6 +34,7 @@ export type TrackEvent =
   | "vocab_session_started"
   | "vocab_session_completed"
   | "vocab_session_abandoned"
+  | "vocab_milestone_reached"
   // features
   | "interview_started"
   | "interview_completed"
