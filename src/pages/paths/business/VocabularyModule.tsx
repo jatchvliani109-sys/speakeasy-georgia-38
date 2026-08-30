@@ -84,6 +84,15 @@ export default function VocabularyModule() {
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [qIdx, setQIdx] = useState(0);
+  // READ-ONLY review of an already-answered question.
+  //
+  // Correct answers auto-advance after 1.5s, which is not always long enough to
+  // take in the word. This lets the user page back and look again — but NOT
+  // re-answer: the answer is already recorded, has already fed the spaced
+  // repetition schedule, and may have requeued the question. Allowing a second
+  // attempt would corrupt that, and a word you got wrong and then "fixed" is
+  // not a word you know.
+  const [reviewIdx, setReviewIdx] = useState<number | null>(null);
   const [answers, setAnswers] = useState<{ wordKey: string; correct: boolean; production: boolean }[]>([]);
   const [selected, setSelected] = useState<string | number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -326,14 +335,37 @@ export default function VocabularyModule() {
   };
 
   // QUIZ — single click flow
-  const currentQ = quiz[qIdx];
+  const liveQ = quiz[qIdx];
+  // When reviewing, the screen shows an earlier question instead of the live
+  // one. Everything below still operates on the LIVE question, so reviewing
+  // cannot affect answers, combo, requeue or scheduling.
+  const isReviewing = reviewIdx !== null;
+  const currentQ = isReviewing ? quiz[reviewIdx!] : liveQ;
+
+  /** What the user picked on an already-answered question, for read-only display. */
+  const reviewedAnswer = (i: number): string | number | null => {
+    const q = quiz[i];
+    if (!q) return null;
+    const rec = answers[i];
+    if (!rec) return null;
+    // Reconstruct the displayed choice: for a correct answer it is the correct
+    // option; for a wrong one we cannot recover the exact pick, so show the
+    // correct answer revealed instead.
+    return (q as any).correct ?? (q as any).correctKa ?? null;
+  };
+
+  const enterReview = () => {
+    if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
+    setReviewIdx(qIdx > 0 ? qIdx - 1 : 0);
+  };
+  const exitReview = () => setReviewIdx(null);
 
   // Duolingo-style mistake requeue: a missed question is appended to the END of
   // the session and must be answered again, so the session grows by one item per
   // mistake. A question is a RETRY if the same item already appeared earlier in
   // the queue — that also caps it at exactly one repeat (a retry never requeues).
   const qid = (q: QuizQuestion) => `${q.type}:${"wordKey" in q ? q.wordKey : (q as any).key}`;
-  const isRetry = !!currentQ && quiz.slice(0, qIdx).some((q) => qid(q) === qid(currentQ));
+  const isRetry = !isReviewing && !!liveQ && quiz.slice(0, qIdx).some((q) => qid(q) === qid(liveQ));
 
   const triggerStreak = (n: number) => {
     setStreakN(n);
@@ -356,11 +388,15 @@ export default function VocabularyModule() {
   };
 
   const handleSelect = (val: string | number) => {
-    if (revealed || !currentQ) return;
+    // While reviewing, currentQ is an EARLIER question — recording an answer
+    // here would attribute it to the wrong item. pointer-events already blocks
+    // clicks; this closes the keyboard path too.
+    if (reviewIdx !== null) return;
+    if (revealed || !liveQ) return;
     setSelected(val);
-    const correct = checkAnswer(currentQ, val);
-    const key = "wordKey" in currentQ ? currentQ.wordKey : `mistake:${currentQ.key}`;
-    const nextAnswers = [...answers, { wordKey: key, correct, production: isProductionType(currentQ.type) }];
+    const correct = checkAnswer(liveQ, val);
+    const key = "wordKey" in liveQ ? liveQ.wordKey : `mistake:${liveQ.key}`;
+    const nextAnswers = [...answers, { wordKey: key, correct, production: isProductionType(liveQ.type) }];
     setAnswers(nextAnswers);
     setRevealed(true);
 
@@ -381,13 +417,15 @@ export default function VocabularyModule() {
       setCombo(0);
       playWrong();
       // Requeue the missed question once, at the end of this session.
-      if (!isRetry) setQuiz((qs) => [...qs, currentQ]);
+      if (!isRetry) setQuiz((qs) => [...qs, liveQ]);
       // Wrong: do not auto-advance — let user review and click next.
     }
   };
 
   const goNext = (ans: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
+    // Never advance while the user is looking back at an earlier question.
+    if (reviewIdx !== null) return;
     if (resumed) setResumed(false);
     if (qIdx + 1 < quiz.length) {
       setQIdx((i) => i + 1);
@@ -804,15 +842,63 @@ export default function VocabularyModule() {
               🔁 გამეორება — ეს კითხვა ადრე გამოგრჩა
             </p>
           )}
-          <div key={qIdx} className="biz-question-slide">
-            <QuestionCard
-              q={currentQ}
-              selected={selected}
-              revealed={revealed}
-              setSelected={handleSelect}
-            />
+          <div key={isReviewing ? `r${reviewIdx}` : qIdx} className="biz-question-slide">
+            {isReviewing ? (
+              // Read-only: the answer is shown, nothing is clickable, and
+              // setSelected is a no-op so a stray tap cannot record anything.
+              <div className="pointer-events-none opacity-95">
+                <QuestionCard
+                  q={currentQ}
+                  selected={reviewedAnswer(reviewIdx!)}
+                  revealed={true}
+                  setSelected={() => {}}
+                />
+              </div>
+            ) : (
+              <QuestionCard
+                q={currentQ}
+                selected={selected}
+                revealed={revealed}
+                setSelected={handleSelect}
+              />
+            )}
           </div>
-          {revealed && selected !== null && !checkAnswer(currentQ, selected) && (
+
+          {/* Review navigation. Only offered once at least one question has been
+              answered — there is nothing to look back at before that. */}
+          {(isReviewing || (qIdx > 0 && revealed)) && (
+            <div className="mt-3 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  if (!isReviewing) enterReview();
+                  else if (reviewIdx! > 0) setReviewIdx(reviewIdx! - 1);
+                }}
+                disabled={isReviewing && reviewIdx === 0}
+                className="ka inline-flex items-center gap-1.5 text-xs text-[#4A4A4A] hover:text-[#5C1A2E] disabled:opacity-30 transition-colors"
+              >
+                ← წინა კითხვა
+              </button>
+
+              {isReviewing && (
+                <span className="ka text-[11px] text-[#8A8A8A]">
+                  {reviewIdx! + 1}/{quiz.length} · მხოლოდ დათვალიერება
+                </span>
+              )}
+
+              {isReviewing && (
+                <button
+                  onClick={() => {
+                    if (reviewIdx! + 1 >= qIdx) exitReview();
+                    else setReviewIdx(reviewIdx! + 1);
+                  }}
+                  className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] hover:opacity-80 transition-opacity"
+                >
+                  {reviewIdx! + 1 >= qIdx ? "დაბრუნება →" : "შემდეგი →"}
+                </button>
+              )}
+            </div>
+          )}
+          {!isReviewing && revealed && selected !== null && !checkAnswer(liveQ, selected) && (
             <div className="mt-4 flex justify-end animate-[bizFade_.3s_ease-out_both]">
               <BizButton onClick={() => goNext(answers)}>
                 {qIdx + 1 < quiz.length ? "შემდეგი →" : "შედეგი →"}
