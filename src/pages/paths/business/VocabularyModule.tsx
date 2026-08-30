@@ -1626,7 +1626,7 @@ function Results({
             <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9A84C] text-[#1C1C1E]">
               <span className="text-sm">✦</span>
               <span className="ka text-[13px] font-bold">
-                {masteredMilestone} სიტყვა სრულად ნასწავლი
+                {masteredMilestone} სრულად ნასწავლი სიტყვა
               </span>
             </div>
           )}
@@ -1665,8 +1665,8 @@ function Results({
           </div>
           <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
             {newlyMastered.length === 1
-              ? "ეს სიტყვა უკვე მყარად იცი — რამდენჯერმე, სხვადასხვა დღეს, დამოუკიდებლადაც დაწერე."
-              : "ეს სიტყვები უკვე მყარად იცი — რამდენჯერმე, სხვადასხვა დღეს, დამოუკიდებლადაც დაწერე."}
+              ? "ეს სიტყვა უკვე ხარისხიანად იცი"
+              : "ეს სიტყვები უკვე ხარისხიანად იცი"}
           </p>
           <ul className="mt-3 space-y-1.5">
             {newlyMastered.map((w) => (
