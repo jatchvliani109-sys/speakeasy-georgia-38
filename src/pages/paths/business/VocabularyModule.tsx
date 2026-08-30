@@ -92,6 +92,12 @@ export default function VocabularyModule() {
   // results screen can show "+0.6% დღეს". The absolute percentage barely moves
   // at 980 words; the delta is what makes a session feel like it counted.
   const [sessionDelta, setSessionDelta] = useState<number | null>(null);
+  // Words that crossed into mastered during this session, and the running
+  // total. Mastery was previously invisible: confetti fired every 10 words with
+  // no explanation, so the user saw celebration without knowing what for.
+  const [newlyMastered, setNewlyMastered] = useState<VocabWord[]>([]);
+  const [masteredTotal, setMasteredTotal] = useState<number>(0);
+  const [masteredMilestone, setMasteredMilestone] = useState<number | null>(null);
 
   const [lastResults, setLastResults] = useState<{
     answers: { wordKey: string; correct: boolean; production: boolean }[];
@@ -433,11 +439,36 @@ export default function VocabularyModule() {
     // Count it now so the daily cap applies within this visit too.
     setSessionsToday((x) => x + 1);
 
-    // Mastered milestone (every 10 mastered → confetti)
-    const newMastered = newProgress.filter((p) => p.confidence >= 4).length;
+    // Mastery recognition.
+    //
+    // Previously this fired confetti every 10 mastered words and said nothing —
+    // celebration with no explanation. Now we identify WHICH words crossed the
+    // line this session and name them, and the milestone states what was
+    // reached. Mastery is the app's most meaningful number; it should not be
+    // something the user has to infer.
+    const wasMastered = new Set(
+      progress.filter((p) => p.confidence >= 4 || p.manual_label === "easy").map((p) => p.word_key),
+    );
+    const crossed = newProgress
+      .filter(
+        (p) =>
+          (p.confidence >= 4 || p.manual_label === "easy") && !wasMastered.has(p.word_key),
+      )
+      .map((p) => findWord(p.word_key))
+      .filter(Boolean) as VocabWord[];
+    setNewlyMastered(crossed);
+
+    const newMastered = newProgress.filter(
+      (p) => p.confidence >= 4 || p.manual_label === "easy",
+    ).length;
+    setMasteredTotal(newMastered);
+
     const baseline = masteredBaselineRef.current;
     if (Math.floor(newMastered / 10) > Math.floor(baseline / 10)) {
       setConfettiKey((k) => k + 1);
+      // Name the milestone. Confetti alone left the user guessing what they had
+      // just achieved — the number is the point, not the animation.
+      setMasteredMilestone(Math.floor(newMastered / 10) * 10);
     }
     masteredBaselineRef.current = newMastered;
 
@@ -769,6 +800,9 @@ export default function VocabularyModule() {
       {stage === "results" && lastResults && (
         <Results
           sessionDelta={sessionDelta}
+          newlyMastered={newlyMastered}
+          masteredTotal={masteredTotal}
+          masteredMilestone={masteredMilestone}
           answers={lastResults.answers}
           newWords={lastResults.newWords}
           reviewCount={reviewKeys.length}
@@ -1512,8 +1546,14 @@ function Results({
   onPracticeMore,
   isPaid,
   sessionDelta,
+  newlyMastered,
+  masteredTotal,
+  masteredMilestone,
 }: {
   sessionDelta: number | null;
+  newlyMastered: VocabWord[];
+  masteredTotal: number;
+  masteredMilestone: number | null;
   answers: { wordKey: string; correct: boolean }[];
   newWords: VocabWord[];
   reviewCount: number;
@@ -1582,6 +1622,15 @@ function Results({
           <p className="ka text-sm text-[#F5F4F2]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-[#E5D4A8] mt-3 font-semibold">{message}</p>
 
+          {masteredMilestone !== null && (
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9A84C] text-[#1C1C1E]">
+              <span className="text-sm">✦</span>
+              <span className="ka text-[13px] font-bold">
+                {masteredMilestone} სიტყვა სრულად ნასწავლი
+              </span>
+            </div>
+          )}
+
           {/* Progress gained this session. The absolute percentage moves slowly
               across 980 words; the delta is what makes the session feel like it
               counted. Only shown when it is actually positive. */}
@@ -1599,10 +1648,41 @@ function Results({
         <SummaryStat label="სულ ლექსიკაში" value={totalVocab} />
       </div>
 
+      {/* TRUE mastery — words that crossed the full bar this session: 4+ correct
+          answers, on 3+ separate days, including 2 production-type answers.
+          Distinct from the list below, which is simply what went well today.
+          This is the app's most meaningful achievement and was previously
+          invisible — only silent confetti every ten words. */}
+      {newlyMastered.length > 0 && (
+        <BizCard className="border-[#C9A84C]/50 bg-[#FBF8F0]">
+          <div className="flex items-center justify-between">
+            <p className="ka text-[11px] uppercase tracking-wider text-[#8A6D2F] font-semibold">
+              ✦ სრულად ნასწავლი
+            </p>
+            <p className="ka text-[11px] text-[#8A6D2F]">
+              სულ {masteredTotal}
+            </p>
+          </div>
+          <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
+            {newlyMastered.length === 1
+              ? "ეს სიტყვა უკვე მყარად იცი — რამდენჯერმე, სხვადასხვა დღეს, დამოუკიდებლადაც დაწერე."
+              : "ეს სიტყვები უკვე მყარად იცი — რამდენჯერმე, სხვადასხვა დღეს, დამოუკიდებლადაც დაწერე."}
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {newlyMastered.map((w) => (
+              <li key={w.key} className="flex items-baseline justify-between gap-3">
+                <span className="text-sm font-bold text-[#5C1A2E]">{w.en}</span>
+                <span className="ka text-xs text-[#4A4A4A] text-right">{w.ka}</span>
+              </li>
+            ))}
+          </ul>
+        </BizCard>
+      )}
+
       {mastered.length > 0 && (
         <BizCard>
           <p className="ka text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">
-            დაძლეული სიტყვები
+            დღეს კარგად გამოვიდა
           </p>
           <ul className="mt-2 space-y-1.5">
             {mastered.map((w) => (
