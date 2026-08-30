@@ -79,6 +79,12 @@ export type BusinessState = {
   trialDeclined?: boolean;
   /** The end-of-trial screen has been shown, so it only appears once. */
   trialEndSeen?: boolean;
+  /**
+   * Highest vocabulary milestone already celebrated (10, 20, ... 100).
+   * Persisted so the celebration shows ONCE on the dashboard and does not
+   * reappear on every visit.
+   */
+  lastVocabMilestone?: number;
 };
 
 

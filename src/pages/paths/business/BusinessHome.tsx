@@ -9,8 +9,8 @@ import {
   Library,
   Star,
   Target,
+  Check,
   ArrowRight,
-
   Instagram,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -40,6 +40,8 @@ import {
   pickDailyScenario,
   planSession,
   summarizeVocabProgress,
+  milestoneLetters,
+  MILESTONE_WORD,
   nextMilestone as nextVocabMilestone,
   type VocabProgressSummary,
 } from "./lib/vocabEngine";
@@ -89,6 +91,11 @@ export default function BusinessHome() {
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
   const [vocabSummary, setVocabSummary] = useState<VocabProgressSummary | null>(null);
+  // Milestone celebration shown on RETURN to the dashboard, not on the results
+  // screen — the user asked for it here, and it works better: arriving back at
+  // the dashboard to a celebration reads as the app noticing, rather than as
+  // one more panel at the end of a session.
+  const [milestoneCelebration, setMilestoneCelebration] = useState<number | null>(null);
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
@@ -192,7 +199,18 @@ export default function BusinessHome() {
           const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);
-          setVocabSummary(summarizeVocabProgress(vp));
+          const summary = summarizeVocabProgress(vp);
+          setVocabSummary(summary);
+
+          // Has a new 10% milestone been reached since we last celebrated?
+          // `lastVocabMilestone` is persisted, so this fires exactly once.
+          const reached = Math.min(100, Math.floor(summary.percent / 10) * 10);
+          const alreadyShown = cur.lastVocabMilestone ?? 0;
+          if (reached >= 10 && reached > alreadyShown) {
+            setMilestoneCelebration(reached);
+            track("vocab_milestone_reached", { pct: reached });
+            saveBusiness(user.id, { lastVocabMilestone: reached });
+          }
         }
       } catch {}
 
@@ -593,13 +611,16 @@ export default function BusinessHome() {
                   <span className="ka text-[10px] uppercase tracking-wider text-[#F5F4F2]/70 font-semibold">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
-                  {!focusDoneToday && (
+                  {focusDoneToday ? (
+                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-[#F5F4F2]/20 text-[#F5F4F2]/85 px-2 py-0.5 rounded-md font-semibold">
+                      <Check size={11} strokeWidth={2.5} /> დასრულდა
+                    </span>
+                  ) : (
                     <span className="ka text-[10px] inline-flex items-center gap-1 text-[#F5F4F2]/70">
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
                 </div>
-
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
@@ -820,6 +841,13 @@ export default function BusinessHome() {
           </section>
 
           <SocialRow />
+
+          {milestoneCelebration !== null && (
+            <MilestoneCelebration
+              pct={milestoneCelebration}
+              onClose={() => setMilestoneCelebration(null)}
+            />
+          )}
         </>
       )}
     </BusinessShell>
@@ -866,6 +894,105 @@ const SOCIAL_PROMPTS = [
   "რა უნდა გავაუმჯობესოთ?",
   "შემოგვიერთდი სოციალურ ქსელებში",
 ];
+
+/**
+ * Milestone celebration. Full-screen, dismissible, shown once per 10% reached.
+ *
+ * The word "ბიზნესმენი" is exactly ten letters, so each 10% reveals one more —
+ * the user spells out what they are becoming. That gives an abstract percentage
+ * something concrete to reach for, and the unrevealed letters show how far is
+ * left without needing a second number.
+ */
+function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => void }) {
+  const earned = milestoneLetters(pct);
+  const rest = MILESTONE_WORD.slice(earned.length);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-5 bg-[#1C1C1E]/70 backdrop-blur-sm animate-[bizFade_.3s_ease-out_both]"
+      onClick={onClose}
+    >
+      <MilestoneConfetti />
+      <div
+        className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-[#5C1A2E] to-[#4A1526] text-[#F8F5F0] p-7 text-center shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-5xl">🎉</div>
+
+        <p className="ka text-2xl font-bold mt-4">{pct}% დაძლეულია</p>
+
+        {/* Earned letters in gold, the rest faded — progress you can see. */}
+        <p className="mt-5 text-3xl font-extrabold tracking-wide">
+          <span className="text-[#C9A84C]">{earned}</span>
+          <span className="text-[#F8F5F0]/25">{rest}</span>
+        </p>
+
+        <p className="ka text-sm text-[#F8F5F0]/80 mt-4 leading-relaxed">
+          „ბიზნესმენი“-დან <b className="text-[#C9A84C]">„{earned}“</b> უკვე ხარ.
+        </p>
+
+        {pct === 100 && (
+          <p className="ka text-sm text-[#C9A84C] font-bold mt-3">
+            სრული ლექსიკა დაძლეულია — გილოცავ!
+          </p>
+        )}
+
+        <button
+          onClick={onClose}
+          className="ka mt-6 w-full h-12 rounded-2xl bg-[#C9A84C] text-[#1C1C1E] text-sm font-bold"
+        >
+          გავაგრძელოთ
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MilestoneConfetti() {
+  const pieces = useMemo(() => {
+    const colors = ["#C9A84C", "#E5D4A8", "#F8F5F0", "#5A8A6A"];
+    return Array.from({ length: 40 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 400,
+      duration: 1600 + Math.random() * 1200,
+      color: colors[i % colors.length],
+      size: 6 + Math.round(Math.random() * 7),
+      rot: Math.round(Math.random() * 360),
+    }));
+  }, []);
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" data-milestone-confetti aria-hidden>
+      {/* Keyframes defined locally: bizConfettiFall is used by the vocab module
+          but lives in a global stylesheet, and this component must not silently
+          fail to animate if that changes. Duplicating six lines is cheaper than
+          a celebration that does nothing. */}
+      <style>{`
+        @keyframes bizConfettiFall {
+          0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-milestone-confetti] span { animation: none !important; opacity: 0 !important; }
+        }
+      `}</style>
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="absolute top-0 rounded-sm"
+          style={{
+            left: `${p.left}%`,
+            width: p.size,
+            height: p.size * 0.4,
+            background: p.color,
+            transform: `rotate(${p.rot}deg)`,
+            animation: `bizConfettiFall ${p.duration}ms ease-in ${p.delay}ms forwards`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 function SocialRow() {
   // useMemo keyed to nothing: chosen once per mount, so a re-render mid-session

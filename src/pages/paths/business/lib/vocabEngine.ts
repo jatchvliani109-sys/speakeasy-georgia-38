@@ -1425,20 +1425,32 @@ export function summarizeVocabProgress(rows: ProgressRow[]): VocabProgressSummar
   return { percent, known, learning, fresh, started, remaining: Math.max(0, total - started), total };
 }
 
-// Milestones. Deliberately dense early — the first ones must be reachable in
-// the first week or they motivate nobody — then spaced out.
-export type Milestone = { pct: number; titleKa: string; subKa: string };
+// Milestones every 10%, each revealing one more letter of "ბიზნესმენი".
+//
+// The word is exactly ten letters, so one letter per 10% lands the final ი at
+// 100%. The user is literally spelling out what they are becoming — which gives
+// a percentage, an abstract number, something concrete to reach for.
+export const MILESTONE_WORD = "ბიზნესმენი";
 
-export const VOCAB_MILESTONES: Milestone[] = [
-  { pct: 1,   titleKa: "დაწყებულია",        subKa: "პირველი ნაბიჯი გადადგმულია" },
-  { pct: 5,   titleKa: "5% დაფარულია",      subKa: "რიტმი აღებულია" },
-  { pct: 10,  titleKa: "10% — პირველი ათი", subKa: "ყოველი მეათე სიტყვა უკვე შენია" },
-  { pct: 25,  titleKa: "მეოთხედი გავლილია", subKa: "ეს უკვე სერიოზული პროგრესია" },
-  { pct: 50,  titleKa: "ნახევარი გზა",      subKa: "ლექსიკის ნახევარი უკვე იცი" },
-  { pct: 75,  titleKa: "სამი მეოთხედი",     subKa: "ბოლო მონაკვეთი დარჩა" },
-  { pct: 90,  titleKa: "90% — ფინიშთან",    subKa: "დასასრული ახლოსაა" },
-  { pct: 100, titleKa: "სრული ლექსიკა",     subKa: "ცხრაასამდე სიტყვა — დასრულებულია" },
-];
+export type Milestone = {
+  pct: number;
+  /** Letters revealed so far, e.g. "ბიზ". */
+  letters: string;
+  /** The full word, for showing the unrevealed remainder greyed out. */
+  word: string;
+};
+
+export const VOCAB_MILESTONES: Milestone[] = Array.from({ length: 10 }, (_, i) => ({
+  pct: (i + 1) * 10,
+  letters: MILESTONE_WORD.slice(0, i + 1),
+  word: MILESTONE_WORD,
+}));
+
+/** Letters earned at the current percentage — drives the dashboard display. */
+export function milestoneLetters(pct: number): string {
+  const steps = Math.min(10, Math.floor(pct / 10));
+  return MILESTONE_WORD.slice(0, steps);
+}
 
 /** The milestone just reached, if any, given the previous percentage. */
 export function milestoneCrossed(prevPct: number, nextPct: number): Milestone | null {
