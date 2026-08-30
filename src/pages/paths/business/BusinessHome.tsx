@@ -9,8 +9,8 @@ import {
   Library,
   Star,
   Target,
-  Check,
   ArrowRight,
+
   Instagram,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -593,16 +593,13 @@ export default function BusinessHome() {
                   <span className="ka text-[10px] uppercase tracking-wider text-[#F5F4F2]/70 font-semibold">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
-                  {focusDoneToday ? (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-[#F5F4F2]/20 text-[#F5F4F2]/85 px-2 py-0.5 rounded-md font-semibold">
-                      <Check size={11} strokeWidth={2.5} /> დასრულდა
-                    </span>
-                  ) : (
+                  {!focusDoneToday && (
                     <span className="ka text-[10px] inline-flex items-center gap-1 text-[#F5F4F2]/70">
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
                 </div>
+
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
