@@ -34,7 +34,15 @@ import {
   trialDaysLeft,
   aiSessionsRemaining,
 } from "./lib/state";
-import { computeStreakWithFreezes, loadProgress, pickDailyScenario, planSession } from "./lib/vocabEngine";
+import {
+  computeStreakWithFreezes,
+  loadProgress,
+  pickDailyScenario,
+  planSession,
+  summarizeVocabProgress,
+  nextMilestone as nextVocabMilestone,
+  type VocabProgressSummary,
+} from "./lib/vocabEngine";
 import type { VocabWord } from "./lib/vocabBank";
 
 const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
@@ -80,6 +88,7 @@ export default function BusinessHome() {
   const [savingName, setSavingName] = useState(false);
   const [s, setS] = useState<BusinessState | null>(null);
   const [progress, setProgress] = useState<Record<string, ModuleProgress>>({});
+  const [vocabSummary, setVocabSummary] = useState<VocabProgressSummary | null>(null);
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
@@ -183,6 +192,7 @@ export default function BusinessHome() {
           const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);
+          setVocabSummary(summarizeVocabProgress(vp));
         }
       } catch {}
 
@@ -741,6 +751,58 @@ export default function BusinessHome() {
               <BarChart2 size={12} strokeWidth={2.25} /> პროგრესი
             </p>
             <BizCard>
+              {/* Overall vocabulary progress — the number that makes months of
+                  work visible. Weighted rather than mastered-only: mastery needs
+                  correct answers across three separate days, so a user with
+                  weeks of effort can still have very few "known" words. Showing
+                  only those would report ~1% after 18 sessions. */}
+              {vocabSummary && (
+                <div className="mb-4 pb-4 border-b border-[#E4E2DF]">
+                  <div className="flex items-end justify-between mb-2">
+                    <div>
+                      <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+                        ბიზნეს ლექსიკა
+                      </p>
+                      <p className="ka text-[11px] text-[#8A8A8A] mt-0.5">
+                        {vocabSummary.known} ვიცი · {vocabSummary.learning} ვსწავლობ ·{" "}
+                        {vocabSummary.total} სულ
+                      </p>
+                    </div>
+                    <p className="text-2xl font-extrabold text-[#5C1A2E] tabular-nums leading-none">
+                      {vocabSummary.percent}%
+                    </p>
+                  </div>
+
+                  <div className="h-2.5 rounded-full bg-[#F5F4F2] overflow-hidden">
+                    {/* Two segments: solid for mastered, lighter for in-progress,
+                        so the bar shows momentum rather than only finished work. */}
+                    <div className="h-full flex">
+                      <div
+                        className="h-full bg-[#5C1A2E] transition-all duration-700"
+                        style={{ width: `${(vocabSummary.known / vocabSummary.total) * 100}%` }}
+                      />
+                      <div
+                        className="h-full bg-[#C9A84C] transition-all duration-700"
+                        style={{
+                          width: `${((vocabSummary.learning * 0.5 + vocabSummary.fresh * 0.15) / vocabSummary.total) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const nm = nextVocabMilestone(vocabSummary.percent);
+                    if (!nm) return null;
+                    const left = Math.max(0.1, Math.round((nm.pct - vocabSummary.percent) * 10) / 10);
+                    return (
+                      <p className="ka text-[11px] text-[#4A4A4A] mt-2">
+                        კიდევ <b>{left}%</b> — „{nm.titleKa}"
+                      </p>
+                    );
+                  })()}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <Stat label="🔥 Streak" value={String(streak)} />
                 <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />

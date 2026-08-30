@@ -1318,6 +1318,120 @@ export async function ingestExternalPhrases(userId: string, existing: ProgressRo
   return [...existing, ...newRows];
 }
 
+// ---------------- Overall progress ----------------
+//
+// A single number the user can watch move, and the basis for milestones.
+//
+// Why partial credit: mastery requires correct answers across THREE DIFFERENT
+// DAYS, so it is gated by the calendar, not effort. A user with 18 sessions had
+// only 11 mastered words but many more in progress — counting only mastered
+// words would have shown them almost nothing after weeks of real work, which is
+// exactly the wrong signal.
+//
+// Weighting is per CONFIDENCE LEVEL, not per tab. An earlier version used three
+// buckets matching the lexicon tabs, which created a dead zone: promoting a word
+// from confidence 2 to 3 changed nothing, so a review-heavy session could move
+// the number by zero. Every improvement should register.
+//
+//   confidence 0 (seen, weak)   -> 0.15
+//   confidence 1                -> 0.30
+//   confidence 2                -> 0.50
+//   confidence 3                -> 0.75
+//   confidence 4-5, or "easy"   -> 1.00   (= ვიცი)
+//   never seen                  -> 0
+//
+// The tab COUNTS still follow the lexicon's own thresholds, so the two never
+// disagree on what "ვიცი" means — only the percentage is finer-grained.
+const CONFIDENCE_WEIGHT: Record<number, number> = {
+  0: 0.15,
+  1: 0.30,
+  2: 0.50,
+  3: 0.75,
+  4: 1.00,
+  5: 1.00,
+};
+
+export const TOTAL_VOCAB_WORDS = ALL_WORDS.length;
+
+export type VocabProgressSummary = {
+  /** 0-100, one decimal. The headline number. */
+  percent: number;
+  /** Fully mastered — the ვიცი tab. */
+  known: number;
+  /** In progress — the ვსწავლობ tab. */
+  learning: number;
+  /** Seen at least once but still weak. */
+  fresh: number;
+  /** Touched at all (known + learning + fresh). */
+  started: number;
+  /** Never encountered. */
+  remaining: number;
+  total: number;
+};
+
+export function summarizeVocabProgress(rows: ProgressRow[]): VocabProgressSummary {
+  const total = TOTAL_VOCAB_WORDS;
+  let known = 0, learning = 0, fresh = 0;
+
+  for (const r of rows) {
+    const easy = r.manual_label === "easy";
+    if (r.confidence >= 4 || easy) known++;
+    else if (r.confidence >= 2) learning++;
+    else fresh++;
+  }
+
+  // Weighted by exact confidence, so every level-up moves the number.
+  let weighted = 0;
+  for (const r of rows) {
+    if (r.manual_label === "easy") { weighted += 1; continue; }
+    const c = Math.max(0, Math.min(5, Math.round(r.confidence ?? 0)));
+    weighted += CONFIDENCE_WEIGHT[c] ?? 0;
+  }
+  const percent = total > 0 ? Math.min(100, Math.round((weighted / total) * 1000) / 10) : 0;
+  const started = known + learning + fresh;
+
+  return { percent, known, learning, fresh, started, remaining: Math.max(0, total - started), total };
+}
+
+// Milestones. Deliberately dense early — the first ones must be reachable in
+// the first week or they motivate nobody — then spaced out.
+export type Milestone = { pct: number; titleKa: string; subKa: string };
+
+export const VOCAB_MILESTONES: Milestone[] = [
+  { pct: 1,   titleKa: "დაწყებულია",        subKa: "პირველი ნაბიჯი გადადგმულია" },
+  { pct: 5,   titleKa: "5% დაფარულია",      subKa: "რიტმი აღებულია" },
+  { pct: 10,  titleKa: "10% — პირველი ათი", subKa: "ყოველი მეათე სიტყვა უკვე შენია" },
+  { pct: 25,  titleKa: "მეოთხედი გავლილია", subKa: "ეს უკვე სერიოზული პროგრესია" },
+  { pct: 50,  titleKa: "ნახევარი გზა",      subKa: "ლექსიკის ნახევარი უკვე იცი" },
+  { pct: 75,  titleKa: "სამი მეოთხედი",     subKa: "ბოლო მონაკვეთი დარჩა" },
+  { pct: 90,  titleKa: "90% — ფინიშთან",    subKa: "დასასრული ახლოსაა" },
+  { pct: 100, titleKa: "სრული ლექსიკა",     subKa: "ცხრაასამდე სიტყვა — დასრულებულია" },
+];
+
+/** The milestone just reached, if any, given the previous percentage. */
+export function milestoneCrossed(prevPct: number, nextPct: number): Milestone | null {
+  for (let i = VOCAB_MILESTONES.length - 1; i >= 0; i--) {
+    const m = VOCAB_MILESTONES[i];
+    if (prevPct < m.pct && nextPct >= m.pct) return m;
+  }
+  return null;
+}
+
+/**
+ * Progress gained in a session, for the "+0.3% დღეს" line.
+ *
+ * Attributing movement to the session the user just finished is far more
+ * motivating than the absolute figure, which barely changes at this scale.
+ */
+export function progressDelta(beforePct: number, afterPct: number): number {
+  return Math.round((afterPct - beforePct) * 10) / 10;
+}
+
+/** The next milestone to aim at — powers "დარჩა X% შემდეგ ეტაპამდე". */
+export function nextMilestone(pct: number): Milestone | null {
+  return VOCAB_MILESTONES.find((m) => m.pct > pct) ?? null;
+}
+
 // ---------------- Notebook helpers ----------------
 
 export function progressToWord(p: ProgressRow): VocabWord | null {

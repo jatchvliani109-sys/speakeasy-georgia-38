@@ -30,6 +30,8 @@ import {
   type ProgressRow,
   type QuizQuestion,
   upsertProgress,
+  summarizeVocabProgress,
+  progressDelta,
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState,
   hasUnlimitedVocab,
@@ -86,6 +88,11 @@ export default function VocabularyModule() {
   const [selected, setSelected] = useState<string | number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [totalVocab, setTotalVocab] = useState(0);
+  // Progress gained this session — captured before and after the save so the
+  // results screen can show "+0.6% დღეს". The absolute percentage barely moves
+  // at 980 words; the delta is what makes a session feel like it counted.
+  const [sessionDelta, setSessionDelta] = useState<number | null>(null);
+
   const [lastResults, setLastResults] = useState<{
     answers: { wordKey: string; correct: boolean; production: boolean }[];
     newWords: VocabWord[];
@@ -472,6 +479,15 @@ export default function VocabularyModule() {
     playComplete();
     // Only discard the resume snapshot if the results actually reached the server.
     if (saveRes.ok) clearSessionSnapshot();
+
+    // Percentage before this session's rows were applied, versus after.
+    try {
+      const before = summarizeVocabProgress(progress).percent;
+      const after = summarizeVocabProgress(newProgress).percent;
+      const d = progressDelta(before, after);
+      if (d > 0) setSessionDelta(d);
+    } catch { /* display only — never block the results screen */ }
+
     setLastResults({ answers: finalAnswers, newWords });
     setStage("results");
   };
@@ -752,6 +768,7 @@ export default function VocabularyModule() {
 
       {stage === "results" && lastResults && (
         <Results
+          sessionDelta={sessionDelta}
           answers={lastResults.answers}
           newWords={lastResults.newWords}
           reviewCount={reviewKeys.length}
@@ -776,11 +793,14 @@ function IntroCard({
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#1C1C1E]/15 blur-2xl pointer-events-none" />
       <div className="relative">
         <p className="ka text-[10px] uppercase tracking-wider bg-[#1C1C1E]/20 text-[#E5D4A8] px-2 py-1 rounded-md font-semibold inline-block">
-          შემდეგი სესია
+          დღევანდელი სესია
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {newWords.length} ახალი სიტყვა · {reviewCount} გასამეორებელი
         </h2>
+        <p className="ka text-sm text-[#F5F4F2]/80 mt-2 leading-relaxed">
+          ჯერ ვისწავლი ახალ სიტყვებს ბარათების სახით. შემდეგ — მოკლე ქვიზი ნასწავლის შესამოწმებლად.
+        </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           <Mini label="ბარათები" value={`${newWords.length}`} />
           <Mini label="გასამეორებელი" value={`${reviewCount}`} />
@@ -1494,7 +1514,9 @@ function Results({
   canPracticeMore,
   onPracticeMore,
   isPaid,
+  sessionDelta,
 }: {
+  sessionDelta: number | null;
   answers: { wordKey: string; correct: boolean }[];
   newWords: VocabWord[];
   reviewCount: number;
@@ -1562,6 +1584,15 @@ function Results({
           <p className="text-6xl font-bold mt-2 tabular-nums"><CountUp to={pct} duration={1200} />%</p>
           <p className="ka text-sm text-[#F5F4F2]/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-[#E5D4A8] mt-3 font-semibold">{message}</p>
+
+          {/* Progress gained this session. The absolute percentage moves slowly
+              across 980 words; the delta is what makes the session feel like it
+              counted. Only shown when it is actually positive. */}
+          {sessionDelta !== null && sessionDelta > 0 && (
+            <p className="ka text-[13px] text-[#C9A84C] mt-2 font-bold">
+              +{sessionDelta}% ლექსიკის პროგრესი
+            </p>
+          )}
         </div>
       </div>
 
