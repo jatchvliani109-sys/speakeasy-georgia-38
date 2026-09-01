@@ -279,8 +279,8 @@ export default function TrialGift() {
             />
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
-              title="ყველა ფუნქცია ხელმისაწვდომი შენთვის რადგან გვინდა რომ გქონდეს \"full picture\". "
-              sub="\n"
+              title={'ყველა ფუნქცია ხელმისაწვდომი შენთვის რადგან გვინდა რომ გქონდეს "full picture". '}
+              sub={"\n"}
               last
             />
 
