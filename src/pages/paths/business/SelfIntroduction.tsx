@@ -130,7 +130,7 @@ export default function SelfIntroduction() {
 
   // Business state decides AI access. It was previously fetched and discarded —
   // only its side effects were used.
-  const [biz, setBiz] = useState<BusinessState | null>(null);
+  const [biz, setBiz] = useState<BusinessState | null>(() => null);
 
   useEffect(() => {
     if (!user) return;
@@ -166,7 +166,6 @@ export default function SelfIntroduction() {
   }, [user]);
 
 
-  const biz = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
   const tier = tierOf(biz?.level);
   const isBeginner = tier === "beginner";
   const isElementary = tier === "elementary";
