@@ -130,7 +130,7 @@ export default function SelfIntroduction() {
 
   // Business state decides AI access. It was previously fetched and discarded —
   // only its side effects were used.
-  const [biz, setBiz] = useState<BusinessState | null>(null);
+  const [biz, setBiz] = useState<BusinessState | null>(() => null);
 
   useEffect(() => {
     if (!user) return;
