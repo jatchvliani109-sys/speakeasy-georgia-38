@@ -33,8 +33,9 @@ export type TrackEvent =
   // core loop
   | "vocab_session_started"
   | "vocab_session_completed"
-  | "vocab_session_abandoned"
   | "vocab_milestone_reached"
+  | "vocab_session_abandoned"
+  | "streak_broken"
   // features
   | "interview_started"
   | "interview_completed"

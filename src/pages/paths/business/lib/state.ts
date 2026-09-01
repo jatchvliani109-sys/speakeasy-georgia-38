@@ -80,6 +80,14 @@ export type BusinessState = {
   /** The end-of-trial screen has been shown, so it only appears once. */
   trialEndSeen?: boolean;
   /**
+   * Longest Streak ever reached. Without this the app cannot tell a broken
+   * Streak from a fresh start, so the moment a user is most likely to quit
+   * passes in silence.
+   */
+  bestStreak?: number;
+  /** Best Streak value already acknowledged, so the message shows once. */
+  streakBreakSeen?: number;
+  /**
    * Highest vocabulary milestone already celebrated (10, 20, ... 100).
    * Persisted so the celebration shows ONCE on the dashboard and does not
    * reappear on every visit.

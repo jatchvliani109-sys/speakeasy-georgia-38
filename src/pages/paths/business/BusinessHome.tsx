@@ -12,6 +12,7 @@ import {
   Check,
   ArrowRight,
   Instagram,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
@@ -96,6 +97,10 @@ export default function BusinessHome() {
   // the dashboard to a celebration reads as the app noticing, rather than as
   // one more panel at the end of a session.
   const [milestoneCelebration, setMilestoneCelebration] = useState<number | null>(null);
+  // A broken Streak previously passed in silence: 40 days became 1 with no
+  // acknowledgement, at exactly the moment a user is most likely to give up.
+  // Held here so the dashboard can say something once, then move on.
+  const [brokenStreak, setBrokenStreak] = useState<number | null>(null);
   const [hasResume, setHasResume] = useState<boolean>(false);
   const [vocabWordCount, setVocabWordCount] = useState<number>(0);
   const [vocabNewToday, setVocabNewToday] = useState<number>(0);
@@ -277,13 +282,41 @@ export default function BusinessHome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streakDates, user]);
 
+  // Record the best Streak, and notice when one has been lost.
+  //
+  // Deliberately gentle. This fires at the point of highest churn risk, and
+  // guilt is what makes someone close an app rather than reopen it. The message
+  // leads with what they KEPT, because that part is true and it is the actual
+  // argument against giving up.
+  useEffect(() => {
+    if (!user || !s) return;
+    const best = s.bestStreak ?? 0;
+
+    // New record: just store it, say nothing. The Streak card already
+    // celebrates growth.
+    if (streak > best) {
+      saveBusiness(user.id, { bestStreak: streak });
+      return;
+    }
+
+    // A Streak worth mourning was lost, and we have not said so yet.
+    // The threshold of 3 avoids commenting on a one-day lapse.
+    const alreadySeen = s.streakBreakSeen ?? 0;
+    if (best >= 3 && streak <= 1 && alreadySeen < best) {
+      setBrokenStreak(best);
+      saveBusiness(user.id, { streakBreakSeen: best });
+      track("streak_broken", { best });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streak, user, s]);
+
   // Streak drama scales with the count (Duolingo-style): bigger flame, richer
   // card, escalating copy, and a progress bar toward the next milestone.
   const streakTier = streak >= 30 ? 4 : streak >= 14 ? 3 : streak >= 7 ? 2 : streak >= 3 ? 1 : 0;
   const nextMilestone = streak >= 30 ? null : streak >= 14 ? 30 : streak >= 7 ? 14 : streak >= 3 ? 7 : 3;
   const streakMsg =
     streakTier === 4
-      ? "ლეგენდარული სერია! 👑"
+      ? "ლეგენდარული Streak 👑"
       : streakTier === 3
         ? "ორ კვირაზე მეტი — სერიოზული ხარ 🏆"
         : streakTier === 2
@@ -443,9 +476,14 @@ export default function BusinessHome() {
                     <p className={`ka text-[10px] mt-0.5 font-semibold ${streakDark ? "text-[#C9A84C]" : "text-[#4A4A4A]"}`}>
                       {streakMsg}
                     </p>
+                    {(s?.bestStreak ?? 0) > streak && (s?.bestStreak ?? 0) >= 3 && (
+                      <p className={`ka text-[9px] mt-0.5 ${streakDark ? "text-[#F5F4F2]/50" : "text-[#8A8A8A]"}`}>
+                        რეკორდი {s?.bestStreak} დღე
+                      </p>
+                    )}
                     {usedFreezeToday && (
                       <p className={`ka text-[9px] mt-0.5 font-semibold ${streakDark ? "text-[#7FB2D9]" : "text-[#5C1A2E]"}`}>
-                        ❄ სერია გადარჩა!
+                        ❄ Streak გადარჩა
                       </p>
                     )}
                   </div>
@@ -552,6 +590,45 @@ export default function BusinessHome() {
                 </div>
               </div>
             </section>
+          )}
+
+          {brokenStreak !== null && (
+            <BizCard className="mb-4 border-l-2 border-l-[#C9A84C]">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="ka text-sm font-bold text-[#1C1C1E]">
+                    {brokenStreak} დღიანი Streak შეწყდა
+                  </p>
+                  <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
+                    ნასწავლი სიტყვები, პროგრესი და ლექსიკონი ადგილზეა. მარტო
+                    Streak დაიწყო თავიდან.
+                  </p>
+                  {vocabSummary && (
+                    <p className="ka text-xs text-[#5C1A2E] mt-2 font-semibold">
+                      {vocabSummary.known} სიტყვა უკვე იცი. {vocabSummary.percent}% დაფარულია.
+                    </p>
+                  )}
+                  <p className="ka text-xs text-[#4A4A4A] mt-2 leading-relaxed">
+                    ერთი სესია და ახალი Streak დაიწყება. რეკორდი {brokenStreak} დღეა.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setBrokenStreak(null)}
+                  aria-label="დახურვა"
+                  className="shrink-0 -mt-1 -mr-1 p-1.5 text-[#8A8A8A] hover:text-[#1C1C1E]"
+                >
+                  <X size={15} strokeWidth={2.5} />
+                </button>
+              </div>
+              <Link
+                to="/path/business/vocabulary"
+                onClick={() => setBrokenStreak(null)}
+                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-sm font-bold"
+              >
+                დღევანდელი სესია
+                <ArrowRight size={15} strokeWidth={2.25} />
+              </Link>
+            </BizCard>
           )}
 
           {/* Trial banner — shown INSTEAD of the upgrade prompt while the trial
