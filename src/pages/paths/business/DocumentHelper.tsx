@@ -19,7 +19,8 @@ import {
   saveDocument,
   updateDocument,
 } from "./lib/docs";
-import { aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, type BusinessState } from "./lib/state";
+import { aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, type BusinessState } from "./lib/state";
+import AiLockedCard from "./AiLockedCard";
 
 // Every document generation draws one session from the unified weekly AI
 // budget (shared with interviews + self-introduction). Edits/deletes/library
@@ -120,12 +121,22 @@ export default function DocumentHelper() {
         <p className="ka text-sm text-[#4A4A4A] mt-1">
           რეალური პროფესიონალური დოკუმენტები — შენი მონაცემებით, წამიერად.
         </p>
-        <p className="ka text-[11px] text-[#4A4A4A] mt-1">
-          ამ კვირაში დარჩა {aiSessionsRemaining(state)}/{aiWeeklyLimit(state)} AI სესია
-        </p>
+        {!aiLocked(state) && (
+          <p className="ka text-[11px] text-[#4A4A4A] mt-1">
+            ამ კვირაში დარჩა {aiSessionsRemaining(state)}/{aiWeeklyLimit(state)} AI სესია
+          </p>
+        )}
       </header>
 
-      {view.kind === "home" && (
+      {aiLocked(state) && (
+        <AiLockedCard
+          title="დოკუმენტების ასისტენტი"
+          description="რეზიუმე, სამოტივაციო წერილი და ბიო — შენი მონაცემებით, პროფესიონალურ ინგლისურად."
+          trialAvailable={shouldOfferTrial(state)}
+        />
+      )}
+
+      {!aiLocked(state) && view.kind === "home" && (
         <HomeView
           docs={docs}
           onTool={(t) => setView({ kind: "tool", tool: t })}
@@ -134,7 +145,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {view.kind === "library" && (
+      {!aiLocked(state) && view.kind === "library" && (
         <LibraryView
           docs={docs}
           onBack={() => setView({ kind: "home" })}
@@ -146,7 +157,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {view.kind === "tool" && (
+      {!aiLocked(state) && view.kind === "tool" && (
         <ToolView
           tool={view.tool}
           profile={profile}
@@ -160,7 +171,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {view.kind === "doc" && (
+      {!aiLocked(state) && view.kind === "doc" && (
         <DocView
           doc={view.doc}
           onBack={() => setView({ kind: "library" })}

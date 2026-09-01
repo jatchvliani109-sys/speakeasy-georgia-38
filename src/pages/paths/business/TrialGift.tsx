@@ -275,7 +275,7 @@ export default function TrialGift() {
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
               title={`${TRIAL_AI_TOTAL} AI სესია`}
-              sub="გასაუბრების სიმულაცია, დოკუმენტები, თვითპრეზენტაცია"
+              sub="გასაუბრების სიმულაცია, დოკუმენტები, თვითპრეზენტაცია — პრემიუმში 7 ყოველ კვირას"
             />
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}

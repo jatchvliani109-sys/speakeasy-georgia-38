@@ -173,7 +173,14 @@ export function resetBusiness(uid: string) {
 
 // --- Weekly AI budget (client-side UI hint; the server enforces the real limit) ---
 
-export const FREE_WEEKLY_AI = 1;
+// AI is premium-only as of 2026-08-03. Free users get 0; the 7-day trial still
+// grants 3, so a new user experiences the feature before deciding — the trial is
+// now the ONLY route to AI for a non-paying user, which makes it a real taste
+// rather than a permanent allowance.
+//
+// Resume parsing is NOT covered by this quota. It stays free with a 5/day rate
+// limit: a one-time onboarding step and a dependency of the paid feature.
+export const FREE_WEEKLY_AI = 0;
 export const PREMIUM_WEEKLY_AI = 7;
 
 /** Monday of the current Tbilisi week — must match the server's currentAiWeekKey(). */
@@ -247,6 +254,11 @@ export function shouldShowTrialEnd(state: BusinessState | null | undefined, now:
   if (state.trialEndSeen) return false;         // already said goodbye
   const ends = trialEndsAt(state);
   return !!ends && now >= ends;
+}
+
+/** True when the user has no AI access at all — free tier, no active trial. */
+export function aiLocked(state: BusinessState | null | undefined): boolean {
+  return state?.mockPro !== true && !isTrialActive(state);
 }
 
 export function aiWeeklyLimit(state: BusinessState | null | undefined): number {

@@ -20,7 +20,11 @@ import {
   SELF_INTRO_PURPOSES,
   SELF_INTRO_STATUSES,
   tryConsumeAiSession,
+  aiLocked,
+  shouldOfferTrial,
+  type BusinessState,
 } from "./lib/state";
+import AiLockedCard from "./AiLockedCard";
 
 
 type GenResult = {
@@ -124,12 +128,19 @@ export default function SelfIntroduction() {
   const [saved, setSaved] = useState<SavedSelfIntro[]>([]);
   const [rewriting, setRewriting] = useState<string | null>(null);
 
+  // Business state decides AI access. It was previously fetched and discarded —
+  // only its side effects were used.
+  const [biz, setBiz] = useState<BusinessState | null>(null);
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      await pullBusinessFromSupabase(user.id);
-      if (!cancelled) setSaved(loadSelfIntros(user.id));
+      const bizState = await pullBusinessFromSupabase(user.id);
+      if (!cancelled) {
+        setBiz(bizState);
+        setSaved(loadSelfIntros(user.id));
+      }
       // Pre-fill from latest resume if user hasn't started typing yet
       const { data: resume } = await supabase
         .from("business_resumes")
@@ -252,6 +263,20 @@ export default function SelfIntroduction() {
   const STEP_LABELS = [
     "სტრუქტურა", "მაგალითები", "შენი ინფო", "შედეგი", "ფრაზები & პრაქტიკა", "შენახვა", "დასრულება"
   ];
+
+  // No AI access — locked but visible, so the value stays legible rather than
+  // the feature simply vanishing from the app.
+  if (aiLocked(biz)) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="თვითპრეზენტაცია"
+          description="შექმენი პროფესიონალური თვითპრეზენტაცია ინგლისურად — გასაუბრებისთვის, ქსელური შეხვედრებისთვის ან LinkedIn-ისთვის."
+          trialAvailable={shouldOfferTrial(biz)}
+        />
+      </BusinessShell>
+    );
+  }
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>

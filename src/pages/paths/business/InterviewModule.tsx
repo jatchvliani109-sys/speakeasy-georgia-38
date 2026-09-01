@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, aiSessionsRemaining, aiWeeklyLimit, pullBusinessFromSupabase, tryConsumeAiSession } from "./lib/state";
+import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, tryConsumeAiSession } from "./lib/state";
+import AiLockedCard from "./AiLockedCard";
 import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 import { randomRoleCard, type RoleCard } from "./lib/roleCards";
 
@@ -115,7 +116,10 @@ export default function InterviewModule() {
   const aiEmpty = aiRemaining <= 0;
   const aiLockedHint = isPaidUser
     ? "ამ კვირის AI სესიები ამოწურულია — ორშაბათს განახლდება"
-    : "ამ კვირის AI სესია გამოყენებულია — ⭐ პრემიუმი: 7/კვირაში";
+    : "ამ კვირის AI სესიები ამოწურულია";
+  // No AI access at all (free tier, no active trial) — show the locked card
+  // rather than a spent-quota message, which would imply they once had some.
+  const noAiAccess = aiLocked(biz);
   const [session, setSession] = useState<SessionData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -641,6 +645,21 @@ export default function InterviewModule() {
           {error && <p className="ka text-xs text-[#C0392B] mt-3">{error}</p>}
         </BizCard>
         <style>{`@keyframes loadbar { 0%{transform:translateX(-100%)} 100%{transform:translateX(250%)} }`}</style>
+      </BusinessShell>
+    );
+  }
+
+  // ---- No AI access: locked, but visible ----
+  // Placed after the loading state (so `biz` is populated) and before every
+  // interactive step, so no path into the interview bypasses it.
+  if (noAiAccess) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="გასაუბრების სიმულაცია"
+          description="ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება — რა გამოგივიდა და რა უნდა გააუმჯობესო."
+          trialAvailable={shouldOfferTrial(biz)}
+        />
       </BusinessShell>
     );
   }
