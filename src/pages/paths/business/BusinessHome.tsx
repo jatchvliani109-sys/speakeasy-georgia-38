@@ -885,9 +885,6 @@ export default function BusinessHome() {
                     </div>
                   </div>
 
-                   <p className="ka text-[11px] text-[#4A4A4A] mt-2">
-                     კიდევ 9.9%&nbsp;და "ბი"-ს მიაღწევ
-                   </p>
                 </div>
               )}
 
