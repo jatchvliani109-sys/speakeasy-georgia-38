@@ -74,44 +74,47 @@ const WaveDivider = ({
 const valueCards = [
   {
     icon: BookOpen,
-    title: "სტრუქტურირებული სწავლება",
+    title: "980 სიტყვა, ქართულად ახსნილი",
     body:
-      "მოდულები ელ-ფოსტებში, გასაუბრებებში, შეხვედრებსა და ლექსიკაში — ყველაფერი რეალური ბიზნეს კონტექსტში.",
+      "ყოველი სიტყვა — ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით. ყველა თარგმანი ხელით შემოწმებული.",
   },
   {
     icon: Target,
-    title: "პერსონალიზებული გეგმა",
+    title: "დღეში ხუთი წუთი",
     body:
-      "პლატფორმა ადაპტირდება შენს დონეზე, პროფესიასა და მიზნებზე — სწავლება, რომელიც შენზეა მორგებული.",
+      "მოკლე ყოველდღიური სესიები, რომლებიც სიტყვებს სწორ მომენტში გიბრუნებს — რომ ნასწავლი არ დაგავიწყდეს.",
   },
   {
     icon: TrendingUp,
-    title: "რეალური შედეგები",
+    title: "ქართველების შეცდომებზე",
     body:
-      "ისწავლე ის ინგლისური, რომელიც გამოგადგება — გასაუბრებებზე, კლიენტებთან, საერთაშორისო გარემოში.",
+      "არტიკლები, წინდებულები, კალკები — შევკრიბეთ შეცდომები, რომლებსაც სწორედ ქართველები უშვებენ ინგლისურში.",
   },
 ];
 
+// Only features that actually exist. The previous version advertised an email
+// module (deleted) and a meetings module (never built) — and understated the
+// vocabulary at 500 when the bank holds 980.
 const modules = [
-  {
-    icon: Mail,
-    title: "ბიზნეს ელ-ფოსტები",
-    body: "დაწერე პროფესიონალური, თავაზიანი და ეფექტური ელ-ფოსტები.",
-  },
-  {
-    icon: Briefcase,
-    title: "გასაუბრება",
-    body: "მოემზადე სამსახურის ინტერვიუსთვის და გაიმარჯვე.",
-  },
-  {
-    icon: Users,
-    title: "შეხვედრები",
-    body: "ისაუბრე თავდაჯერებულად სამუშაო შეხვედრებზე.",
-  },
   {
     icon: GraduationCap,
     title: "ბიზნეს ლექსიკა",
-    body: "შეიძინე 500+ პროფესიული სიტყვა და ფრაზა.",
+    body: "980 სიტყვა და ფრაზა — აუდიოთი, ქართული ახსნებით, ყოველდღიური სესიებით. უფასო ვერსიაშიც.",
+  },
+  {
+    icon: Briefcase,
+    title: "გასაუბრების სიმულაცია",
+    body: "ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება. პრემიუმში.",
+  },
+  {
+    icon: Mail,
+    title: "დოკუმენტები",
+    body: "რეზიუმე, სამოტივაციო წერილი და ბიო — შენი გამოცდილებით, პროფესიონალურ ინგლისურად. პრემიუმში.",
+  },
+  {
+    icon: Users,
+    title: "თვითპრეზენტაცია",
+    body: "მოამზადე შენი „tell me about yourself“ — გასაუბრებისთვის ან ქსელური შეხვედრებისთვის. პრემიუმში.",
   },
 ];
 
@@ -147,7 +150,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-[#F8F5F0] text-[#1C1C1E]">
       <SEO
         title="SpeakBusy — ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
-        description="ისწავლე ბიზნეს ინგლისური AI-powered პლატფორმით. პერსონალიზებული მოდულები ელ-ფოსტებში, გასაუბრებებში, შეხვედრებსა და ლექსიკაში. დაიწყე უფასოდ."
+        description="ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის — 980 სიტყვა ქართული ახსნებით და აუდიოთი, გასაუბრების სიმულაცია და დოკუმენტების მომზადება. დაიწყე უფასოდ."
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
@@ -186,16 +189,26 @@ const Index = () => {
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ბიზნეს ინგლისური,
-              <span className="block mt-2 text-[#C9A84C]">რომელიც კარიერას ცვლის.</span>
+              ბიზნეს ინგლისურს
+              <span className="block mt-2 text-[#C9A84C]">არსად გასწავლიან.</span>
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-[#B8B0A8] leading-relaxed max-w-2xl ka">
-              AI-powered სწავლების პლატფორმა ქართველი პროფესიონალებისთვის — პერსონალიზებული,
-              სტრუქტურირებული, შედეგზე ორიენტირებული.
+              არც ფაკულტეტზე, არც სამსახურში. მერე კი გასაუბრებაზე გეკითხებიან —
+              „Can we continue in English?“ SpeakBusy სწორედ ამისთვისაა:
+              980 ბიზნეს სიტყვა, ქართული ახსნებით, დღეში ხუთ წუთში.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Price and trial stated up front. The previous page mentioned
+                neither, so a visitor could not tell whether this was free,
+                cheap or expensive — and unanswered price questions are a
+                reason to leave. */}
+            <p className="mt-5 ka text-sm text-[#B8B0A8]">
+              უფასო ვერსია რეკლამების გარეშე · პრემიუმი 13.99 ₾/თვე ·
+              <span className="text-[#C9A84C] font-semibold"> პირველი 7 დღე უფასოდ</span>
+            </p>
+
+            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 to="/auth?mode=signup"
                 className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-base font-bold hover:bg-[#D4B560] transition-colors ka"
