@@ -763,6 +763,57 @@ export type Database = {
         }
         Relationships: []
       }
+      progress_backup: {
+        Row: {
+          confidence: number | null
+          correct_count: number | null
+          created_at: string | null
+          due_at: string | null
+          field: string | null
+          id: string | null
+          last_seen_at: string | null
+          manual_label: string | null
+          meta: Json | null
+          source: string | null
+          updated_at: string | null
+          user_id: string | null
+          word_key: string | null
+          wrong_count: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          correct_count?: number | null
+          created_at?: string | null
+          due_at?: string | null
+          field?: string | null
+          id?: string | null
+          last_seen_at?: string | null
+          manual_label?: string | null
+          meta?: Json | null
+          source?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          word_key?: string | null
+          wrong_count?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          correct_count?: number | null
+          created_at?: string | null
+          due_at?: string | null
+          field?: string | null
+          id?: string | null
+          last_seen_at?: string | null
+          manual_label?: string | null
+          meta?: Json | null
+          source?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          word_key?: string | null
+          wrong_count?: number | null
+        }
+        Relationships: []
+      }
       pronunciation_attempts: {
         Row: {
           created_at: string
