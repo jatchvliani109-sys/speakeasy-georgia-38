@@ -166,7 +166,6 @@ export default function SelfIntroduction() {
   }, [user]);
 
 
-  const biz = useMemo(() => (user ? loadBusiness(user.id) : null), [user]);
   const tier = tierOf(biz?.level);
   const isBeginner = tier === "beginner";
   const isElementary = tier === "elementary";
