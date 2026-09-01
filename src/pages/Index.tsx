@@ -76,19 +76,19 @@ const valueCards = [
     icon: BookOpen,
     title: "980 სიტყვა, ქართულად ახსნილი",
     body:
-      "ყოველი სიტყვა — ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით. ყველა თარგმანი ხელით შემოწმებული.",
+      "ყოველი სიტყვა ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით. ",
   },
   {
     icon: Target,
     title: "დღეში ხუთი წუთი",
     body:
-      "მოკლე ყოველდღიური სესიები, რომლებიც სიტყვებს სწორ მომენტში გიბრუნებს — რომ ნასწავლი არ დაგავიწყდეს.",
+      "მოკლე ყოველდღიური სესიები, რომლებიც სიტყვებს პერიოდულად გახსენებს რომ ნასწავლი არ დაგავიწყდეს.",
   },
   {
     icon: TrendingUp,
-    title: "ქართველების შეცდომებზე",
+    title: "ხშირად დაშვებული შეცდომები",
     body:
-      "არტიკლები, წინდებულები, კალკები — შევკრიბეთ შეცდომები, რომლებსაც სწორედ ქართველები უშვებენ ინგლისურში.",
+      "შეცდომები, რომლებიც ხშირად გვხვდება ინტეგრირებულია ლექსიკის სესიებში.",
   },
 ];
 
@@ -99,22 +99,22 @@ const modules = [
   {
     icon: GraduationCap,
     title: "ბიზნეს ლექსიკა",
-    body: "980 სიტყვა და ფრაზა — აუდიოთი, ქართული ახსნებით, ყოველდღიური სესიებით. უფასო ვერსიაშიც.",
+    body: "980 სიტყვა და ფრაზა აუდიოთი, ქართული ახსნებით, ყოველდღიური სესიებით. უფასო ვერსიაშიც.",
   },
   {
     icon: Briefcase,
     title: "გასაუბრების სიმულაცია",
-    body: "ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება. პრემიუმში.",
+    body: "ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება.",
   },
   {
     icon: Mail,
     title: "დოკუმენტები",
-    body: "რეზიუმე, სამოტივაციო წერილი და ბიო — შენი გამოცდილებით, პროფესიონალურ ინგლისურად. პრემიუმში.",
+    body: "რეზიუმე, სამოტივაციო წერილი და ბიო  შენი გამოცდილებით, პროფესიონალური ინგლისურით. ",
   },
   {
     icon: Users,
     title: "თვითპრეზენტაცია",
-    body: "მოამზადე შენი „tell me about yourself“ — გასაუბრებისთვის ან ქსელური შეხვედრებისთვის. პრემიუმში.",
+    body: "მოამზადე შენი „tell me about yourself“ - გასაუბრებისთვის ან ქსელური შეხვედრებისთვის.",
   },
 ];
 
@@ -189,13 +189,11 @@ const Index = () => {
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ბიზნეს ინგლისურს
-              <span className="block mt-2 text-[#C9A84C]">არსად გასწავლიან.</span>
+              ისწავლე ბიზნეს ინგლისური
+              <span className="block mt-2 text-[#C9A84C]">ერთ სივრცეში.</span>
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-[#B8B0A8] leading-relaxed max-w-2xl ka">
-              არც ფაკულტეტზე, არც სამსახურში. მერე კი გასაუბრებაზე გეკითხებიან —
-              „Can we continue in English?“ SpeakBusy სწორედ ამისთვისაა:
               980 ბიზნეს სიტყვა, ქართული ახსნებით, დღეში ხუთ წუთში.
             </p>
 
@@ -204,7 +202,7 @@ const Index = () => {
                 cheap or expensive — and unanswered price questions are a
                 reason to leave. */}
             <p className="mt-5 ka text-sm text-[#B8B0A8]">
-              უფასო ვერსია რეკლამების გარეშე · პრემიუმი 13.99 ₾/თვე ·
+              პრემიუმის
               <span className="text-[#C9A84C] font-semibold"> პირველი 7 დღე უფასოდ</span>
             </p>
 
@@ -315,7 +313,7 @@ const Index = () => {
                 to="/auth?mode=signup"
                 className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-base font-bold hover:bg-[#D4B560] transition-colors ka"
               >
-                დაიწყე ახლავე — უფასოა
+                დაიწყე ახლავე უფასოდ
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
@@ -333,7 +331,7 @@ const Index = () => {
                 გვითხარი, რას ფიქრობ
               </p>
               <p className="ka text-[13px] text-[#B8B0A8] mt-1.5 leading-relaxed max-w-md mx-auto">
-                SpeakBusy ჯერ ახალია და შენი აზრი ნამდვილად გვჭირდება — მოგვწერე
+                SpeakBusy ჯერ ახალია და შენი აზრი მნიშვნელოვანია. მოგვწერე
                 სოციალურ ქსელებში ან ელფოსტაზე.
               </p>
               <div className="flex items-center justify-center gap-3 mt-5">
