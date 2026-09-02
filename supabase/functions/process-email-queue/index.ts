@@ -1,11 +1,18 @@
 import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 const MAX_RETRIES = 5
 const DEFAULT_BATCH_SIZE = 10
 const DEFAULT_SEND_DELAY_MS = 200
 const DEFAULT_AUTH_TTL_MINUTES = 15
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60
+
+interface QueueMessage {
+  msg_id: number
+  read_ct: number
+  enqueued_at: string
+  message: Record<string, unknown>
+}
 
 // Check if an error is a rate-limit (429) response.
 // Uses EmailAPIError.status when available (email-js >=0.x with structured errors),
@@ -54,9 +61,9 @@ function parseJwtClaims(token: string): Record<string, unknown> | null {
 
 // Move a message to the dead letter queue and log the reason.
 async function moveToDlq(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, any, any, any, any>,
   queue: string,
-  msg: { msg_id: number; message: Record<string, unknown> },
+  msg: QueueMessage,
   reason: string
 ): Promise<void> {
   const payload = msg.message
@@ -66,13 +73,13 @@ async function moveToDlq(
     recipient_email: payload.to,
     status: 'dlq',
     error_message: reason,
-  })
+  } as any)
   const { error } = await supabase.rpc('move_to_dlq', {
     source_queue: queue,
     dlq_name: `${queue}_dlq`,
     message_id: msg.msg_id,
     payload,
-  })
+  } as any)
   if (error) {
     console.error('Failed to move message to DLQ', { queue, msg_id: msg.msg_id, reason, error })
   }
@@ -141,7 +148,7 @@ Deno.serve(async (req) => {
       queue_name: queue,
       batch_size: batchSize,
       vt: 30,
-    })
+    } as any)
 
     if (readError) {
       console.error('Failed to read email batch', { queue, error: readError })
@@ -150,12 +157,14 @@ Deno.serve(async (req) => {
 
     if (!messages?.length) continue
 
+    const typedMessages = messages as unknown as QueueMessage[]
+
     // Retry budget is based on real send failures, not pgmq read_ct.
     // read_ct increments for every message in a claimed batch, including
     // messages not attempted when a 429 stops processing early.
     const messageIds = Array.from(
       new Set(
-        messages
+        typedMessages
           .map((msg) =>
             msg?.message?.message_id && typeof msg.message.message_id === 'string'
               ? msg.message.message_id
@@ -189,8 +198,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    for (let i = 0; i < messages.length; i++) {
-      const msg = messages[i]
+    for (let i = 0; i < typedMessages.length; i++) {
+      const msg = typedMessages[i]
       const payload = msg.message
       const failedAttempts =
         payload?.message_id && typeof payload.message_id === 'string'
@@ -240,7 +249,7 @@ Deno.serve(async (req) => {
           const { error: dupDelError } = await supabase.rpc('delete_email', {
             queue_name: queue,
             message_id: msg.msg_id,
-          })
+          } as any)
           if (dupDelError) {
             console.error('Failed to delete duplicate message from queue', { queue, msg_id: msg.msg_id, error: dupDelError })
           }
@@ -276,13 +285,13 @@ Deno.serve(async (req) => {
           template_name: payload.label || queue,
           recipient_email: payload.to,
           status: 'sent',
-        })
+        } as any)
 
         // Delete from queue
         const { error: delError } = await supabase.rpc('delete_email', {
           queue_name: queue,
           message_id: msg.msg_id,
-        })
+        } as any)
         if (delError) {
           console.error('Failed to delete sent message from queue', { queue, msg_id: msg.msg_id, error: delError })
         }
@@ -304,7 +313,7 @@ Deno.serve(async (req) => {
             recipient_email: payload.to,
             status: 'rate_limited',
             error_message: errorMsg.slice(0, 1000),
-          })
+          } as any)
 
           const retryAfterSecs = getRetryAfterSeconds(error)
           await supabase
@@ -314,7 +323,7 @@ Deno.serve(async (req) => {
                 Date.now() + retryAfterSecs * 1000
               ).toISOString(),
               updated_at: new Date().toISOString(),
-            })
+            } as any)
             .eq('id', 1)
 
           // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
@@ -341,7 +350,7 @@ Deno.serve(async (req) => {
           recipient_email: payload.to,
           status: 'failed',
           error_message: errorMsg.slice(0, 1000),
-        })
+        } as any)
         if (payload?.message_id && typeof payload.message_id === 'string') {
           failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1)
         }
@@ -350,7 +359,7 @@ Deno.serve(async (req) => {
       }
 
       // Small delay between sends to smooth bursts
-      if (i < messages.length - 1) {
+      if (i < typedMessages.length - 1) {
         await new Promise((r) => setTimeout(r, sendDelayMs))
       }
     }
