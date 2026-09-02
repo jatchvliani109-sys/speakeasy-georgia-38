@@ -56,6 +56,39 @@ export default function BusinessPremium() {
     }
   };
 
+  // ── TEMPORARY PAYMENT TEST ────────────────────────────────────────────────
+  // Calls flitt-subscribe and shows the raw response on screen, so the Flitt
+  // signature can be verified without touching the browser console.
+  // DELETE this block, its state, and the panel in the render once payments work.
+  const [testResult, setTestResult] = useState<string>("");
+  const [testing, setTesting] = useState(false);
+
+  const runPaymentTest = async () => {
+    if (testing) return;
+    setTesting(true);
+    setTestResult("იგზავნება...");
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("flitt-subscribe", { body: {} });
+
+      if (error) {
+        // functions.invoke hides the response body on non-2xx; dig it out,
+        // because Flitt's error detail is the whole point of this test.
+        let detail = "";
+        try { detail = JSON.stringify(await (error as any).context?.json?.(), null, 2); }
+        catch { detail = String(error.message ?? error); }
+        setTestResult("ERROR:\n" + detail);
+      } else {
+        setTestResult(JSON.stringify(data, null, 2));
+      }
+    } catch (e: any) {
+      setTestResult("EXCEPTION:\n" + String(e?.message ?? e));
+    } finally {
+      setTesting(false);
+    }
+  };
+  // ── END TEMPORARY ─────────────────────────────────────────────────────────
+
   const cancel = async () => {
     if (!user || busy) return;
     setBusy(true);
@@ -70,6 +103,33 @@ export default function BusinessPremium() {
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+      {/* ── TEMPORARY PAYMENT TEST PANEL — delete once payments work ── */}
+      <div className="mb-4 rounded-xl border-2 border-dashed border-[#C0392B]/40 bg-[#FFF8F7] p-4">
+        <p className="text-[11px] uppercase tracking-wider text-[#C0392B] font-bold">
+          TEST ONLY — remove before launch
+        </p>
+        <button
+          onClick={runPaymentTest}
+          disabled={testing}
+          className="mt-2 px-4 py-2 rounded-lg bg-[#C0392B] text-white text-sm font-bold disabled:opacity-50"
+        >
+          {testing ? "..." : "Test Flitt connection"}
+        </button>
+        {testResult && (
+          <>
+            <pre className="mt-3 text-[10px] leading-relaxed bg-white border border-[#E4E2DF] rounded-lg p-3 overflow-auto max-h-72 whitespace-pre-wrap break-all">
+              {testResult}
+            </pre>
+            <button
+              onClick={() => navigator.clipboard?.writeText(testResult)}
+              className="mt-2 text-[11px] text-[#5C1A2E] underline"
+            >
+              copy result
+            </button>
+          </>
+        )}
+      </div>
+
       <div className="mb-4">
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] inline-flex items-center gap-2">
           <Star size={22} className="text-[#C9A84C] fill-[#C9A84C]" /> პრემიუმი
