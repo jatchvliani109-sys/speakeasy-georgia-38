@@ -313,7 +313,7 @@ Deno.serve(async (req) => {
             recipient_email: payload.to,
             status: 'rate_limited',
             error_message: errorMsg.slice(0, 1000),
-          })
+          } as any)
 
           const retryAfterSecs = getRetryAfterSeconds(error)
           await supabase
@@ -323,7 +323,7 @@ Deno.serve(async (req) => {
                 Date.now() + retryAfterSecs * 1000
               ).toISOString(),
               updated_at: new Date().toISOString(),
-            })
+            } as any)
             .eq('id', 1)
 
           // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
