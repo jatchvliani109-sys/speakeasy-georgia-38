@@ -82,30 +82,39 @@ Deno.serve(async (req) => {
     // report which one Flitt accepts. A rejected order costs nothing and
     // charges nobody, so this is cheaper than guessing one per round trip.
     if (probe) {
-      // SOLVED: recurring_data must be a JSON STRING, not a nested object, and
-      // it is signed as that literal string. Sending it as an object always
-      // fails signature validation; sending it as a string reached PARAMETER
-      // validation instead (error 1007), which proves the signature passed.
-      //
-      // Remaining question: which fields Flitt requires inside it.
+      // Their documented example VERBATIM. My earlier "docs verbatim" test was
+      // not: it omitted trial_period and trial_quantity, and lowercased the Y
+      // values. This is exactly what docs.flitt.com/api/subscriptions/ shows.
+      const docsExact = {
+        every: 5,
+        period: "day",
+        amount: 1000,
+        state: "Y",
+        readonly: "Y",
+        quantity: 100,
+        trial_period: "month",
+        trial_quantity: 1,
+      };
+      // What we actually want, in the same shape and casing.
+      const ourReal = {
+        every: 1,
+        period: "month",
+        amount: PRICE_TETRI,
+        state: "Y",
+        readonly: "Y",
+        quantity: 120,
+      };
+
       const base = { ...request };
       delete base.recurring_data;
-      const today = new Date().toISOString().slice(0, 10);
-      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-      const variants: Array<{ name: string; rd: Record<string, unknown> }> = [
-        // Their documented example, verbatim except the amount.
-        { name: "M_docs_verbatim", rd: { every: 5, period: "day", amount: PRICE_TETRI, state: "y", readonly: "n", quantity: 100 } },
-        // Monthly, with state.
-        { name: "N_month_state", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12 } },
-        // Monthly with start_time as a date.
-        { name: "O_start_date", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12, start_time: today } },
-        // start_time with the full datetime format their docs specify.
-        { name: "P_start_datetime", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12, start_time: now } },
-        // Every value as a string.
-        { name: "Q_all_strings", rd: { every: "1", period: "month", amount: String(PRICE_TETRI), state: "y", quantity: "12" } },
-        // With readonly, as in their example.
-        { name: "R_with_readonly", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", readonly: "y", quantity: 12 } },
+      const variants: Array<{ name: string; rd: unknown; nested: NestedMode }> = [
+        { name: "S_docsexact_merge",  rd: docsExact, nested: "merge" },
+        { name: "T_docsexact_json",   rd: docsExact, nested: "json" },
+        { name: "U_docsexact_excl",   rd: docsExact, nested: "exclude" },
+        { name: "V_docsexact_flat",   rd: docsExact, nested: "flatten" },
+        { name: "W_ours_merge",       rd: ourReal,   nested: "merge" },
+        { name: "X_ours_json",        rd: ourReal,   nested: "json" },
       ];
 
       const results: Record<string, string> = {};
@@ -114,9 +123,9 @@ Deno.serve(async (req) => {
           ...base,
           order_id: `${orderId}_${v.name}`,
           subscription: "Y",
-          recurring_data: JSON.stringify(v.rd),   // STRING, not object
+          recurring_data: v.rd,
         };
-        const { signature: sg } = await sign(attempt, "exclude");
+        const { signature: sg } = await sign(attempt, v.nested);
         const res2 = await fetch(`${FLITT_API}/checkout/url`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -127,7 +136,7 @@ Deno.serve(async (req) => {
           ? "*** WORKS ***"
           : `${b2.error_code ?? "?"} ${b2.error_message ?? ""}`.trim();
       }
-      return json({ probe: 4, results });
+      return json({ probe: 5, results });
     }
 
     const { signature, debugString } = await sign(request);
