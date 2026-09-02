@@ -210,8 +210,9 @@ Deno.serve(async (req) => {
       // Prefer payload.queued_at when present; fall back to PGMQ's enqueued_at
       // which is always set by the queue.
       const queuedAt = payload.queued_at ?? msg.enqueued_at
-      if (queuedAt) {
-        const ageMs = Date.now() - new Date(queuedAt).getTime()
+      const queuedAtStr = typeof queuedAt === 'string' ? queuedAt : undefined
+      if (queuedAtStr) {
+        const ageMs = Date.now() - new Date(queuedAtStr).getTime()
         const maxAgeMs = ttlMinutes[queue] * 60 * 1000
         if (ageMs > maxAgeMs) {
           console.warn('Email expired (TTL exceeded)', {
@@ -260,18 +261,18 @@ Deno.serve(async (req) => {
       try {
         await sendLovableEmail(
           {
-            run_id: payload.run_id,
-            to: payload.to,
-            from: payload.from,
-            sender_domain: payload.sender_domain,
-            subject: payload.subject,
-            html: payload.html,
-            text: payload.text,
-            purpose: payload.purpose,
-            label: payload.label,
-            idempotency_key: payload.idempotency_key,
-            unsubscribe_token: payload.unsubscribe_token,
-            message_id: payload.message_id,
+            run_id: payload.run_id as string | undefined,
+            to: payload.to as string,
+            from: payload.from as { name?: string; email: string },
+            sender_domain: payload.sender_domain as string | undefined,
+            subject: payload.subject as string,
+            html: payload.html as string,
+            text: payload.text as string,
+            purpose: payload.purpose as string | undefined,
+            label: payload.label as string | undefined,
+            idempotency_key: payload.idempotency_key as string | undefined,
+            unsubscribe_token: payload.unsubscribe_token as string | undefined,
+            message_id: payload.message_id as string | undefined,
           },
           // sendUrl is optional — when LOVABLE_SEND_URL is not set, the library
           // falls back to the default Lovable API endpoint (https://api.lovable.dev).
