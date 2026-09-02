@@ -82,35 +82,45 @@ Deno.serve(async (req) => {
     // report which one Flitt accepts. A rejected order costs nothing and
     // charges nobody, so this is cheaper than guessing one per round trip.
     if (probe) {
-      // All five nested encodings failed, so the fault is not in how
-      // recurring_data is serialised. These variants isolate WHICH PARAMETER
-      // breaks the request by removing one thing at a time.
+      // PROVEN so far: variant C put recurring_data in the request but LEFT IT
+      // OUT of the signature, producing a signature string identical to the
+      // working plain payment — and it still failed. The signature is therefore
+      // correct, and "Invalid signature" is a misleading error for a rejected
+      // recurring_data payload.
+      //
+      // These variants vary the CONTENTS of recurring_data instead.
       const base = { ...request };
-      const rd = base.recurring_data;
       delete base.subscription;
       delete base.recurring_data;
 
-      const variants: Array<{ name: string; body: Record<string, unknown>; nested: NestedMode }> = [
-        // Control: proven to work. If this fails now, something else changed.
-        { name: "A_plain_no_sub", body: { ...base }, nested: "exclude" },
-        // Only the flag, no schedule.
-        { name: "B_sub_flag_only", body: { ...base, subscription: "Y" }, nested: "exclude" },
-        // Only the schedule, no flag.
-        { name: "C_recdata_only_excl", body: { ...base, recurring_data: rd }, nested: "exclude" },
-        { name: "D_recdata_only_json", body: { ...base, recurring_data: rd }, nested: "json" },
-        // Both present, signature omits the nested object.
-        { name: "E_both_excl", body: { ...base, subscription: "Y", recurring_data: rd }, nested: "exclude" },
-        // Both present, but `subscription` also left out of the signature.
-        { name: "F_both_sub_unsigned", body: { ...base, subscription: "Y", recurring_data: rd }, nested: "exclude" },
+      const today = new Date().toISOString().slice(0, 10);
+      const variants: Array<{ name: string; rd: unknown }> = [
+        // Only the four documented mandatory fields.
+        { name: "G_minimal", rd: { amount: PRICE_TETRI, period: "month", every: 1, quantity: 12 } },
+        // `readonly` appears in Flitt's example but NOT in their property table,
+        // and their Node sample spells it "Readonly". Prime suspect.
+        { name: "H_no_readonly", rd: { amount: PRICE_TETRI, period: "month", every: 1, quantity: 12, state: "y" } },
+        // Explicit start date, as in their PHP sample.
+        { name: "I_with_start", rd: { start_time: today, amount: PRICE_TETRI, period: "month", every: 1, quantity: 12, state: "y" } },
+        // Their documented sample values verbatim, only the amount changed.
+        { name: "J_docs_exact", rd: { every: 5, period: "day", amount: PRICE_TETRI, state: "y", readonly: "n", quantity: 100 } },
+        // Amount as a string rather than a number.
+        { name: "K_string_amount", rd: { amount: String(PRICE_TETRI), period: "month", every: "1", quantity: "12" } },
+        // recurring_data sent as a JSON STRING rather than a nested object.
+        { name: "L_json_string", rd: JSON.stringify({ amount: PRICE_TETRI, period: "month", every: 1, quantity: 12 }) },
       ];
 
       const results: Record<string, string> = {};
       for (const v of variants) {
-        const attempt: Record<string, unknown> = { ...v.body, order_id: `${orderId}_${v.name}` };
-        // Variant F signs everything EXCEPT the subscription flag.
-        const toSign = { ...attempt };
-        if (v.name === "F_both_sub_unsigned") delete toSign.subscription;
-        const { signature: sg } = await sign(toSign, v.nested);
+        const attempt: Record<string, unknown> = {
+          ...base,
+          order_id: `${orderId}_${v.name}`,
+          subscription: "Y",
+          recurring_data: v.rd,
+        };
+        // Sign with the nested object excluded — proven equivalent to the
+        // working plain-payment signature.
+        const { signature: sg } = await sign(attempt, typeof v.rd === "string" ? "json" : "exclude");
         const res2 = await fetch(`${FLITT_API}/checkout/url`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -121,7 +131,7 @@ Deno.serve(async (req) => {
           ? "*** WORKS ***"
           : `${b2.error_code ?? "?"} ${b2.error_message ?? ""}`.trim();
       }
-      return json({ probe: 2, results });
+      return json({ probe: 3, results });
     }
 
     const { signature, debugString } = await sign(request);
