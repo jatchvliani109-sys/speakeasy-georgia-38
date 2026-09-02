@@ -104,6 +104,26 @@ export function decodeV2Response(data: unknown): Record<string, unknown> {
   }
 }
 
+/** Verify and decode a protocol 2.0 callback/response envelope. */
+export async function verifyAndDecodeV2(
+  envelope: Record<string, unknown>,
+): Promise<Record<string, unknown> | null> {
+  const data = typeof envelope.data === "string" ? envelope.data : "";
+  const claimed = typeof envelope.signature === "string" ? envelope.signature.toLowerCase() : "";
+  if (!data || !claimed) return null;
+
+  const hash = await crypto.subtle.digest(
+    "SHA-1",
+    new TextEncoder().encode(`${secretKey()}|${data}`),
+  );
+  const expected = Array.from(new Uint8Array(hash))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+  if (expected !== claimed) return null;
+
+  return decodeV2Response(data);
+}
+
 /** Verifies a callback really came from Flitt and was not tampered with. */
 export async function verifyCallback(body: Record<string, unknown>): Promise<boolean> {
   const claimed = String(body.signature ?? "");

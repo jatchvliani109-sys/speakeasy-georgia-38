@@ -7,7 +7,7 @@
 // Deploy with verify_jwt = false, or Flitt's calls will be rejected.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { verifyCallback, corsHeaders, json } from "../_shared/flitt.ts";
+import { verifyCallback, verifyAndDecodeV2, corsHeaders, json } from "../_shared/flitt.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -26,10 +26,14 @@ Deno.serve(async (req) => {
 
     // NEVER trust an unverified callback. Anyone can POST to a public URL;
     // without this check they could grant themselves premium.
-    if (!(await verifyCallback(body))) {
+    const isV2 = body.version === "2.0" || (typeof body.data === "string" && body.data.length > 0);
+    const decodedV2 = isV2 ? await verifyAndDecodeV2(body) : null;
+    const valid = isV2 ? decodedV2 !== null : await verifyCallback(body);
+    if (!valid) {
       console.error("flitt-callback: bad signature", body?.order_id);
       return json({ error: "invalid_signature" }, 403);
     }
+    if (decodedV2) body = decodedV2;
 
     const orderId = String(body.order_id ?? "");
     const paymentId = String(body.payment_id ?? "");
