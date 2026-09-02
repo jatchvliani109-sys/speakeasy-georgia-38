@@ -131,6 +131,13 @@ export async function verifyCallback(body: Record<string, unknown>): Promise<boo
   return signature === claimed.toLowerCase();
 }
 
+/** Placeholder for protocol 2.0 callback verification (not yet implemented). */
+export async function verifyAndDecodeV2(
+  _body: Record<string, unknown>,
+): Promise<Record<string, unknown> | null> {
+  return null;
+}
+
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
