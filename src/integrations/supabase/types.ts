@@ -709,6 +709,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          order_id: string | null
+          payment_id: string | null
+          raw: Json | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          payment_id?: string | null
+          raw?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          payment_id?: string | null
+          raw?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -760,57 +793,6 @@ export type Database = {
           speaking_longest_streak?: number
           streak?: number
           updated_at?: string
-        }
-        Relationships: []
-      }
-      progress_backup: {
-        Row: {
-          confidence: number | null
-          correct_count: number | null
-          created_at: string | null
-          due_at: string | null
-          field: string | null
-          id: string | null
-          last_seen_at: string | null
-          manual_label: string | null
-          meta: Json | null
-          source: string | null
-          updated_at: string | null
-          user_id: string | null
-          word_key: string | null
-          wrong_count: number | null
-        }
-        Insert: {
-          confidence?: number | null
-          correct_count?: number | null
-          created_at?: string | null
-          due_at?: string | null
-          field?: string | null
-          id?: string | null
-          last_seen_at?: string | null
-          manual_label?: string | null
-          meta?: Json | null
-          source?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          word_key?: string | null
-          wrong_count?: number | null
-        }
-        Update: {
-          confidence?: number | null
-          correct_count?: number | null
-          created_at?: string | null
-          due_at?: string | null
-          field?: string | null
-          id?: string | null
-          last_seen_at?: string | null
-          manual_label?: string | null
-          meta?: Json | null
-          source?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          word_key?: string | null
-          wrong_count?: number | null
         }
         Relationships: []
       }
@@ -896,6 +878,42 @@ export type Database = {
           scenario_id?: string
           score?: number
           tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          masked_card: string | null
+          order_id: string
+          rectoken: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          masked_card?: string | null
+          order_id: string
+          rectoken?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          masked_card?: string | null
+          order_id?: string
+          rectoken?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -1042,6 +1060,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      has_active_subscription: { Args: { p_user_id: string }; Returns: boolean }
       has_claimed_trial: { Args: never; Returns: boolean }
       move_to_dlq: {
         Args: {
@@ -1082,12 +1101,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1111,11 +1130,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1136,11 +1155,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1161,11 +1180,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1178,11 +1197,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
