@@ -8,8 +8,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireUser } from "../_shared/auth.ts";
 import {
-  FLITT_API, PRICE_TETRI, CURRENCY, merchantId, sign, createV2Request,
-  decodeV2Response, corsHeaders, json,
+  FLITT_API, PRICE_TETRI, CURRENCY, merchantId, sign, corsHeaders, json,
+  type NestedMode,
 } from "../_shared/flitt.ts";
 
 Deno.serve(async (req) => {
@@ -45,9 +45,11 @@ Deno.serve(async (req) => {
     // no recurring_data. If simple signs but subscription does not, the fault
     // is isolated to the nested object.
     let mode = "subscription";
+    let probe = false;
     try {
       const b = await req.json();
       if (b?.mode === "simple") mode = "simple";
+      if (b?.mode === "probe") { mode = "subscription"; probe = true; }
     } catch { /* no body is fine */ }
 
     const request: Record<string, unknown> = {
@@ -76,31 +78,38 @@ Deno.serve(async (req) => {
       sender_email: user.email ?? "",
     };
 
-    // Flitt's protocol 1.0 signature format only supports flat values. Their
-    // official SDK therefore switches subscription orders (which contain the
-    // nested recurring_data object) to protocol 2.0.
-    let payload: Record<string, unknown>;
-    let debugString: string;
-    if (mode === "subscription") {
-      const signed = await createV2Request(request);
-      payload = signed;
-      debugString = signed.debugString;
-    } else {
-      const signed = await sign(request);
-      request.signature = signed.signature;
-      payload = { request };
-      debugString = signed.debugString;
+    // PROBE MODE: try each nested-object encoding against the live API and
+    // report which one Flitt accepts. A rejected order costs nothing and
+    // charges nobody, so this is cheaper than guessing one per round trip.
+    if (probe) {
+      const modes: NestedMode[] = ["exclude", "json", "json_sorted", "flatten", "flatten_sorted"];
+      const results: Record<string, string> = {};
+      for (const m of modes) {
+        const attempt = { ...request, order_id: `${orderId}_${m}` };
+        const { signature: sg } = await sign(attempt, m);
+        const res2 = await fetch(`${FLITT_API}/checkout/url`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request: { ...attempt, signature: sg } }),
+        });
+        const b2 = (await res2.json())?.response ?? {};
+        results[m] = b2.response_status === "success"
+          ? "*** WORKS ***"
+          : `${b2.error_code ?? "?"} ${b2.error_message ?? ""}`.trim();
+      }
+      return json({ probe: true, results });
     }
+
+    const { signature, debugString } = await sign(request);
+    request.signature = signature;
 
     const res = await fetch(`${FLITT_API}/checkout/url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ request }),
     });
     const body = await res.json();
-    const response = body?.response ?? {};
-    const decoded = mode === "subscription" ? decodeV2Response(response.data) : {};
-    const r = Object.keys(decoded).length > 0 ? decoded : response;
+    const r = body?.response ?? {};
 
     if (r.response_status !== "success" || !r.checkout_url) {
       // response_signature_string is returned in TEST MODE only and shows
@@ -109,22 +118,15 @@ Deno.serve(async (req) => {
       console.error("flitt create failed", JSON.stringify(r));
       // Return the string WE hashed, with the secret masked, so a mismatch can
       // be diagnosed without Flitt's own hint (which only appears in test mode).
-      const masked = mode === "subscription"
-        ? `********|base64(${new TextEncoder().encode(debugString.slice(debugString.indexOf("|") + 1)).length} bytes)`
-        : debugString.replace(/^[^|]*/, "********");
+      const masked = debugString.replace(/^[^|]*/, "********");
       return json({
         error: r.error_message ?? "payment_init_failed",
         error_code: r.error_code ?? null,
         mode,
         flitt_hint: r.response_signature_string ?? null,
         our_signature_string: masked,
-        // Non-secret diagnostics: which merchant we signed for and how long the
-        // key is. A wrong-length key is the usual cause of error 1014.
-        merchant_id: merchantId(),
-        key_length: (Deno.env.get("FLITT_PAYMENT_KEY") ?? "").trim().length,
         full_response: r,
       }, 502);
-
     }
 
     // Record the attempt so the callback can find this user by order_id.

@@ -63,7 +63,7 @@ export default function BusinessPremium() {
   const [testResult, setTestResult] = useState<string>("");
   const [testing, setTesting] = useState(false);
 
-  const runPaymentTest = async (mode: "simple" | "subscription") => {
+  const runPaymentTest = async (mode: "simple" | "subscription" | "probe") => {
     if (testing) return;
     setTesting(true);
     setTestResult("იგზავნება...");
@@ -122,6 +122,13 @@ export default function BusinessPremium() {
             className="px-3 py-2 rounded-lg bg-[#1C1C1E] text-white text-xs font-bold disabled:opacity-50"
           >
             2. Test subscription
+          </button>
+          <button
+            onClick={() => runPaymentTest("probe")}
+            disabled={testing}
+            className="px-3 py-2 rounded-lg bg-[#5C1A2E] text-white text-xs font-bold disabled:opacity-50"
+          >
+            3. Probe signature
           </button>
         </div>
         {testResult && (

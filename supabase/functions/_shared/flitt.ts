@@ -39,7 +39,25 @@ const secretKey = () => env("FLITT_PAYMENT_KEY");
  * includes `response_signature_string` showing exactly what they expected —
  * compare it against `debugString` below.
  */
-export async function sign(params: Record<string, unknown>): Promise<{ signature: string; debugString: string }> {
+/**
+ * How nested objects (recurring_data) participate in the signature.
+ *
+ * A plain payment signs correctly with the base algorithm, so sort/filter/join
+ * are proven right — only the nested object is in question, and Flitt's docs do
+ * not say. These are the candidate encodings; `probeSignature` tries them
+ * against the live API to find the one that works.
+ */
+export type NestedMode =
+  | "exclude"        // omit nested objects entirely
+  | "json"           // JSON.stringify as-is
+  | "json_sorted"    // JSON.stringify with keys sorted
+  | "flatten"        // append each nested VALUE as its own segment
+  | "flatten_sorted";// same, with nested keys sorted first
+
+export async function sign(
+  params: Record<string, unknown>,
+  nested: NestedMode = "exclude",
+): Promise<{ signature: string; debugString: string }> {
   const parts: string[] = [secretKey()];
 
   for (const key of Object.keys(params).sort()) {
@@ -47,11 +65,25 @@ export async function sign(params: Record<string, unknown>): Promise<{ signature
     const raw = params[key];
     // 0 is meaningful; only null/undefined/"" are skipped.
     if (raw === null || raw === undefined || raw === "") continue;
-    // NESTED OBJECTS ARE EXCLUDED. Flitt's own PHP SDK filters parameters with
-    // `array_filter($params, 'strlen')`, which cannot accept an array — so
-    // recurring_data never reaches their signature string. JSON-encoding it
-    // (the obvious guess) produces "Invalid signature", error 1014.
-    if (typeof raw === "object") continue;
+
+    if (typeof raw === "object") {
+      const obj = raw as Record<string, unknown>;
+      if (nested === "exclude") continue;
+      if (nested === "json") { parts.push(JSON.stringify(obj)); continue; }
+      if (nested === "json_sorted") {
+        const sorted: Record<string, unknown> = {};
+        for (const k of Object.keys(obj).sort()) sorted[k] = obj[k];
+        parts.push(JSON.stringify(sorted));
+        continue;
+      }
+      const keys = nested === "flatten_sorted" ? Object.keys(obj).sort() : Object.keys(obj);
+      for (const k of keys) {
+        const v = obj[k];
+        if (v === null || v === undefined || v === "") continue;
+        parts.push(String(v));
+      }
+      continue;
+    }
     parts.push(String(raw));
   }
 
