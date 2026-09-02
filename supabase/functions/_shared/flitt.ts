@@ -65,6 +65,45 @@ export async function sign(params: Record<string, unknown>): Promise<{ signature
   return { signature, debugString };
 }
 
+/**
+ * Flitt protocol 2.0 signing for requests containing nested data.
+ *
+ * Protocol 1.0 signs a flat parameter list and cannot represent
+ * `recurring_data` reliably. Flitt's own SDK switches subscription creation to
+ * 2.0: the complete order is JSON encoded, base64 encoded, then signed as
+ * sha1(paymentKey + "|" + base64Data).
+ */
+export async function createV2Request(order: Record<string, unknown>): Promise<{
+  request: { version: "2.0"; data: string; signature: string };
+  debugString: string;
+}> {
+  const json = JSON.stringify({ order });
+  const bytes = new TextEncoder().encode(json);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  const data = btoa(binary);
+  const debugString = `${secretKey()}|${data}`;
+  const hash = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(debugString));
+  const signature = Array.from(new Uint8Array(hash))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return { request: { version: "2.0", data, signature }, debugString };
+}
+
+/** Decode the order carried by a successful protocol 2.0 response. */
+export function decodeV2Response(data: unknown): Record<string, unknown> {
+  if (typeof data !== "string" || !data) return {};
+  try {
+    const binary = atob(data);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const decoded = JSON.parse(new TextDecoder().decode(bytes));
+    return decoded?.order && typeof decoded.order === "object" ? decoded.order : {};
+  } catch {
+    return {};
+  }
+}
+
 /** Verifies a callback really came from Flitt and was not tampered with. */
 export async function verifyCallback(body: Record<string, unknown>): Promise<boolean> {
   const claimed = String(body.signature ?? "");
