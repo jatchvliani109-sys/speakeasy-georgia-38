@@ -63,13 +63,13 @@ export default function BusinessPremium() {
   const [testResult, setTestResult] = useState<string>("");
   const [testing, setTesting] = useState(false);
 
-  const runPaymentTest = async () => {
+  const runPaymentTest = async (mode: "simple" | "subscription") => {
     if (testing) return;
     setTesting(true);
     setTestResult("იგზავნება...");
     try {
       const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase.functions.invoke("flitt-subscribe", { body: {} });
+      const { data, error } = await supabase.functions.invoke("flitt-subscribe", { body: { mode } });
 
       if (error) {
         // functions.invoke hides the response body on non-2xx; dig it out,
@@ -108,13 +108,22 @@ export default function BusinessPremium() {
         <p className="text-[11px] uppercase tracking-wider text-[#C0392B] font-bold">
           TEST ONLY — remove before launch
         </p>
-        <button
-          onClick={runPaymentTest}
-          disabled={testing}
-          className="mt-2 px-4 py-2 rounded-lg bg-[#C0392B] text-white text-sm font-bold disabled:opacity-50"
-        >
-          {testing ? "..." : "Test Flitt connection"}
-        </button>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={() => runPaymentTest("simple")}
+            disabled={testing}
+            className="px-3 py-2 rounded-lg bg-[#C0392B] text-white text-xs font-bold disabled:opacity-50"
+          >
+            {testing ? "..." : "1. Test simple payment"}
+          </button>
+          <button
+            onClick={() => runPaymentTest("subscription")}
+            disabled={testing}
+            className="px-3 py-2 rounded-lg bg-[#1C1C1E] text-white text-xs font-bold disabled:opacity-50"
+          >
+            2. Test subscription
+          </button>
+        </div>
         {testResult && (
           <>
             <pre className="mt-3 text-[10px] leading-relaxed bg-white border border-[#E4E2DF] rounded-lg p-3 overflow-auto max-h-72 whitespace-pre-wrap break-all">

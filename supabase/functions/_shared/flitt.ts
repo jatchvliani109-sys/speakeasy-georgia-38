@@ -43,7 +43,12 @@ export async function sign(params: Record<string, unknown>): Promise<{ signature
     const raw = params[key];
     // 0 is meaningful; only null/undefined/"" are skipped.
     if (raw === null || raw === undefined || raw === "") continue;
-    parts.push(typeof raw === "object" ? JSON.stringify(raw) : String(raw));
+    // NESTED OBJECTS ARE EXCLUDED. Flitt's own PHP SDK filters parameters with
+    // `array_filter($params, 'strlen')`, which cannot accept an array — so
+    // recurring_data never reaches their signature string. JSON-encoding it
+    // (the obvious guess) produces "Invalid signature", error 1014.
+    if (typeof raw === "object") continue;
+    parts.push(String(raw));
   }
 
   const debugString = parts.join("|");

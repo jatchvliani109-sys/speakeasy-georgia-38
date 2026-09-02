@@ -40,31 +40,42 @@ Deno.serve(async (req) => {
     // across attempts would also collide in our own table.
     const orderId = `sb_${user.id.slice(0, 8)}_${Date.now()}`;
 
+    // Optional { "mode": "simple" } in the body creates a ONE-OFF payment with
+    // no recurring_data. If simple signs but subscription does not, the fault
+    // is isolated to the nested object.
+    let mode = "subscription";
+    try {
+      const b = await req.json();
+      if (b?.mode === "simple") mode = "simple";
+    } catch { /* no body is fine */ }
+
     const request: Record<string, unknown> = {
       order_id: orderId,
       order_desc: "SpeakBusy Premium",
       currency: CURRENCY,
       amount: PRICE_TETRI,
       merchant_id: merchantId(),
-      subscription: "Y",
-      recurring_data: {
-        every: 1,
-        period: "month",
-        amount: PRICE_TETRI,
-        // 'hidden' enables the schedule without showing the user a calendar
-        // they might switch off. They agreed to a monthly subscription; the
-        // cancel button lives in our app, where consumer law expects it.
-        state: "hidden",
-        readonly: "y",
-        quantity: 120,        // 10 years of months; renewed long before then
-      },
+      ...(mode === "subscription" ? {
+        subscription: "Y",
+        recurring_data: {
+          every: 1,
+          period: "month",
+          amount: PRICE_TETRI,
+          // 'hidden' enables the schedule without showing the user a calendar
+          // they might switch off. They agreed to a monthly subscription; the
+          // cancel button lives in our app, where consumer law expects it.
+          state: "hidden",
+          readonly: "y",
+          quantity: 120,      // 10 years of months; renewed long before then
+        },
+      } : {}),
       server_callback_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/flitt-callback`,
       response_url: `${siteUrl}/path/business/premium?payment=return`,
       lang: "ka",
       sender_email: user.email ?? "",
     };
 
-    const { signature } = await sign(request);
+    const { signature, debugString } = await sign(request);
     request.signature = signature;
 
     const res = await fetch(`${FLITT_API}/checkout/url`, {
@@ -80,10 +91,16 @@ Deno.serve(async (req) => {
       // exactly how Flitt built the signature — the fastest way to fix a
       // signature mismatch.
       console.error("flitt create failed", JSON.stringify(r));
+      // Return the string WE hashed, with the secret masked, so a mismatch can
+      // be diagnosed without Flitt's own hint (which only appears in test mode).
+      const masked = debugString.replace(/^[^|]*/, "********");
       return json({
         error: r.error_message ?? "payment_init_failed",
         error_code: r.error_code ?? null,
-        hint: r.response_signature_string ?? null,
+        mode,
+        flitt_hint: r.response_signature_string ?? null,
+        our_signature_string: masked,
+        full_response: r,
       }, 502);
     }
 
