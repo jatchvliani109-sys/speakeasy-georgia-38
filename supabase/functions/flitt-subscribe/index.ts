@@ -8,7 +8,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireUser } from "../_shared/auth.ts";
 import {
-  FLITT_API, PRICE_TETRI, CURRENCY, merchantId, sign, corsHeaders, json,
+  FLITT_API, PRICE_TETRI, CURRENCY, merchantId, sign, createV2Request,
+  decodeV2Response, corsHeaders, json,
 } from "../_shared/flitt.ts";
 
 Deno.serve(async (req) => {
@@ -75,16 +76,31 @@ Deno.serve(async (req) => {
       sender_email: user.email ?? "",
     };
 
-    const { signature, debugString } = await sign(request);
-    request.signature = signature;
+    // Flitt's protocol 1.0 signature format only supports flat values. Their
+    // official SDK therefore switches subscription orders (which contain the
+    // nested recurring_data object) to protocol 2.0.
+    let payload: Record<string, unknown>;
+    let debugString: string;
+    if (mode === "subscription") {
+      const signed = await createV2Request(request);
+      payload = signed;
+      debugString = signed.debugString;
+    } else {
+      const signed = await sign(request);
+      request.signature = signed.signature;
+      payload = { request };
+      debugString = signed.debugString;
+    }
 
     const res = await fetch(`${FLITT_API}/checkout/url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ request }),
+      body: JSON.stringify(payload),
     });
     const body = await res.json();
-    const r = body?.response ?? {};
+    const response = body?.response ?? {};
+    const decoded = mode === "subscription" ? decodeV2Response(response.data) : {};
+    const r = Object.keys(decoded).length > 0 ? decoded : response;
 
     if (r.response_status !== "success" || !r.checkout_url) {
       // response_signature_string is returned in TEST MODE only and shows
@@ -93,7 +109,9 @@ Deno.serve(async (req) => {
       console.error("flitt create failed", JSON.stringify(r));
       // Return the string WE hashed, with the secret masked, so a mismatch can
       // be diagnosed without Flitt's own hint (which only appears in test mode).
-      const masked = debugString.replace(/^[^|]*/, "********");
+      const masked = mode === "subscription"
+        ? `********|base64(${new TextEncoder().encode(debugString.slice(debugString.indexOf("|") + 1)).length} bytes)`
+        : debugString.replace(/^[^|]*/, "********");
       return json({
         error: r.error_message ?? "payment_init_failed",
         error_code: r.error_code ?? null,
