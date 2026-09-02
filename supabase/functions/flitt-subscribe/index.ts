@@ -82,32 +82,30 @@ Deno.serve(async (req) => {
     // report which one Flitt accepts. A rejected order costs nothing and
     // charges nobody, so this is cheaper than guessing one per round trip.
     if (probe) {
-      // PROVEN so far: variant C put recurring_data in the request but LEFT IT
-      // OUT of the signature, producing a signature string identical to the
-      // working plain payment — and it still failed. The signature is therefore
-      // correct, and "Invalid signature" is a misleading error for a rejected
-      // recurring_data payload.
+      // SOLVED: recurring_data must be a JSON STRING, not a nested object, and
+      // it is signed as that literal string. Sending it as an object always
+      // fails signature validation; sending it as a string reached PARAMETER
+      // validation instead (error 1007), which proves the signature passed.
       //
-      // These variants vary the CONTENTS of recurring_data instead.
+      // Remaining question: which fields Flitt requires inside it.
       const base = { ...request };
-      delete base.subscription;
       delete base.recurring_data;
-
       const today = new Date().toISOString().slice(0, 10);
-      const variants: Array<{ name: string; rd: unknown }> = [
-        // Only the four documented mandatory fields.
-        { name: "G_minimal", rd: { amount: PRICE_TETRI, period: "month", every: 1, quantity: 12 } },
-        // `readonly` appears in Flitt's example but NOT in their property table,
-        // and their Node sample spells it "Readonly". Prime suspect.
-        { name: "H_no_readonly", rd: { amount: PRICE_TETRI, period: "month", every: 1, quantity: 12, state: "y" } },
-        // Explicit start date, as in their PHP sample.
-        { name: "I_with_start", rd: { start_time: today, amount: PRICE_TETRI, period: "month", every: 1, quantity: 12, state: "y" } },
-        // Their documented sample values verbatim, only the amount changed.
-        { name: "J_docs_exact", rd: { every: 5, period: "day", amount: PRICE_TETRI, state: "y", readonly: "n", quantity: 100 } },
-        // Amount as a string rather than a number.
-        { name: "K_string_amount", rd: { amount: String(PRICE_TETRI), period: "month", every: "1", quantity: "12" } },
-        // recurring_data sent as a JSON STRING rather than a nested object.
-        { name: "L_json_string", rd: JSON.stringify({ amount: PRICE_TETRI, period: "month", every: 1, quantity: 12 }) },
+      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+      const variants: Array<{ name: string; rd: Record<string, unknown> }> = [
+        // Their documented example, verbatim except the amount.
+        { name: "M_docs_verbatim", rd: { every: 5, period: "day", amount: PRICE_TETRI, state: "y", readonly: "n", quantity: 100 } },
+        // Monthly, with state.
+        { name: "N_month_state", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12 } },
+        // Monthly with start_time as a date.
+        { name: "O_start_date", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12, start_time: today } },
+        // start_time with the full datetime format their docs specify.
+        { name: "P_start_datetime", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", quantity: 12, start_time: now } },
+        // Every value as a string.
+        { name: "Q_all_strings", rd: { every: "1", period: "month", amount: String(PRICE_TETRI), state: "y", quantity: "12" } },
+        // With readonly, as in their example.
+        { name: "R_with_readonly", rd: { every: 1, period: "month", amount: PRICE_TETRI, state: "y", readonly: "y", quantity: 12 } },
       ];
 
       const results: Record<string, string> = {};
@@ -116,11 +114,9 @@ Deno.serve(async (req) => {
           ...base,
           order_id: `${orderId}_${v.name}`,
           subscription: "Y",
-          recurring_data: v.rd,
+          recurring_data: JSON.stringify(v.rd),   // STRING, not object
         };
-        // Sign with the nested object excluded — proven equivalent to the
-        // working plain-payment signature.
-        const { signature: sg } = await sign(attempt, typeof v.rd === "string" ? "json" : "exclude");
+        const { signature: sg } = await sign(attempt, "exclude");
         const res2 = await fetch(`${FLITT_API}/checkout/url`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -131,7 +127,7 @@ Deno.serve(async (req) => {
           ? "*** WORKS ***"
           : `${b2.error_code ?? "?"} ${b2.error_message ?? ""}`.trim();
       }
-      return json({ probe: 3, results });
+      return json({ probe: 4, results });
     }
 
     const { signature, debugString } = await sign(request);
