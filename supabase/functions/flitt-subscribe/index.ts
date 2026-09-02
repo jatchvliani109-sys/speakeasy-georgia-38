@@ -82,22 +82,46 @@ Deno.serve(async (req) => {
     // report which one Flitt accepts. A rejected order costs nothing and
     // charges nobody, so this is cheaper than guessing one per round trip.
     if (probe) {
-      const modes: NestedMode[] = ["exclude", "json", "json_sorted", "flatten", "flatten_sorted"];
+      // All five nested encodings failed, so the fault is not in how
+      // recurring_data is serialised. These variants isolate WHICH PARAMETER
+      // breaks the request by removing one thing at a time.
+      const base = { ...request };
+      const rd = base.recurring_data;
+      delete base.subscription;
+      delete base.recurring_data;
+
+      const variants: Array<{ name: string; body: Record<string, unknown>; nested: NestedMode }> = [
+        // Control: proven to work. If this fails now, something else changed.
+        { name: "A_plain_no_sub", body: { ...base }, nested: "exclude" },
+        // Only the flag, no schedule.
+        { name: "B_sub_flag_only", body: { ...base, subscription: "Y" }, nested: "exclude" },
+        // Only the schedule, no flag.
+        { name: "C_recdata_only_excl", body: { ...base, recurring_data: rd }, nested: "exclude" },
+        { name: "D_recdata_only_json", body: { ...base, recurring_data: rd }, nested: "json" },
+        // Both present, signature omits the nested object.
+        { name: "E_both_excl", body: { ...base, subscription: "Y", recurring_data: rd }, nested: "exclude" },
+        // Both present, but `subscription` also left out of the signature.
+        { name: "F_both_sub_unsigned", body: { ...base, subscription: "Y", recurring_data: rd }, nested: "exclude" },
+      ];
+
       const results: Record<string, string> = {};
-      for (const m of modes) {
-        const attempt = { ...request, order_id: `${orderId}_${m}` };
-        const { signature: sg } = await sign(attempt, m);
+      for (const v of variants) {
+        const attempt: Record<string, unknown> = { ...v.body, order_id: `${orderId}_${v.name}` };
+        // Variant F signs everything EXCEPT the subscription flag.
+        const toSign = { ...attempt };
+        if (v.name === "F_both_sub_unsigned") delete toSign.subscription;
+        const { signature: sg } = await sign(toSign, v.nested);
         const res2 = await fetch(`${FLITT_API}/checkout/url`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ request: { ...attempt, signature: sg } }),
         });
         const b2 = (await res2.json())?.response ?? {};
-        results[m] = b2.response_status === "success"
+        results[v.name] = b2.response_status === "success"
           ? "*** WORKS ***"
           : `${b2.error_code ?? "?"} ${b2.error_message ?? ""}`.trim();
       }
-      return json({ probe: true, results });
+      return json({ probe: 2, results });
     }
 
     const { signature, debugString } = await sign(request);
