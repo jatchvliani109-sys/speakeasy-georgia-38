@@ -14,11 +14,15 @@ export const CURRENCY = "GEL";
 function env(name: string): string {
   const v = Deno.env.get(name);
   if (!v) throw new Error(`missing secret: ${name}`);
-  return v;
+  // Secrets pasted through a dashboard very often carry a trailing newline or
+  // stray space. That single invisible byte changes the SHA-1 and Flitt
+  // answers with error 1014 "Invalid signature".
+  return v.trim();
 }
 
 export const merchantId = () => Number(env("FLITT_MERCHANT_ID"));
 const secretKey = () => env("FLITT_PAYMENT_KEY");
+
 
 /**
  * Flitt signature: sha1 of the payment secret key followed by every non-empty
