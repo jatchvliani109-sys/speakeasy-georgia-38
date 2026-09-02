@@ -100,8 +100,13 @@ Deno.serve(async (req) => {
         mode,
         flitt_hint: r.response_signature_string ?? null,
         our_signature_string: masked,
+        // Non-secret diagnostics: which merchant we signed for and how long the
+        // key is. A wrong-length key is the usual cause of error 1014.
+        merchant_id: merchantId(),
+        key_length: (Deno.env.get("FLITT_PAYMENT_KEY") ?? "").trim().length,
         full_response: r,
       }, 502);
+
     }
 
     // Record the attempt so the callback can find this user by order_id.
