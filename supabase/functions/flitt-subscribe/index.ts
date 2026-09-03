@@ -150,6 +150,40 @@ Deno.serve(async (req) => {
     const body = await res.json();
     const r = body?.response ?? {};
 
+    // FALLBACK: subscriptions are not yet enabled on this merchant, so the
+    // recurring request is refused with 1014. Rather than leave the user at a
+    // dead button, retry as a plain one-off payment for the same amount. The
+    // card is still saved, the payment still completes, and only the automatic
+    // monthly renewal is missing until Flitt enable it.
+    if (mode === "subscription" && r.response_status !== "success") {
+      const fallback: Record<string, unknown> = { ...request };
+      delete fallback.subscription;
+      delete fallback.recurring_data;
+      fallback.order_id = `${orderId}_single`;
+      const { signature: fbSig } = await sign(fallback);
+      const fbRes = await fetch(`${FLITT_API}/checkout/url`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ request: { ...fallback, signature: fbSig } }),
+      });
+      const fb = (await fbRes.json())?.response ?? {};
+      if (fb.response_status === "success" && fb.checkout_url) {
+        await admin.from("subscriptions").upsert({
+          user_id: user.id,
+          order_id: String(fallback.order_id),
+          status: "pending",
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "user_id" });
+        console.warn("flitt: subscription refused, fell back to single payment");
+        return json({
+          ok: true,
+          checkout_url: fb.checkout_url,
+          order_id: fallback.order_id,
+          recurring: false,
+        });
+      }
+    }
+
     if (r.response_status !== "success" || !r.checkout_url) {
       // response_signature_string is returned in TEST MODE only and shows
       // exactly how Flitt built the signature — the fastest way to fix a
