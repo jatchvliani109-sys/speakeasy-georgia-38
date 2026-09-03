@@ -93,7 +93,7 @@ const valueCards = [
 ];
 
 // Only features that actually exist. The previous version advertised an email
-// module (deleted) and a meetings module (never built) — and understated the
+// module (deleted) and a meetings module (never built), and understated the
 // vocabulary at 500 when the bank holds 980.
 const modules = [
   {
@@ -131,7 +131,7 @@ function TikTokIcon() {
 const Index = () => {
   const { user, loading } = useAuth();
 
-  // Top of the funnel. Fires for anonymous visitors too — that is the point:
+  // Top of the funnel. Fires for anonymous visitors too, that is the point:
   // the biggest drop-off is between landing and signup, and no table can see it.
   useEffect(() => {
     track("landing_viewed");
@@ -149,8 +149,8 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F5F0] text-[#1C1C1E]">
       <SEO
-        title="SpeakBusy — ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
-        description="ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის — 980 სიტყვა ქართული ახსნებით და აუდიოთი, გასაუბრების სიმულაცია და დოკუმენტების მომზადება. დაიწყე უფასოდ."
+        title="SpeakBusy, ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
+        description="ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის, 980 სიტყვა ქართული ახსნებით და აუდიოთი, გასაუბრების სიმულაცია და დოკუმენტების მომზადება. დაიწყე უფასოდ."
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
@@ -199,7 +199,7 @@ const Index = () => {
 
             {/* Price and trial stated up front. The previous page mentioned
                 neither, so a visitor could not tell whether this was free,
-                cheap or expensive — and unanswered price questions are a
+                cheap or expensive, and unanswered price questions are a
                 reason to leave. */}
             <p className="mt-5 ka text-sm text-[#B8B0A8]">
               პრემიუმის
@@ -324,7 +324,7 @@ const Index = () => {
         <footer className="bg-[#1C1C1E] text-[#B8B0A8]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Feedback invitation. Placed above the legal row because it is an
-                invitation, not fine print — and social is where a Georgian
+                invitation, not fine print, and social is where a Georgian
                 audience will actually reply. */}
             <div className="text-center pb-9 border-b border-white/10">
               <p className="ka text-[15px] font-bold text-[#F8F5F0]">
@@ -362,6 +362,43 @@ const Index = () => {
               >
                 speakbusy@gmail.com
               </a>
+            </div>
+
+            {/* Pricing and contact, publicly visible. The premium page is behind
+                login, so a reviewer (or a visitor deciding whether to sign up)
+                would otherwise never see a price. */}
+            <div className="pt-8 pb-8 border-b border-white/10 grid gap-6 sm:grid-cols-2">
+              <div>
+                <p className="ka text-[13px] font-bold text-[#F8F5F0]">ფასი</p>
+                <p className="ka text-[13px] text-[#B8B0A8] mt-2 leading-relaxed">
+                  უფასო ვერსია, 0 ₾, დღიური ლიმიტით, რეკლამების გარეშე.
+                  <br />
+                  პრემიუმი, <b className="text-[#C9A84C]">13.99 ₾ თვეში</b>.
+                  <br />
+                  პირველი 7 დღე უფასოა, ბარათის მითითების გარეშე.
+                  <br />
+                  გამოწერა ავტომატურად განახლდება ყოველთვიურად, სანამ არ
+                  გააუქმებ. გაუქმება შესაძლებელია ნებისმიერ დროს აპლიკაციიდან.
+                </p>
+              </div>
+              <div>
+                <p className="ka text-[13px] font-bold text-[#F8F5F0]">კონტაქტი</p>
+                <p className="ka text-[13px] text-[#B8B0A8] mt-2 leading-relaxed">
+                  ინდივიდუალური მეწარმე ნინო ჯაჭვლიანი
+                  <br />
+                  ს/ნ 62009004530
+                  <br />
+                  ქ. თბილისი, ეკა ბეჟანიშვილის ქუჩა №104
+                  <br />
+                  <a href="tel:+995551588969" className="hover:text-[#C9A84C] transition-colors">
+                    +995 551 58 89 69
+                  </a>
+                  <br />
+                  <a href="mailto:speakbusy@gmail.com" className="hover:text-[#C9A84C] transition-colors">
+                    speakbusy@gmail.com
+                  </a>
+                </p>
+              </div>
             </div>
 
             <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
