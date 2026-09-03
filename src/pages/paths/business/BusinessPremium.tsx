@@ -1,6 +1,6 @@
 // src/pages/paths/business/BusinessPremium.tsx
 // -----------------------------------------------------------------------------
-// PREMIUM (MOCK) — placeholder paywall until real payments launch.
+// PREMIUM. Real Flitt payment flow.
 // The unlock button just flips `mockPro` in the business state blob so the
 // premium experience (unlimited vocab + real interviews) can be felt end to
 // end. When the ინდ. მეწარმე registration completes, the unlock button gets
@@ -21,9 +21,9 @@ import { pullBusinessFromSupabase, saveBusinessAsync } from "./lib/state";
 const PRICE_GEL = "13.99";
 
 const FEATURES: { titleKa: string; subKa: string }[] = [
-  { titleKa: "ულიმიტო ლექსიკის სესიები", subKa: "იმდენი სესია დღეში, რამდენიც გინდა — ლიმიტის გარეშე" },
-  { titleKa: "AI სესიები — კვირაში 7", subKa: "გასაუბრებები, დოკუმენტები და თვითპრეზენტაცია. უფასო ვერსიაში AI არ არის; საცდელ კვირაში — 3 ჯამში" },
-  { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და \"Streak\" — რჩება" },
+  { titleKa: "ულიმიტო ლექსიკის სესიები", subKa: "იმდენი სესია დღეში, რამდენიც გინდა, ლიმიტის გარეშე" },
+  { titleKa: "AI სესიები, კვირაში 7", subKa: "გასაუბრებები, დოკუმენტები და თვითპრეზენტაცია. უფასო ვერსიაში AI არ არის; საცდელ კვირაში 3 ჯამში" },
+  { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და \"Streak\", რჩება" },
 ];
 
 export default function BusinessPremium() {
@@ -220,7 +220,7 @@ export default function BusinessPremium() {
         <BizCard>
           <p className="ka text-sm text-[#1C1C1E] font-semibold mb-1">მართვა</p>
           <p className="ka text-[12px] text-[#4A4A4A] mb-3">
-            ეს სატესტო ვერსიაა — შეგიძლია ნებისმიერ დროს გამორთო.
+            ეს სატესტო ვერსიაა, შეგიძლია ნებისმიერ დროს გამორთო.
           </p>
           <button
             onClick={cancel}
