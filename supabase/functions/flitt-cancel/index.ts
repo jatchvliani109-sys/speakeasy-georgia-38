@@ -45,10 +45,15 @@ Deno.serve(async (req) => {
 
     if (!sub) return json({ error: "no_subscription" }, 404);
     if (action === "cancel" && !["active", "past_due", "pending"].includes(sub.status)) {
-      return json({ error: "no_active_subscription" }, 404);
+      // Already cancelled: report success rather than an error. The user asked
+      // for a state that already holds, so from their side nothing is wrong.
+      return json({ ok: true, action, note: "already_cancelled" });
     }
-    if (action === "delete_card" && !sub.rectoken) {
-      return json({ error: "no_saved_card" }, 404);
+    // No hard failure for delete_card. If the token is already gone at Flitt
+    // but a masked number is still displayed, the user must still be able to
+    // clear it: otherwise the interface shows a card that cannot be removed.
+    if (action === "delete_card" && !sub.rectoken && !sub.masked_card) {
+      return json({ ok: true, action, note: "nothing_to_delete" });
     }
 
     let flittStopped = false;

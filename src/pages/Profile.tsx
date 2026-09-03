@@ -71,7 +71,16 @@ export default function Profile() {
       await loadSubscription();
       toast.success(action === "cancel" ? "გამოწერა გაუქმდა" : "ბარათი წაიშალა");
     } catch (e: any) {
-      toast.error(e?.message ?? "ვერ მოხერხდა");
+      // functions.invoke hides the response body on a non-2xx, leaving only
+      // "Edge Function returned a non-2xx status code" — which tells the user
+      // nothing and tells us nothing either. Dig the real message out.
+      let msg = e?.message ?? "ვერ მოხერხდა";
+      try {
+        const body = await e?.context?.json?.();
+        if (body?.error) msg = String(body.error);
+      } catch { /* keep the generic message */ }
+      console.error("subscription action failed:", msg);
+      toast.error(msg);
     } finally {
       setSubBusy(false);
     }
