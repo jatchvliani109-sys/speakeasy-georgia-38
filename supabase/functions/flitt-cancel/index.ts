@@ -106,6 +106,11 @@ Deno.serve(async (req) => {
       updated_at: new Date().toISOString(),
     }).eq("user_id", user.id);
 
+    // Access is NOT revoked here. The user paid for the current period and is
+    // entitled to it; withdrawing the service early would be taking their money
+    // and giving nothing back. business_state.mockPro is cleared when the period
+    // actually lapses (see the expiry check on load).
+
     await admin.from("payment_events").insert({
       user_id: user.id,
       order_id: sub.order_id,

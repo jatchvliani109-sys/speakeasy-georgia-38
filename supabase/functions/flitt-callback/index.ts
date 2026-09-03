@@ -7,7 +7,7 @@
 // Deploy with verify_jwt = false, or Flitt's calls will be rejected.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { verifyCallback, verifyAndDecodeV2, corsHeaders, json } from "../_shared/flitt.ts";
+import { verifyCallback, corsHeaders, json } from "../_shared/flitt.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -26,14 +26,10 @@ Deno.serve(async (req) => {
 
     // NEVER trust an unverified callback. Anyone can POST to a public URL;
     // without this check they could grant themselves premium.
-    const isV2 = body.version === "2.0" || (typeof body.data === "string" && body.data.length > 0);
-    const decodedV2 = isV2 ? await verifyAndDecodeV2(body) : null;
-    const valid = isV2 ? decodedV2 !== null : await verifyCallback(body);
-    if (!valid) {
+    if (!(await verifyCallback(body))) {
       console.error("flitt-callback: bad signature", body?.order_id);
       return json({ error: "invalid_signature" }, 403);
     }
-    if (decodedV2) body = decodedV2;
 
     const orderId = String(body.order_id ?? "");
     const paymentId = String(body.payment_id ?? "");
@@ -88,6 +84,22 @@ Deno.serve(async (req) => {
         current_period_end: periodEnd.toISOString(),
         updated_at: new Date().toISOString(),
       }).eq("user_id", sub.user_id);
+
+      // GRANT ACCESS.
+      //
+      // Every premium check in the app reads business_state.mockPro:
+      // aiLocked(), hasUnlimitedVocab(), isTrialActive() and the dashboard all
+      // depend on it. Updating only the subscriptions table left a paid user
+      // with no premium at all, which is exactly what happened in testing.
+      //
+      // Setting it here also supersedes the free trial: isTrialActive()
+      // returns false when mockPro is true, so a user who subscribes mid-trial
+      // moves straight onto the paid tier and its larger AI allowance.
+      const { data: bs } = await admin
+        .from("business_state").select("state").eq("user_id", sub.user_id).maybeSingle();
+      const nextState = { ...((bs?.state as Record<string, unknown>) ?? {}), mockPro: true };
+      await admin.from("business_state")
+        .upsert({ user_id: sub.user_id, state: nextState }, { onConflict: "user_id" });
     } else if (["declined", "expired", "reversed"].includes(orderStatus)) {
       // Do not revoke immediately: the paid period may still be running, and
       // a failed renewal deserves a retry before access is removed.

@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { pullBusinessFromSupabase, shouldOfferTrial, shouldShowTrialEnd } from "./lib/state";
+import {
+  pullBusinessFromSupabase,
+  saveBusinessAsync,
+  shouldOfferTrial,
+  shouldShowTrialEnd,
+} from "./lib/state";
 
 export default function BusinessGate() {
   const { user } = useAuth();
@@ -13,6 +18,30 @@ export default function BusinessGate() {
     (async () => {
       const s = await pullBusinessFromSupabase(user.id);
       if (cancelled) return;
+
+      // SUBSCRIPTION EXPIRY.
+      //
+      // Premium access lives in business_state.mockPro, which the payment
+      // callback sets. Nothing would ever unset it, so a cancelled or lapsed
+      // subscription would keep full access forever. Checked on entry rather
+      // than by a scheduled job: it costs one query and cannot silently fail.
+      if (s.mockPro === true) {
+        try {
+          const { supabase } = await import("@/integrations/supabase/client");
+          const { data: sub } = await supabase
+            .from("subscriptions" as any)
+            .select("status, current_period_end")
+            .maybeSingle();
+          const ended =
+            sub &&
+            (sub as any).current_period_end &&
+            new Date((sub as any).current_period_end) < new Date();
+          if (ended) {
+            await saveBusinessAsync(user.id, { mockPro: false });
+            s.mockPro = false;
+          }
+        } catch { /* no subscriptions table yet: leave access as-is */ }
+      }
 
 
       // ONBOARDING GATE — deliberately short.
