@@ -356,6 +356,12 @@ const Index = () => {
                   TikTok
                 </a>
               </div>
+              <Link
+                to="/contact"
+                className="ka inline-block mt-4 mr-4 text-[13px] text-[#B8B0A8] hover:text-[#C9A84C] transition-colors underline underline-offset-4"
+              >
+                დაგვიკავშირდით
+              </Link>
               <a
                 href="mailto:speakbusy@gmail.com"
                 className="ka inline-block mt-4 text-[13px] text-[#B8B0A8] hover:text-[#C9A84C] transition-colors underline underline-offset-4"
@@ -364,41 +370,19 @@ const Index = () => {
               </a>
             </div>
 
-            {/* Pricing and contact, publicly visible. The premium page is behind
-                login, so a reviewer (or a visitor deciding whether to sign up)
-                would otherwise never see a price. */}
-            <div className="pt-8 pb-8 border-b border-white/10 grid gap-6 sm:grid-cols-2">
-              <div>
-                <p className="ka text-[13px] font-bold text-[#F8F5F0]">ფასი</p>
-                <p className="ka text-[13px] text-[#B8B0A8] mt-2 leading-relaxed">
-                  უფასო ვერსია, 0 ₾, დღიური ლიმიტით, რეკლამების გარეშე.
-                  <br />
-                  პრემიუმი, <b className="text-[#C9A84C]">13.99 ₾ თვეში</b>.
-                  <br />
-                  პირველი 7 დღე უფასოა, ბარათის მითითების გარეშე.
-                  <br />
-                  გამოწერა ავტომატურად განახლდება ყოველთვიურად, სანამ არ
-                  გააუქმებ. გაუქმება შესაძლებელია ნებისმიერ დროს აპლიკაციიდან.
-                </p>
-              </div>
-              <div>
-                <p className="ka text-[13px] font-bold text-[#F8F5F0]">კონტაქტი</p>
-                <p className="ka text-[13px] text-[#B8B0A8] mt-2 leading-relaxed">
-                  ინდივიდუალური მეწარმე ნინო ჯაჭვლიანი
-                  <br />
-                  ს/ნ 62009004530
-                  <br />
-                  ქ. თბილისი, ეკა ბეჟანიშვილის ქუჩა №104
-                  <br />
-                  <a href="tel:+995551588969" className="hover:text-[#C9A84C] transition-colors">
-                    +995 551 58 89 69
-                  </a>
-                  <br />
-                  <a href="mailto:speakbusy@gmail.com" className="hover:text-[#C9A84C] transition-colors">
-                    speakbusy@gmail.com
-                  </a>
-                </p>
-              </div>
+            {/* Pricing, publicly visible. The premium page sits behind login, so
+                a visitor deciding whether to sign up would otherwise never see
+                a price. Business identification and contact details live in the
+                Terms and Privacy pages, both linked below and publicly reachable. */}
+            <div className="pt-8 pb-8 border-b border-white/10 text-center">
+              <p className="ka text-[13px] text-[#B8B0A8] leading-relaxed max-w-lg mx-auto">
+                უფასო ვერსია, 0 ₾, დღიური ლიმიტით და რეკლამების გარეშე.
+                პრემიუმი, <b className="text-[#C9A84C]">13.99 ₾ თვეში</b>.
+                პირველი 7 დღე უფასოა, ბარათის მითითების გარეშე.
+                <br />
+                გამოწერა ავტომატურად განახლდება ყოველთვიურად, სანამ არ გააუქმებ.
+                გაუქმება შესაძლებელია ნებისმიერ დროს, უშუალოდ აპლიკაციიდან.
+              </p>
             </div>
 
             <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -406,6 +390,9 @@ const Index = () => {
                 <Wordmark size="md" />
               </div>
               <div className="flex items-center gap-4 text-xs ka tracking-wide">
+                <Link to="/contact" className="hover:text-[#F8F5F0] transition-colors">
+                  დაგვიკავშირდით
+                </Link>
                 <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
                   კონფიდენციალობის პოლიტიკა
                 </Link>
