@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
           {
             run_id: payload.run_id as string | undefined,
             to: payload.to as string,
-            from: payload.from as { name?: string; address: string },
+            from: payload.from as { name: string; address: string },
             sender_domain: payload.sender_domain as string | undefined,
             subject: payload.subject as string,
             html: payload.html as string,
