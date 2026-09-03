@@ -30,6 +30,13 @@ export default function BusinessPremium() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isPro, setIsPro] = useState<boolean | null>(null);
+  // Real subscription, from the subscriptions table. mockPro remains only as a
+  // development switch; this is the record that matters once payments are live.
+  const [sub, setSub] = useState<{
+    status: string;
+    masked_card: string | null;
+    current_period_end: string | null;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -38,6 +45,14 @@ export default function BusinessPremium() {
     (async () => {
       const s = await pullBusinessFromSupabase(user.id);
       if (!cancelled) setIsPro(s?.mockPro === true);
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase
+          .from("subscriptions" as any)
+          .select("status, masked_card, current_period_end")
+          .maybeSingle();
+        if (!cancelled && data) setSub(data as any);
+      } catch { /* table may not exist yet in older environments */ }
     })();
     return () => { cancelled = true; };
   }, [user]);
@@ -88,6 +103,45 @@ export default function BusinessPremium() {
     }
   };
   // ── END TEMPORARY ─────────────────────────────────────────────────────────
+
+  /** Starts a real subscription: creates the order and hands the user to Flitt. */
+  const subscribe = async () => {
+    if (!user || busy) return;
+    setBusy(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("flitt-subscribe", { body: {} });
+      if (error) throw error;
+      if (data?.checkout_url) {
+        // Card details are entered on Flitt's page, never here.
+        window.location.href = data.checkout_url;
+        return;
+      }
+      toast.error(data?.error ?? "გადახდის გვერდი ვერ გაიხსნა");
+    } catch (e: any) {
+      toast.error(e?.message ?? "შეცდომა");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Cancels at Flitt and removes the saved card. */
+  const cancelSubscription = async () => {
+    if (!user || busy) return;
+    if (!confirm("დარწმუნებული ხარ? შენახული ბარათი წაიშლება და გამოწერა აღარ განახლდება.")) return;
+    setBusy(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("flitt-cancel", { body: {} });
+      if (error) throw error;
+      setSub((p) => (p ? { ...p, status: "cancelled", masked_card: null } : p));
+      toast.success("გამოწერა გაუქმდა და ბარათი წაიშალა");
+    } catch (e: any) {
+      toast.error(e?.message ?? "გაუქმება ვერ მოხერხდა");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const cancel = async () => {
     if (!user || busy) return;
@@ -190,6 +244,61 @@ export default function BusinessPremium() {
           </div>
         )}
       </div>
+
+      {/* SAVED CARD MANAGEMENT
+          Shown whenever a card is stored. Flitt require evidence that a user can
+          see their saved card and remove it themselves, and consumer law expects
+          cancellation to be as easy as subscribing. */}
+      {sub?.masked_card && (
+        <BizCard className="mb-4">
+          <p className="ka text-sm text-[#1C1C1E] font-bold mb-1">შენახული ბარათი</p>
+          <p className="ka text-[12px] text-[#4A4A4A] mb-3">
+            ბარათის სრული მონაცემები ჩვენთან არ ინახება. გადახდას ამუშავებს Flitt.
+          </p>
+
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-[#E4E2DF] bg-[#F8F5F0] px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="w-9 h-6 rounded bg-[#1C1C1E] text-[#F8F5F0] text-[9px] font-bold grid place-items-center shrink-0">
+                CARD
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
+                  {sub.masked_card}
+                </p>
+                {sub.current_period_end && (
+                  <p className="ka text-[11px] text-[#4A4A4A]">
+                    შემდეგი გადახდა:{" "}
+                    {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}
+                  </p>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={cancelSubscription}
+              disabled={busy}
+              className="ka shrink-0 px-3 py-2 rounded-lg border border-[#C0392B]/40 text-[#C0392B] text-xs font-bold hover:bg-[#C0392B]/5 transition-colors disabled:opacity-50"
+            >
+              {busy ? "..." : "ბარათის წაშლა"}
+            </button>
+          </div>
+
+          <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
+            ბარათის წაშლისას გამოწერა უქმდება და ავტომატური გადახდა წყდება.
+            პრემიუმით სარგებლობ უკვე გადახდილი პერიოდის ბოლომდე.
+          </p>
+        </BizCard>
+      )}
+
+      {sub && sub.status === "cancelled" && !sub.masked_card && (
+        <BizCard className="mb-4">
+          <p className="ka text-sm font-bold text-[#1C1C1E]">გამოწერა გაუქმებულია</p>
+          <p className="ka text-[12px] text-[#4A4A4A] mt-1.5 leading-relaxed">
+            შენახული ბარათი წაშლილია და ავტომატური გადახდა აღარ მოხდება.
+            {sub.current_period_end &&
+              ` პრემიუმი აქტიურია ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.`}
+          </p>
+        </BizCard>
+      )}
 
       {isPro === true && (
         <BizCard>
