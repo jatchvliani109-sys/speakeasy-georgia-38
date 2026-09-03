@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle, Download, AtSign, Instagram, MessageCircle } from "lucide-react";
+import { Mail, User as UserIcon, Award, FileText, Target, Briefcase, Save, Upload, Check, KeyRound, ShieldCheck, LifeBuoy, Trash2, AlertTriangle, Download, AtSign, Instagram, MessageCircle, CreditCard, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./paths/business/BusinessShell";
@@ -30,6 +30,53 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pwBusy, setPwBusy] = useState(false);
+  // Subscription. Managed here rather than on the premium page because that is
+  // where people look for it: settings, alongside password and account deletion.
+  const [sub, setSub] = useState<{
+    status: string;
+    masked_card: string | null;
+    current_period_end: string | null;
+  } | null>(null);
+  const [subBusy, setSubBusy] = useState(false);
+
+  const loadSubscription = async () => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = await supabase
+        .from("subscriptions" as any)
+        .select("status, masked_card, current_period_end")
+        .maybeSingle();
+      setSub((data as any) ?? null);
+    } catch { /* table absent in older environments */ }
+  };
+
+  useEffect(() => { if (user) loadSubscription(); }, [user]);
+
+  /**
+   * Two distinct actions:
+   *   cancel      stop future charges, keep access to period end, card stays
+   *   delete_card remove the stored card, which also ends the subscription
+   */
+  const manageSubscription = async (action: "cancel" | "delete_card") => {
+    if (subBusy) return;
+    const msg = action === "cancel"
+      ? "გამოწერის გაუქმება? ავტომატური გადახდა შეწყდება, პრემიუმით ისარგებლებ გადახდილი პერიოდის ბოლომდე."
+      : "ბარათის წაშლა? შენახული ბარათი წაიშლება და გამოწერაც გაუქმდება.";
+    if (!confirm(msg)) return;
+    setSubBusy(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("flitt-cancel", { body: { action } });
+      if (error) throw error;
+      await loadSubscription();
+      toast.success(action === "cancel" ? "გამოწერა გაუქმდა" : "ბარათი წაიშალა");
+    } catch (e: any) {
+      toast.error(e?.message ?? "ვერ მოხერხდა");
+    } finally {
+      setSubBusy(false);
+    }
+  };
+
   // Data export (right to portability)
   const [exporting, setExporting] = useState(false);
   // Email change
@@ -495,6 +542,80 @@ export default function Profile() {
             წესები და პირობები
           </Link>
         </div>
+      </BizCard>
+
+      {/* SUBSCRIPTION
+          Cancelling and removing a card are separate, because they are separate
+          decisions: someone may want to stop paying while keeping the card on
+          file for later, or remove the card entirely. Consumer law also requires
+          cancellation to be as easy as subscribing was. */}
+      <BizCard className="mb-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Star size={14} strokeWidth={2.25} className="text-[#C9A84C]" />
+          <h2 className="ka font-bold text-[#5C1A2E] text-sm">გამოწერა</h2>
+        </div>
+
+        {!sub || ["cancelled", "expired"].includes(sub.status) ? (
+          <>
+            <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
+              {sub?.status === "cancelled" && sub?.current_period_end
+                ? `გამოწერა გაუქმებულია. პრემიუმი აქტიურია ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.`
+                : "აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ."}
+            </p>
+            <Link
+              to="/path/business/premium"
+              className="ka inline-block mt-3 px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
+            >
+              პრემიუმის ნახვა
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="ka text-xs text-[#4A4A4A] mt-1 mb-3 leading-relaxed">
+              პრემიუმი აქტიურია.
+              {sub.current_period_end &&
+                ` შემდეგი გადახდა: ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}.`}
+            </p>
+
+            {sub.masked_card && (
+              <div className="flex items-center gap-3 rounded-lg border border-[#E4E2DF] bg-[#F8F5F0] px-3 py-2.5 mb-3">
+                <CreditCard size={16} strokeWidth={2} className="text-[#5C1A2E] shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
+                    {sub.masked_card}
+                  </p>
+                  <p className="ka text-[10px] text-[#8A8A8A]">
+                    სრული მონაცემები ჩვენთან არ ინახება
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => manageSubscription("cancel")}
+                disabled={subBusy}
+                className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold hover:border-[#5C1A2E]/40 disabled:opacity-50"
+              >
+                {subBusy ? "..." : "გამოწერის გაუქმება"}
+              </button>
+              {sub.masked_card && (
+                <button
+                  onClick={() => manageSubscription("delete_card")}
+                  disabled={subBusy}
+                  className="ka px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5 disabled:opacity-50"
+                >
+                  ბარათის წაშლა
+                </button>
+              )}
+            </div>
+
+            <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
+              გაუქმებისას ავტომატური გადახდა წყდება, პრემიუმით სარგებლობ
+              გადახდილი პერიოდის ბოლომდე. ბარათის წაშლისას ორივე უქმდება.
+            </p>
+          </>
+        )}
       </BizCard>
 
       <BizCard className="mb-4">

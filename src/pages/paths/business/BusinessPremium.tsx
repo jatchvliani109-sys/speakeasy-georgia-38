@@ -71,38 +71,6 @@ export default function BusinessPremium() {
     }
   };
 
-  // ── TEMPORARY PAYMENT TEST ────────────────────────────────────────────────
-  // Calls flitt-subscribe and shows the raw response on screen, so the Flitt
-  // signature can be verified without touching the browser console.
-  // DELETE this block, its state, and the panel in the render once payments work.
-  const [testResult, setTestResult] = useState<string>("");
-  const [testing, setTesting] = useState(false);
-
-  const runPaymentTest = async (mode: "simple" | "subscription" | "probe") => {
-    if (testing) return;
-    setTesting(true);
-    setTestResult("იგზავნება...");
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase.functions.invoke("flitt-subscribe", { body: { mode } });
-
-      if (error) {
-        // functions.invoke hides the response body on non-2xx; dig it out,
-        // because Flitt's error detail is the whole point of this test.
-        let detail = "";
-        try { detail = JSON.stringify(await (error as any).context?.json?.(), null, 2); }
-        catch { detail = String(error.message ?? error); }
-        setTestResult("ERROR:\n" + detail);
-      } else {
-        setTestResult(JSON.stringify(data, null, 2));
-      }
-    } catch (e: any) {
-      setTestResult("EXCEPTION:\n" + String(e?.message ?? e));
-    } finally {
-      setTesting(false);
-    }
-  };
-  // ── END TEMPORARY ─────────────────────────────────────────────────────────
 
   /** Starts a real subscription: creates the order and hands the user to Flitt. */
   const subscribe = async () => {
@@ -157,49 +125,6 @@ export default function BusinessPremium() {
 
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
-      {/* ── TEMPORARY PAYMENT TEST PANEL — delete once payments work ── */}
-      <div className="mb-4 rounded-xl border-2 border-dashed border-[#C0392B]/40 bg-[#FFF8F7] p-4">
-        <p className="text-[11px] uppercase tracking-wider text-[#C0392B] font-bold">
-          TEST ONLY — remove before launch
-        </p>
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={() => runPaymentTest("simple")}
-            disabled={testing}
-            className="px-3 py-2 rounded-lg bg-[#C0392B] text-white text-xs font-bold disabled:opacity-50"
-          >
-            {testing ? "..." : "1. Test simple payment"}
-          </button>
-          <button
-            onClick={() => runPaymentTest("subscription")}
-            disabled={testing}
-            className="px-3 py-2 rounded-lg bg-[#1C1C1E] text-white text-xs font-bold disabled:opacity-50"
-          >
-            2. Test subscription
-          </button>
-          <button
-            onClick={() => runPaymentTest("probe")}
-            disabled={testing}
-            className="px-3 py-2 rounded-lg bg-[#5C1A2E] text-white text-xs font-bold disabled:opacity-50"
-          >
-            3. Probe signature
-          </button>
-        </div>
-        {testResult && (
-          <>
-            <pre className="mt-3 text-[10px] leading-relaxed bg-white border border-[#E4E2DF] rounded-lg p-3 overflow-auto max-h-72 whitespace-pre-wrap break-all">
-              {testResult}
-            </pre>
-            <button
-              onClick={() => navigator.clipboard?.writeText(testResult)}
-              className="mt-2 text-[11px] text-[#5C1A2E] underline"
-            >
-              copy result
-            </button>
-          </>
-        )}
-      </div>
-
       <div className="mb-4">
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] inline-flex items-center gap-2">
           <Star size={22} className="text-[#C9A84C] fill-[#C9A84C]" /> პრემიუმი
@@ -234,69 +159,43 @@ export default function BusinessPremium() {
           </div>
         ) : (
           <div className="mt-6">
-            <BizButton onClick={unlock} disabled={busy || isPro === null}>
-              {busy ? "..." : "განბლოკვა ⭐"}
-            </BizButton>
-            <p className="ka text-[11px] text-[#F5F4F2]/60 mt-2">
-              სატესტო რეჟიმი — გადახდა ჯერ არ არის საჭირო. გამოშვებისას აქ
-              რეალური გადახდა იქნება, 7-დღიანი უფასო პერიოდით.
+            <button
+              onClick={subscribe}
+              disabled={busy}
+              className="ka w-full py-3.5 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-[15px] font-bold hover:bg-[#D4B560] transition-colors disabled:opacity-60"
+            >
+              {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
+            </button>
+
+            {/* Subscription terms next to the button, not buried in a policy:
+                price, frequency, that it renews automatically, and how to stop
+                it. What a consumer is entitled to know BEFORE paying. */}
+            <p className="ka text-[11px] text-[#F5F4F2]/70 mt-3 leading-relaxed">
+              გადახდის შემდეგ პრემიუმი აქტიურდება მაშინვე. გამოწერა ავტომატურად
+              განახლდება ყოველ თვეს, {PRICE_GEL} ლარად, სანამ არ გააუქმებ.
+              გაუქმება ნებისმიერ დროს შეგიძლია პროფილის გვერდიდან.
+            </p>
+            <p className="ka text-[11px] text-[#F5F4F2]/50 mt-2 leading-relaxed">
+              გადახდას ამუშავებს Flitt. ბარათის მონაცემები ჩვენთან არ ინახება.
             </p>
           </div>
         )}
       </div>
 
-      {/* SAVED CARD MANAGEMENT
-          Shown whenever a card is stored. Flitt require evidence that a user can
-          see their saved card and remove it themselves, and consumer law expects
-          cancellation to be as easy as subscribing. */}
       {sub?.masked_card && (
         <BizCard className="mb-4">
-          <p className="ka text-sm text-[#1C1C1E] font-bold mb-1">შენახული ბარათი</p>
-          <p className="ka text-[12px] text-[#4A4A4A] mb-3">
-            ბარათის სრული მონაცემები ჩვენთან არ ინახება. გადახდას ამუშავებს Flitt.
-          </p>
-
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-[#E4E2DF] bg-[#F8F5F0] px-4 py-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="w-9 h-6 rounded bg-[#1C1C1E] text-[#F8F5F0] text-[9px] font-bold grid place-items-center shrink-0">
-                CARD
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
-                  {sub.masked_card}
-                </p>
-                {sub.current_period_end && (
-                  <p className="ka text-[11px] text-[#4A4A4A]">
-                    შემდეგი გადახდა:{" "}
-                    {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}
-                  </p>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={cancelSubscription}
-              disabled={busy}
-              className="ka shrink-0 px-3 py-2 rounded-lg border border-[#C0392B]/40 text-[#C0392B] text-xs font-bold hover:bg-[#C0392B]/5 transition-colors disabled:opacity-50"
-            >
-              {busy ? "..." : "ბარათის წაშლა"}
-            </button>
-          </div>
-
-          <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
-            ბარათის წაშლისას გამოწერა უქმდება და ავტომატური გადახდა წყდება.
-            პრემიუმით სარგებლობ უკვე გადახდილი პერიოდის ბოლომდე.
-          </p>
-        </BizCard>
-      )}
-
-      {sub && sub.status === "cancelled" && !sub.masked_card && (
-        <BizCard className="mb-4">
-          <p className="ka text-sm font-bold text-[#1C1C1E]">გამოწერა გაუქმებულია</p>
+          <p className="ka text-sm font-bold text-[#1C1C1E]">გამოწერა აქტიურია</p>
           <p className="ka text-[12px] text-[#4A4A4A] mt-1.5 leading-relaxed">
-            შენახული ბარათი წაშლილია და ავტომატური გადახდა აღარ მოხდება.
+            ბარათი {sub.masked_card}
             {sub.current_period_end &&
-              ` პრემიუმი აქტიურია ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.`}
+              ` · შემდეგი გადახდა ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}`}
           </p>
+          <a
+            href="/profile"
+            className="ka inline-block mt-3 text-[13px] text-[#5C1A2E] font-semibold underline underline-offset-4"
+          >
+            გამოწერის მართვა
+          </a>
         </BizCard>
       )}
 

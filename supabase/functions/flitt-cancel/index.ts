@@ -1,11 +1,19 @@
 // supabase/functions/flitt-cancel/index.ts
 //
-// Cancels a subscription AND deletes the saved card at Flitt.
+// Two DISTINCT actions, because they are not the same thing:
 //
-// Both halves matter. Marking a row cancelled in our own database while Flitt
-// keeps the card and keeps charging is the worst failure available: the user
-// believes they cancelled, the money keeps leaving, and the first they hear of
-// it is a chargeback.
+//   action: "cancel"      Stop future charges. Access continues to the end of
+//                         the period already paid for. The saved card REMAINS,
+//                         so resubscribing later is one tap.
+//
+//   action: "delete_card" Remove the stored card entirely. This necessarily
+//                         cancels the subscription too, since there is nothing
+//                         left to charge.
+//
+// Either way the change must reach Flitt, not just our database. Marking a row
+// cancelled locally while Flitt keeps charging is the worst outcome available:
+// the user believes they cancelled, money keeps leaving, and the first anyone
+// hears of it is a chargeback.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireUser } from "../_shared/auth.ts";
@@ -26,16 +34,28 @@ Deno.serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } },
     );
 
+    let action = "cancel";
+    try {
+      const b = await req.json();
+      if (b?.action === "delete_card") action = "delete_card";
+    } catch { /* default to cancel */ }
+
     const { data: sub } = await admin
       .from("subscriptions").select("*").eq("user_id", user.id).maybeSingle();
 
-    if (!sub || !["active", "past_due", "pending"].includes(sub.status)) {
+    if (!sub) return json({ error: "no_subscription" }, 404);
+    if (action === "cancel" && !["active", "past_due", "pending"].includes(sub.status)) {
       return json({ error: "no_active_subscription" }, 404);
+    }
+    if (action === "delete_card" && !sub.rectoken) {
+      return json({ error: "no_saved_card" }, 404);
     }
 
     let flittStopped = false;
     let flittError: string | null = null;
 
+    // Stop the schedule for BOTH actions: a deleted card cannot be charged, so
+    // leaving the schedule running would only generate failed payments.
     if (sub.order_id) {
       // Stop the recurring schedule at Flitt.
       const stopReq: Record<string, unknown> = {
@@ -58,8 +78,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Delete the saved card token so it cannot be charged again.
-    if (sub.rectoken) {
+    // Only remove the stored card when that is what was asked for.
+    if (action === "delete_card" && sub.rectoken) {
       const delReq: Record<string, unknown> = {
         merchant_id: merchantId(),
         rectoken: sub.rectoken,
@@ -79,8 +99,9 @@ Deno.serve(async (req) => {
     // withdrawing the service.
     await admin.from("subscriptions").update({
       status: "cancelled",
-      rectoken: null,
-      masked_card: null,
+      // Card details are cleared ONLY on delete_card. After a plain cancel the
+      // card stays on file so resubscribing does not mean re-entering it.
+      ...(action === "delete_card" ? { rectoken: null, masked_card: null } : {}),
       cancelled_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }).eq("user_id", user.id);
@@ -88,12 +109,13 @@ Deno.serve(async (req) => {
     await admin.from("payment_events").insert({
       user_id: user.id,
       order_id: sub.order_id,
-      status: "cancelled_by_user",
-      raw: { flittStopped, flittError } as any,
+      status: action === "delete_card" ? "card_deleted_by_user" : "cancelled_by_user",
+      raw: { action, flittStopped, flittError } as any,
     });
 
     return json({
       ok: true,
+      action,
       flitt_stopped: flittStopped,
       access_until: sub.current_period_end,
     });
