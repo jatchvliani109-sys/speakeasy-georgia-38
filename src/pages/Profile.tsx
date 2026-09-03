@@ -555,67 +555,101 @@ export default function Profile() {
           <h2 className="ka font-bold text-[#5C1A2E] text-sm">გამოწერა</h2>
         </div>
 
-        {!sub || ["cancelled", "expired"].includes(sub.status) ? (
-          <>
-            <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
-              {sub?.status === "cancelled" && sub?.current_period_end
-                ? `გამოწერა გაუქმებულია. პრემიუმი აქტიურია ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.`
-                : "აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ."}
-            </p>
-            <Link
-              to="/path/business/premium"
-              className="ka inline-block mt-3 px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
-            >
-              პრემიუმის ნახვა
-            </Link>
-          </>
-        ) : (
-          <>
-            <p className="ka text-xs text-[#4A4A4A] mt-1 mb-3 leading-relaxed">
-              პრემიუმი აქტიურია.
-              {sub.current_period_end &&
-                ` შემდეგი გადახდა: ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}.`}
-            </p>
+        {(() => {
+          // THREE states, not two. The earlier version treated "cancelled" as
+          // "no subscription", which hid the saved card even though cancelling
+          // deliberately keeps it. The card looked deleted when it was not.
+          const periodEnd = sub?.current_period_end ? new Date(sub.current_period_end) : null;
+          const stillInPeriod = !!periodEnd && periodEnd > new Date();
+          const active = sub?.status === "active";
+          const cancelledButActive = sub?.status === "cancelled" && stillInPeriod;
 
-            {sub.masked_card && (
-              <div className="flex items-center gap-3 rounded-lg border border-[#E4E2DF] bg-[#F8F5F0] px-3 py-2.5 mb-3">
-                <CreditCard size={16} strokeWidth={2} className="text-[#5C1A2E] shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
-                    {sub.masked_card}
-                  </p>
-                  <p className="ka text-[10px] text-[#8A8A8A]">
-                    სრული მონაცემები ჩვენთან არ ინახება
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => manageSubscription("cancel")}
-                disabled={subBusy}
-                className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold hover:border-[#5C1A2E]/40 disabled:opacity-50"
-              >
-                {subBusy ? "..." : "გამოწერის გაუქმება"}
-              </button>
-              {sub.masked_card && (
-                <button
-                  onClick={() => manageSubscription("delete_card")}
-                  disabled={subBusy}
-                  className="ka px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5 disabled:opacity-50"
+          // 1 — nothing to manage
+          if (!sub || (!active && !cancelledButActive && !sub.masked_card)) {
+            return (
+              <>
+                <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
+                  აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ.
+                </p>
+                <Link
+                  to="/path/business/premium"
+                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
                 >
-                  ბარათის წაშლა
-                </button>
-              )}
-            </div>
+                  პრემიუმის ნახვა
+                </Link>
+              </>
+            );
+          }
 
-            <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
-              გაუქმებისას ავტომატური გადახდა წყდება, პრემიუმით სარგებლობ
-              გადახდილი პერიოდის ბოლომდე. ბარათის წაშლისას ორივე უქმდება.
-            </p>
-          </>
-        )}
+          // 2 & 3 — active, or cancelled with access remaining
+          return (
+            <>
+              <p className="ka text-xs text-[#4A4A4A] mt-1 mb-3 leading-relaxed">
+                {active ? (
+                  <>
+                    პრემიუმი აქტიურია.
+                    {periodEnd && ` შემდეგი გადახდა: ${periodEnd.toLocaleDateString("ka-GE")}.`}
+                  </>
+                ) : (
+                  <>
+                    გამოწერა გაუქმებულია, ავტომატური გადახდა აღარ მოხდება.
+                    {periodEnd && ` პრემიუმი აქტიურია ${periodEnd.toLocaleDateString("ka-GE")}-მდე.`}
+                  </>
+                )}
+              </p>
+
+              {sub.masked_card && (
+                <div className="flex items-center gap-3 rounded-lg border border-[#E4E2DF] bg-[#F8F5F0] px-3 py-2.5 mb-3">
+                  <CreditCard size={16} strokeWidth={2} className="text-[#5C1A2E] shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
+                      {sub.masked_card}
+                    </p>
+                    <p className="ka text-[10px] text-[#8A8A8A]">
+                      {active
+                        ? "სრული მონაცემები ჩვენთან არ ინახება"
+                        : "ბარათი შენახულია, გადახდა აღარ მოხდება"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {active && (
+                  <button
+                    onClick={() => manageSubscription("cancel")}
+                    disabled={subBusy}
+                    className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold hover:border-[#5C1A2E]/40 disabled:opacity-50"
+                  >
+                    {subBusy ? "..." : "გამოწერის გაუქმება"}
+                  </button>
+                )}
+                {!active && (
+                  <Link
+                    to="/path/business/premium"
+                    className="ka px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
+                  >
+                    გამოწერის განახლება
+                  </Link>
+                )}
+                {sub.masked_card && (
+                  <button
+                    onClick={() => manageSubscription("delete_card")}
+                    disabled={subBusy}
+                    className="ka px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5 disabled:opacity-50"
+                  >
+                    {subBusy ? "..." : "ბარათის წაშლა"}
+                  </button>
+                )}
+              </div>
+
+              <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
+                გაუქმებისას ავტომატური გადახდა წყდება, ბარათი კი შენახული რჩება,
+                რომ განახლება მარტივი იყოს. ბარათის წაშლისას ორივე უქმდება.
+              </p>
+            </>
+          );
+        })()}
       </BizCard>
 
       <BizCard className="mb-4">

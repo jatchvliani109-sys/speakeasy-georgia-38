@@ -161,7 +161,7 @@ export default function BusinessPremium() {
           <div className="mt-6">
             <button
               onClick={subscribe}
-              disabled={busy}
+              disabled={busy || (sub?.status === "active")}
               className="ka w-full py-3.5 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-[15px] font-bold hover:bg-[#D4B560] transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
@@ -182,13 +182,30 @@ export default function BusinessPremium() {
         )}
       </div>
 
-      {sub?.masked_card && (
+      {/* Subscription status. Must check STATUS, not just whether a card is on
+          file: a cancelled subscription can still have a saved card, and the
+          earlier version announced "გამოწერა აქტიურია" for it. Management lives
+          in Profile; this is a summary with a link. */}
+      {sub && ["active", "cancelled"].includes(sub.status) &&
+        sub.current_period_end &&
+        new Date(sub.current_period_end) > new Date() && (
         <BizCard className="mb-4">
-          <p className="ka text-sm font-bold text-[#1C1C1E]">გამოწერა აქტიურია</p>
+          <p className="ka text-sm font-bold text-[#1C1C1E]">
+            {sub.status === "active" ? "გამოწერა აქტიურია" : "გამოწერა გაუქმებულია"}
+          </p>
           <p className="ka text-[12px] text-[#4A4A4A] mt-1.5 leading-relaxed">
-            ბარათი {sub.masked_card}
-            {sub.current_period_end &&
-              ` · შემდეგი გადახდა ${new Date(sub.current_period_end).toLocaleDateString("ka-GE")}`}
+            {sub.status === "active" ? (
+              <>
+                {sub.masked_card ? `ბარათი ${sub.masked_card} · ` : ""}
+                შემდეგი გადახდა{" "}
+                {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}
+              </>
+            ) : (
+              <>
+                ავტომატური გადახდა აღარ მოხდება. პრემიუმი აქტიურია{" "}
+                {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.
+              </>
+            )}
           </p>
           <a
             href="/profile"
