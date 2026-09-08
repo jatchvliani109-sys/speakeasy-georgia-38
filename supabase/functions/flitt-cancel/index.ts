@@ -123,6 +123,14 @@ Deno.serve(async (req) => {
       raw: { action, flittStopped, flittError } as any,
     });
 
+    // Written confirmation of the cancellation. Fire-and-forget: the helper
+    // swallows its own errors so a mail problem cannot fail the cancellation.
+    await sendCancellationConfirmation(admin, {
+      userId: user.id,
+      email: user.email,
+      periodEnd: sub.current_period_end,
+    });
+
     return json({
       ok: true,
       action,
