@@ -33,7 +33,6 @@ import NotFound from "./pages/NotFound";
 // ---------------------------------------------------------------------------
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
-const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BusinessModulesList = lazy(() => import("./pages/paths/business/BusinessModulesList"));
 const BusinessGate = lazy(() => import("./pages/paths/business/BusinessGate"));
 const BusinessSetup = lazy(() => import("./pages/paths/business/BusinessSetup"));
@@ -80,7 +79,6 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
