@@ -16,6 +16,7 @@
 // hears of it is a chargeback.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendAppEmail, getUserEmail, formatGeorgianDate } from "../_shared/subscriptionEmails.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { FLITT_API, merchantId, sign, corsHeaders, json } from "../_shared/flitt.ts";
 
@@ -122,6 +123,24 @@ Deno.serve(async (req) => {
       status: action === "delete_card" ? "card_deleted_by_user" : "cancelled_by_user",
       raw: { action, flittStopped, flittError } as any,
     });
+
+    // Cancellation confirmation. Fire-and-forget.
+    try {
+      const email = await getUserEmail(admin, user.id);
+      if (email) {
+        await sendAppEmail({
+          templateName: "subscription-cancelled",
+          recipientEmail: email,
+          idempotencyKey: `subscription-cancelled-${user.id}-${sub.order_id ?? "na"}-${action}`,
+          templateData: {
+            period_end_date: formatGeorgianDate(sub.current_period_end),
+            premium_url: "https://speakbusy.com/path/business/premium",
+          },
+        });
+      }
+    } catch (e) {
+      console.error("cancellation email failed", e);
+    }
 
     return json({
       ok: true,
