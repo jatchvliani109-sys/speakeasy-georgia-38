@@ -37,7 +37,7 @@ export default function Unsubscribe() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
-      <SEO title="გამოწერის გაუქმება — SpeakBusy" description="შეწყვიტე SpeakBusy-ის შეტყობინებების მიღება." />
+      <SEO title="გამოწერის გაუქმება — SpeakBusy" description="შეწყვიტე SpeakBusy-ის შეტყობინებების მიღება." path="/unsubscribe" />
       <div className="w-full max-w-md rounded-2xl border bg-card p-8 text-center">
         <h1 className="text-xl font-bold text-foreground mb-4">შეტყობინებების გაუქმება</h1>
 
