@@ -8,6 +8,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { verifyCallback, corsHeaders, json } from "../_shared/flitt.ts";
+import { sendAppEmail, getUserEmail, formatGeorgianDate } from "../_shared/subscriptionEmails.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -95,6 +96,31 @@ Deno.serve(async (req) => {
       // Setting it here also supersedes the free trial: isTrialActive()
       // returns false when mockPro is true, so a user who subscribes mid-trial
       // moves straight onto the paid tier and its larger AI allowance.
+      // Payment confirmation + regulatory advance notice of the next charge.
+      // Fire-and-forget: a send failure must never affect the payment.
+      try {
+        const email = await getUserEmail(admin, sub.user_id);
+        if (email) {
+          const dateKa = formatGeorgianDate(periodEnd);
+          await sendAppEmail({
+            templateName: "payment-confirmation",
+            recipientEmail: email,
+            idempotencyKey: `payment-confirmation-${paymentId || orderId || periodEnd.toISOString()}`,
+            templateData: {
+              amount: "13.99",
+              next_charge_date: dateKa,
+              period_end_date: dateKa,
+              profile_url: "https://speakbusy.com/profile",
+            },
+          });
+          await admin.from("subscriptions")
+            .update({ next_notice_sent: new Date().toISOString() })
+            .eq("user_id", sub.user_id);
+        }
+      } catch (e) {
+        console.error("payment confirmation email failed", e);
+      }
+
       const { data: bs } = await admin
         .from("business_state").select("state").eq("user_id", sub.user_id).maybeSingle();
       const nextState = { ...((bs?.state as Record<string, unknown>) ?? {}), mockPro: true };
