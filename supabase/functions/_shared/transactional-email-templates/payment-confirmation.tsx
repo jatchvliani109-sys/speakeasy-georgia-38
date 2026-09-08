@@ -18,7 +18,12 @@ const PaymentConfirmationEmail = ({
   profile_url = 'https://speakbusy.com/profile',
 }: Props) => (
   <Html lang="ka" dir="ltr">
-    <Head />
+    <Head>
+      {/* Explicit charset. Georgian characters are three bytes each in UTF-8,
+          and a client that guesses the encoding will mangle them. */}
+      <meta charSet="utf-8" />
+      <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+    </Head>
     <Preview>გადახდა დადასტურებულია · SpeakBusy</Preview>
     <Body style={body}>
       <Container style={outer}>
