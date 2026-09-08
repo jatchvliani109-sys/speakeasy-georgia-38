@@ -8,7 +8,6 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { verifyCallback, corsHeaders, json } from "../_shared/flitt.ts";
-import { sendPaymentConfirmation } from "../_shared/billingEmails.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -101,16 +100,6 @@ Deno.serve(async (req) => {
       const nextState = { ...((bs?.state as Record<string, unknown>) ?? {}), mockPro: true };
       await admin.from("business_state")
         .upsert({ user_id: sub.user_id, state: nextState }, { onConflict: "user_id" });
-
-      // Payment confirmation + advance notice of the next charge (required by
-      // the National Bank of Georgia rules on merchant-initiated recurring
-      // payments). Fire-and-forget: the helper never throws, so a mail failure
-      // cannot undo or block the activation above.
-      await sendPaymentConfirmation(admin, {
-        userId: sub.user_id,
-        amountGel: amount > 0 ? amount / 100 : 13.99,
-        periodEnd: periodEnd.toISOString(),
-      });
     } else if (["declined", "expired", "reversed"].includes(orderStatus)) {
       // Do not revoke immediately: the paid period may still be running, and
       // a failed renewal deserves a retry before access is removed.
