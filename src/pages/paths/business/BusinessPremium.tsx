@@ -1,10 +1,11 @@
 // src/pages/paths/business/BusinessPremium.tsx
 // -----------------------------------------------------------------------------
-// PREMIUM. Real Flitt payment flow.
-// The unlock button just flips `mockPro` in the business state blob so the
-// premium experience (unlimited vocab + real interviews) can be felt end to
-// end. When the ინდ. მეწარმე registration completes, the unlock button gets
-// replaced by the real payment flow; everything else on this page stays.
+// PREMIUM
+//
+// Real Flitt payment flow. The mock unlock and disable controls are gone: they
+// wrote `mockPro` directly, so any user could grant themselves premium without
+// paying, or switch it off by accident. Access is granted only by the payment
+// callback now, and cancellation lives in Profile so it reaches Flitt too.
 // -----------------------------------------------------------------------------
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -75,21 +76,6 @@ export default function BusinessPremium() {
     return () => { cancelled = true; };
   }, [user]);
 
-  const unlock = async () => {
-    if (!user || busy) return;
-    setBusy(true);
-    try {
-      // Awaited remote write: pages that pull from Supabase right after
-      // (vocab, interview) must see the flag immediately, not stale state.
-      await saveBusinessAsync(user.id, { mockPro: true });
-      setIsPro(true);
-      toast.success("პრემიუმი ჩართულია ⭐");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-
   /** Starts a real subscription: creates the order and hands the user to Flitt. */
   const subscribe = async () => {
     if (!user || busy) return;
@@ -124,18 +110,6 @@ export default function BusinessPremium() {
       toast.success("გამოწერა გაუქმდა და ბარათი წაიშალა");
     } catch (e: any) {
       toast.error(e?.message ?? "გაუქმება ვერ მოხერხდა");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const cancel = async () => {
-    if (!user || busy) return;
-    setBusy(true);
-    try {
-      await saveBusinessAsync(user.id, { mockPro: false });
-      setIsPro(false);
-      toast("პრემიუმი გამორთულია");
     } finally {
       setBusy(false);
     }
@@ -269,21 +243,6 @@ export default function BusinessPremium() {
         </BizCard>
       )}
 
-      {isPro === true && (
-        <BizCard>
-          <p className="ka text-sm text-[#1C1C1E] font-semibold mb-1">მართვა</p>
-          <p className="ka text-[12px] text-[#4A4A4A] mb-3">
-            ეს სატესტო ვერსიაა, შეგიძლია ნებისმიერ დროს გამორთო.
-          </p>
-          <button
-            onClick={cancel}
-            disabled={busy}
-            className="ka text-sm font-semibold text-[#5C1A2E] underline underline-offset-4 disabled:opacity-50"
-          >
-            პრემიუმის გამორთვა
-          </button>
-        </BizCard>
-      )}
     </BusinessShell>
   );
 }
