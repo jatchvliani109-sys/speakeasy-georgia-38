@@ -886,9 +886,12 @@ export type Database = {
       subscriptions: {
         Row: {
           cancelled_at: string | null
+          consent_at: string | null
+          consent_terms: string | null
           created_at: string
           current_period_end: string | null
           masked_card: string | null
+          next_notice_sent: string | null
           order_id: string
           rectoken: string | null
           status: string
@@ -897,9 +900,12 @@ export type Database = {
         }
         Insert: {
           cancelled_at?: string | null
+          consent_at?: string | null
+          consent_terms?: string | null
           created_at?: string
           current_period_end?: string | null
           masked_card?: string | null
+          next_notice_sent?: string | null
           order_id: string
           rectoken?: string | null
           status?: string
@@ -908,9 +914,12 @@ export type Database = {
         }
         Update: {
           cancelled_at?: string | null
+          consent_at?: string | null
+          consent_terms?: string | null
           created_at?: string
           current_period_end?: string | null
           masked_card?: string | null
+          next_notice_sent?: string | null
           order_id?: string
           rectoken?: string | null
           status?: string
@@ -1082,6 +1091,15 @@ export type Database = {
       refund_ai_session: {
         Args: { p_user_id: string; p_week: string }
         Returns: undefined
+      }
+      subscriptions_needing_notice: {
+        Args: never
+        Returns: {
+          amount_gel: number
+          email: string
+          next_charge: string
+          user_id: string
+        }[]
       }
     }
     Enums: {
