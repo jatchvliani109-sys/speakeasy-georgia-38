@@ -7,3 +7,5 @@ project_id = "hmpwjhzrmfyapijikkuc"
     verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
+  [functions.daily-tasks]
+    verify_jwt = false
