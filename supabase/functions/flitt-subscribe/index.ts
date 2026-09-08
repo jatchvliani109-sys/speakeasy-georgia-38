@@ -84,6 +84,12 @@ Deno.serve(async (req) => {
       } : {}),
       server_callback_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/flitt-callback`,
       response_url: `${siteUrl}/path/business/premium?payment=return`,
+      // Save the card and return a reusable token. This is a SEPARATE mechanism
+      // from subscription/recurring_data, and being a plain scalar it signs
+      // without the nested-object problem that has blocked the subscription
+      // block. With a rectoken we can charge monthly ourselves and do not need
+      // Flitt's own scheduler at all.
+      required_rectoken: "y",
       lang: "ka",
       sender_email: user.email ?? "",
     };
