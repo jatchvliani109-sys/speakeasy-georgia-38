@@ -15,7 +15,7 @@ const CancellationEmail = ({
 }: Props) => (
   <Html lang="ka" dir="ltr">
     <Head />
-    <Preview>გამოწერა გაუქმებულია — SpeakBusy</Preview>
+    <Preview>გამოწერა გაუქმებულია · SpeakBusy</Preview>
     <Body style={body}>
       <Container style={outer}>
         <Container style={card}>
@@ -76,7 +76,7 @@ const CancellationEmail = ({
 
 export const template = {
   component: CancellationEmail,
-  subject: 'SpeakBusy — გამოწერა გაუქმებულია',
+  subject: 'SpeakBusy: გამოწერა გაუქმებულია',
   displayName: 'გაუქმების დადასტურება',
   previewData: {
     period_end_date: '15 ოქტომბერი, 2026',

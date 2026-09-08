@@ -16,9 +16,9 @@
 // hears of it is a chargeback.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { sendAppEmail, getUserEmail, formatGeorgianDate } from "../_shared/subscriptionEmails.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { FLITT_API, merchantId, sign, corsHeaders, json } from "../_shared/flitt.ts";
+import { sendAppEmail, formatGeorgianDate } from "../_shared/subscriptionEmails.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -124,22 +124,18 @@ Deno.serve(async (req) => {
       raw: { action, flittStopped, flittError } as any,
     });
 
-    // Cancellation confirmation. Fire-and-forget.
-    try {
-      const email = await getUserEmail(admin, user.id);
-      if (email) {
-        await sendAppEmail({
-          templateName: "subscription-cancelled",
-          recipientEmail: email,
-          idempotencyKey: `subscription-cancelled-${user.id}-${sub.order_id ?? "na"}-${action}`,
-          templateData: {
-            period_end_date: formatGeorgianDate(sub.current_period_end),
-            premium_url: "https://speakbusy.com/path/business/premium",
-          },
-        });
-      }
-    } catch (e) {
-      console.error("cancellation email failed", e);
+    // Written confirmation. Without one the customer has no evidence they
+    // cancelled, which is the usual root of a "you kept charging me" dispute.
+    if (user.email) {
+      await sendAppEmail({
+        templateName: "subscription-cancelled",   // must match registry.ts exactly
+        recipientEmail: user.email,
+        idempotencyKey: `cancel_${sub.order_id}_${action}`,
+        templateData: {
+          period_end_date: formatGeorgianDate(sub.current_period_end),
+          premium_url: "https://speakbusy.com/path/business/premium",
+        },
+      });
     }
 
     return json({

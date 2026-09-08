@@ -19,7 +19,7 @@ const PaymentConfirmationEmail = ({
 }: Props) => (
   <Html lang="ka" dir="ltr">
     <Head />
-    <Preview>გადახდა დადასტურებულია — SpeakBusy</Preview>
+    <Preview>გადახდა დადასტურებულია · SpeakBusy</Preview>
     <Body style={body}>
       <Container style={outer}>
         <Container style={card}>
@@ -42,7 +42,7 @@ const PaymentConfirmationEmail = ({
               <Text style={rowValue}>{period_end_date}-მდე</Text>
             </Section>
 
-            {/* REGULATORY: advance notice of the next charge — do not remove */}
+            {/* REGULATORY: advance notice of the next charge. Do not remove. */}
             <Section style={goldBox}>
               <Text style={goldLabel}>შემდეგი გადახდა</Text>
               <Text style={goldValue}>
@@ -90,7 +90,7 @@ const PaymentConfirmationEmail = ({
 
 export const template = {
   component: PaymentConfirmationEmail,
-  subject: 'SpeakBusy — გადახდა დადასტურებულია',
+  subject: 'SpeakBusy: გადახდა დადასტურებულია',
   displayName: 'გადახდის დადასტურება',
   previewData: {
     amount: '13.99',
