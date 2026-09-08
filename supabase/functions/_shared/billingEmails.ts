@@ -221,7 +221,7 @@ async function enqueue(
 ): Promise<boolean> {
   const messageId = crypto.randomUUID();
   const { error } = await admin.rpc("enqueue_email", {
-    queue_name: "transactional_emails",
+    queue_name: "auth_emails",
     payload: {
       message_id: messageId,
       to: opts.to,
