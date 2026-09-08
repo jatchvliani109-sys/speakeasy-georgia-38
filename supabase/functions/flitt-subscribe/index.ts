@@ -37,6 +37,16 @@ Deno.serve(async (req) => {
     }
 
     const siteUrl = Deno.env.get("SITE_URL") ?? "https://speakbusy.com";
+
+    // The terms the customer confirmed, in the wording the National Bank
+    // regulation requires: exact amount and day of the month.
+    const chargeDay = new Date().getDate();
+    const dayText = chargeDay > 28
+      ? "ყოველი თვის ბოლო რიცხვში"
+      : `ყოველი თვის ${chargeDay} რიცხვში`;
+    const consentTerms =
+      `13.99 ლარი ${dayText}. ბარათი ინახება Flitt-თან. ` +
+      `გამოწერა ძალაშია სანამ არ გაუქმდება. გაუქმება ნებისმიერ დროს, პროფილიდან.`;
     // Unique per attempt. Flitt rejects a reused order_id, and reusing one
     // across attempts would also collide in our own table.
     const orderId = `sb_${user.id.slice(0, 8)}_${Date.now()}`;
@@ -202,11 +212,16 @@ Deno.serve(async (req) => {
       }, 502);
     }
 
-    // Record the attempt so the callback can find this user by order_id.
+    // Record the attempt so the callback can find this user by order_id, and
+    // store the consent terms verbatim. If a charge is ever disputed, what
+    // matters is what the customer agreed to at the time, not what the page
+    // says months later.
     await admin.from("subscriptions").upsert({
       user_id: user.id,
       order_id: orderId,
       status: "pending",
+      consent_at: new Date().toISOString(),
+      consent_terms: consentTerms,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
 

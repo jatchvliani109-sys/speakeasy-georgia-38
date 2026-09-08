@@ -26,6 +26,18 @@ const FEATURES: { titleKa: string; subKa: string }[] = [
   { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და \"Streak\", რჩება" },
 ];
 
+/**
+ * The charge date in the wording the regulation asks for:
+ * "you will be charged X on the Nth of every month".
+ */
+function chargeDayText(): string {
+  const day = new Date().getDate();
+  // The 29th to 31st do not exist in every month, so state the rule rather
+  // than a date that would sometimes be wrong.
+  if (day > 28) return "ყოველი თვის ბოლო რიცხვში";
+  return `ყოველი თვის ${day} რიცხვში`;
+}
+
 export default function BusinessPremium() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -38,6 +50,12 @@ export default function BusinessPremium() {
     current_period_end: string | null;
   } | null>(null);
   const [busy, setBusy] = useState(false);
+  // Explicit consent to storing the card and to recurring charges.
+  //
+  // Required by National Bank of Georgia regulation: merchants must describe
+  // the subscription process and terms and obtain a ONE-TIME confirmation from
+  // the customer. The subscribe button stays disabled until this is ticked.
+  const [cardConsent, setCardConsent] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -159,9 +177,44 @@ export default function BusinessPremium() {
           </div>
         ) : (
           <div className="mt-6">
+            {/* CONSENT. Regulation requires the terms to be described and
+                confirmed once, before the card is stored. */}
+            <div className="rounded-xl bg-[#F5F4F2]/10 border border-[#F5F4F2]/15 p-4 mb-4 text-left">
+              <p className="ka text-[12px] font-bold text-[#F5F4F2] mb-2">
+                გამოწერის პირობები
+              </p>
+              <ul className="space-y-1.5 mb-3">
+                {[
+                  `თქვენ ჩამოგეჭრებათ ${PRICE_GEL} ლარი ${chargeDayText()}.`,
+                  "თქვენი ბარათი შეინახება Flitt-ის დაცულ სისტემაში, რომ ყოველთვიური გადახდა ავტომატურად მოხდეს.",
+                  "გამოწერა ძალაშია სანამ არ გააუქმებთ.",
+                  "გაუქმება და ბარათის წაშლა ნებისმიერ დროს შეგიძლიათ პროფილის გვერდიდან.",
+                  "ყოველი გადახდის შესახებ წინასწარ მიიღებთ შეტყობინებას ელფოსტაზე.",
+                ].map((t) => (
+                  <li key={t} className="ka text-[11px] text-[#F5F4F2]/75 flex items-start gap-2 leading-relaxed">
+                    <span className="text-[#C9A84C] mt-0.5 shrink-0">•</span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={cardConsent}
+                  onChange={(e) => setCardConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 shrink-0 accent-[#C9A84C] cursor-pointer"
+                />
+                <span className="ka text-[12px] text-[#F5F4F2] leading-relaxed">
+                  ვეთანხმები ბარათის დამახსოვრებას და ყოველთვიურ ავტომატურ
+                  გადახდას ზემოთ მითითებული პირობებით.
+                </span>
+              </label>
+            </div>
+
             <button
               onClick={subscribe}
-              disabled={busy || (sub?.status === "active")}
+              disabled={busy || !cardConsent || (sub?.status === "active")}
               className="ka w-full py-3.5 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-[15px] font-bold hover:bg-[#D4B560] transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
