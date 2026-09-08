@@ -284,7 +284,14 @@ export default function TrialGift() {
               last
             />
 
+            {/* Naming the reminder emails here means accepting the gift is the
+                  consent for them, rather than relying on the argument that they
+                  are transactional. Costs one line. */}
             <p className="ka text-[11px] text-[#8A8A8A] mt-5 leading-relaxed text-center">
+              საცდელი პერიოდის განმავლობაში მოგწერთ ორ შეტყობინებას პროგრესის
+              შესახებ. გამოწერის გაუქმება ნებისმიერ დროს შეგიძლია.
+              <br />
+              <br />
               ბარათი არ გჭირდება. არაფერი ჩამოგეჭრება.
               <br />
               {TRIAL_DAYS} დღის შემდეგ ავტომატურად გადახვალ უფასო ვერსიაზე.
@@ -325,7 +332,7 @@ export default function TrialGift() {
                 დარწმუნებული ხარ?
               </p>
               <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
-                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება — მოგვიანებით ვეღარ გაააქტიურებ.
+                ეს შეთავაზება მხოლოდ ერთხელ ჩნდება. მოგვიანებით ვეღარ გაააქტიურებ.
               </p>
               <div className="flex gap-2 mt-4">
                 <button
