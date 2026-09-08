@@ -178,10 +178,16 @@ Deno.serve(async (req) => {
       });
       const fb = (await fbRes.json())?.response ?? {};
       if (fb.response_status === "success" && fb.checkout_url) {
+        // Consent must be recorded on THIS path too. It is currently the only
+        // path that runs, since Flitt have not enabled subscriptions yet, and
+        // an unrecorded consent is the same as no consent if a charge is ever
+        // disputed.
         await admin.from("subscriptions").upsert({
           user_id: user.id,
           order_id: String(fallback.order_id),
           status: "pending",
+          consent_at: new Date().toISOString(),
+          consent_terms: consentTerms,
           updated_at: new Date().toISOString(),
         }, { onConflict: "user_id" });
         console.warn("flitt: subscription refused, fell back to single payment");
