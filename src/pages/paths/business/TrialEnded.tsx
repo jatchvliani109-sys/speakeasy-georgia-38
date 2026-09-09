@@ -123,7 +123,7 @@ export default function TrialEnded() {
 
           <Button
             onClick={() => {
-              track("premium_cta_clicked", { source: "trial_ended" });
+              track("trial_end_upgrade_clicked", { source: "trial_ended" });
               navigate("/path/business/premium");
             }}
             className="w-full h-12 bg-[#C9A84C] hover:bg-[#B89A3E] text-[#1C1C1E] font-bold rounded-full text-base"
