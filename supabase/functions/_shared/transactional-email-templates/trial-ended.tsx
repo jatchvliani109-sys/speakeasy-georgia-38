@@ -23,7 +23,6 @@ interface Props {
   percent?: string
   days_left?: string
   app_url?: string
-  unsubscribe_url?: string
 }
 
 const TrialEndedEmail = ({
@@ -31,7 +30,6 @@ const TrialEndedEmail = ({
   percent = '0',
   days_left = '5',
   app_url = 'https://speakbusy.com/path/business/premium',
-  unsubscribe_url = '',
 }: Props) => (
   <Html lang="ka" dir="ltr">
     <Head>
@@ -77,12 +75,6 @@ const TrialEndedEmail = ({
               </Link>
             </Section>
 
-            <Section style={hr} />
-
-            <Text style={muted}>
-              აღარ გინდა ასეთი შეტყობინებები?{' '}
-              <Link href={unsubscribe_url} style={linkStyle}>გამოწერის გაუქმება</Link>
-            </Text>
           </Section>
 
           <Section style={footer}>
@@ -103,7 +95,6 @@ export const template = {
     percent: '7.4',
     days_left: '5',
     app_url: 'https://speakbusy.com/path/business/premium',
-    unsubscribe_url: 'https://speakbusy.com/unsubscribe?token=preview',
   },
 } satisfies TemplateEntry
 
@@ -140,8 +131,5 @@ const button = {
   color: '#1C1C1E',
   textDecoration: 'none',
 }
-const linkStyle = { color: '#5C1A2E' }
-const hr = { borderTop: '1px solid #E4E2DF', margin: '0 0 18px' }
-const muted = { margin: 0, fontSize: '12px', lineHeight: 1.75, color: '#8A8A8A' }
 const footer = { padding: '18px 32px', borderTop: '1px solid #E4E2DF' }
 const footerText = { margin: 0, fontSize: '12px', color: '#8A8A8A' }

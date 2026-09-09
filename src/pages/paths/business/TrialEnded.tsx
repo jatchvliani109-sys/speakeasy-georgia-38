@@ -1,138 +1,144 @@
-/// <reference types="npm:@types/react@18.3.1" />
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Crown, BookOpen, Brain, Flame } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useDisplayName } from "@/hooks/useDisplayName";
+import { Button } from "@/components/ui/button";
+import { track } from "@/lib/track";
+import {
+  pullBusinessFromSupabase,
+  saveBusinessAsync,
+  shouldShowTrialEnd,
+} from "./lib/state";
 
-// Trial ended.
-//
-// The conversion moment. Leads with what they ACHIEVED rather than what they
-// have lost: "your trial ended, pay now" reads as a toll gate, while the same
-// offer after their own numbers reads as keeping something they built.
-//
-// It also says plainly that nothing is lost. Manufacturing a sense of loss
-// produces resentment, not subscriptions, and the honest version is more
-// persuasive because it is true.
-//
-// Consent: the gift screen states that reminders will be sent during the trial,
-// so accepting the gift is the consent. An unsubscribe link is included anyway,
-// because these sit closer to marketing than a payment receipt does.
+/**
+ * Trial ended screen.
+ *
+ * Shown once after the 7-day gift expires. Leads with what the user kept,
+ * then offers premium. Marks trialEndSeen so the gate does not redirect back.
+ */
+export default function TrialEnded() {
+  const { user } = useAuth();
+  const { displayName } = useDisplayName();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ words: 0, percent: 0 });
 
-import * as React from 'npm:react@18.3.1'
-import { Body, Container, Head, Html, Preview, Section, Text, Link } from 'npm:@react-email/components@0.0.22'
-import type { TemplateEntry } from './registry.ts'
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const st = await pullBusinessFromSupabase(user.id);
+      if (cancelled) return;
 
-interface Props {
-  words_started?: string
-  percent?: string
-  days_left?: string
-  app_url?: string
+      // Guard: only someone whose trial just ended should land here.
+      if (!shouldShowTrialEnd(st)) {
+        navigate("/path/business/home", { replace: true });
+        return;
+      }
+
+      // Mark the farewell as shown so BusinessGate stops routing here.
+      await saveBusinessAsync(user.id, { trialEndSeen: true });
+
+      // Best-effort stats from progress table.
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { count } = await (supabase as any)
+          .from("vocabulary_progress")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "learned");
+        const learned = count ?? 0;
+        setStats({
+          words: learned,
+          percent: Math.min(Math.round((learned / 1500) * 1000) / 10, 100),
+        });
+      } catch {
+        // Stats are decorative; do not block the screen.
+      } finally {
+        setLoading(false);
+      }
+
+      track("trial_ended_shown");
+    })();
+    return () => { cancelled = true; };
+  }, [user, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F5F0]">
+        <span className="ka text-sm text-[#4A4A4A]">იტვირთება...</span>
+      </div>
+    );
+  }
+
+  const greeting = displayName ? `${displayName}, ` : "";
+
+  return (
+    <div className="min-h-screen bg-[#F8F5F0] px-4 py-8 md:py-12">
+      <div className="max-w-md mx-auto">
+        <div className="bg-[#1C1C1E] rounded-2xl p-6 md:p-8 text-[#F8F5F0] shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-[#C9A84C]/20 flex items-center justify-center">
+              <Crown className="w-5 h-5 text-[#C9A84C]" />
+            </div>
+            <span className="text-sm font-medium text-[#C9A84C] tracking-wide uppercase">
+              საცდელი პერიოდი დასრულდა
+            </span>
+          </div>
+
+          <h1 className="text-2xl md:text-3xl font-bold mb-3">
+            {greeting}7 დღე დასრულდა
+          </h1>
+
+          <p className="text-[#E4E2DF] leading-relaxed mb-6">
+            პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა — ყველა ნასწავლი სიტყვა, streak-ი და ლექსიკონი შენთან რჩება.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-[#F8F5F0]/10 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-[#C9A84C]">{stats.words}</p>
+              <p className="text-xs text-[#E4E2DF]/80 mt-1">სიტყვა დაიწყე</p>
+            </div>
+            <div className="bg-[#F8F5F0]/10 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-[#C9A84C]">{stats.percent}%</p>
+              <p className="text-xs text-[#E4E2DF]/80 mt-1">ლექსიკა დაფარულია</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-8">
+            <div className="flex items-start gap-3">
+              <BookOpen className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
+              <p className="text-sm text-[#E4E2DF]">ულიმიტო სესიები და ლექსიკონი</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <Brain className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
+              <p className="text-sm text-[#E4E2DF]">კვირაში 7 AI სესია</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <Flame className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
+              <p className="text-sm text-[#E4E2DF]">გასაუბრების სიმულაცია</p>
+            </div>
+          </div>
+
+          <Button
+            onClick={() => {
+              track("trial_end_upgrade_clicked", { source: "trial_ended" });
+              navigate("/path/business/premium");
+            }}
+            className="w-full h-12 bg-[#C9A84C] hover:bg-[#B89A3E] text-[#1C1C1E] font-bold rounded-full text-base"
+          >
+            პრემიუმის ნახვა — 13.99 ლარი/თვე
+          </Button>
+
+          <button
+            onClick={() => navigate("/path/business/home", { replace: true })}
+            className="w-full mt-4 text-sm text-[#E4E2DF]/70 hover:text-[#F8F5F0] transition-colors"
+          >
+            უფასო ვერსიით გაგრძელება
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-const TrialEndedEmail = ({
-  words_started = '0',
-  percent = '0',
-  days_left = '5',
-  app_url = 'https://speakbusy.com/path/business/premium',
-}: Props) => (
-  <Html lang="ka" dir="ltr">
-    <Head>
-      <meta charSet="utf-8" />
-      <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
-    </Head>
-    <Preview>საცდელი პერიოდი დასრულდა</Preview>
-    <Body style={body}>
-      <Container style={outer}>
-        <Container style={card}>
-          <Section style={header}>
-            <Text style={brand}>SpeakBusy</Text>
-          </Section>
-
-          <Section style={content}>
-            <Text style={h1}>7 დღე დასრულდა</Text>
-
-            <Text style={p}>
-              საცდელი პერიოდი დასრულდა. აი, რა გააკეთე ამ 7 დღეში:
-            </Text>
-
-            <Section style={infoBox}>
-              <Text style={statValue}>{words_started}</Text>
-              <Text style={statLabel}>სიტყვა დაიწყე</Text>
-              <Text style={{ ...statValue, marginTop: '14px' }}>{percent}%</Text>
-              <Text style={statLabel}>ლექსიკა დაფარულია</Text>
-            </Section>
-
-            <Text style={p}>
-              <b>შენი პროგრესი არსად წასულა.</b> ყველა ნასწავლი სიტყვა,
-              ლექსიკონი და Streak შენთან რჩება. უფასო ვერსიით აგრძელებ
-              ყოველდღიურ სესიებს.
-            </Text>
-
-            <Text style={p}>
-              თუ გინდა ულიმიტო სესიები, გასაუბრების სიმულაცია და კვირაში
-              7 AI სესია, პრემიუმი 13.99 ლარია თვეში.
-            </Text>
-
-            <Section style={{ margin: '18px 0 22px' }}>
-              <Link href={app_url} style={button}>
-                პრემიუმის ნახვა
-              </Link>
-            </Section>
-
-          </Section>
-
-          <Section style={footer}>
-            <Text style={footerText}>SpeakBusy · ბიზნეს ინგლისური ქართველებისთვის</Text>
-          </Section>
-        </Container>
-      </Container>
-    </Body>
-  </Html>
-)
-
-export const template = {
-  component: TrialEndedEmail,
-  subject: 'SpeakBusy: საცდელი პერიოდი დასრულდა',
-  displayName: 'საცდელი პერიოდი დასრულდა',
-  previewData: {
-    words_started: '112',
-    percent: '7.4',
-    days_left: '5',
-    app_url: 'https://speakbusy.com/path/business/premium',
-  },
-} satisfies TemplateEntry
-
-const body = {
-  margin: 0,
-  padding: '24px 12px',
-  backgroundColor: '#ffffff',
-  fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif",
-}
-const outer = { backgroundColor: '#F0EEEB', padding: '16px 8px', borderRadius: '16px' }
-const card = { maxWidth: '560px', backgroundColor: '#FFFFFF', borderRadius: '14px', overflow: 'hidden' as const, padding: 0 }
-const header = { backgroundColor: '#5C1A2E', padding: '26px 32px' }
-const brand = { margin: 0, color: '#FFFFFF', fontSize: '22px', fontWeight: 700, letterSpacing: '-0.2px' }
-const content = { padding: '32px' }
-const h1 = { margin: '0 0 14px', fontSize: '20px', lineHeight: 1.4, color: '#1C1C1E', fontWeight: 700 }
-const p = { margin: '0 0 20px', fontSize: '15px', lineHeight: 1.75, color: '#3A3A3A' }
-const infoBox = {
-  backgroundColor: '#F8F5F0',
-  border: '1px solid #E4E2DF',
-  borderRadius: '10px',
-  padding: '18px',
-  marginBottom: '20px',
-  textAlign: 'center' as const,
-}
-const statValue = { margin: 0, fontSize: '28px', lineHeight: 1.2, color: '#5C1A2E', fontWeight: 700 }
-const statLabel = { margin: '2px 0 0', fontSize: '12px', color: '#8A8A8A' }
-const button = {
-  backgroundColor: '#C9A84C',
-  borderRadius: '26px',
-  display: 'inline-block',
-  padding: '14px 30px',
-  fontSize: '15px',
-  fontWeight: 700,
-  color: '#1C1C1E',
-  textDecoration: 'none',
-}
-const linkStyle = { color: '#5C1A2E' }
-const hr = { borderTop: '1px solid #E4E2DF', margin: '0 0 18px' }
-const muted = { margin: 0, fontSize: '12px', lineHeight: 1.75, color: '#8A8A8A' }
-const footer = { padding: '18px 32px', borderTop: '1px solid #E4E2DF' }
-const footerText = { margin: 0, fontSize: '12px', color: '#8A8A8A' }
