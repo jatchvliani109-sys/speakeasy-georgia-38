@@ -75,12 +75,6 @@ const TrialEndedEmail = ({
               </Link>
             </Section>
 
-            <Section style={hr} />
-
-            <Text style={muted}>
-              აღარ გინდა ასეთი შეტყობინებები?{' '}
-              <Link href={unsubscribe_url} style={linkStyle}>გამოწერის გაუქმება</Link>
-            </Text>
           </Section>
 
           <Section style={footer}>
