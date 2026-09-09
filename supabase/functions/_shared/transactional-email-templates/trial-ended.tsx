@@ -95,7 +95,6 @@ export const template = {
     percent: '7.4',
     days_left: '5',
     app_url: 'https://speakbusy.com/path/business/premium',
-    unsubscribe_url: 'https://speakbusy.com/unsubscribe?token=preview',
   },
 } satisfies TemplateEntry
 
