@@ -19,7 +19,6 @@ interface Props {
   percent?: string
   days_left?: string
   app_url?: string
-  unsubscribe_url?: string
 }
 
 const TrialDay2Email = ({
@@ -27,7 +26,6 @@ const TrialDay2Email = ({
   percent = '0',
   days_left = '5',
   app_url = 'https://speakbusy.com/path/business/vocabulary',
-  unsubscribe_url = '',
 }: Props) => (
   <Html lang="ka" dir="ltr">
     <Head>
@@ -72,12 +70,6 @@ const TrialDay2Email = ({
               </Link>
             </Section>
 
-            <Section style={hr} />
-
-            <Text style={muted}>
-              აღარ გინდა ასეთი შეტყობინებები?{' '}
-              <Link href={unsubscribe_url} style={linkStyle}>გამოწერის გაუქმება</Link>
-            </Text>
           </Section>
 
           <Section style={footer}>
@@ -98,7 +90,6 @@ export const template = {
     percent: '1.8',
     days_left: '5',
     app_url: 'https://speakbusy.com/path/business/vocabulary',
-    unsubscribe_url: 'https://speakbusy.com/unsubscribe?token=preview',
   },
 } satisfies TemplateEntry
 
