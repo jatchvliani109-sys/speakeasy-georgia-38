@@ -1,6 +1,6 @@
 # SpeakBusy — CLAUDE CONTEXT (authoritative status)
 
-Last updated: 2026-08-03. Source of truth for any new Claude conversation.
+Last updated: 2026-09-08. Source of truth for any new Claude conversation.
 Where older docs, messages or memory disagree, **this wins**.
 
 ---
@@ -255,72 +255,128 @@ Two consequences worth carrying forward:
 
 Full research: `IE_LEGAL_ALIGNMENT.md`.
 
-## 7. Monetization (MOCK ERA — payments still blocked)
+## 7. Payments (REAL, via Flitt)
 
-- Price **13.99 GEL/month** — raised from 8.99 on 2026-08-02 after measuring
-  real cost: ~4.7c per AI interview, so a maximum-usage subscriber costs roughly
-  5 GEL/month against 13.99 revenue. Testers consistently read 8.99 as too low
-  for a career-advancement product.
-- Free: 1 AI session/week. Premium: 7/week, unified pool across all AI features,
-  Monday reset (Tbilisi time).
-- `mockPro` flag in `business_state.state` JSON.
-- **Premium cancel is still a mock** — it flips the local flag. When real
-  payments exist it MUST reach the payment provider, or people who cancel keep
-  being charged.
-- Payment processor availability in Georgia is **still UNVERIFIED**. This is the
-  biggest remaining unknown and could reshape the launch plan.
+Price **13.99 GEL/month**. Raised from 8.99 on 2026-08-02 after measuring cost:
+~4.7c per AI interview, so a maximum-usage subscriber costs roughly 5 GEL/month.
+Testers consistently read 8.99 as too low for a career product.
 
----
+### Provider
 
-## 8. Where things stand
+**Flitt** (`pay.flitt.com`), TBC's e-commerce partner. Merchant 4058017, live
+mode. NOT TBC's own Checkout API: different credentials, different signature.
 
-A full requirements audit exists in `APP_REQUIREMENTS.md` (174 requirements) and
-`REQUIREMENTS_AUDIT.md` (graded, with a 5-tier build order). Read those before
-planning work — they are more detailed than this summary.
+Secrets: `FLITT_MERCHANT_ID`, `FLITT_PAYMENT_KEY`, `SITE_URL`, `CRON_SECRET`.
+The "credit payment key" is for payouts and is deliberately NOT stored.
 
-### Done today
-- **Tier 1** — dev RESET button removed · all 22 routes click-verified by Olegi ·
-  monitoring queries · AI disclosure written AND wired into the product ·
-  real support address (speakbusy@gmail.com) everywhere.
-- **Tier 3** — data export (right to portability) · change-email UI ·
-  `DATA_PROTECTION_RECORDS.md` (processing record + breach procedure).
-- **Tier 4** — first-party analytics live end to end · content error reporting
-  ("რაღაც არასწორია?" on every word card) · uptime monitoring on the app URL.
-- **Onboarding rebuilt**: was 6 mandatory screens (test → setup → plan → resume
-  → self-intro → home), now 1. Placement test skippable; only the FIELD question
-  is required. BusinessHome self-heals a missing plan with a seeded level.
+### The signature, and the thing that cost days
 
-### Deliberately NOT done
-- **PITR backups** — $100/month minimum. Not sensible at this size. Revisit when
-  losing a day of data would mean refunding real customers.
-- **Third-party analytics (PostHog etc.)** — would add a processor to disclose,
-  a privacy-policy entry and a consent question. First-party events chosen
-  instead; upgrade path stays open.
-- **Saved-phrase practice** — built and reverted; isolation logic was sound but
-  the UI was wrong. Needs its own screen, not a panel inside MyLexicon.
+SHA1 of the payment key, then every NON-EMPTY value sorted by KEY name, joined
+with `|`. Empty values are omitted including their separator. Lowercase hex.
 
-### Known operational limits
-- **Olegi cannot restore his own database.** Only Lovable support can, and the
-  best case is yesterday's daily snapshot (7-day retention). Manual pre-migration
-  export query is in the conversation and in
-  `docs/support-backup-restore-template.md` in the repo.
-- **Placement test is genuinely optional and needs no skip button.** Olegi
-  confirmed 08-01: nothing forces the test. It surfaces only as a friendly
-  dashboard nudge — "შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის
-  გაიარე მოკლე ტესტი (თუ არ გინდა გამოტოვე :) no pressure!)" with a
-  "დონის შეფასება" button. This is the intended design; do not add a skip
-  control or otherwise "fix" it.
+**`subscription: "Y"` + `recurring_data` DOES NOT WORK on this merchant.** Every
+signature encoding was tried, including Flitt's own documented example verbatim;
+all return `1014 Invalid signature`. Proven not to be a signature fault: sending
+`recurring_data` while EXCLUDING it from the signature produces a string
+identical to a working plain payment, and still fails.
 
-### Next up
-1. **Payments — the only thing on the critical path.** Whether recurring GEL
-   billing is available to an ინდ. მეწარმე in Georgia is STILL UNVERIFIED and is
-   not a coding task. Everything else is polish until this is answered. Real
-   premium cancel must reach the processor once it exists.
-2. **Tier 5 growth**: social sign-in (biggest signup-friction win) · offline
-   tolerance · re-engagement email · referrals · accessibility audit.
-3. **Analytics review** — once events accumulate, run `ANALYTICS_QUERIES.sql`.
-   The key question: did shortening onboarding actually work?
-4. Ask a Georgian lawyer the six questions in `DATA_PROTECTION_RECORDS.md` §5.
+**Do not retry this.** The route that works is different:
+
+- **`required_rectoken: "y"`** on the checkout request saves the card and
+  returns a `rectoken`. A plain scalar, so it signs cleanly. CONFIRMED WORKING.
+- **`POST /api/recurring`** charges that token later. All scalars.
+  **Requires Flitt to enable it in production** (their docs say so explicitly).
+
+So SpeakBusy does not use Flitt's scheduler. It saves the card and charges it
+monthly itself, via `daily-tasks`.
+
+**Amounts are in tetri.** 13.99 GEL is `1399`. Getting this wrong charges 1,399.
+
+### Flow
+
+```
+subscribe -> flitt-subscribe -> Flitt checkout page (card never touches our site)
+          -> flitt-callback (PUBLIC, verify_jwt=false, signature-verified)
+          -> subscriptions row + business_state.mockPro = true
+          -> payment-confirmation email
+```
+
+`mockPro` is now the real premium flag, not a dev switch. Every access check
+reads it: `aiLocked()`, `hasUnlimitedVocab()`, `isTrialActive()`. The callback
+sets it; `BusinessGate` clears it when the period lapses.
+
+### Regulation (National Bank of Georgia)
+
+Binding on merchant-initiated recurring payments:
+
+- **One-time consent** describing the terms. The checkbox on BusinessPremium;
+  terms stored verbatim in `subscriptions.consent_terms` with a timestamp.
+- **Exact amount and day** stated: "თქვენ ჩამოგეჭრებათ 13.99 ლარი ყოველი თვის N რიცხვში."
+- **Notice at least 4 weeks before each charge.** Satisfied by sending the
+  payment-confirmation email on the day of each payment: a monthly cycle is
+  always at least 28 days, so this always clears the bar. No separate reminder,
+  and no scheduler that could silently fail.
+- Trials of 7 days or fewer are exempt from the trial-reminder rule.
+
+## 8. Where things stand (2026-09-08)
+
+### Product work since the audit
+
+**Trial as a gift.** Offered once after setup, accepted or declined explicitly.
+7 days, unlimited vocabulary, **3 AI sessions total** (not 7/week: AI output is
+kept by the user, so a full allowance would reward re-registering). Guarded at
+three layers, including a `trial_claims` table the client cannot write.
+
+**AI is premium-only.** Free tier gets zero AI sessions; the trial is the only
+free taste. Locked-but-visible cards on all three AI surfaces, since you cannot
+want what you cannot see.
+
+**Progress and milestones.** Weighted percentage by exact confidence level
+(0.15 / 0.30 / 0.50 / 0.75 / 1.0). Mastery needs correct answers across three
+separate days, so counting only mastered words showed ~1% after 18 sessions;
+weighting shows ~5% for the same work. Milestones every 10% reveal one letter of
+"ბიზნესმენი", which is exactly ten letters.
+
+**Streak break recovery.** A broken streak of 3+ days is acknowledged once,
+leading with what was KEPT. Deliberately not guilt: this fires at the moment of
+highest churn risk.
+
+**Themed session rotation.** Scenario sessions used `SITUATION_CLUSTERS.find()`,
+which returns the first cluster with any unmastered word, and drew ONLY from
+that cluster's 6-9 words. Result: the same 8 words every other session for
+weeks. Now scored by remaining value, rotated, and topped up from the normal
+plan.
+
+**Read-only question review.** Answers cannot be changed; they have already fed
+the scheduler.
+
+**Onboarding.** Six mandatory screens reduced to one. Placement test optional.
+
+### Blocked
+
+**Flitt enabling `/api/recurring`.** Everything else is built and deployed.
+See `WHEN_FLITT_CONFIRMS.md` for exactly what to do when they reply.
+
+### Content exhaustion, decide by ~October 2026
+
+980 words. Mastery is calendar-gated, so exhaustion is further out than a naive
+estimate suggests, but still finite. Undecided:
+
+- What happens at 100%. Currently a generic "come back tomorrow" card.
+- Olegi wants a bigger completion message: "შენ დაეწაფე სიტყვების 100%ს!!"
+  with "ბიზნესმენი" fully spelled.
+- Tell users near the end that vocabulary stays after cancelling.
+- Olegi plans similar apps for other fields. **Recommending the next app at 100%
+  is the natural ending**: the completed user becomes the first customer of the
+  next product rather than a cancellation.
+
+### Next
+
+1. **Real users.** Everything above is unvalidated by anyone but Olegi, and the
+   analytics are instrumented and measuring nothing.
+2. Analytics review once events accumulate: funnel, D1/D7/D30, per-user cost.
+3. Remaining open questions in `OPEN_QUESTIONS.md`: lapsed-user re-engagement,
+   content error follow-up, offline tolerance, accessibility.
 
 ## 9. Removed / deleted (2026-07-31 → 08-01)
 
@@ -353,18 +409,59 @@ but is unused.
 
 ## 10. Live edge functions
 
-`business-docs` · `business-self-intro` · `business-interview` —
-requireUser ✅ quota ✅
-`business-resume-parse` — requireUser ✅ rate-limited (5/day) ✅
-`delete-account` — JWT-identified, service-role
-`generate-word-audio` — ops/backfill, service-role only
-`auth-email-hook` · `process-email-queue` · `mcp` — infrastructure
+| Function | Auth | Purpose |
+|---|---|---|
+| `business-docs` | JWT + quota | CV, cover letter, bio |
+| `business-self-intro` | JWT + quota | Self-introduction |
+| `business-interview` | JWT + quota on first reply | Interview simulation |
+| `business-resume-parse` | JWT, 5/day rate limit | CV parsing. Deliberately free |
+| `delete-account` | JWT, service role | Clears 21 locations + auth user |
+| `flitt-subscribe` | JWT | Creates the payment, saves the card |
+| `flitt-callback` | **PUBLIC**, signature-verified | Grants premium. `verify_jwt=false` |
+| `flitt-cancel` | JWT | `cancel` or `delete_card`, reaches Flitt |
+| `daily-tasks` | `x-cron-secret` | Trial reminders + renewal charges |
+| `send-transactional-email` | service role | Renders templates, enqueues |
+| `process-email-queue` | service role | Delivers, retries, rate limits |
+| `generate-word-audio` | service role | Ops only |
 
-Every function that spends money is authenticated and metered.
+### Email
 
----
+React Email components in `_shared/transactional-email-templates/`, registered
+in `registry.ts`. Send with `sendAppEmail({ templateName, ... })`.
+
+**Template names use HYPHENS.** Calling `payment_confirmation` instead of
+`payment-confirmation` fails silently: the lookup 404s and `sendAppEmail`
+swallows errors by design, so nothing sends and nothing is logged as wrong.
+
+Templates: `payment-confirmation`, `subscription-cancelled`, `trial-day-2`,
+`trial-day-5`, `trial-ended`.
+
+Trial reminders carry an unsubscribe link; the gift screen states that they will
+be sent, so accepting the gift is the consent.
 
 ## 11. Working principles that have proven necessary
+
+**Ask before assuming, especially about state.** Repeatedly asserted "the
+fallback is the only path that runs" after Olegi had said live mode was on. One
+query would have settled it. When something is checkable, check it.
+
+**Upload the live file before editing it.** Olegi's habit of sending the current
+version first has caught real losses at least five times: the "Streak" wording,
+Profile's password and delete sections, BusinessPremium's copy, and a full
+TrialGift rewrite. Rebuilding from a stale copy destroys work silently.
+
+**A misleading error is still evidence.** Flitt returned "Invalid signature" for
+a problem that was not the signature. Isolating it (send the parameter, exclude
+it from the signature, observe the same failure with a byte-identical signature
+string) proved the error message wrong and redirected the whole investigation.
+
+**Probe rather than guess in sequence.** After three wrong guesses at the
+signature encoding, testing five encodings in one request against the live API
+was faster than three more round trips, and cost nothing.
+
+**Leftover dev switches become production holes.** The mock premium toggle was
+harmless until `mockPro` started meaning "has paid". Then it was a paywall
+bypass sitting in the UI.
 
 **Verify against the schema, not the frontend.** The first `delete-account`
 covered 10 tables because that is all the frontend referenced. The schema had 21.
