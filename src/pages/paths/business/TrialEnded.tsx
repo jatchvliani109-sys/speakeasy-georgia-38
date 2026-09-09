@@ -44,10 +44,10 @@ export default function TrialEnded() {
       try {
         const { supabase } = await import("@/integrations/supabase/client");
         const { count } = await supabase
-          .from("vocabulary_progress")
+          .from("vocabulary_progress" as any)
           .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("status", "learned");
+          .eq("user_id" as any, user.id)
+          .eq("status" as any, "learned");
         const learned = count ?? 0;
         setStats({
           words: learned,
