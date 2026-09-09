@@ -131,8 +131,5 @@ const button = {
   color: '#1C1C1E',
   textDecoration: 'none',
 }
-const linkStyle = { color: '#5C1A2E' }
-const hr = { borderTop: '1px solid #E4E2DF', margin: '0 0 18px' }
-const muted = { margin: 0, fontSize: '12px', lineHeight: 1.75, color: '#8A8A8A' }
 const footer = { padding: '18px 32px', borderTop: '1px solid #E4E2DF' }
 const footerText = { margin: 0, fontSize: '12px', color: '#8A8A8A' }
