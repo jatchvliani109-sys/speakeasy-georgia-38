@@ -43,11 +43,11 @@ export default function TrialEnded() {
       // Best-effort stats from progress table.
       try {
         const { supabase } = await import("@/integrations/supabase/client");
-        const { count } = await supabase
-          .from("vocabulary_progress" as any)
+        const { count } = await (supabase as any)
+          .from("vocabulary_progress")
           .select("*", { count: "exact", head: true })
-          .eq("user_id" as any, user.id)
-          .eq("status" as any, "learned");
+          .eq("user_id", user.id)
+          .eq("status", "learned");
         const learned = count ?? 0;
         setStats({
           words: learned,
