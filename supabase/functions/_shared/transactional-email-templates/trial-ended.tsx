@@ -23,7 +23,6 @@ interface Props {
   percent?: string
   days_left?: string
   app_url?: string
-  unsubscribe_url?: string
 }
 
 const TrialEndedEmail = ({
@@ -31,7 +30,6 @@ const TrialEndedEmail = ({
   percent = '0',
   days_left = '5',
   app_url = 'https://speakbusy.com/path/business/premium',
-  unsubscribe_url = '',
 }: Props) => (
   <Html lang="ka" dir="ltr">
     <Head>
