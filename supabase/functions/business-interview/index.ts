@@ -445,19 +445,30 @@ Deno.serve(async (req) => {
     if (_auth.error) return _auth.error;
     const body = (await req.json()) as { action: Action } & Record<string, unknown>;
 
-    // One interview = one weekly AI session, charged on the FIRST reply (not on
-    // "session"), so abandoning at the briefing costs nothing and random mode —
-    // which skips the "session" call entirely — is covered too. "First" is
-    // decided by the persisted quota_charged flag, never by the client.
-    if (body.action === "reply") {
+    // One interview = one AI session, charged on the first "session" OR
+    // "reply", whichever comes first.
+    //
+    // This used to charge only on "reply", so that abandoning at the briefing
+    // cost nothing. But generating the briefing is itself an AI call that costs
+    // real money, and the behaviour was farmable: start an interview, read the
+    // briefing, quit, repeat, indefinitely, for free.
+    //
+    // "First" is decided by the persisted quota_charged flag on the session
+    // row, never by the client, so the two entry points cannot double-charge.
+    if (body.action === "reply" || body.action === "session") {
       const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
-      if (!sessionId) {
+      if (!sessionId && body.action === "reply") {
+        // A reply without a session id is a client bug and must fail loudly.
+        // A "session" without one is legitimate: the row does not exist yet,
+        // so the charge lands on the first reply instead, as before.
         return new Response(JSON.stringify({ error: "missing sessionId" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const claimed = await claimInterviewCharge(_auth.user.id, sessionId);
+      const claimed = sessionId
+        ? await claimInterviewCharge(_auth.user.id, sessionId)
+        : false;
       if (claimed) {
         _chargedSessionId = sessionId;
         const quota = await consumeAiSession(_auth.user.id);

@@ -144,13 +144,50 @@ export function shouldOfferTrial(state: BusinessState | null | undefined): boole
   return state.setupCompleted === true;
 }
 
+/**
+ * Fields the SERVER owns. The client must never write these.
+ *
+ * Both save paths push the WHOLE state blob, rebuilt from localStorage. The AI
+ * quota is incremented by the edge functions directly in the database, so any
+ * client save wrote a stale counter back over it: the charge landed, then
+ * silently vanished, and the user got the session back for free. That is why a
+ * self-introduction never appeared to cost anything.
+ *
+ * mockPro matters just as much now that it is the real premium flag: a stale
+ * blob could switch off a paying user, or restore an expired one.
+ */
+const SERVER_OWNED_KEYS = [
+  "aiUsedWeek",
+  "aiWeekKey",
+  "trialAiUsed",
+  "mockPro",
+] as const;
+
+/** Strips server-owned fields from a client write and re-applies the server's. */
+async function mergeServerOwned(uid: string, next: BusinessState): Promise<BusinessState> {
+  const remote = await pullBusinessFromSupabase(uid).catch(() => null);
+  const out: Record<string, unknown> = { ...next };
+  for (const k of SERVER_OWNED_KEYS) {
+    delete out[k];
+    const v = remote ? (remote as Record<string, unknown>)[k] : undefined;
+    if (v !== undefined) out[k] = v;
+  }
+  return out as BusinessState;
+}
+
 export function saveBusiness(uid: string, patch: Partial<BusinessState>) {
   const cur = loadBusiness(uid);
   const next = { ...cur, ...patch };
   localStorage.setItem(KEY(uid), JSON.stringify(next));
-  pushBusinessRemote(uid, next).catch((e) => {
-    console.warn("[business] remote push failed (will retry on next save)", e);
-  });
+  void (async () => {
+    try {
+      const authoritative = await mergeServerOwned(uid, next);
+      await pushBusinessRemote(uid, authoritative);
+      localStorage.setItem(KEY(uid), JSON.stringify(authoritative));
+    } catch (e) {
+      console.warn("[business] remote push failed (will retry on next save)", e);
+    }
+  })();
   return next;
 }
 
@@ -162,7 +199,10 @@ export async function saveBusinessAsync(uid: string, patch: Partial<BusinessStat
   const next = { ...cur, ...patch };
   localStorage.setItem(KEY(uid), JSON.stringify(next));
   try {
-    await pushBusinessRemote(uid, next);
+    const authoritative = await mergeServerOwned(uid, next);
+    await pushBusinessRemote(uid, authoritative);
+    localStorage.setItem(KEY(uid), JSON.stringify(authoritative));
+    return authoritative;
   } catch (e) {
     console.warn("[business] remote push failed (continuing with local state)", e);
   }

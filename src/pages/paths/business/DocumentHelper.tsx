@@ -128,6 +128,33 @@ export default function DocumentHelper() {
         )}
       </header>
 
+      {/* Quota exhausted, checked HERE rather than at generation. The interview
+          module already blocks up front; letting someone fill in an entire form
+          and only then refusing them is the worst version of the same message. */}
+      {!aiLocked(state) && aiSessionsRemaining(state) <= 0 &&
+        view.kind !== "library" && view.kind !== "doc" && (
+        <BizCard className="text-center py-8">
+          <p className="ka text-sm font-bold text-wine">AI სესიები ამოიწურა</p>
+          <p className="ka text-xs text-ink-muted mt-2 leading-relaxed max-w-sm mx-auto">
+            ამ კვირის ლიმიტი გამოყენებულია. ახალი სესიები ორშაბათს დაემატება.
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center mt-4">
+            <button
+              onClick={() => setView({ kind: "library" })}
+              className="ka px-3 py-2 rounded-md border border-line text-wine text-xs font-semibold hover:border-wine/50 transition-colors"
+            >
+              შენახული დოკუმენტები
+            </button>
+            <Link
+              to="/path/business/premium"
+              className="ka px-3 py-2 rounded-md bg-wine text-[#F8F5F0] text-xs font-bold"
+            >
+              პრემიუმის ნახვა
+            </Link>
+          </div>
+        </BizCard>
+      )}
+
       {aiLocked(state) && (
         <AiLockedCard
           title="დოკუმენტების ასისტენტი"
@@ -136,7 +163,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {!aiLocked(state) && view.kind === "home" && (
+      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && view.kind === "home" && (
         <HomeView
           docs={docs}
           onTool={(t) => setView({ kind: "tool", tool: t })}
@@ -157,7 +184,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {!aiLocked(state) && view.kind === "tool" && (
+      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && view.kind === "tool" && (
         <ToolView
           tool={view.tool}
           profile={profile}
