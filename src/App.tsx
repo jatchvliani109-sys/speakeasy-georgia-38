@@ -7,6 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import { ThemeProvider } from "@/lib/theme";
+
 
 // ---------------------------------------------------------------------------
 // EAGER: public pages — the first paint for a new visitor, so they must not
@@ -66,8 +68,10 @@ function RouteFallback() {
 }
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -114,6 +118,8 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
+
 
 export default App;
