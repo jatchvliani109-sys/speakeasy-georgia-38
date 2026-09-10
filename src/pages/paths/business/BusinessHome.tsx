@@ -416,7 +416,7 @@ export default function BusinessHome() {
           </h1>
           {plan && (
             <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-[#4A4A4A] border border-[#E4E2DF] bg-white px-2 py-0.5 rounded-full">
-              {LEVEL_LABELS[plan.level]}
+              {LEVEL_LABELS[s.level ?? plan.level]}
             </span>
           )}
         </div>

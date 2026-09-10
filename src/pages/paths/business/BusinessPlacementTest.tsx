@@ -225,7 +225,16 @@ export default function BusinessPlacementTest() {
     setDone(true);
     track("placement_test_completed", { score_pct: Math.round(pct), level });
     if (user) {
-      saveBusiness(user.id, { level, testCompleted: true });
+      // The plan holds its own copy of the level (that is what the dashboard
+      // badge shows), so keep it in sync with the new test result.
+      (async () => {
+        const cur = await pullBusinessFromSupabase(user.id);
+        saveBusiness(user.id, {
+          level,
+          testCompleted: true,
+          ...(cur.plan ? { plan: { ...cur.plan, level } } : {}),
+        } as any);
+      })();
     }
   };
 
