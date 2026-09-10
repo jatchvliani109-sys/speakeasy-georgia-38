@@ -62,6 +62,39 @@
     --shadow-card: 0 2px 12px -2px hsl(240 3% 12% / 0.08);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Brand palette tokens (light) */
+    --wine: 343 56% 23%;
+    --wine-deep: 343 57% 18%;
+    --wine-soft: 345 30% 87%;
+    --gold: 43 54% 54%;
+    --gold-soft: 43 55% 78%;
+    --gold-2: 43 58% 60%;
+    --gold-deep: 43 49% 36%;
+    --ink: 240 3% 12%;
+    --ink-muted: 0 0% 29%;
+    --ink-muted-2: 0 0% 42%;
+    --ink-subtle: 0 0% 54%;
+    --on-dark: 36 36% 96%;
+    --on-dark-muted: 30 19% 84%;
+    --on-dark-subtle: 30 10% 69%;
+    --cream: 36 36% 96%;
+    --cream-2: 36 30% 92%;
+    --line: 30 19% 84%;
+    --line-2: 25 20% 84%;
+    --panel: 240 3% 12%;
+    --panel-soft: 0 0% 14%;
+    --panel-deep: 0 0% 7%;
+    --panel-line: 0 0% 23%;
+    --danger: 6 63% 46%;
+    --danger-deep: 8 72% 38%;
+    --danger-soft: 8 70% 96%;
+    --danger-line: 6 70% 87%;
+    --sage: 135 21% 45%;
+    --sage-deep: 135 24% 32%;
+    --sage-soft: 140 40% 96%;
+    --sage-line: 140 25% 87%;
+    --info: 205 55% 67%;
   }
 
   .dark {
@@ -73,18 +106,65 @@
     --popover-foreground: 36 36% 96%;
     --primary: 43 54% 54%;
     --primary-foreground: 240 5% 8%;
+    --primary-glow: 43 62% 66%;
+    --primary-hover: 43 60% 62%;
     --secondary: 240 4% 20%;
     --secondary-foreground: 36 36% 96%;
     --muted: 240 4% 18%;
     --muted-foreground: 30 10% 70%;
     --accent: 343 56% 35%;
     --accent-foreground: 36 36% 96%;
-    --destructive: 6 63% 46%;
+    --success: 135 30% 55%;
+    --success-foreground: 240 5% 8%;
+    --destructive: 6 63% 52%;
     --destructive-foreground: 0 0% 100%;
     --border: 240 4% 22%;
     --input: 240 4% 22%;
     --ring: 43 54% 54%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(344 45% 22%) 0%, hsl(240 5% 8%) 70%, hsl(43 54% 44%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(240 5% 8%) 0%, hsl(240 4% 11%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(344 50% 40%), hsl(43 60% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(240 4% 13%), hsl(240 4% 11%));
+
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.5);
+    --shadow-warm: 0 8px 30px -6px hsl(43 54% 30% / 0.35);
+    --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.45);
+
+    /* Brand palette tokens (dark) */
+    --wine: 344 50% 56%;
+    --wine-deep: 344 45% 44%;
+    --wine-soft: 344 25% 30%;
+    --gold: 43 62% 62%;
+    --gold-soft: 43 55% 80%;
+    --gold-2: 43 62% 66%;
+    --gold-deep: 43 55% 66%;
+    --ink: 36 30% 93%;
+    --ink-muted: 30 8% 70%;
+    --ink-muted-2: 30 8% 66%;
+    --ink-subtle: 0 0% 60%;
+    --on-dark: 36 30% 94%;
+    --on-dark-muted: 30 10% 74%;
+    --on-dark-subtle: 30 8% 62%;
+    --cream: 240 5% 10%;
+    --cream-2: 240 4% 14%;
+    --line: 240 4% 24%;
+    --line-2: 240 4% 28%;
+    --panel: 240 4% 16%;
+    --panel-soft: 240 3% 20%;
+    --panel-deep: 240 5% 6%;
+    --panel-line: 0 0% 28%;
+    --danger: 6 70% 64%;
+    --danger-deep: 8 70% 60%;
+    --danger-soft: 6 40% 16%;
+    --danger-line: 6 40% 30%;
+    --sage: 135 30% 60%;
+    --sage-deep: 135 30% 56%;
+    --sage-soft: 140 25% 13%;
+    --sage-line: 140 18% 26%;
+    --info: 205 60% 70%;
   }
+
 }
 
 @layer base {
