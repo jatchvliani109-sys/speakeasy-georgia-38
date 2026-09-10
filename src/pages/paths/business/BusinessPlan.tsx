@@ -64,15 +64,15 @@ export default function BusinessPlan() {
 
 
   const plan = useMemo(() => s?.plan ?? null, [s]);
-  if (!s || !plan) return <BusinessShell><div className="text-[#4A4A4A] ka">იტვირთება...</div></BusinessShell>;
+  if (!s || !plan) return <BusinessShell><div className="text-ink-muted ka">იტვირთება...</div></BusinessShell>;
 
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           შენი გეგმა
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი ბიზნეს ინგლისურის გეგმა</h1>
+        <h1 className="ka text-2xl font-bold text-wine mt-1">შენი ბიზნეს ინგლისურის გეგმა</h1>
       </div>
 
       <BizCard className="mb-4">
@@ -83,21 +83,21 @@ export default function BusinessPlan() {
       </BizCard>
 
       <BizCard className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
           რეკომენდებული პირველი მოდული
         </p>
-        <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-1">{plan.recommendedModuleTitle}</h3>
-        <p className="ka text-xs text-[#4A4A4A] mt-1">შენი მიზნის შესაბამისად დავიწყოთ აქედან.</p>
+        <h3 className="ka text-lg font-bold text-wine mt-1">{plan.recommendedModuleTitle}</h3>
+        <p className="ka text-xs text-ink-muted mt-1">შენი მიზნის შესაბამისად დავიწყოთ აქედან.</p>
       </BizCard>
 
       <BizCard className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-2">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2">
           ყოველკვირეული ფოკუსი
         </p>
         <ul className="space-y-2">
           {plan.weeklyFocus.map((f, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-[#5C1A2E]">
-              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1C1C1E] shrink-0" />
+            <li key={i} className="flex items-start gap-2 text-sm text-wine">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-panel shrink-0" />
               <span className="ka">{f}</span>
             </li>
           ))}
@@ -113,9 +113,9 @@ export default function BusinessPlan() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-[#E4E2DF] last:border-0">
-      <span className="ka text-xs text-[#4A4A4A]">{label}</span>
-      <span className="ka text-sm font-semibold text-[#5C1A2E]">{value}</span>
+    <div className="flex items-center justify-between py-2 border-b border-line last:border-0">
+      <span className="ka text-xs text-ink-muted">{label}</span>
+      <span className="ka text-sm font-semibold text-wine">{value}</span>
     </div>
   );
 }

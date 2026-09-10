@@ -142,31 +142,31 @@ export default function Auth() {
         />
         <div className="max-w-sm mx-auto py-10">
           <div className="text-center mb-6">
-            <span className="inline-flex w-14 h-14 rounded-full bg-[#111111] text-[#F5F4F2] items-center justify-center">
+            <span className="inline-flex w-14 h-14 rounded-full bg-panel-deep text-on-dark items-center justify-center">
               <Mail className="w-6 h-6" />
             </span>
-            <h1 className="text-2xl font-extrabold ka text-[#5C1A2E] mt-4 tracking-tight">
+            <h1 className="text-2xl font-extrabold ka text-wine mt-4 tracking-tight">
               შეამოწმეთ თქვენი ელ-ფოსტა
             </h1>
-            <p className="text-sm text-[#4A4A4A] mt-3 ka leading-relaxed">
+            <p className="text-sm text-ink-muted mt-3 ka leading-relaxed">
               გთხოვთ შეამოწმოთ თქვენი ელ-ფოსტა. გამოგვიგზავნეთ დადასტურების ბმული —
               გთხოვთ გადახედოთ inbox-ს და დააჭიროთ ბმულს.
             </p>
-            <p className="text-xs text-[#6B6B6B] mt-3 ka">
-              გავაგზავნეთ: <span className="font-semibold text-[#5C1A2E]">{pendingEmail}</span>
+            <p className="text-xs text-ink-muted-2 mt-3 ka">
+              გავაგზავნეთ: <span className="font-semibold text-wine">{pendingEmail}</span>
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] space-y-3">
-            <div className="flex items-start gap-2 text-xs text-[#4A4A4A] ka">
-              <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-[#5C1A2E]" />
+          <div className="p-5 rounded-2xl bg-cream border border-line space-y-3">
+            <div className="flex items-start gap-2 text-xs text-ink-muted ka">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-wine" />
               <span>ბმულზე დაჭერის შემდეგ ავტომატურად შეხვალთ აპში.</span>
             </div>
             <button
               type="button"
               onClick={resend}
               disabled={resending}
-              className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#5C1A2E] hover:bg-[#111111]/5 transition-colors disabled:opacity-60 ka"
+              className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-wine-deep/30 text-sm font-semibold text-wine hover:bg-panel-deep/5 transition-colors disabled:opacity-60 ka"
             >
               {resending ? "იგზავნება..." : "ხელახლა გაგზავნა"}
             </button>
@@ -177,7 +177,7 @@ export default function Auth() {
               setPendingEmail(null);
               setMode("login");
             }}
-            className="w-full text-center mt-6 text-sm text-[#4A4A4A] hover:text-[#5C1A2E] transition-colors ka"
+            className="w-full text-center mt-6 text-sm text-ink-muted hover:text-wine transition-colors ka"
           >
             ← სხვა ანგარიში / შესვლა
           </button>
@@ -213,25 +213,25 @@ export default function Auth() {
       />
       <div className="max-w-sm mx-auto py-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
-            <span className="h-px w-6 bg-[#1C1C1E]" />
+          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-ink">
+            <span className="h-px w-6 bg-panel" />
             {mode === "signup" ? "Welcome" : "Sign in"}
-            <span className="h-px w-6 bg-[#1C1C1E]" />
+            <span className="h-px w-6 bg-panel" />
           </div>
-          <h1 className="text-3xl font-extrabold ka text-[#5C1A2E] mt-3 tracking-tight">
+          <h1 className="text-3xl font-extrabold ka text-wine mt-3 tracking-tight">
             {mode === "signup" ? "შექმენი ანგარიში" : "შესვლა"}
           </h1>
-          <p className="text-sm text-[#4A4A4A] mt-2 ka">
+          <p className="text-sm text-ink-muted mt-2 ka">
             {mode === "signup" ? "ელ-ფოსტა და პაროლი" : "კეთილი იყოს თქვენი მობრძანება."}
           </p>
         </div>
 
         <form
           onSubmit={submit}
-          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
+          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-cream border border-line shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
         >
           <div>
-            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-ink-muted">
               ელ-ფოსტა
             </Label>
             <Input
@@ -240,18 +240,18 @@ export default function Auth() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-[#E4E2DF] focus-visible:ring-[#1C1C1E]"
+              className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
             />
           </div>
           <div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+              <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-ink-muted">
                 პაროლი
               </Label>
               {mode === "login" && (
                 <Link
                   to="/forgot-password"
-                  className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2 transition-colors"
+                  className="ka text-xs text-ink-muted hover:text-wine underline underline-offset-2 transition-colors"
                 >
                   დაგავიწყდათ პაროლი?
                 </Link>
@@ -263,7 +263,7 @@ export default function Auth() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-[#E4E2DF] focus-visible:ring-[#1C1C1E]"
+              className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
             />
           </div>
           {mode === "signup" && (
@@ -271,7 +271,7 @@ export default function Auth() {
               ref={termsRef}
               data-terms-row
               className={`flex items-start gap-3 rounded-lg -mx-2 px-2 py-1.5 transition-colors ${
-                termsShake ? "animate-[termsShake_.5s_ease-in-out] bg-[#C0392B]/5" : ""
+                termsShake ? "animate-[termsShake_.5s_ease-in-out] bg-danger/5" : ""
               }`}
             >
               {/* shrink-0: without it the flex row squashes the box into a
@@ -283,17 +283,17 @@ export default function Auth() {
                 id="terms"
                 checked={termsAccepted}
                 onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                className={`mt-0.5 shrink-0 h-5 w-5 border-2 transition-colors data-[state=checked]:bg-[#5C1A2E] data-[state=checked]:border-[#5C1A2E] data-[state=checked]:text-[#F5F4F2] ${
-                  termsShake ? "border-[#C0392B]" : "border-[#5C1A2E]/40"
+                className={`mt-0.5 shrink-0 h-5 w-5 border-2 transition-colors data-[state=checked]:bg-wine data-[state=checked]:border-wine data-[state=checked]:text-on-dark ${
+                  termsShake ? "border-danger" : "border-wine/40"
                 }`}
               />
-              <Label htmlFor="terms" className="text-xs text-[#4A4A4A] ka leading-relaxed cursor-pointer">
+              <Label htmlFor="terms" className="text-xs text-ink-muted ka leading-relaxed cursor-pointer">
                 ვეთანხმები{" "}
-                <Link to="/terms" className="underline hover:text-[#5C1A2E] transition-colors">
+                <Link to="/terms" className="underline hover:text-wine transition-colors">
                   წესებს და პირობებს
                 </Link>{" "}
                 და{" "}
-                <Link to="/privacy" className="underline hover:text-[#5C1A2E] transition-colors">
+                <Link to="/privacy" className="underline hover:text-wine transition-colors">
                   კონფიდენციალობის პოლიტიკას
                 </Link>
               </Label>
@@ -306,7 +306,7 @@ export default function Auth() {
             type="submit"
             disabled={loading}
             aria-disabled={mode === "signup" && !termsAccepted}
-            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold tracking-wide ka hover:bg-[#161616] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-panel-deep text-on-dark text-sm font-semibold tracking-wide ka hover:bg-panel-deep transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -320,9 +320,9 @@ export default function Auth() {
         </form>
 
         <div className="flex items-center gap-3 my-5">
-          <span className="h-px flex-1 bg-[#E4E2DF]" />
-          <span className="text-[10px] uppercase tracking-[0.18em] text-[#6B6B6B]">ან</span>
-          <span className="h-px flex-1 bg-[#E4E2DF]" />
+          <span className="h-px flex-1 bg-line" />
+          <span className="text-[10px] uppercase tracking-[0.18em] text-ink-muted-2">ან</span>
+          <span className="h-px flex-1 bg-line" />
         </div>
 
         <button
@@ -346,7 +346,7 @@ export default function Auth() {
               setLoading(false);
             }
           }}
-          className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-[#E4E2DF] bg-white text-sm font-semibold text-[#1C1C1E] hover:bg-[#F5F4F2] transition-colors disabled:opacity-60 ka"
+          className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-line bg-white text-sm font-semibold text-ink hover:bg-cream transition-colors disabled:opacity-60 ka"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z" />
@@ -360,17 +360,17 @@ export default function Auth() {
 
         <button
           onClick={() => setMode(mode === "signup" ? "login" : "signup")}
-          className="w-full text-center mt-6 text-sm text-[#4A4A4A] hover:text-[#5C1A2E] transition-colors ka"
+          className="w-full text-center mt-6 text-sm text-ink-muted hover:text-wine transition-colors ka"
         >
           {mode === "signup" ? "უკვე მაქვს ანგარიში → შესვლა" : "ანგარიში არ მაქვს → რეგისტრაცია"}
         </button>
 
-        <div className="flex items-center justify-center gap-4 mt-6 text-xs text-[#6B6B6B] ka">
-          <Link to="/privacy" className="hover:text-[#5C1A2E] transition-colors">
+        <div className="flex items-center justify-center gap-4 mt-6 text-xs text-ink-muted-2 ka">
+          <Link to="/privacy" className="hover:text-wine transition-colors">
             კონფიდენციალობის პოლიტიკა
           </Link>
-          <span className="text-[#E4E2DF]">|</span>
-          <Link to="/terms" className="hover:text-[#5C1A2E] transition-colors">
+          <span className="text-on-dark-muted">|</span>
+          <Link to="/terms" className="hover:text-wine transition-colors">
             წესები და პირობები
           </Link>
         </div>

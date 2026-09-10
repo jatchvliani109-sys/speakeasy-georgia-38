@@ -41,7 +41,7 @@ const CircleRing = ({ className = "" }: { className?: string }) => (
 );
 
 const GoldLine = ({ className = "" }: { className?: string }) => (
-  <div className={`absolute h-px bg-[#C9A84C] pointer-events-none ${className}`} aria-hidden />
+  <div className={`absolute h-px bg-gold pointer-events-none ${className}`} aria-hidden />
 );
 
 /* ─────────────── curved divider ─────────────── */
@@ -147,21 +147,21 @@ const Index = () => {
   if (user) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F5F0] text-[#1C1C1E]">
+    <div className="min-h-screen flex flex-col bg-cream text-ink">
       <SEO
         title="SpeakBusy, ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის"
         description="ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის, 980 სიტყვა ქართული ახსნებით და აუდიოთი, გასაუბრების სიმულაცია და დოკუმენტების მომზადება. დაიწყე უფასოდ."
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#F8F5F0]/85 border-b border-[#E0D8D0]">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-cream/85 border-b border-line-2">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-[#3D1220] hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center text-wine-deep hover:opacity-80 transition-opacity">
             <Wordmark size="md" />
           </Link>
           <Link
             to="/auth?mode=login"
-            className="inline-flex items-center gap-1.5 h-10 px-5 rounded-lg border border-[#1C1C1E]/15 text-sm font-semibold text-[#1C1C1E] hover:bg-[#1C1C1E] hover:text-[#F8F5F0] transition-colors ka"
+            className="inline-flex items-center gap-1.5 h-10 px-5 rounded-lg border border-ink/15 text-sm font-semibold text-ink hover:bg-panel hover:text-on-dark transition-colors ka"
           >
             შესვლა
           </Link>
@@ -170,30 +170,30 @@ const Index = () => {
 
       <main className="flex-1">
         {/* ═══════════════ HERO ═══════════════ */}
-        <section className="relative overflow-hidden bg-[#1C1C1E] text-white">
+        <section className="relative overflow-hidden bg-panel text-white">
           <CircleRing className="w-[520px] h-[520px] -top-40 -right-40" />
           <CircleRing className="w-[320px] h-[320px] top-1/2 -left-24" />
           <Dots className="top-10 right-10 text-white opacity-40" />
           <Dots className="bottom-14 left-10 text-white opacity-25" />
           <GoldLine className="top-28 left-0 w-28" />
           <GoldLine className="bottom-36 right-0 w-20" />
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-[#C9A84C] opacity-60" aria-hidden />
-          <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-[#C9A84C] opacity-40" aria-hidden />
+          <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
+          <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-gold opacity-40" aria-hidden />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-28 sm:pt-28 sm:pb-36 relative z-10">
             <div className="flex items-center gap-3 mb-8">
-              <span className="h-px w-8 bg-[#C9A84C]" />
-              <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[#C9A84C] ka">
+              <span className="h-px w-8 bg-gold" />
+              <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold ka">
                 SpeakBusy
               </span>
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
               ისწავლე ბიზნეს ინგლისური
-              <span className="block mt-2 text-[#C9A84C]">ერთ სივრცეში.</span>
+              <span className="block mt-2 text-gold">ერთ სივრცეში.</span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-[#B8B0A8] leading-relaxed max-w-2xl ka">
+            <p className="mt-6 text-base sm:text-lg text-on-dark-subtle leading-relaxed max-w-2xl ka">
               980 ბიზნეს სიტყვა, ქართული ახსნებით, დღეში ხუთ წუთში.
             </p>
 
@@ -201,22 +201,22 @@ const Index = () => {
                 neither, so a visitor could not tell whether this was free,
                 cheap or expensive, and unanswered price questions are a
                 reason to leave. */}
-            <p className="mt-5 ka text-sm text-[#B8B0A8]">
+            <p className="mt-5 ka text-sm text-on-dark-subtle">
               პრემიუმის
-              <span className="text-[#C9A84C] font-semibold"> პირველი 7 დღე უფასოდ</span>
+              <span className="text-gold font-semibold"> პირველი 7 დღე უფასოდ</span>
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 to="/auth?mode=signup"
-                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-base font-bold hover:bg-[#D4B560] transition-colors ka"
+                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
                 უფასოდ დაიწყე
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <Link
                 to="/auth?mode=login"
-                className="text-sm font-semibold text-[#B8B0A8] hover:text-white transition-colors ka underline-offset-4 hover:underline"
+                className="text-sm font-semibold text-on-dark-subtle hover:text-white transition-colors ka underline-offset-4 hover:underline"
               >
                 უკვე გაქვს ანგარიში? შედი
               </Link>
@@ -227,15 +227,15 @@ const Index = () => {
         </section>
 
         {/* ═══════════════ VALUE CARDS ═══════════════ */}
-        <section className="bg-[#F8F5F0] py-20 sm:py-28">
+        <section className="bg-cream py-20 sm:py-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#5C1A2E] mb-3">
-                <span className="h-px w-6 bg-[#5C1A2E]" />
+              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-wine mb-3">
+                <span className="h-px w-6 bg-wine" />
                 Why SpeakBusy
-                <span className="h-px w-6 bg-[#5C1A2E]" />
+                <span className="h-px w-6 bg-wine" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-[#1C1C1E]">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-ink">
                 რატომ SpeakBusy?
               </h2>
             </div>
@@ -244,13 +244,13 @@ const Index = () => {
               {valueCards.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="group relative bg-white border border-[#E0D8D0] rounded-2xl p-8 hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
+                  className="group relative bg-white border border-line-2 rounded-2xl p-8 hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
                 >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#5C1A2E] text-[#C9A84C] mb-5">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-wine text-gold mb-5">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold ka text-[#1C1C1E] mb-2">{title}</h3>
-                  <p className="text-sm text-[#4A4A4A] leading-relaxed ka">{body}</p>
+                  <h3 className="text-lg font-bold ka text-ink mb-2">{title}</h3>
+                  <p className="text-sm text-ink-muted leading-relaxed ka">{body}</p>
                 </div>
               ))}
             </div>
@@ -264,12 +264,12 @@ const Index = () => {
         <section className="bg-white py-20 sm:py-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#C9A84C] mb-3">
-                <span className="h-px w-6 bg-[#C9A84C]" />
+              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-gold mb-3">
+                <span className="h-px w-6 bg-gold" />
                 Modules
-                <span className="h-px w-6 bg-[#C9A84C]" />
+                <span className="h-px w-6 bg-gold" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-[#1C1C1E]">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-ink">
                 რას ისწავლი?
               </h2>
             </div>
@@ -278,13 +278,13 @@ const Index = () => {
               {modules.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="relative bg-[#F8F5F0] border border-[#E0D8D0] rounded-2xl p-6 hover:bg-white hover:border-[#5C1A2E]/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
+                  className="relative bg-cream border border-line-2 rounded-2xl p-6 hover:bg-white hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
                 >
-                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[#1C1C1E] text-[#C9A84C] mb-4">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-panel text-gold mb-4">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-bold ka text-[#1C1C1E] mb-1.5">{title}</h3>
-                  <p className="text-sm text-[#4A4A4A] leading-relaxed ka">{body}</p>
+                  <h3 className="text-base font-bold ka text-ink mb-1.5">{title}</h3>
+                  <p className="text-sm text-ink-muted leading-relaxed ka">{body}</p>
                 </div>
               ))}
             </div>
@@ -292,10 +292,10 @@ const Index = () => {
         </section>
 
         {/* curved transition into CTA */}
-        <WaveDivider fill="#FFFFFF" flip className="bg-[#5C1A2E]" />
+        <WaveDivider fill="#FFFFFF" flip className="bg-wine" />
 
         {/* ═══════════════ FINAL CTA ═══════════════ */}
-        <section className="relative bg-[#5C1A2E] text-white overflow-hidden">
+        <section className="relative bg-wine text-white overflow-hidden">
           <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-white" />
           <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-white" />
           <GoldLine className="top-16 right-10 w-24" />
@@ -305,13 +305,13 @@ const Index = () => {
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
               მზად ხარ პროფესიონალურ ინგლისურს დაეუფლო?
             </h2>
-            <p className="mt-5 text-base sm:text-lg text-[#E8D5DA] ka leading-relaxed">
+            <p className="mt-5 text-base sm:text-lg text-wine-soft ka leading-relaxed">
               შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
             </p>
             <div className="mt-10">
               <Link
                 to="/auth?mode=signup"
-                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-base font-bold hover:bg-[#D4B560] transition-colors ka"
+                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
                 დაიწყე ახლავე უფასოდ
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
@@ -321,16 +321,16 @@ const Index = () => {
         </section>
 
         {/* ═══════════════ FOOTER ═══════════════ */}
-        <footer className="bg-[#1C1C1E] text-[#B8B0A8]">
+        <footer className="bg-panel text-on-dark-subtle">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Feedback invitation. Placed above the legal row because it is an
                 invitation, not fine print, and social is where a Georgian
                 audience will actually reply. */}
             <div className="text-center pb-9 border-b border-white/10">
-              <p className="ka text-[15px] font-bold text-[#F8F5F0]">
+              <p className="ka text-[15px] font-bold text-on-dark">
                 გვითხარი, რას ფიქრობ
               </p>
-              <p className="ka text-[13px] text-[#B8B0A8] mt-1.5 leading-relaxed max-w-md mx-auto">
+              <p className="ka text-[13px] text-on-dark-subtle mt-1.5 leading-relaxed max-w-md mx-auto">
                 SpeakBusy ჯერ ახალია და შენი აზრი მნიშვნელოვანია. მოგვწერე
                 სოციალურ ქსელებში ან ელფოსტაზე.
               </p>
@@ -340,7 +340,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy Instagram-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-[#F8F5F0] text-sm font-semibold hover:bg-white/5 hover:border-[#C9A84C]/50 transition-colors"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-white/5 hover:border-gold/50 transition-colors"
                 >
                   <Instagram size={16} strokeWidth={2} />
                   Instagram
@@ -350,7 +350,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy TikTok-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-[#F8F5F0] text-sm font-semibold hover:bg-white/5 hover:border-[#C9A84C]/50 transition-colors"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-white/5 hover:border-gold/50 transition-colors"
                 >
                   <TikTokIcon />
                   TikTok
@@ -358,13 +358,13 @@ const Index = () => {
               </div>
               <Link
                 to="/contact"
-                className="ka inline-block mt-4 mr-4 text-[13px] text-[#B8B0A8] hover:text-[#C9A84C] transition-colors underline underline-offset-4"
+                className="ka inline-block mt-4 mr-4 text-[13px] text-on-dark-subtle hover:text-gold transition-colors underline underline-offset-4"
               >
                 დაგვიკავშირდით
               </Link>
               <a
                 href="mailto:speakbusy@gmail.com"
-                className="ka inline-block mt-4 text-[13px] text-[#B8B0A8] hover:text-[#C9A84C] transition-colors underline underline-offset-4"
+                className="ka inline-block mt-4 text-[13px] text-on-dark-subtle hover:text-gold transition-colors underline underline-offset-4"
               >
                 speakbusy@gmail.com
               </a>
@@ -375,9 +375,9 @@ const Index = () => {
                 a price. Business identification and contact details live in the
                 Terms and Privacy pages, both linked below and publicly reachable. */}
             <div className="pt-8 pb-8 border-b border-white/10 text-center">
-              <p className="ka text-[13px] text-[#B8B0A8] leading-relaxed max-w-lg mx-auto">
+              <p className="ka text-[13px] text-on-dark-subtle leading-relaxed max-w-lg mx-auto">
                 უფასო ვერსია, 0 ₾, დღიური ლიმიტით და რეკლამების გარეშე.
-                პრემიუმი, <b className="text-[#C9A84C]">13.99 ₾ თვეში</b>.
+                პრემიუმი, <b className="text-gold">13.99 ₾ თვეში</b>.
                 პირველი 7 დღე უფასოა, ბარათის მითითების გარეშე.
                 <br />
                 გამოწერა ავტომატურად განახლდება ყოველთვიურად, სანამ არ გააუქმებ.
@@ -386,17 +386,17 @@ const Index = () => {
             </div>
 
             <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-[#F8F5F0]">
+              <div className="text-on-dark">
                 <Wordmark size="md" />
               </div>
               <div className="flex items-center gap-4 text-xs ka tracking-wide">
-                <Link to="/contact" className="hover:text-[#F8F5F0] transition-colors">
+                <Link to="/contact" className="hover:text-on-dark transition-colors">
                   დაგვიკავშირდით
                 </Link>
-                <Link to="/privacy" className="hover:text-[#F8F5F0] transition-colors">
+                <Link to="/privacy" className="hover:text-on-dark transition-colors">
                   კონფიდენციალობის პოლიტიკა
                 </Link>
-                <Link to="/terms" className="hover:text-[#F8F5F0] transition-colors">
+                <Link to="/terms" className="hover:text-on-dark transition-colors">
                   წესები და პირობები
                 </Link>
               </div>

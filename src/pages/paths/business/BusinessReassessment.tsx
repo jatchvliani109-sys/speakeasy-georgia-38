@@ -173,7 +173,7 @@ export default function BusinessReassessment() {
   if (loading || !test) {
     return (
       <BusinessShell>
-        <div className="ka text-[#4A4A4A]">იტვირთება...</div>
+        <div className="ka text-ink-muted">იტვირთება...</div>
       </BusinessShell>
     );
   }
@@ -204,21 +204,21 @@ export default function BusinessReassessment() {
 
     return (
       <BusinessShell>
-        <BizCard className={changed && went > 0 ? "border-l-4 border-l-[#5A8A6A] bg-[#F0F7F2]" : ""}>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <BizCard className={changed && went > 0 ? "border-l-4 border-l-sage bg-sage-soft" : ""}>
+          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
             შედეგი · ტესტი #{test.version}
           </p>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">{title}</h1>
-          <p className="text-sm text-[#4A4A4A] mt-1">Score: {resultPct}%</p>
-          <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">{blurb}</p>
+          <h1 className="ka text-2xl font-bold text-wine mt-1">{title}</h1>
+          <p className="text-sm text-ink-muted mt-1">Score: {resultPct}%</p>
+          <p className="ka text-sm text-ink mt-4 leading-relaxed">{blurb}</p>
 
           {weakAreas.length > 0 && went <= 0 && (
-            <div className="mt-4 p-3 rounded-xl bg-[#F5F4F2] border border-[#F0E8D8]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <div className="mt-4 p-3 rounded-xl bg-cream border border-gold-soft">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
                 სფეროები სამუშაოდ
               </p>
-              <p className="ka text-sm text-[#5C1A2E] mt-1">{weakAreas.join(" · ")}</p>
-              <p className="ka text-[11px] text-[#4A4A4A] mt-1">
+              <p className="ka text-sm text-wine mt-1">{weakAreas.join(" · ")}</p>
+              <p className="ka text-[11px] text-ink-muted mt-1">
                 გირჩევთ შესაბამის მოდულში დამატებითი სესიების გაკეთებას.
               </p>
             </div>
@@ -237,23 +237,23 @@ export default function BusinessReassessment() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           კითხვა {idx + 1} / {total}
           {q?.type === "mcq" && (
-            <span className="ml-2 text-[#4A4A4A] normal-case tracking-normal">
+            <span className="ml-2 text-ink-muted normal-case tracking-normal">
               · {q.weight} pt
             </span>
           )}
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">დონის შეფასება</h1>
-        <p className="ka text-sm text-[#4A4A4A] mt-1">
+        <h1 className="ka text-2xl font-bold text-wine mt-1">დონის შეფასება</h1>
+        <p className="ka text-sm text-ink-muted mt-1">
           12 კითხვა + არასავალდებულო წერითი დავალება. შენი წინა პროგრესი დაცულია.
         </p>
       </div>
 
       <BizCard>
-        {q?.promptKa && <p className="ka text-xs text-[#4A4A4A] mb-1">{q.promptKa}</p>}
-        <p className="text-[#5C1A2E] font-semibold">{q?.prompt}</p>
+        {q?.promptKa && <p className="ka text-xs text-ink-muted mb-1">{q.promptKa}</p>}
+        <p className="text-wine font-semibold">{q?.prompt}</p>
 
         {q?.type === "mcq" ? (
           <div className="space-y-2 mt-4">
@@ -267,8 +267,8 @@ export default function BusinessReassessment() {
                   }
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
-                      ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                      : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                      ? "border-wine bg-wine/5 text-wine"
+                      : "border-line hover:border-wine/40 text-ink"
                   }`}
                 >
                   {opt}
@@ -285,9 +285,9 @@ export default function BusinessReassessment() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-line focus:border-wine outline-none text-sm bg-white"
             />
-            <p className="ka text-xs text-[#4A4A4A] mt-2">
+            <p className="ka text-xs text-ink-muted mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
             </p>
           </>

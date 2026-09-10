@@ -66,8 +66,8 @@ export default function TrialEnded() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F5F0]">
-        <span className="ka text-sm text-[#4A4A4A]">იტვირთება...</span>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <span className="ka text-sm text-ink-muted">იტვირთება...</span>
       </div>
     );
   }
@@ -75,14 +75,14 @@ export default function TrialEnded() {
   const greeting = displayName ? `${displayName}, ` : "";
 
   return (
-    <div className="min-h-screen bg-[#F8F5F0] px-4 py-8 md:py-12">
+    <div className="min-h-screen bg-cream px-4 py-8 md:py-12">
       <div className="max-w-md mx-auto">
-        <div className="bg-[#1C1C1E] rounded-2xl p-6 md:p-8 text-[#F8F5F0] shadow-xl">
+        <div className="bg-panel rounded-2xl p-6 md:p-8 text-on-dark shadow-xl">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-[#C9A84C]/20 flex items-center justify-center">
-              <Crown className="w-5 h-5 text-[#C9A84C]" />
+            <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center">
+              <Crown className="w-5 h-5 text-gold" />
             </div>
-            <span className="text-sm font-medium text-[#C9A84C] tracking-wide uppercase">
+            <span className="text-sm font-medium text-gold tracking-wide uppercase">
               საცდელი პერიოდი დასრულდა
             </span>
           </div>
@@ -91,33 +91,33 @@ export default function TrialEnded() {
             {greeting}7 დღე დასრულდა
           </h1>
 
-          <p className="text-[#E4E2DF] leading-relaxed mb-6">
+          <p className="text-on-dark-muted leading-relaxed mb-6">
             პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა — ყველა ნასწავლი სიტყვა, streak-ი და ლექსიკონი შენთან რჩება.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6">
-            <div className="bg-[#F8F5F0]/10 rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-[#C9A84C]">{stats.words}</p>
-              <p className="text-xs text-[#E4E2DF]/80 mt-1">სიტყვა დაიწყე</p>
+            <div className="bg-cream/10 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-gold">{stats.words}</p>
+              <p className="text-xs text-on-dark-muted/80 mt-1">სიტყვა დაიწყე</p>
             </div>
-            <div className="bg-[#F8F5F0]/10 rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-[#C9A84C]">{stats.percent}%</p>
-              <p className="text-xs text-[#E4E2DF]/80 mt-1">ლექსიკა დაფარულია</p>
+            <div className="bg-cream/10 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-gold">{stats.percent}%</p>
+              <p className="text-xs text-on-dark-muted/80 mt-1">ლექსიკა დაფარულია</p>
             </div>
           </div>
 
           <div className="space-y-3 mb-8">
             <div className="flex items-start gap-3">
-              <BookOpen className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
-              <p className="text-sm text-[#E4E2DF]">ულიმიტო სესიები და ლექსიკონი</p>
+              <BookOpen className="w-5 h-5 text-gold mt-0.5 shrink-0" />
+              <p className="text-sm text-on-dark-muted">ულიმიტო სესიები და ლექსიკონი</p>
             </div>
             <div className="flex items-start gap-3">
-              <Brain className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
-              <p className="text-sm text-[#E4E2DF]">კვირაში 7 AI სესია</p>
+              <Brain className="w-5 h-5 text-gold mt-0.5 shrink-0" />
+              <p className="text-sm text-on-dark-muted">კვირაში 7 AI სესია</p>
             </div>
             <div className="flex items-start gap-3">
-              <Flame className="w-5 h-5 text-[#C9A84C] mt-0.5 shrink-0" />
-              <p className="text-sm text-[#E4E2DF]">გასაუბრების სიმულაცია</p>
+              <Flame className="w-5 h-5 text-gold mt-0.5 shrink-0" />
+              <p className="text-sm text-on-dark-muted">გასაუბრების სიმულაცია</p>
             </div>
           </div>
 
@@ -126,14 +126,14 @@ export default function TrialEnded() {
               track("trial_end_upgrade_clicked", { source: "trial_ended" });
               navigate("/path/business/premium");
             }}
-            className="w-full h-12 bg-[#C9A84C] hover:bg-[#B89A3E] text-[#1C1C1E] font-bold rounded-full text-base"
+            className="w-full h-12 bg-gold hover:bg-gold-deep text-ink font-bold rounded-full text-base"
           >
             პრემიუმის ნახვა — 13.99 ლარი/თვე
           </Button>
 
           <button
             onClick={() => navigate("/path/business/home", { replace: true })}
-            className="w-full mt-4 text-sm text-[#E4E2DF]/70 hover:text-[#F8F5F0] transition-colors"
+            className="w-full mt-4 text-sm text-on-dark-muted/70 hover:text-on-dark transition-colors"
           >
             უფასო ვერსიით გაგრძელება
           </button>

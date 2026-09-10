@@ -260,17 +260,17 @@ export default function BusinessPlacementTest() {
     return (
       <BusinessShell>
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
             შედეგი
           </p>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
+          <h1 className="ka text-2xl font-bold text-wine mt-1">
             შენი დონე:{" "}
-            <span className="text-[#5A8A6A]">{LEVEL_LABELS[resultLevel]}</span>
+            <span className="text-sage">{LEVEL_LABELS[resultLevel]}</span>
           </h1>
-          <p className="text-sm text-[#4A4A4A] mt-1">
+          <p className="text-sm text-ink-muted mt-1">
             Score: {resultPct}% (weighted)
           </p>
-          <p className="ka text-sm text-[#1C1C1E] mt-4 leading-relaxed">
+          <p className="ka text-sm text-ink mt-4 leading-relaxed">
             {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
@@ -286,25 +286,25 @@ export default function BusinessPlacementTest() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           კითხვა {idx + 1} / {total}
           {q.type === "mcq" && (
-            <span className="ml-2 text-[#4A4A4A] normal-case tracking-normal">
+            <span className="ml-2 text-ink-muted normal-case tracking-normal">
               · {q.weight} pt
             </span>
           )}
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">
+        <h1 className="ka text-2xl font-bold text-wine mt-1">
           ბიზნეს ინგლისურის მოკლე ტესტი
         </h1>
-        <p className="ka text-sm text-[#4A4A4A] mt-1">
+        <p className="ka text-sm text-ink-muted mt-1">
           ტესტი დაგვეხმარება გავიგოთ რა დონიდან დავიწყოთ.
         </p>
       </div>
 
       <BizCard>
-        {q.promptKa && <p className="ka text-xs text-[#4A4A4A] mb-1">{q.promptKa}</p>}
-        <p className="text-[#5C1A2E] font-semibold">{q.prompt}</p>
+        {q.promptKa && <p className="ka text-xs text-ink-muted mb-1">{q.promptKa}</p>}
+        <p className="text-wine font-semibold">{q.prompt}</p>
 
         {q.type === "mcq" ? (
           <div className="space-y-2 mt-4">
@@ -318,8 +318,8 @@ export default function BusinessPlacementTest() {
                   }
                   className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
                     on
-                      ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                      : "border-[#E0D8D0] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                      ? "border-wine bg-wine/5 text-wine"
+                      : "border-line-2 hover:border-wine/40 text-ink"
                   }`}
                 >
                   {opt}
@@ -338,9 +338,9 @@ export default function BusinessPlacementTest() {
               }
               rows={5}
               placeholder="Write your answer in English... (optional)"
-              className="mt-4 w-full px-4 py-3 rounded-xl border border-[#E0D8D0] focus:border-[#5C1A2E] outline-none text-sm bg-white"
+              className="mt-4 w-full px-4 py-3 rounded-xl border border-line-2 focus:border-wine outline-none text-sm bg-white"
             />
-            <p className="ka text-xs text-[#4A4A4A] mt-2">
+            <p className="ka text-xs text-ink-muted mt-2">
               ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
             </p>
           </>

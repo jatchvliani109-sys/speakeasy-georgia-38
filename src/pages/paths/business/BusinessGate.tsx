@@ -65,7 +65,7 @@ export default function BusinessGate() {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-[#4A4A4A]">
+    <div className="min-h-screen flex items-center justify-center text-ink-muted">
       <span className="ka text-sm">იტვირთება...</span>
     </div>
   );

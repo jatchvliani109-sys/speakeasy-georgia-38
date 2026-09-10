@@ -104,59 +104,59 @@ export default function AddToHomeScreen() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-      <div className="mx-auto max-w-md rounded-2xl bg-white border border-[#E4E2DF] shadow-[0_8px_30px_-8px_rgba(28,28,30,0.35)] p-4">
+      <div className="mx-auto max-w-md rounded-2xl bg-white border border-line shadow-[0_8px_30px_-8px_rgba(28,28,30,0.35)] p-4">
         <div className="flex items-start gap-3">
-          <span className="w-10 h-10 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] grid place-items-center shrink-0 font-bold text-sm">
+          <span className="w-10 h-10 rounded-xl bg-wine text-on-dark grid place-items-center shrink-0 font-bold text-sm">
             SB
           </span>
           <div className="flex-1 min-w-0">
-            <p className="ka text-sm font-bold text-[#1C1C1E]">
+            <p className="ka text-sm font-bold text-ink">
               დაამატე SpeakBusy მთავარ ეკრანზე
             </p>
-            <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
+            <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
               გაიხსნება აპივით — სწრაფად, ბრაუზერის ზოლის გარეშე.
             </p>
           </div>
           <button
             onClick={dismiss}
             aria-label="დახურვა"
-            className="shrink-0 -mt-1 -mr-1 p-1.5 text-[#8A8A8A] hover:text-[#1C1C1E]"
+            className="shrink-0 -mt-1 -mr-1 p-1.5 text-ink-subtle hover:text-ink"
           >
             <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
         {platform === "ios" ? (
-          <ol className="mt-3 space-y-2 border-t border-[#E4E2DF] pt-3">
-            <li className="flex items-center gap-2 ka text-xs text-[#1C1C1E]">
-              <span className="w-5 h-5 rounded-full bg-[#F5F4F2] grid place-items-center text-[10px] font-bold shrink-0">1</span>
-              დააჭირე <Share size={13} strokeWidth={2.25} className="inline text-[#5C1A2E]" /> ღილაკს ბრაუზერის ქვემოთ
+          <ol className="mt-3 space-y-2 border-t border-line pt-3">
+            <li className="flex items-center gap-2 ka text-xs text-ink">
+              <span className="w-5 h-5 rounded-full bg-cream grid place-items-center text-[10px] font-bold shrink-0">1</span>
+              დააჭირე <Share size={13} strokeWidth={2.25} className="inline text-wine" /> ღილაკს ბრაუზერის ქვემოთ
             </li>
-            <li className="flex items-center gap-2 ka text-xs text-[#1C1C1E]">
-              <span className="w-5 h-5 rounded-full bg-[#F5F4F2] grid place-items-center text-[10px] font-bold shrink-0">2</span>
-              აირჩიე <Plus size={13} strokeWidth={2.25} className="inline text-[#5C1A2E]" /> „Add to Home Screen“
+            <li className="flex items-center gap-2 ka text-xs text-ink">
+              <span className="w-5 h-5 rounded-full bg-cream grid place-items-center text-[10px] font-bold shrink-0">2</span>
+              აირჩიე <Plus size={13} strokeWidth={2.25} className="inline text-wine" /> „Add to Home Screen“
             </li>
-            <li className="flex items-center gap-2 ka text-xs text-[#1C1C1E]">
-              <span className="w-5 h-5 rounded-full bg-[#F5F4F2] grid place-items-center text-[10px] font-bold shrink-0">3</span>
+            <li className="flex items-center gap-2 ka text-xs text-ink">
+              <span className="w-5 h-5 rounded-full bg-cream grid place-items-center text-[10px] font-bold shrink-0">3</span>
               დაადასტურე „Add“
             </li>
           </ol>
         ) : installEvent ? (
           <button
             onClick={install}
-            className="ka mt-3 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-sm font-bold"
+            className="ka mt-3 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine text-on-dark text-sm font-bold"
           >
             <Download size={15} strokeWidth={2.25} />
             დაამატე მთავარ ეკრანზე
           </button>
         ) : (
-          <ol className="mt-3 space-y-2 border-t border-[#E4E2DF] pt-3">
-            <li className="flex items-center gap-2 ka text-xs text-[#1C1C1E]">
-              <span className="w-5 h-5 rounded-full bg-[#F5F4F2] grid place-items-center text-[10px] font-bold shrink-0">1</span>
+          <ol className="mt-3 space-y-2 border-t border-line pt-3">
+            <li className="flex items-center gap-2 ka text-xs text-ink">
+              <span className="w-5 h-5 rounded-full bg-cream grid place-items-center text-[10px] font-bold shrink-0">1</span>
               გახსენი ბრაუზერის მენიუ (⋮)
             </li>
-            <li className="flex items-center gap-2 ka text-xs text-[#1C1C1E]">
-              <span className="w-5 h-5 rounded-full bg-[#F5F4F2] grid place-items-center text-[10px] font-bold shrink-0">2</span>
+            <li className="flex items-center gap-2 ka text-xs text-ink">
+              <span className="w-5 h-5 rounded-full bg-cream grid place-items-center text-[10px] font-bold shrink-0">2</span>
               აირჩიე „Add to Home screen“
             </li>
           </ol>

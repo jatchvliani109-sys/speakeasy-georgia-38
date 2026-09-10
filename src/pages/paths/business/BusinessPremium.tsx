@@ -118,28 +118,28 @@ export default function BusinessPremium() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <div className="mb-4">
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] inline-flex items-center gap-2">
-          <Star size={22} className="text-[#C9A84C] fill-[#C9A84C]" /> პრემიუმი
+        <h1 className="ka text-2xl font-bold text-wine inline-flex items-center gap-2">
+          <Star size={22} className="text-gold fill-gold" /> პრემიუმი
         </h1>
-        <p className="ka text-sm text-[#4A4A4A] mt-1">
+        <p className="ka text-sm text-ink-muted mt-1">
           ერთი ფასი. ყველაფერი ხელმისაწვდომი.
         </p>
       </div>
 
       {/* Offer card */}
-      <div className="rounded-2xl overflow-hidden border border-[#C9A84C]/40 bg-gradient-to-br from-[#232323] to-[#161616] text-[#F5F4F2] p-6 mb-4">
+      <div className="rounded-2xl overflow-hidden border border-gold/40 bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark p-6 mb-4">
         <p className="text-3xl font-bold">
-          {PRICE_GEL} <span className="ka text-base font-semibold text-[#F5F4F2]/80">ლარი / თვეში</span>
+          {PRICE_GEL} <span className="ka text-base font-semibold text-on-dark/80">ლარი / თვეში</span>
         </p>
         <div className="mt-5 space-y-3">
           {FEATURES.map((f) => (
             <div key={f.titleKa} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-[#C9A84C] text-[#5C1A2E] grid place-items-center shrink-0 mt-0.5">
+              <span className="w-5 h-5 rounded-full bg-gold text-wine grid place-items-center shrink-0 mt-0.5">
                 <Check size={13} strokeWidth={3} />
               </span>
               <div>
                 <p className="ka text-sm font-semibold">{f.titleKa}</p>
-                <p className="ka text-[12px] text-[#F5F4F2]/70">{f.subKa}</p>
+                <p className="ka text-[12px] text-on-dark/70">{f.subKa}</p>
               </div>
             </div>
           ))}
@@ -147,14 +147,14 @@ export default function BusinessPremium() {
 
         {isPro === true ? (
           <div className="mt-6">
-            <p className="ka text-sm font-semibold text-[#C9A84C]">✓ პრემიუმი აქტიურია</p>
+            <p className="ka text-sm font-semibold text-gold">✓ პრემიუმი აქტიურია</p>
           </div>
         ) : (
           <div className="mt-6">
             {/* CONSENT. Regulation requires the terms to be described and
                 confirmed once, before the card is stored. */}
-            <div className="rounded-xl bg-[#F5F4F2]/10 border border-[#F5F4F2]/15 p-4 mb-4 text-left">
-              <p className="ka text-[12px] font-bold text-[#F5F4F2] mb-2">
+            <div className="rounded-xl bg-cream/10 border border-cream/15 p-4 mb-4 text-left">
+              <p className="ka text-[12px] font-bold text-on-dark mb-2">
                 გამოწერის პირობები
               </p>
               <ul className="space-y-1.5 mb-3">
@@ -165,8 +165,8 @@ export default function BusinessPremium() {
                   "გაუქმება და ბარათის წაშლა ნებისმიერ დროს შეგიძლიათ პროფილის გვერდიდან.",
                   "ყოველი გადახდის შესახებ წინასწარ მიიღებთ შეტყობინებას ელფოსტაზე.",
                 ].map((t) => (
-                  <li key={t} className="ka text-[11px] text-[#F5F4F2]/75 flex items-start gap-2 leading-relaxed">
-                    <span className="text-[#C9A84C] mt-0.5 shrink-0">•</span>
+                  <li key={t} className="ka text-[11px] text-on-dark/75 flex items-start gap-2 leading-relaxed">
+                    <span className="text-gold mt-0.5 shrink-0">•</span>
                     {t}
                   </li>
                 ))}
@@ -177,9 +177,9 @@ export default function BusinessPremium() {
                   type="checkbox"
                   checked={cardConsent}
                   onChange={(e) => setCardConsent(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 shrink-0 accent-[#C9A84C] cursor-pointer"
+                  className="mt-0.5 w-4 h-4 shrink-0 accent-gold cursor-pointer"
                 />
-                <span className="ka text-[12px] text-[#F5F4F2] leading-relaxed">
+                <span className="ka text-[12px] text-on-dark leading-relaxed">
                   ვეთანხმები ბარათის დამახსოვრებას და ყოველთვიურ ავტომატურ
                   გადახდას ზემოთ მითითებული პირობებით.
                 </span>
@@ -189,7 +189,7 @@ export default function BusinessPremium() {
             <button
               onClick={subscribe}
               disabled={busy || !cardConsent || (sub?.status === "active")}
-              className="ka w-full py-3.5 rounded-xl bg-[#C9A84C] text-[#1C1C1E] text-[15px] font-bold hover:bg-[#D4B560] transition-colors disabled:opacity-60"
+              className="ka w-full py-3.5 rounded-xl bg-gold text-ink text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
             </button>
@@ -197,12 +197,12 @@ export default function BusinessPremium() {
             {/* Subscription terms next to the button, not buried in a policy:
                 price, frequency, that it renews automatically, and how to stop
                 it. What a consumer is entitled to know BEFORE paying. */}
-            <p className="ka text-[11px] text-[#F5F4F2]/70 mt-3 leading-relaxed">
+            <p className="ka text-[11px] text-on-dark/70 mt-3 leading-relaxed">
               გადახდის შემდეგ პრემიუმი აქტიურდება მაშინვე. გამოწერა ავტომატურად
               განახლდება ყოველ თვეს, {PRICE_GEL} ლარად, სანამ არ გააუქმებ.
               გაუქმება ნებისმიერ დროს შეგიძლია პროფილის გვერდიდან.
             </p>
-            <p className="ka text-[11px] text-[#F5F4F2]/50 mt-2 leading-relaxed">
+            <p className="ka text-[11px] text-on-dark/50 mt-2 leading-relaxed">
               გადახდას ამუშავებს Flitt. ბარათის მონაცემები ჩვენთან არ ინახება.
             </p>
           </div>
@@ -217,10 +217,10 @@ export default function BusinessPremium() {
         sub.current_period_end &&
         new Date(sub.current_period_end) > new Date() && (
         <BizCard className="mb-4">
-          <p className="ka text-sm font-bold text-[#1C1C1E]">
+          <p className="ka text-sm font-bold text-ink">
             {sub.status === "active" ? "გამოწერა აქტიურია" : "გამოწერა გაუქმებულია"}
           </p>
-          <p className="ka text-[12px] text-[#4A4A4A] mt-1.5 leading-relaxed">
+          <p className="ka text-[12px] text-ink-muted mt-1.5 leading-relaxed">
             {sub.status === "active" ? (
               <>
                 {sub.masked_card ? `ბარათი ${sub.masked_card} · ` : ""}
@@ -236,7 +236,7 @@ export default function BusinessPremium() {
           </p>
           <a
             href="/profile"
-            className="ka inline-block mt-3 text-[13px] text-[#5C1A2E] font-semibold underline underline-offset-4"
+            className="ka inline-block mt-3 text-[13px] text-wine font-semibold underline underline-offset-4"
           >
             გამოწერის მართვა
           </a>

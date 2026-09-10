@@ -168,16 +168,16 @@ export default function BusinessSetup() {
     return (
       <BusinessShell>
         <div className="mb-6">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
             ნაბიჯი 1 / 4
           </p>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">როგორ მოგმართოთ?</h1>
-          <p className="ka text-sm text-[#4A4A4A] mt-1">
+          <h1 className="ka text-2xl font-bold text-wine mt-1">როგორ მოგმართოთ?</h1>
+          <p className="ka text-sm text-ink-muted mt-1">
             შეიყვანე შენი სახელი
           </p>
         </div>
         <BizCard>
-          <label className="ka text-xs text-[#4A4A4A] font-semibold" htmlFor="name-input">
+          <label className="ka text-xs text-ink-muted font-semibold" htmlFor="name-input">
             შენი სახელი
           </label>
           <input
@@ -191,7 +191,7 @@ export default function BusinessSetup() {
             }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-base"
+            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-line focus:border-wine focus:outline-none text-ink text-base"
           />
           <div className="flex justify-end mt-6">
             <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
@@ -206,11 +206,11 @@ export default function BusinessSetup() {
   return (
     <BusinessShell>
       <div className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           ნაბიჯი {step + 2} / 4
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი მიზანი</h1>
-        <p className="ka text-sm text-[#4A4A4A] mt-1">
+        <h1 className="ka text-2xl font-bold text-wine mt-1">შენი მიზანი</h1>
+        <p className="ka text-sm text-ink-muted mt-1">
           niniebi, გვითხარი&nbsp;რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
       </div>
@@ -219,8 +219,8 @@ export default function BusinessSetup() {
       <BizCard>
         {step === 0 && (
           <div>
-            <h2 className="ka font-semibold text-[#5C1A2E]">რისთვის გჭირდება ბიზნეს ინგლისური?</h2>
-            <p className="ka text-xs text-[#4A4A4A] mt-1 mb-4">შეგიძლია რამდენიმე პასუხი აირჩიო.</p>
+            <h2 className="ka font-semibold text-wine">რისთვის გჭირდება ბიზნეს ინგლისური?</h2>
+            <p className="ka text-xs text-ink-muted mt-1 mb-4">შეგიძლია რამდენიმე პასუხი აირჩიო.</p>
             <div className="space-y-2">
               {GOAL_KEYS.map((g) => {
                 const on = goals.includes(g);
@@ -230,8 +230,8 @@ export default function BusinessSetup() {
                     onClick={() => toggleGoal(g)}
                     className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                       on
-                        ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                        : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                        ? "border-wine bg-wine/5 text-wine"
+                        : "border-line hover:border-wine/40 text-ink"
                     }`}
                   >
                     <span className="inline-block w-4 h-4 mr-2 rounded border align-middle"
@@ -256,7 +256,7 @@ export default function BusinessSetup() {
               }}
             />
             {intensity === "deadline" && (
-              <div className="mt-5 pt-5 border-t border-[#E4E2DF]">
+              <div className="mt-5 pt-5 border-t border-line">
                 <SingleSelect
                   title="როდის გჭირდება შედეგი?"
                   options={DEADLINE_KEYS.map((k) => ({ value: k, label: DEADLINE_LABELS[k] }))}
@@ -289,7 +289,7 @@ export default function BusinessSetup() {
                   track("setup_step_skipped", { step });
                   setStep((st) => (st + 1) as Step);
                 }}
-                className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] underline underline-offset-2"
+                className="ka text-xs text-ink-muted hover:text-wine underline underline-offset-2"
               >
                 მოგვიანებით
               </button>
@@ -317,7 +317,7 @@ function SingleSelect<T extends string>({
 }) {
   return (
     <div>
-      <h2 className="ka font-semibold text-[#5C1A2E] mb-3">{title}</h2>
+      <h2 className="ka font-semibold text-wine mb-3">{title}</h2>
       <div className="space-y-2">
         {options.map((o) => {
           const on = value === o.value;
@@ -327,8 +327,8 @@ function SingleSelect<T extends string>({
               onClick={() => onChange(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                  : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                  ? "border-wine bg-wine/5 text-wine"
+                  : "border-line hover:border-wine/40 text-ink"
               }`}
             >
               <span
@@ -359,8 +359,8 @@ function MultiSelect<T extends string>({
 }) {
   return (
     <div>
-      <h2 className="ka font-semibold text-[#5C1A2E]">{title}</h2>
-      {hint && <p className="ka text-xs text-[#4A4A4A] mt-1 mb-4">{hint}</p>}
+      <h2 className="ka font-semibold text-wine">{title}</h2>
+      {hint && <p className="ka text-xs text-ink-muted mt-1 mb-4">{hint}</p>}
       <div className="space-y-2">
         {options.map((o) => {
           const on = values.includes(o.value);
@@ -370,8 +370,8 @@ function MultiSelect<T extends string>({
               onClick={() => onToggle(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E]"
-                  : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                  ? "border-wine bg-wine/5 text-wine"
+                  : "border-line hover:border-wine/40 text-ink"
               }`}
             >
               <span
