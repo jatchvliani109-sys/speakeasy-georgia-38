@@ -817,7 +817,7 @@ export default function InterviewModule() {
               {matchedPostingText}
             </div>
             <div className="mt-3">
-              <BizButton onClick={() => setStep("briefing")}>მზად ვარ — გავაგრძელოთ</BizButton>
+              <BizButton onClick={() => setStep("briefing")}>მზად ვარ</BizButton>
             </div>
           </BizCard>
         </div>
