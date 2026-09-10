@@ -587,8 +587,7 @@ export default function SelfIntroduction() {
             <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#1C1C1E] font-semibold si-rise-1">დასრულდა</p>
             <h2 className="ka text-2xl font-bold text-[#5C1A2E] mt-2 si-rise-1">წარდგენა მზადაა</h2>
             <p className="ka text-sm text-[#4A4A4A] mt-3 max-w-md mx-auto si-rise-2">
-              ეს არის შენი პირადი პროფესიონალური წარდგენა — ინგლისურად, შენი ხმით.
-              გამოიყენე გასაუბრებაზე, ქსელშეკრებებზე ან ნებისმიერ პროფესიულ გარემოში.
+              
             </p>
           </div>
 
