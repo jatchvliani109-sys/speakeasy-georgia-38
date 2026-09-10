@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
 import SEO from "@/components/SEO";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
+
 
 // Shared shell for the Business English path.
 
@@ -25,7 +27,11 @@ export default function BusinessShell({
             <Logo size={28} />
             <span className="font-bold text-sm tracking-tight">SpeakBusy</span>
           </Link>
-          <GlobalNav />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <GlobalNav />
+          </div>
+
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">

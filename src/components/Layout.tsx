@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import GlobalNav from "@/components/GlobalNav";
 import Wordmark from "@/components/Wordmark";
+import ThemeToggle from "@/components/ThemeToggle";
+
 
 export default function Layout({ children, showLogout = true, fullWidth = false }: { children: ReactNode; showLogout?: boolean; fullWidth?: boolean }) {
   const { user } = useAuth();
@@ -14,7 +16,11 @@ export default function Layout({ children, showLogout = true, fullWidth = false 
             <Wordmark size="md" />
           </Link>
 
-          {user && showLogout && <GlobalNav />}
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            {user && showLogout && <GlobalNav />}
+          </div>
+
         </div>
       </header>
       <main className={`flex-1 w-full ${fullWidth ? "" : "max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6"}`}>{children}</main>
