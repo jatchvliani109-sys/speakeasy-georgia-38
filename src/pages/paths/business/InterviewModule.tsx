@@ -859,7 +859,7 @@ export default function InterviewModule() {
               <p className="ka text-[11px] text-ink mt-2">↑ დღეს ამაზე ავაშენებთ</p>
             </BizCard>
           )}
-          <BizCard className="border-l-4 border-l-[#1C1C1E]">
+          <BizCard className="border-l-4 border-l-ink">
             {curriculum && (
               <p className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
                 ეტაპი {curriculum.step} / {curriculum.total}
@@ -1011,7 +1011,7 @@ export default function InterviewModule() {
 
           {/* Mini quiz */}
           {activeQuiz && step === "interview" && (
-            <BizCard className="border-l-4 border-l-[#1C1C1E]">
+            <BizCard className="border-l-4 border-l-ink">
               <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
                 სწრაფი კითხვა
               </p>
@@ -1082,7 +1082,7 @@ export default function InterviewModule() {
               verdict.verdict === "strong"
                 ? "border-l-4 border-l-sage bg-sage-soft"
                 : verdict.verdict === "average"
-                  ? "border-l-4 border-l-[#1C1C1E] bg-cream"
+                  ? "border-l-4 border-l-ink bg-cream"
                   : "border-l-4 border-l-danger bg-cream"
             }>
               <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
