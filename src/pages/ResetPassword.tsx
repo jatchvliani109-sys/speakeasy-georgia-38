@@ -75,25 +75,25 @@ export default function ResetPassword() {
       />
       <div className="max-w-sm mx-auto py-10">
         <div className="text-center mb-8">
-          <span className="inline-flex w-14 h-14 rounded-full bg-[#111111] text-[#F5F4F2] items-center justify-center">
+          <span className="inline-flex w-14 h-14 rounded-full bg-panel-deep text-on-dark items-center justify-center">
             <KeyRound className="w-6 h-6" />
           </span>
-          <h1 className="text-3xl font-extrabold ka text-[#5C1A2E] mt-4 tracking-tight">
+          <h1 className="text-3xl font-extrabold ka text-wine mt-4 tracking-tight">
             ახალი პაროლი
           </h1>
-          <p className="text-sm text-[#4A4A4A] mt-2 ka leading-relaxed">
+          <p className="text-sm text-ink-muted mt-2 ka leading-relaxed">
             შეიყვანე ახალი პაროლი ანგარიშისთვის.
           </p>
         </div>
 
         {invalidLink && !ready ? (
-          <div className="p-6 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] text-center">
-            <p className="text-sm text-[#5C1A2E] ka leading-relaxed">
+          <div className="p-6 rounded-2xl bg-cream border border-line text-center">
+            <p className="text-sm text-wine ka leading-relaxed">
               ბმული არასწორია ან ვადა გაუვიდა. გთხოვთ, მოითხოვოთ ახალი ბმული.
             </p>
             <Link
               to="/forgot-password"
-              className="inline-block mt-4 text-sm font-semibold text-[#5C1A2E] underline ka"
+              className="inline-block mt-4 text-sm font-semibold text-wine underline ka"
             >
               ახალი ბმულის მოთხოვნა
             </Link>
@@ -101,10 +101,10 @@ export default function ResetPassword() {
         ) : (
           <form
             onSubmit={submit}
-            className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
+            className="space-y-4 p-6 sm:p-7 rounded-2xl bg-cream border border-line shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
           >
             <div>
-              <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+              <Label htmlFor="password" className="ka text-xs font-semibold tracking-wide uppercase text-ink-muted">
                 ახალი პაროლი
               </Label>
               <Input
@@ -113,11 +113,11 @@ export default function ResetPassword() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 mt-1.5 rounded-lg bg-white border-[#E4E2DF] focus-visible:ring-[#1C1C1E]"
+                className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
               />
             </div>
             <div>
-              <Label htmlFor="confirm" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+              <Label htmlFor="confirm" className="ka text-xs font-semibold tracking-wide uppercase text-ink-muted">
                 გაიმეორე პაროლი
               </Label>
               <Input
@@ -126,13 +126,13 @@ export default function ResetPassword() {
                 required
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="h-11 mt-1.5 rounded-lg bg-white border-[#E4E2DF] focus-visible:ring-[#1C1C1E]"
+                className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
               />
             </div>
             <button
               type="submit"
               disabled={loading || !ready}
-              className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold tracking-wide ka hover:bg-[#161616] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-panel-deep text-on-dark text-sm font-semibold tracking-wide ka hover:bg-panel-deep transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

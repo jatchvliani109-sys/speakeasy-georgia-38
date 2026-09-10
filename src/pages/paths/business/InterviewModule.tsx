@@ -638,11 +638,11 @@ export default function InterviewModule() {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard>
-          <p className="ka text-[#4A4A4A]">გასაუბრება მზადდება შენი პროფილისთვის...</p>
-          <div className="mt-3 h-2 w-full bg-[#E4E2DF] rounded-full overflow-hidden">
-            <div className="h-full bg-[#232323] animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
+          <p className="ka text-ink-muted">გასაუბრება მზადდება შენი პროფილისთვის...</p>
+          <div className="mt-3 h-2 w-full bg-line rounded-full overflow-hidden">
+            <div className="h-full bg-panel-soft animate-[loadbar_1.6s_ease-in-out_infinite]" style={{ width: "40%" }} />
           </div>
-          {error && <p className="ka text-xs text-[#C0392B] mt-3">{error}</p>}
+          {error && <p className="ka text-xs text-danger mt-3">{error}</p>}
         </BizCard>
         <style>{`@keyframes loadbar { 0%{transform:translateX(-100%)} 100%{transform:translateX(250%)} }`}</style>
       </BusinessShell>
@@ -674,14 +674,14 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <div className="space-y-3">
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
               დაუსრულებელი გასაუბრება
             </p>
-            <h2 className="ka text-lg font-bold text-[#1C1C1E] mt-1">
+            <h2 className="ka text-lg font-bold text-ink mt-1">
               {rb?.roleTitleKa || rb?.roleTitle}
               {rb?.companyName ? ` · ${rb.companyName}` : ""}
             </h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-2">
+            <p className="ka text-sm text-ink-muted mt-2">
               ბოლო გასაუბრება შეწყდა {answered} პასუხის შემდეგ. შეგიძლია იქიდან
               გააგრძელო, სადაც გაჩერდი — ახალი AI სესია არ დაგეხარჯება.
             </p>
@@ -691,7 +691,7 @@ export default function InterviewModule() {
               </BizButton>
               <button
                 onClick={discardResumable}
-                className="ka w-full text-sm font-semibold text-[#5C1A2E] underline underline-offset-4 py-2"
+                className="ka w-full text-sm font-semibold text-wine underline underline-offset-4 py-2"
               >
                 ახლიდან დაწყება
               </button>
@@ -708,9 +708,9 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <div className="space-y-3">
           <BizCard>
-            <h2 className="ka text-lg font-bold text-[#1C1C1E]">აირჩიე გასაუბრების ტიპი</h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-1">{"\n"}</p>
-            <p className="ka text-[11px] text-[#4A4A4A] mt-1.5">
+            <h2 className="ka text-lg font-bold text-ink">აირჩიე გასაუბრების ტიპი</h2>
+            <p className="ka text-sm text-ink-muted mt-1">{"\n"}</p>
+            <p className="ka text-[11px] text-ink-muted mt-1.5">
               ამ კვირაში დარჩა {aiRemaining}/{aiLimit} AI სესია
             </p>
           </BizCard>
@@ -756,7 +756,7 @@ export default function InterviewModule() {
             onLockedClick={() => { if (!isPaidUser) navigate("/path/business/premium"); }}
           />
 
-          {error && <p className="ka text-xs text-[#C0392B]">{error}</p>}
+          {error && <p className="ka text-xs text-danger">{error}</p>}
         </div>
       </BusinessShell>
     );
@@ -768,8 +768,8 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <div className="space-y-3">
           <BizCard>
-            <h2 className="ka text-lg font-bold text-[#1C1C1E]">ჩასვი ვაკანსიის ტექსტი</h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-1">
+            <h2 className="ka text-lg font-bold text-ink">ჩასვი ვაკანსიის ტექსტი</h2>
+            <p className="ka text-sm text-ink-muted mt-1">
               დააკოპირე რეალური ვაკანსიის აღწერა (მოვალეობები და მოთხოვნები). გასაუბრება სწორედ ამ ვაკანსიაზე მოგირგებს.
             </p>
             <textarea
@@ -777,7 +777,7 @@ export default function InterviewModule() {
               onChange={(e) => setJobPosting(e.target.value)}
               rows={10}
               placeholder="Paste the job description here..."
-              className="mt-3 w-full rounded-xl border border-[#E4E2DF] bg-white p-3 text-sm text-[#1C1C1E] focus:outline-none focus:border-[#5C1A2E]"
+              className="mt-3 w-full rounded-xl border border-line bg-card p-3 text-sm text-ink focus:outline-none focus:border-wine"
             />
             <div className="mt-3 flex gap-2">
               <BizButton
@@ -788,13 +788,13 @@ export default function InterviewModule() {
               </BizButton>
               <button
                 onClick={() => setStep("picker")}
-                className="ka px-4 py-2 rounded-xl border border-[#E4E2DF] text-sm text-[#4A4A4A]"
+                className="ka px-4 py-2 rounded-xl border border-line text-sm text-ink-muted"
               >
                 უკან
               </button>
             </div>
             {jobPosting.trim().length > 0 && jobPosting.trim().length < 40 && (
-              <p className="ka text-xs text-[#C0392B] mt-2">ცოტა მეტი დეტალი ჩასვი (მინიმუმ რამდენიმე წინადადება).</p>
+              <p className="ka text-xs text-danger mt-2">ცოტა მეტი დეტალი ჩასვი (მინიმუმ რამდენიმე წინადადება).</p>
             )}
           </BizCard>
         </div>
@@ -808,12 +808,12 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <div className="space-y-3">
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">მორგებული ვაკანსია</p>
-            <h2 className="ka text-lg font-bold text-[#1C1C1E] mt-1">წაიკითხე ვაკანსია</h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-1">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">მორგებული ვაკანსია</p>
+            <h2 className="ka text-lg font-bold text-ink mt-1">წაიკითხე ვაკანსია</h2>
+            <p className="ka text-sm text-ink-muted mt-1">
               ეს ვაკანსია შენს რეზიუმეზეა მორგებული, ოდნავ მაღალ დონეზე. წაიკითხე, შემდეგ დაიწყე გასაუბრება.
             </p>
-            <div className="mt-3 p-3 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF] whitespace-pre-wrap text-sm text-[#1C1C1E]">
+            <div className="mt-3 p-3 rounded-xl bg-cream border border-line whitespace-pre-wrap text-sm text-ink">
               {matchedPostingText}
             </div>
             <div className="mt-3">
@@ -829,8 +829,8 @@ export default function InterviewModule() {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <BizCard>
-          <p className="ka text-[#4A4A4A]">იტვირთება...</p>
-          {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
+          <p className="ka text-ink-muted">იტვირთება...</p>
+          {error && <p className="ka text-xs text-danger mt-2">{error}</p>}
         </BizCard>
       </BusinessShell>
     );
@@ -843,34 +843,34 @@ export default function InterviewModule() {
       {step === "briefing" && (
         <div className="space-y-3">
           {previouslyLearned && (
-            <BizCard className="bg-[#F5F4F2] border-dashed">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            <BizCard className="bg-cream border-dashed">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
                 წინა გასაუბრებიდან
               </p>
-              <p className="ka text-xs text-[#4A4A4A] mt-1">{previouslyLearned.topicKa}</p>
+              <p className="ka text-xs text-ink-muted mt-1">{previouslyLearned.topicKa}</p>
               <div className="mt-2 space-y-1.5">
                 {previouslyLearned.phrases.map((p, i) => (
-                  <div key={i} className="p-2 rounded-lg bg-white border border-[#E4E2DF]">
-                    <p className="text-sm text-[#5C1A2E] font-medium">"{p.en}"</p>
-                    <p className="ka text-[11px] text-[#4A4A4A]">{p.ka}</p>
+                  <div key={i} className="p-2 rounded-lg bg-card border border-line">
+                    <p className="text-sm text-wine font-medium">"{p.en}"</p>
+                    <p className="ka text-[11px] text-ink-muted">{p.ka}</p>
                   </div>
                 ))}
               </div>
-              <p className="ka text-[11px] text-[#1C1C1E] mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+              <p className="ka text-[11px] text-ink mt-2">↑ დღეს ამაზე ავაშენებთ</p>
             </BizCard>
           )}
-          <BizCard className="border-l-4 border-l-[#1C1C1E]">
+          <BizCard className="border-l-4 border-l-ink">
             {curriculum && (
-              <p className="ka text-[10px] uppercase tracking-wider text-[#4A4A4A] font-semibold mb-1">
+              <p className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
                 ეტაპი {curriculum.step} / {curriculum.total}
                 {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
               </p>
             )}
-            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               გასაუბრების ბრიფინგი · ~{session.estimatedMinutes} წუთი
             </p>
-            <h2 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{b.roleTitleKa}</h2>
-            <p className="text-sm text-[#4A4A4A] mt-0.5">{b.roleTitle}</p>
+            <h2 className="ka text-xl font-bold text-wine mt-2">{b.roleTitleKa}</h2>
+            <p className="text-sm text-ink-muted mt-0.5">{b.roleTitle}</p>
 
             <div className="mt-4 grid grid-cols-1 gap-2">
               <BriefRow label="კომპანია" valueKa={b.companyName} sub={b.companyType} />
@@ -878,13 +878,13 @@ export default function InterviewModule() {
               <BriefRow label="ინტერვიუერი" valueKa={b.interviewerName} sub={b.interviewerTitle} />
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
-              <p className="ka text-xs font-semibold text-[#5C1A2E]">კომპანიის შესახებ</p>
-              <p className="ka text-sm text-[#1C1C1E] mt-1">{b.aboutCompanyKa}</p>
+            <div className="mt-4 p-3 rounded-lg bg-cream border border-line">
+              <p className="ka text-xs font-semibold text-wine">კომპანიის შესახებ</p>
+              <p className="ka text-sm text-ink mt-1">{b.aboutCompanyKa}</p>
             </div>
-            <div className="mt-2 p-3 rounded-lg bg-[#F5F4F2] border border-[#F0E8D8]">
-              <p className="ka text-xs font-semibold text-[#1C1C1E]">რას უნდა ელოდე</p>
-              <p className="ka text-sm text-[#1C1C1E] mt-1">{b.whatToExpectKa}</p>
+            <div className="mt-2 p-3 rounded-lg bg-cream border border-gold-soft">
+              <p className="ka text-xs font-semibold text-ink">რას უნდა ელოდე</p>
+              <p className="ka text-sm text-ink mt-1">{b.whatToExpectKa}</p>
             </div>
 
             <div className="mt-5 flex justify-end">
@@ -898,11 +898,11 @@ export default function InterviewModule() {
 
       {step === "warmup" && session.warmUp[warmupIdx] && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
             გახურება · {warmupIdx + 1} / {session.warmUp.length}
           </p>
-          <p className="text-xs text-[#4A4A4A] mt-2 italic">"{session.warmUp[warmupIdx].contextEn}"</p>
-          <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">
+          <p className="text-xs text-ink-muted mt-2 italic">"{session.warmUp[warmupIdx].contextEn}"</p>
+          <p className="ka text-sm font-semibold text-wine mt-2">
             {session.warmUp[warmupIdx].promptKa}
           </p>
           <div className="mt-3 space-y-2">
@@ -910,12 +910,12 @@ export default function InterviewModule() {
               const reveal = warmupChoice !== null;
               const isPicked = warmupChoice === i;
               const cls = !reveal
-                ? "border-[#E4E2DF] hover:border-[#5C1A2E]"
+                ? "border-line hover:border-wine"
                 : o.isBetter
-                  ? "border-[#5A8A6A] bg-[#F0F7F2]"
+                  ? "border-sage bg-sage-soft"
                   : isPicked
-                    ? "border-[#C0392B] bg-[#F5F4F2]"
-                    : "border-[#E4E2DF] opacity-60";
+                    ? "border-danger bg-cream"
+                    : "border-line opacity-60";
               return (
                 <button
                   key={i}
@@ -923,9 +923,9 @@ export default function InterviewModule() {
                   onClick={() => setWarmupChoice(i)}
                   className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                 >
-                  <p className="text-xs font-semibold text-[#4A4A4A]">Option {o.label}</p>
-                  <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
-                  {reveal && <p className="ka text-[11px] text-[#4A4A4A] mt-2">💡 {o.whyKa}</p>}
+                  <p className="text-xs font-semibold text-ink-muted">Option {o.label}</p>
+                  <p className="text-sm text-wine mt-1">{o.text}</p>
+                  {reveal && <p className="ka text-[11px] text-ink-muted mt-2">💡 {o.whyKa}</p>}
                 </button>
               );
             })}
@@ -952,18 +952,18 @@ export default function InterviewModule() {
       {(step === "interview" || step === "verdict") && (
         <div className="space-y-3">
           {/* Interview "set" card */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#232323] via-[#5C1A2E] to-[#161616] text-[#F5F4F2] p-4 shadow-[0_12px_30px_-15px_rgba(92,26,46,0.5)]">
+          <div className="rounded-2xl bg-gradient-to-br from-panel-soft via-wine to-panel-deep text-on-dark p-4 shadow-[0_12px_30px_-15px_rgba(92,26,46,0.5)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] text-[#C9A84C] grid place-items-center font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-panel text-gold grid place-items-center font-bold text-sm">
                 {initials(b.interviewerName)}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-semibold break-words line-clamp-2">{b.interviewerName}</p>
-                <p className="ka text-[11px] text-[#F5F4F2]/70 break-words line-clamp-2">
+                <p className="ka text-[11px] text-on-dark/70 break-words line-clamp-2">
                   {b.interviewerTitle} · {b.companyName}
                 </p>
               </div>
-              <div className="ml-auto ka text-[10px] uppercase tracking-wider text-[#E5D4A8]">
+              <div className="ml-auto ka text-[10px] uppercase tracking-wider text-gold-soft">
                 {currentStage && session.stageLabelsKa[currentStage]
                   ? session.stageLabelsKa[currentStage]
                   : "ინტერვიუ"}
@@ -974,59 +974,59 @@ export default function InterviewModule() {
           {/* Conversation */}
           <div
             ref={chatRef}
-            className="bg-white border border-[#E4E2DF] rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
+            className="bg-card border border-line rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
           >
             {history.map((t, i) => (
               <div
                 key={i}
                 className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                   t.role === "interviewer"
-                    ? "bg-[#F5F4F2] border border-[#E4E2DF] text-[#5C1A2E] mr-auto rounded-bl-sm"
-                    : "bg-[#232323] text-[#F5F4F2] ml-auto rounded-br-sm"
+                    ? "bg-cream border border-line text-wine mr-auto rounded-bl-sm"
+                    : "bg-panel-soft text-on-dark ml-auto rounded-br-sm"
                 }`}
               >
                 {t.text}
               </div>
             ))}
             {thinking && (
-              <div className="max-w-[85%] p-3 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] mr-auto inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#232323] animate-[blink_1s_infinite]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#232323] animate-[blink_1s_.15s_infinite]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#232323] animate-[blink_1s_.3s_infinite]" />
+              <div className="max-w-[85%] p-3 rounded-2xl bg-cream border border-line mr-auto inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-panel-soft animate-[blink_1s_infinite]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-panel-soft animate-[blink_1s_.15s_infinite]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-panel-soft animate-[blink_1s_.3s_infinite]" />
               </div>
             )}
           </div>
 
           {/* Highlight toast */}
           {activeHighlight && (
-            <div className="rounded-2xl bg-[#F0F7F2] border border-[#C8DCCF] p-3 animate-[pop_.4s_ease-out]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#3F6649] font-semibold">
+            <div className="rounded-2xl bg-sage-soft border border-sage-line p-3 animate-[pop_.4s_ease-out]">
+              <p className="ka text-[11px] uppercase tracking-wider text-sage-deep font-semibold">
                 ✨ კარგად გამოიყენე ეს ფრაზა
               </p>
-              <p className="text-sm font-bold text-[#5C1A2E] mt-1">"{activeHighlight.phraseEn}"</p>
-              <p className="ka text-[11px] text-[#4A4A4A]">{activeHighlight.ka}</p>
-              <p className="ka text-xs text-[#3F6649] mt-1">{activeHighlight.praiseKa}</p>
+              <p className="text-sm font-bold text-wine mt-1">"{activeHighlight.phraseEn}"</p>
+              <p className="ka text-[11px] text-ink-muted">{activeHighlight.ka}</p>
+              <p className="ka text-xs text-sage-deep mt-1">{activeHighlight.praiseKa}</p>
             </div>
           )}
 
           {/* Mini quiz */}
           {activeQuiz && step === "interview" && (
-            <BizCard className="border-l-4 border-l-[#1C1C1E]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <BizCard className="border-l-4 border-l-ink">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
                 სწრაფი კითხვა
               </p>
-              <p className="ka text-sm font-semibold text-[#5C1A2E] mt-2">{activeQuiz.promptKa}</p>
+              <p className="ka text-sm font-semibold text-wine mt-2">{activeQuiz.promptKa}</p>
               <div className="mt-2 space-y-2">
                 {activeQuiz.options.map((o, i) => {
                   const reveal = quizChoice !== null;
                   const isPicked = quizChoice === i;
                   const cls = !reveal
-                    ? "border-[#E4E2DF] hover:border-[#5C1A2E]"
+                    ? "border-line hover:border-wine"
                     : o.isBetter
-                      ? "border-[#5A8A6A] bg-[#F0F7F2]"
+                      ? "border-sage bg-sage-soft"
                       : isPicked
-                        ? "border-[#C0392B] bg-[#F5F4F2]"
-                        : "border-[#E4E2DF] opacity-60";
+                        ? "border-danger bg-cream"
+                        : "border-line opacity-60";
                   return (
                     <button
                       key={i}
@@ -1034,9 +1034,9 @@ export default function InterviewModule() {
                       onClick={() => setQuizChoice(i)}
                       className={`w-full text-left p-3 rounded-xl border transition ${cls}`}
                     >
-                      <p className="text-xs font-semibold text-[#4A4A4A]">Option {o.label}</p>
-                      <p className="text-sm text-[#5C1A2E] mt-1">{o.text}</p>
-                      {reveal && <p className="ka text-[11px] text-[#4A4A4A] mt-2">💡 {o.whyKa}</p>}
+                      <p className="text-xs font-semibold text-ink-muted">Option {o.label}</p>
+                      <p className="text-sm text-wine mt-1">{o.text}</p>
+                      {reveal && <p className="ka text-[11px] text-ink-muted mt-2">💡 {o.whyKa}</p>}
                     </button>
                   );
                 })}
@@ -1054,19 +1054,19 @@ export default function InterviewModule() {
           {/* Input */}
           {step === "interview" && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
                 შენი პასუხი
               </p>
               <textarea
                 value={candidateText}
                 onChange={(e) => setCandidateText(e.target.value)}
                 placeholder="Type your answer in English..."
-                className="mt-2 w-full min-h-[110px] p-3 rounded-lg border border-[#E4E2DF] text-sm text-[#5C1A2E] outline-none focus:border-[#5C1A2E] resize-y"
+                className="mt-2 w-full min-h-[110px] p-3 rounded-lg border border-line text-sm text-wine outline-none focus:border-wine resize-y"
                 disabled={thinking}
               />
-              {error && <p className="ka text-xs text-[#C0392B] mt-2">{error}</p>}
+              {error && <p className="ka text-xs text-danger mt-2">{error}</p>}
               <div className="mt-3 flex items-center justify-between">
-                <span className="ka text-[11px] text-[#4A4A4A]">
+                <span className="ka text-[11px] text-ink-muted">
                   ეტაპი {stageIdx + 1} / {stages.length}
                 </span>
                 <BizButton onClick={submitAnswer} disabled={!candidateText.trim() || thinking}>
@@ -1080,16 +1080,16 @@ export default function InterviewModule() {
           {step === "verdict" && verdict && (
             <BizCard className={
               verdict.verdict === "strong"
-                ? "border-l-4 border-l-[#5A8A6A] bg-[#F0F7F2]"
+                ? "border-l-4 border-l-sage bg-sage-soft"
                 : verdict.verdict === "average"
-                  ? "border-l-4 border-l-[#1C1C1E] bg-[#F5F4F2]"
-                  : "border-l-4 border-l-[#C0392B] bg-[#F5F4F2]"
+                  ? "border-l-4 border-l-ink bg-cream"
+                  : "border-l-4 border-l-danger bg-cream"
             }>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
                 გასაუბრების შედეგი
               </p>
-              <h3 className="ka text-xl font-bold text-[#5C1A2E] mt-2">{verdict.headlineKa}</h3>
-              <p className="text-sm text-[#1C1C1E] mt-2 italic">"{verdict.messageEn}"</p>
+              <h3 className="ka text-xl font-bold text-wine mt-2">{verdict.headlineKa}</h3>
+              <p className="text-sm text-ink mt-2 italic">"{verdict.messageEn}"</p>
               <div className="mt-4 text-right">
                 <BizButton onClick={loadDebrief} disabled={thinking}>
                   {thinking ? "Debrief მზადდება..." : "სრული Debrief →"}
@@ -1103,21 +1103,21 @@ export default function InterviewModule() {
       {step === "debrief" && debrief && (
         <div className="space-y-3">
           <BizCard>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               Debrief · მწვრთნელის შეფასება
             </p>
-            <p className="ka text-sm text-[#5C1A2E] mt-2 leading-relaxed">{debrief.summaryKa}</p>
+            <p className="ka text-sm text-wine mt-2 leading-relaxed">{debrief.summaryKa}</p>
           </BizCard>
 
           {debrief.wentWell?.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-[#5A8A6A]">✓ რა გამოგივიდა</p>
+              <p className="ka text-xs font-semibold text-sage">✓ რა გამოგივიდა</p>
               <div className="mt-2 space-y-2">
                 {debrief.wentWell.map((w, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F0F7F2] border border-[#C8DCCF]">
-                    <p className="ka text-sm font-semibold text-[#3F6649]">{w.momentKa}</p>
-                    <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{w.whyKa}</p>
+                  <div key={i} className="p-3 rounded-lg bg-sage-soft border border-sage-line">
+                    <p className="ka text-sm font-semibold text-sage-deep">{w.momentKa}</p>
+                    <p className="text-xs text-wine mt-1 italic">"{w.phraseEn}"</p>
+                    <p className="ka text-[11px] text-ink-muted mt-1">{w.whyKa}</p>
                   </div>
                 ))}
               </div>
@@ -1126,13 +1126,13 @@ export default function InterviewModule() {
 
           {debrief.hurtChances?.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-[#C0392B]">↗ რამ დააზიანა შენი შანსები</p>
+              <p className="ka text-xs font-semibold text-danger">↗ რამ დააზიანა შენი შანსები</p>
               <div className="mt-2 space-y-2">
                 {debrief.hurtChances.map((w, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#F5C9C3]">
-                    <p className="ka text-sm font-semibold text-[#A52A1B]">{w.momentKa}</p>
-                    <p className="text-xs text-[#5C1A2E] mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-[#4A4A4A] mt-1">{w.whyKa}</p>
+                  <div key={i} className="p-3 rounded-lg bg-cream border border-danger-line">
+                    <p className="ka text-sm font-semibold text-danger-deep">{w.momentKa}</p>
+                    <p className="text-xs text-wine mt-1 italic">"{w.phraseEn}"</p>
+                    <p className="ka text-[11px] text-ink-muted mt-1">{w.whyKa}</p>
                   </div>
                 ))}
               </div>
@@ -1141,13 +1141,13 @@ export default function InterviewModule() {
 
           {debrief.keyPhrases?.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-[#5C1A2E]">3 ფრაზა შემდეგისთვის</p>
+              <p className="ka text-xs font-semibold text-wine">3 ფრაზა შემდეგისთვის</p>
               <div className="mt-2 space-y-2">
                 {debrief.keyPhrases.map((p, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
-                    <p className="text-sm font-bold text-[#5C1A2E]">{p.en}</p>
-                    <p className="ka text-xs text-[#4A4A4A]">{p.ka}</p>
-                    <p className="ka text-[11px] text-[#1C1C1E] mt-1">📍 {p.whenKa}</p>
+                  <div key={i} className="p-3 rounded-lg bg-cream border border-line">
+                    <p className="text-sm font-bold text-wine">{p.en}</p>
+                    <p className="ka text-xs text-ink-muted">{p.ka}</p>
+                    <p className="ka text-[11px] text-ink mt-1">📍 {p.whenKa}</p>
                   </div>
                 ))}
               </div>
@@ -1156,25 +1156,25 @@ export default function InterviewModule() {
 
           {debrief.modelAnswers && debrief.modelAnswers.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-[#5C1A2E]">💪 როგორ გეპასუხა უკეთ</p>
+              <p className="ka text-xs font-semibold text-wine">💪 როგორ გეპასუხა უკეთ</p>
               <div className="mt-2 space-y-3">
                 {debrief.modelAnswers.map((m, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
-                    <p className="text-sm font-semibold text-[#1C1C1E]">{m.questionEn}</p>
-                    <p className="ka text-[11px] text-[#C0392B] mt-1">{m.theirAnswerKa}</p>
-                    <div className="mt-2 p-2 rounded-lg bg-white border border-[#E4E2DF]">
-                      <p className="text-sm text-[#1C1C1E]">{m.modelAnswerEn}</p>
+                  <div key={i} className="p-3 rounded-lg bg-cream border border-line">
+                    <p className="text-sm font-semibold text-ink">{m.questionEn}</p>
+                    <p className="ka text-[11px] text-danger mt-1">{m.theirAnswerKa}</p>
+                    <div className="mt-2 p-2 rounded-lg bg-card border border-line">
+                      <p className="text-sm text-ink">{m.modelAnswerEn}</p>
                     </div>
-                    <p className="ka text-[11px] text-[#5A8A6A] mt-1.5">✓ {m.whyStrongerKa}</p>
+                    <p className="ka text-[11px] text-sage mt-1.5">✓ {m.whyStrongerKa}</p>
                   </div>
                 ))}
               </div>
             </BizCard>
           )}
 
-          <BizCard className="bg-[#F5F4F2] border-[#F0E8D8]">
-            <p className="ka text-xs font-semibold text-[#1C1C1E]">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
-            <p className="ka text-sm text-[#5C1A2E] mt-1">{debrief.practiceNextKa}</p>
+          <BizCard className="bg-cream border-gold-soft">
+            <p className="ka text-xs font-semibold text-ink">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
+            <p className="ka text-sm text-wine mt-1">{debrief.practiceNextKa}</p>
           </BizCard>
 
           <div className="text-right">
@@ -1185,33 +1185,33 @@ export default function InterviewModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#232323] via-[#5C1A2E] to-[#161616] text-[#F5F4F2] p-7 shadow-[0_20px_50px_-20px_rgba(92,26,46,0.6)]">
-            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#1C1C1E]/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
-            <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-[#5A8A6A]/15 blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft via-wine to-panel-deep text-on-dark p-7 shadow-[0_20px_50px_-20px_rgba(92,26,46,0.6)]">
+            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-panel/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
+            <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-sage/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
               <div className="mx-auto relative w-20 h-20">
-                <div className="absolute inset-0 rounded-full bg-[#1C1C1E]/15 animate-[ping_1.6s_ease-out_1]" />
-                <div className="absolute inset-0 rounded-full border border-[#1C1C1E]/40" />
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#3A3A3A] grid place-items-center shadow-[0_8px_24px_-6px_rgba(28,28,30,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
-                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-[#C9A84C]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="absolute inset-0 rounded-full bg-panel/15 animate-[ping_1.6s_ease-out_1]" />
+                <div className="absolute inset-0 rounded-full border border-ink/40" />
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-panel to-panel-line grid place-items-center shadow-[0_8px_24px_-6px_rgba(28,28,30,0.6)] animate-[pop_.55s_cubic-bezier(.2,.9,.3,1.3)]">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 text-gold" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12.5l4.5 4.5L19 7" style={{ strokeDasharray: 30, strokeDashoffset: 30, animation: "draw .55s .25s ease-out forwards" }} />
                   </svg>
                 </div>
               </div>
-              <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#E5D4A8] font-semibold mt-5">
+              <p className="ka text-[11px] uppercase tracking-[0.18em] text-gold-soft font-semibold mt-5">
                 {displayName ? `შესრულებულია, ${displayName}` : "შესრულებულია"}
               </p>
               <h2 className="ka text-2xl font-bold mt-1 leading-snug">
                 {verdict?.headlineKa || "გასაუბრება დასრულდა"}
               </h2>
-              <p className="ka text-sm text-[#F5F4F2]/75 mt-2">
+              <p className="ka text-sm text-on-dark/75 mt-2">
                 {b.roleTitleKa} · {b.companyName}
               </p>
             </div>
           </div>
 
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
               დღევანდელი შედეგი
             </p>
             <ul className="mt-3 space-y-2">
@@ -1225,34 +1225,34 @@ export default function InterviewModule() {
           <BizCard className="mt-3">
             <div className="flex items-end justify-between">
               <div>
-                <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
                   გასაუბრებების პროგრესი
                 </p>
-                <p className="ka text-sm text-[#5C1A2E] mt-1">
+                <p className="ka text-sm text-wine mt-1">
                   <b className="text-lg">{stats.total + 1}</b> გასაუბრება გავიარე
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-[#5C1A2E]">{score >= 0 ? `+${score}` : score}</div>
-                <div className="ka text-[10px] text-[#4A4A4A]">საერთო ქულა</div>
+                <div className="text-2xl font-bold text-wine">{score >= 0 ? `+${score}` : score}</div>
+                <div className="ka text-[10px] text-ink-muted">საერთო ქულა</div>
               </div>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#F5F4F2] overflow-hidden">
+            <div className="mt-3 h-2 rounded-full bg-cream overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#1C1C1E] to-[#C9A84C] transition-all duration-700"
+                className="h-full bg-gradient-to-r from-panel to-gold transition-all duration-700"
                 style={{ width: `${Math.min(100, (stats.total + 1) * 10)}%` }}
               />
             </div>
           </BizCard>
 
-          <BizCard className="mt-3 bg-[#F5F4F2] border-[#F0E8D8]">
+          <BizCard className="mt-3 bg-cream border-gold-soft">
             <div className="flex items-start gap-3">
               <div className="text-xl">🌅</div>
               <div className="min-w-0">
-                <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+                <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
                   შემდეგი სესია
                 </p>
-                <p className="ka text-sm text-[#5C1A2E] mt-1 leading-relaxed">
+                <p className="ka text-sm text-wine mt-1 leading-relaxed">
                   {session.tomorrowTeaseKa}
                 </p>
               </div>
@@ -1298,25 +1298,25 @@ function ModeCard({
       className={[
         "w-full text-left p-4 rounded-2xl border transition-colors",
         locked
-          ? "border-[#E4E2DF] bg-[#F5F4F2] opacity-80"
-          : "border-[#E4E2DF] bg-white hover:border-[#5C1A2E]/40 hover:bg-[#5C1A2E]/5",
+          ? "border-line bg-cream opacity-80"
+          : "border-line bg-card hover:border-wine/40 hover:bg-wine/5",
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
         <div className="text-2xl">{emoji}</div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="ka font-bold text-[#1C1C1E]">{titleKa}</h3>
+            <h3 className="ka font-bold text-ink">{titleKa}</h3>
             {badgeKa && (
-              <span className="ka text-[10px] font-bold text-[#5C1A2E] bg-[#C9A84C]/25 border border-[#C9A84C]/40 px-1.5 py-0.5 rounded-full">
+              <span className="ka text-[10px] font-bold text-wine bg-gold/25 border border-gold/40 px-1.5 py-0.5 rounded-full">
                 {badgeKa}
               </span>
             )}
             {locked && <span className="text-xs">🔒</span>}
           </div>
-          <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">{descKa}</p>
+          <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">{descKa}</p>
           {locked && lockedHintKa && (
-            <p className="ka text-[11px] text-[#5C1A2E] font-semibold mt-1.5">{lockedHintKa} →</p>
+            <p className="ka text-[11px] text-wine font-semibold mt-1.5">{lockedHintKa} →</p>
           )}
         </div>
       </div>
@@ -1336,8 +1336,8 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="ka text-xl font-bold text-[#5C1A2E] inline-flex items-center gap-2"><Briefcase size={18} strokeWidth={2.25} /> გასაუბრება</h1>
-        <span className="ka text-[11px] text-[#4A4A4A]">
+        <h1 className="ka text-xl font-bold text-wine inline-flex items-center gap-2"><Briefcase size={18} strokeWidth={2.25} /> გასაუბრება</h1>
+        <span className="ka text-[11px] text-ink-muted">
           {curriculum
             ? `${curriculum.step}/${curriculum.total} · ${curriculum.shortKa}`
             : step === "interview" && session.stages[stageIdx]
@@ -1351,9 +1351,9 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
                     : "Debrief"}
         </span>
       </div>
-      <div className="h-1.5 w-full bg-[#E4E2DF] rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#232323] transition-all duration-500"
+          className="h-full bg-panel-soft transition-all duration-500"
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
@@ -1363,11 +1363,11 @@ function Header({ step, session, stageIdx, curriculum }: { step: Step; session: 
 
 function BriefRow({ label, valueKa, sub }: { label: string; valueKa: string; sub?: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-[#E4E2DF] last:border-0">
-      <span className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A]">{label}</span>
+    <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-dashed border-line last:border-0">
+      <span className="ka text-[11px] uppercase tracking-wider text-ink-muted">{label}</span>
       <div className="text-right min-w-0">
-        <p className="ka text-sm font-semibold text-[#5C1A2E] break-words">{valueKa}</p>
-        {sub && <p className="text-[11px] text-[#4A4A4A] break-words">{sub}</p>}
+        <p className="ka text-sm font-semibold text-wine break-words">{valueKa}</p>
+        {sub && <p className="text-[11px] text-ink-muted break-words">{sub}</p>}
       </div>
     </div>
   );
@@ -1378,12 +1378,12 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`mt-0.5 shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] ${
-          ok ? "bg-[#5A8A6A] text-white" : "bg-[#E4E2DF] text-[#4A4A4A]"
+          ok ? "bg-sage text-on-dark" : "bg-line text-ink-muted"
         }`}
       >
         {ok ? "✓" : "—"}
       </span>
-      <span className="ka text-xs text-[#1C1C1E]">{label}</span>
+      <span className="ka text-xs text-ink">{label}</span>
     </li>
   );
 }

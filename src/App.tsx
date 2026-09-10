@@ -7,6 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import RequireAuth from "@/components/RequireAuth";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import { ThemeProvider } from "@/lib/theme";
+
 
 // ---------------------------------------------------------------------------
 // EAGER: public pages — the first paint for a new visitor, so they must not
@@ -56,18 +58,20 @@ const queryClient = new QueryClient();
 /** Shown briefly while a route chunk downloads. */
 function RouteFallback() {
   return (
-    <div className="min-h-screen bg-[#F8F5F0] grid place-items-center">
+    <div className="min-h-screen bg-cream grid place-items-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 rounded-full border-2 border-[#E4E2DF] border-t-[#5C1A2E] animate-spin" />
-        <p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p>
+        <div className="w-8 h-8 rounded-full border-2 border-line border-t-wine animate-spin" />
+        <p className="ka text-sm text-ink-muted">იტვირთება...</p>
       </div>
     </div>
   );
 }
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -114,6 +118,8 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
+
 
 export default App;

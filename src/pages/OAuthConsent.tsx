@@ -78,18 +78,18 @@ export default function OAuthConsent() {
           </div>
         )}
         {!error && !details && (
-          <div className="text-center text-[#4A4A4A] ka">იტვირთება…</div>
+          <div className="text-center text-ink-muted ka">იტვირთება…</div>
         )}
         {!error && details && (
-          <div className="p-6 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] space-y-5">
+          <div className="p-6 rounded-2xl bg-cream border border-line space-y-5">
             <div>
-              <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
+              <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-ink">
                 Agent integration
               </div>
-              <h1 className="text-2xl font-extrabold ka text-[#5C1A2E] mt-2 tracking-tight">
+              <h1 className="text-2xl font-extrabold ka text-wine mt-2 tracking-tight">
                 დაუკავშირდი {details.client?.name ?? "აპლიკაციას"}
               </h1>
-              <p className="text-sm text-[#4A4A4A] mt-2 ka leading-relaxed">
+              <p className="text-sm text-ink-muted mt-2 ka leading-relaxed">
                 {details.client?.name ?? "ეს აპლიკაცია"} მოითხოვს წვდომას SpeakBusy-ის შენს ანგარიშზე
                 (პროფილი, ლექსიკონი, პროგრესი) შენი სახელით.
               </p>
@@ -98,14 +98,14 @@ export default function OAuthConsent() {
               <button
                 disabled={busy}
                 onClick={() => decide(true)}
-                className="flex-1 h-11 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold ka hover:bg-[#161616] transition-colors disabled:opacity-60"
+                className="flex-1 h-11 rounded-xl bg-panel-deep text-on-dark text-sm font-semibold ka hover:bg-panel-deep transition-colors disabled:opacity-60"
               >
                 დაშვება
               </button>
               <button
                 disabled={busy}
                 onClick={() => decide(false)}
-                className="flex-1 h-11 rounded-xl border border-[#3D1220]/30 text-sm font-semibold text-[#5C1A2E] ka hover:bg-[#111111]/5 transition-colors disabled:opacity-60"
+                className="flex-1 h-11 rounded-xl border border-wine-deep/30 text-sm font-semibold text-wine ka hover:bg-panel-deep/5 transition-colors disabled:opacity-60"
               >
                 უარყოფა
               </button>

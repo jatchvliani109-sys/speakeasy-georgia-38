@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import GlobalNav from "@/components/GlobalNav";
 import SEO from "@/components/SEO";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
+
 
 // Shared shell for the Business English path.
 
@@ -17,20 +19,24 @@ export default function BusinessShell({
   seo?: { title: string; description?: string; path: string };
 }) {
   return (
-    <div className="min-h-screen bg-[#F5F4F2]">
+    <div className="min-h-screen bg-cream">
       {seo && <SEO {...seo} />}
-      <header className="border-b border-[#E4E2DF] bg-[#F5F4F2]/85 backdrop-blur sticky top-0 z-20">
+      <header className="border-b border-line bg-cream/85 backdrop-blur sticky top-0 z-20">
         <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <Link to="/path/business/home" className="flex items-center gap-2 text-[#5C1A2E]">
+          <Link to="/path/business/home" className="flex items-center gap-2 text-wine">
             <Logo size={28} />
             <span className="font-bold text-sm tracking-tight">SpeakBusy</span>
           </Link>
-          <GlobalNav />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <GlobalNav />
+          </div>
+
         </div>
       </header>
       <main className="max-w-2xl w-full mx-auto px-4 py-6 animate-[bizFade_.45s_ease-out_both]">
         {back && (
-          <Link to={back.to} className="ka text-xs text-[#4A4A4A] hover:text-[#5C1A2E] inline-flex items-center gap-1 mb-3">
+          <Link to={back.to} className="ka text-xs text-ink-muted hover:text-wine inline-flex items-center gap-1 mb-3">
             <ArrowLeft size={13} strokeWidth={2.25} /> {back.label}
           </Link>
         )}
@@ -45,7 +51,7 @@ export default function BusinessShell({
 
 export function BizCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`bg-white border border-[#E4E2DF] rounded-lg p-5 ${className}`}>
+    <div className={`bg-card border border-line rounded-lg p-5 ${className}`}>
       {children}
     </div>
   );
@@ -70,12 +76,12 @@ export function BizButton({
     "ka inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-semibold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed";
   const styles =
     variant === "primary"
-      ? "bg-[#232323] text-[#F5F4F2] hover:bg-[#111111]"
+      ? "bg-panel-soft text-on-dark hover:bg-panel-deep"
       : variant === "accent"
-      ? "bg-[#1C1C1E] text-[#C9A84C] hover:bg-[#3A3A3A]"
+      ? "bg-panel text-gold hover:bg-panel-line"
       : variant === "outline"
-      ? "border border-[#5C1A2E]/25 text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
-      : "text-[#5C1A2E] hover:bg-[#5C1A2E]/5";
+      ? "border border-wine/25 text-wine hover:bg-wine/5"
+      : "text-wine hover:bg-wine/5";
   return (
     <button type={type} disabled={disabled} onClick={onClick} className={`${base} ${styles} ${className}`}>
       {children}

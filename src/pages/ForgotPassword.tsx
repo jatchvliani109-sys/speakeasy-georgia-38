@@ -45,30 +45,30 @@ export default function ForgotPassword() {
         />
         <div className="max-w-sm mx-auto py-10">
           <div className="text-center mb-6">
-            <span className="inline-flex w-14 h-14 rounded-full bg-[#111111] text-[#F5F4F2] items-center justify-center">
+            <span className="inline-flex w-14 h-14 rounded-full bg-panel-deep text-on-dark items-center justify-center">
               <Mail className="w-6 h-6" />
             </span>
-            <h1 className="text-2xl font-extrabold ka text-[#5C1A2E] mt-4 tracking-tight">
+            <h1 className="text-2xl font-extrabold ka text-wine mt-4 tracking-tight">
               შეამოწმეთ თქვენი ელ-ფოსტა
             </h1>
-            <p className="text-sm text-[#4A4A4A] mt-3 ka leading-relaxed">
+            <p className="text-sm text-ink-muted mt-3 ka leading-relaxed">
               პაროლის აღდგენის ბმული გამოგზავნილია თქვენს ელფოსტაზე. გთხოვთ, გადახედოთ inbox-ს და დააჭიროთ ბმულს ახალი პაროლის დასაყენებლად.
             </p>
-            <p className="text-xs text-[#6B6B6B] mt-3 ka">
-              გავაგზავნეთ: <span className="font-semibold text-[#5C1A2E]">{email}</span>
+            <p className="text-xs text-ink-muted-2 mt-3 ka">
+              გავაგზავნეთ: <span className="font-semibold text-wine">{email}</span>
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF]">
-            <div className="flex items-start gap-2 text-xs text-[#4A4A4A] ka">
-              <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-[#5C1A2E]" />
+          <div className="p-5 rounded-2xl bg-cream border border-line">
+            <div className="flex items-start gap-2 text-xs text-ink-muted ka">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-wine" />
               <span>თუ არ ხედავთ წერილს, გადაამოწმეთ spam ან junk საქაღალდე.</span>
             </div>
           </div>
 
           <Link
             to="/auth?mode=login"
-            className="block w-full text-center mt-6 text-sm text-[#4A4A4A] hover:text-[#5C1A2E] transition-colors ka"
+            className="block w-full text-center mt-6 text-sm text-ink-muted hover:text-wine transition-colors ka"
           >
             ← შესვლის გვერდზე დაბრუნება
           </Link>
@@ -86,25 +86,25 @@ export default function ForgotPassword() {
       />
       <div className="max-w-sm mx-auto py-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#1C1C1E]">
-            <span className="h-px w-6 bg-[#1C1C1E]" />
+          <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-ink">
+            <span className="h-px w-6 bg-panel" />
             Reset password
-            <span className="h-px w-6 bg-[#1C1C1E]" />
+            <span className="h-px w-6 bg-panel" />
           </div>
-          <h1 className="text-3xl font-extrabold ka text-[#5C1A2E] mt-3 tracking-tight">
+          <h1 className="text-3xl font-extrabold ka text-wine mt-3 tracking-tight">
             პაროლის აღდგენა
           </h1>
-          <p className="text-sm text-[#4A4A4A] mt-2 ka leading-relaxed">
+          <p className="text-sm text-ink-muted mt-2 ka leading-relaxed">
             შეიყვანე ელ-ფოსტა და გამოგიგზავნით აღდგენის ბმულს.
           </p>
         </div>
 
         <form
           onSubmit={submit}
-          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-[#F5F4F2] border border-[#E4E2DF] shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
+          className="space-y-4 p-6 sm:p-7 rounded-2xl bg-cream border border-line shadow-[0_2px_10px_-4px_rgba(61,18,32,0.08)]"
         >
           <div>
-            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-[#4A4A4A]">
+            <Label htmlFor="email" className="ka text-xs font-semibold tracking-wide uppercase text-ink-muted">
               ელ-ფოსტა
             </Label>
             <Input
@@ -113,13 +113,13 @@ export default function ForgotPassword() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-[#E4E2DF] focus-visible:ring-[#1C1C1E]"
+              className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#111111] text-[#F5F4F2] text-sm font-semibold tracking-wide ka hover:bg-[#161616] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-panel-deep text-on-dark text-sm font-semibold tracking-wide ka hover:bg-panel-deep transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -134,7 +134,7 @@ export default function ForgotPassword() {
 
         <Link
           to="/auth?mode=login"
-          className="block w-full text-center mt-6 text-sm text-[#4A4A4A] hover:text-[#5C1A2E] transition-colors ka"
+          className="block w-full text-center mt-6 text-sm text-ink-muted hover:text-wine transition-colors ka"
         >
           ← შესვლის გვერდზე დაბრუნება
         </Link>

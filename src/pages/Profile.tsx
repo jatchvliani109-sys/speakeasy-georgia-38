@@ -298,7 +298,7 @@ export default function Profile() {
   if (!user || !s) {
     return (
       <BusinessShell>
-        <div className="ka text-[#4A4A4A]">იტვირთება...</div>
+        <div className="ka text-ink-muted">იტვირთება...</div>
       </BusinessShell>
     );
   }
@@ -306,20 +306,20 @@ export default function Profile() {
   return (
     <BusinessShell seo={{ title: "ჩემი პროფილი — SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიონალური ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
       <header className="mb-6">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
           ანგარიში
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">პროფილი</h1>
+        <h1 className="ka text-2xl font-bold text-wine mt-1">პროფილი</h1>
       </header>
 
       <BizCard className="mb-4">
         <div className="flex items-start gap-4">
-          <span className="w-12 h-12 rounded-full bg-[#232323] text-[#F5F4F2] grid place-items-center shrink-0 text-base font-bold">
+          <span className="w-12 h-12 rounded-full bg-panel-soft text-on-dark grid place-items-center shrink-0 text-base font-bold">
             {(displayName || email).slice(0, 1).toUpperCase()}
           </span>
           <div className="flex-1 min-w-0 space-y-3">
             <div>
-              <label htmlFor="profile-name" className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold flex items-center gap-1.5">
+              <label htmlFor="profile-name" className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold flex items-center gap-1.5">
                 <UserIcon size={12} strokeWidth={2.25} />
                 სახელი
               </label>
@@ -330,15 +330,15 @@ export default function Profile() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={60}
                 placeholder="შენი სახელი"
-                className="ka mt-1 w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+                className="ka mt-1 w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
               />
             </div>
-            <div className="flex items-center gap-2 text-[#4A4A4A]">
+            <div className="flex items-center gap-2 text-ink-muted">
               <Mail size={13} strokeWidth={2.25} className="shrink-0" />
               <span className="text-sm break-all min-w-0">{email}</span>
             </div>
             <div>
-              <label htmlFor="new-email" className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold flex items-center gap-1.5">
+              <label htmlFor="new-email" className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold flex items-center gap-1.5">
                 <AtSign size={12} strokeWidth={2.25} />
                 ელფოსტის შეცვლა
               </label>
@@ -350,17 +350,17 @@ export default function Profile() {
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="ახალი ელფოსტა"
                   autoComplete="email"
-                  className="ka flex-1 min-w-0 px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+                  className="ka flex-1 min-w-0 px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
                 />
                 <button
                   onClick={handleEmailChange}
                   disabled={emailBusy || !newEmail.trim()}
-                  className="ka shrink-0 px-3 py-2 rounded-md bg-[#232323] text-[#F5F4F2] text-xs font-semibold disabled:opacity-40"
+                  className="ka shrink-0 px-3 py-2 rounded-md bg-panel-soft text-on-dark text-xs font-semibold disabled:opacity-40"
                 >
                   {emailBusy ? "..." : "შეცვლა"}
                 </button>
               </div>
-              <p className="ka text-[11px] text-[#8A8A8A] mt-1 leading-relaxed">
+              <p className="ka text-[11px] text-ink-subtle mt-1 leading-relaxed">
                 დადასტურების ბმული გაიგზავნება ახალ მისამართზე. ცვლილება ძალაში შევა
                 მხოლოდ ბმულზე დაჭერის შემდეგ.
               </p>
@@ -371,20 +371,20 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-3">
-          <span className="w-10 h-10 rounded-md bg-[#5C1A2E]/10 text-[#5C1A2E] grid place-items-center shrink-0">
+          <span className="w-10 h-10 rounded-md bg-wine/10 text-wine grid place-items-center shrink-0">
             <Award size={16} strokeWidth={2.25} />
           </span>
           <div className="flex-1 min-w-0">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
               მიმდინარე დონე
             </p>
-            <p className="ka font-bold text-[#5C1A2E] text-base mt-0.5">
+            <p className="ka font-bold text-wine text-base mt-0.5">
               {level ? LEVEL_LABELS[level] : "ჯერ არ შეფასებულა"}
             </p>
           </div>
           <Link
             to="/path/business/reassessment"
-            className="ka text-xs font-semibold text-[#5C1A2E] border border-[#E4E2DF] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
+            className="ka text-xs font-semibold text-wine border border-line rounded-md px-3 py-2 hover:bg-wine/5"
           >
             შეფასება
           </Link>
@@ -393,20 +393,20 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-3">
-          <span className="w-10 h-10 rounded-md bg-[#5C1A2E]/10 text-[#5C1A2E] grid place-items-center shrink-0">
+          <span className="w-10 h-10 rounded-md bg-wine/10 text-wine grid place-items-center shrink-0">
             <FileText size={16} strokeWidth={2.25} />
           </span>
           <div className="flex-1 min-w-0">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
               რეზიუმე
             </p>
-            <p className="ka text-sm text-[#1C1C1E] mt-0.5 break-words line-clamp-2">
+            <p className="ka text-sm text-ink mt-0.5 break-words line-clamp-2">
               {hasResume ? resumeName || "ატვირთულია" : "ჯერ არ ატვირთულა"}
             </p>
           </div>
           <Link
             to="/path/business/resume"
-            className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-[#5C1A2E] border border-[#E4E2DF] rounded-md px-3 py-2 hover:bg-[#5C1A2E]/5"
+            className="ka inline-flex items-center gap-1.5 text-xs font-semibold text-wine border border-line rounded-md px-3 py-2 hover:bg-wine/5"
           >
             <Upload size={12} strokeWidth={2.25} />
             {hasResume ? "განახლება" : "ატვირთვა"}
@@ -416,10 +416,10 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <Target size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">მიზნები</h2>
+          <Target size={14} strokeWidth={2.25} className="text-wine" />
+          <h2 className="ka font-bold text-wine text-sm">მიზნები</h2>
         </div>
-        <p className="ka text-xs text-[#4A4A4A] mb-3">აირჩიე რა მიმართულებებზე გინდა ფოკუსირება.</p>
+        <p className="ka text-xs text-ink-muted mb-3">აირჩიე რა მიმართულებებზე გინდა ფოკუსირება.</p>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(PRIORITY_LABELS) as BusinessPriority[]).map((g) => {
             const on = goals.includes(g);
@@ -429,8 +429,8 @@ export default function Profile() {
                 onClick={() => toggleGoal(g)}
                 className={`ka inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
-                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
-                    : "bg-white text-[#1C1C1E] border-[#E4E2DF] hover:border-[#5C1A2E]/40"
+                    ? "bg-panel-soft text-on-dark border-wine"
+                    : "bg-card text-ink border-line hover:border-wine/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}
@@ -443,10 +443,10 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <Briefcase size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">სფეროები</h2>
+          <Briefcase size={14} strokeWidth={2.25} className="text-wine" />
+          <h2 className="ka font-bold text-wine text-sm">სფეროები</h2>
         </div>
-        <p className="ka text-xs text-[#4A4A4A] mb-3">რომელ ბიზნეს სფეროებთან გაქვს საქმე.</p>
+        <p className="ka text-xs text-ink-muted mb-3">რომელ ბიზნეს სფეროებთან გაქვს საქმე.</p>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(FIELD_LABELS) as BusinessField[]).map((f) => {
             const on = fields.includes(f);
@@ -456,8 +456,8 @@ export default function Profile() {
                 onClick={() => toggleField(f)}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
-                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
-                    : "bg-white text-[#1C1C1E] border-[#E4E2DF] hover:border-[#5C1A2E]/40"
+                    ? "bg-panel-soft text-on-dark border-wine"
+                    : "bg-card text-ink border-line hover:border-wine/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}
@@ -470,8 +470,8 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <KeyRound size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">პაროლის შეცვლა</h2>
+          <KeyRound size={14} strokeWidth={2.25} className="text-wine" />
+          <h2 className="ka font-bold text-wine text-sm">პაროლის შეცვლა</h2>
         </div>
         <div className="space-y-2">
           <input
@@ -480,7 +480,7 @@ export default function Profile() {
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="ახალი პაროლი"
             autoComplete="new-password"
-            className="ka w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
           />
           <input
             type="password"
@@ -488,12 +488,12 @@ export default function Profile() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="გაიმეორე ახალი პაროლი"
             autoComplete="new-password"
-            className="ka w-full px-3 py-2 rounded-md border border-[#E4E2DF] focus:border-[#5C1A2E] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
           />
           <button
             onClick={handlePasswordChange}
             disabled={pwBusy || !newPassword || !confirmPassword}
-            className="ka w-full px-3 py-2 rounded-md bg-[#232323] text-[#F5F4F2] text-xs font-semibold disabled:opacity-40"
+            className="ka w-full px-3 py-2 rounded-md bg-panel-soft text-on-dark text-xs font-semibold disabled:opacity-40"
           >
             {pwBusy ? "ინახება..." : "პაროლის განახლება"}
           </button>
@@ -502,13 +502,13 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <ShieldCheck size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">დახმარება და პირობები</h2>
+          <ShieldCheck size={14} strokeWidth={2.25} className="text-wine" />
+          <h2 className="ka font-bold text-wine text-sm">დახმარება და პირობები</h2>
         </div>
         <div className="flex flex-col gap-2">
           <a
             href="mailto:speakbusy@gmail.com"
-            className="ka inline-flex items-center gap-2 text-sm text-[#5C1A2E] font-semibold"
+            className="ka inline-flex items-center gap-2 text-sm text-wine font-semibold"
           >
             <LifeBuoy size={13} strokeWidth={2.25} />
             დახმარება — დაგვიკავშირდი
@@ -516,9 +516,9 @@ export default function Profile() {
 
           {/* Feedback is invited explicitly. A user who is already in their
               profile is the one most likely to have an opinion worth hearing. */}
-          <div className="pt-3 mt-1 border-t border-[#E4E2DF]">
-            <p className="ka text-xs text-[#4A4A4A] leading-relaxed">
-              <MessageCircle size={12} strokeWidth={2.25} className="inline -mt-0.5 mr-1 text-[#5C1A2E]" />
+          <div className="pt-3 mt-1 border-t border-line">
+            <p className="ka text-xs text-ink-muted leading-relaxed">
+              <MessageCircle size={12} strokeWidth={2.25} className="inline -mt-0.5 mr-1 text-wine" />
               აპლიკაცია ჯერ ახალია — თუ რამე გაწუხებს ან იდეა გაქვს, აუცილებლად მოგვწერე.
             </p>
             <div className="flex items-center gap-2 mt-2.5">
@@ -526,7 +526,7 @@ export default function Profile() {
                 href="https://www.instagram.com/speakbusy/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line text-wine text-xs font-semibold hover:bg-wine/5 transition-colors"
               >
                 <Instagram size={13} strokeWidth={2.25} />
                 Instagram
@@ -535,7 +535,7 @@ export default function Profile() {
                 href="https://www.tiktok.com/@speakbusy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line text-wine text-xs font-semibold hover:bg-wine/5 transition-colors"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.7a5.66 5.66 0 0 0-.77-.05 5.68 5.68 0 1 0 5.68 5.68V8.99a7.35 7.35 0 0 0 4.29 1.37V7.27a4.29 4.29 0 0 1-3.23-1.45z" />
@@ -544,10 +544,10 @@ export default function Profile() {
               </a>
             </div>
           </div>
-          <Link to="/privacy" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
+          <Link to="/privacy" className="ka text-sm text-ink-muted hover:text-wine">
             კონფიდენციალობის პოლიტიკა
           </Link>
-          <Link to="/terms" className="ka text-sm text-[#4A4A4A] hover:text-[#5C1A2E]">
+          <Link to="/terms" className="ka text-sm text-ink-muted hover:text-wine">
             წესები და პირობები
           </Link>
         </div>
@@ -560,8 +560,8 @@ export default function Profile() {
           cancellation to be as easy as subscribing was. */}
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Star size={14} strokeWidth={2.25} className="text-[#C9A84C]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">გამოწერა</h2>
+          <Star size={14} strokeWidth={2.25} className="text-gold" />
+          <h2 className="ka font-bold text-wine text-sm">გამოწერა</h2>
         </div>
 
         {(() => {
@@ -577,12 +577,12 @@ export default function Profile() {
           if (!sub || (!active && !cancelledButActive && !sub.masked_card)) {
             return (
               <>
-                <p className="ka text-xs text-[#4A4A4A] mt-1 leading-relaxed">
+                <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
                   აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ.
                 </p>
                 <Link
                   to="/path/business/premium"
-                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
+                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-wine text-on-dark text-xs font-bold"
                 >
                   პრემიუმის ნახვა
                 </Link>
@@ -593,7 +593,7 @@ export default function Profile() {
           // 2 & 3 — active, or cancelled with access remaining
           return (
             <>
-              <p className="ka text-xs text-[#4A4A4A] mt-1 mb-3 leading-relaxed">
+              <p className="ka text-xs text-ink-muted mt-1 mb-3 leading-relaxed">
                 {active ? (
                   <>
                     პრემიუმი აქტიურია.
@@ -608,13 +608,13 @@ export default function Profile() {
               </p>
 
               {sub.masked_card && (
-                <div className="flex items-center gap-3 rounded-lg border border-[#E4E2DF] bg-[#F8F5F0] px-3 py-2.5 mb-3">
-                  <CreditCard size={16} strokeWidth={2} className="text-[#5C1A2E] shrink-0" />
+                <div className="flex items-center gap-3 rounded-lg border border-line bg-cream px-3 py-2.5 mb-3">
+                  <CreditCard size={16} strokeWidth={2} className="text-wine shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#1C1C1E] tabular-nums truncate">
+                    <p className="text-sm font-semibold text-ink tabular-nums truncate">
                       {sub.masked_card}
                     </p>
-                    <p className="ka text-[10px] text-[#8A8A8A]">
+                    <p className="ka text-[10px] text-ink-subtle">
                       {active
                         ? "სრული მონაცემები ჩვენთან არ ინახება"
                         : "ბარათი შენახულია, გადახდა აღარ მოხდება"}
@@ -628,7 +628,7 @@ export default function Profile() {
                   <button
                     onClick={() => manageSubscription("cancel")}
                     disabled={subBusy}
-                    className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold hover:border-[#5C1A2E]/40 disabled:opacity-50"
+                    className="ka px-3 py-2 rounded-md border border-line text-ink-muted text-xs font-semibold hover:border-wine/40 disabled:opacity-50"
                   >
                     {subBusy ? "..." : "გამოწერის გაუქმება"}
                   </button>
@@ -636,7 +636,7 @@ export default function Profile() {
                 {!active && (
                   <Link
                     to="/path/business/premium"
-                    className="ka px-3 py-2 rounded-md bg-[#5C1A2E] text-[#F8F5F0] text-xs font-bold"
+                    className="ka px-3 py-2 rounded-md bg-wine text-on-dark text-xs font-bold"
                   >
                     გამოწერის განახლება
                   </Link>
@@ -645,14 +645,14 @@ export default function Profile() {
                   <button
                     onClick={() => manageSubscription("delete_card")}
                     disabled={subBusy}
-                    className="ka px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5 disabled:opacity-50"
+                    className="ka px-3 py-2 rounded-md border border-danger/40 text-danger text-xs font-semibold hover:bg-danger/5 disabled:opacity-50"
                   >
                     {subBusy ? "..." : "ბარათის წაშლა"}
                   </button>
                 )}
               </div>
 
-              <p className="ka text-[11px] text-[#8A8A8A] mt-3 leading-relaxed">
+              <p className="ka text-[11px] text-ink-subtle mt-3 leading-relaxed">
                 გაუქმებისას ავტომატური გადახდა წყდება, ბარათი კი შენახული რჩება,
                 რომ განახლება მარტივი იყოს. ბარათის წაშლისას ორივე უქმდება.
               </p>
@@ -663,43 +663,43 @@ export default function Profile() {
 
       <BizCard className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <Download size={14} strokeWidth={2.25} className="text-[#5C1A2E]" />
-          <h2 className="ka font-bold text-[#5C1A2E] text-sm">ჩემი მონაცემების ჩამოტვირთვა</h2>
+          <Download size={14} strokeWidth={2.25} className="text-wine" />
+          <h2 className="ka font-bold text-wine text-sm">ჩემი მონაცემების ჩამოტვირთვა</h2>
         </div>
-        <p className="ka text-xs text-[#4A4A4A] mb-3 leading-relaxed">
+        <p className="ka text-xs text-ink-muted mb-3 leading-relaxed">
           ჩამოტვირთე ყველა შენი მონაცემი — პროფილი, პროგრესი, სესიები და შენახული
           დოკუმენტები — JSON ფაილად.
         </p>
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#E4E2DF] text-[#5C1A2E] text-xs font-semibold hover:bg-[#5C1A2E]/5 disabled:opacity-40"
+          className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-line text-wine text-xs font-semibold hover:bg-wine/5 disabled:opacity-40"
         >
           <Download size={12} strokeWidth={2.25} />
           {exporting ? "მზადდება..." : "ჩამოტვირთვა"}
         </button>
       </BizCard>
 
-      <BizCard className="mb-4 border-[#C0392B]/30">
+      <BizCard className="mb-4 border-danger/30">
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle size={14} strokeWidth={2.25} className="text-[#C0392B]" />
-          <h2 className="ka font-bold text-[#C0392B] text-sm">ანგარიშის წაშლა</h2>
+          <AlertTriangle size={14} strokeWidth={2.25} className="text-danger" />
+          <h2 className="ka font-bold text-danger text-sm">ანგარიშის წაშლა</h2>
         </div>
-        <p className="ka text-xs text-[#4A4A4A] mb-3 leading-relaxed">
+        <p className="ka text-xs text-ink-muted mb-3 leading-relaxed">
           წაშლა საბოლოოა. წაიშლება შენი პროფილი, ნასწავლი სიტყვები, პროგრესი, რეზიუმე და
           ყველა სესია. დაბრუნება შეუძლებელია.
         </p>
         {!deleteOpen ? (
           <button
             onClick={() => setDeleteOpen(true)}
-            className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#C0392B]/40 text-[#C0392B] text-xs font-semibold hover:bg-[#C0392B]/5"
+            className="ka inline-flex items-center gap-2 px-3 py-2 rounded-md border border-danger/40 text-danger text-xs font-semibold hover:bg-danger/5"
           >
             <Trash2 size={12} strokeWidth={2.25} />
             ანგარიშის წაშლა
           </button>
         ) : (
           <div className="space-y-2">
-            <p className="ka text-xs text-[#1C1C1E] font-semibold">
+            <p className="ka text-xs text-ink font-semibold">
               დასადასტურებლად ჩაწერე სიტყვა: წაშლა
             </p>
             <input
@@ -707,20 +707,20 @@ export default function Profile() {
               value={deleteConfirm}
               onChange={(e) => setDeleteConfirm(e.target.value)}
               placeholder="წაშლა"
-              className="ka w-full px-3 py-2 rounded-md border border-[#C0392B]/40 focus:border-[#C0392B] focus:outline-none text-[#1C1C1E] text-sm bg-white"
+              className="ka w-full px-3 py-2 rounded-md border border-danger/40 focus:border-danger focus:outline-none text-ink text-sm bg-card"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleting || deleteConfirm.trim() !== "წაშლა"}
-                className="ka flex-1 px-3 py-2 rounded-md bg-[#C0392B] text-white text-xs font-bold disabled:opacity-40"
+                className="ka flex-1 px-3 py-2 rounded-md bg-danger text-on-dark text-xs font-bold disabled:opacity-40"
               >
                 {deleting ? "იშლება..." : "საბოლოოდ წაშლა"}
               </button>
               <button
                 onClick={() => { setDeleteOpen(false); setDeleteConfirm(""); }}
                 disabled={deleting}
-                className="ka px-3 py-2 rounded-md border border-[#E4E2DF] text-[#4A4A4A] text-xs font-semibold"
+                className="ka px-3 py-2 rounded-md border border-line text-ink-muted text-xs font-semibold"
               >
                 გაუქმება
               </button>

@@ -12,8 +12,8 @@ export default function PrivacyPolicy() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F5F4F2",
-        color: "#1C1C1E",
+        background: "hsl(var(--cream))",
+        color: "hsl(var(--ink))",
         padding: "24px 16px",
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
@@ -21,15 +21,15 @@ export default function PrivacyPolicy() {
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <a
           href="/"
-          style={{ color: "#5C1A2E", fontSize: 14, textDecoration: "none", fontWeight: 600 }}
+          style={{ color: "hsl(var(--wine))", fontSize: 14, textDecoration: "none", fontWeight: 600 }}
         >
           ← მთავარზე დაბრუნება
         </a>
 
-        <h1 style={{ color: "#5C1A2E", fontSize: 26, marginTop: 20, marginBottom: 4 }}>
+        <h1 style={{ color: "hsl(var(--wine))", fontSize: 26, marginTop: 20, marginBottom: 4 }}>
           კონფიდენციალობის პოლიტიკა
         </h1>
-        <p style={{ color: "#6B6B6B", fontSize: 13, marginTop: 0 }}>
+        <p style={{ color: "hsl(var(--ink-muted-2))", fontSize: 13, marginTop: 0 }}>
           ბოლო განახლება: 3 სექტემბერი, 2026
         </p>
 
@@ -245,8 +245,8 @@ const ulStyle: React.CSSProperties = {
 };
 
 const boxStyle: React.CSSProperties = {
-  background: "#FFFFFF",
-  border: "1px solid #E4E2DF",
+  background: "hsl(var(--card))",
+  border: "1px solid hsl(var(--line))",
   borderRadius: 10,
   padding: "14px 16px",
   margin: "12px 0",
@@ -257,8 +257,8 @@ const boxStyle: React.CSSProperties = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 24 }}>
-      <h2 style={{ color: "#1C1C1E", fontSize: 18, marginBottom: 8 }}>{title}</h2>
-      <div style={{ fontSize: 15, lineHeight: 1.7, color: "#3A3A3A" }}>{children}</div>
+      <h2 style={{ color: "hsl(var(--ink))", fontSize: 18, marginBottom: 8 }}>{title}</h2>
+      <div style={{ fontSize: 15, lineHeight: 1.7, color: "hsl(var(--ink-muted))" }}>{children}</div>
     </div>
   );
 }

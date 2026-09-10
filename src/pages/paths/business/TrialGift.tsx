@@ -123,7 +123,7 @@ export default function TrialGift() {
   // Nothing renders until the server confirms eligibility — otherwise the gift
   // would flash on screen for an ineligible user before redirecting.
   if (eligible !== true && !accepted) {
-    return <div className="min-h-screen bg-[#F8F5F0]" />;
+    return <div className="min-h-screen bg-cream" />;
   }
 
   const accept = async () => {
@@ -178,15 +178,15 @@ export default function TrialGift() {
 
   if (accepted) {
     return (
-      <div className="min-h-screen bg-[#F8F5F0] grid place-items-center px-4">
+      <div className="min-h-screen bg-cream grid place-items-center px-4">
         <div className="text-center animate-[giftPop_.5s_cubic-bezier(.2,.8,.2,1)_both]">
-          <span className="inline-grid place-items-center w-20 h-20 rounded-full bg-[#5C1A2E] text-[#C9A84C]">
+          <span className="inline-grid place-items-center w-20 h-20 rounded-full bg-wine text-gold">
             <Check size={38} strokeWidth={2.5} />
           </span>
-          <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-5">
+          <h1 className="ka text-2xl font-bold text-wine mt-5">
             პრემიუმი გააქტიურებულია
           </h1>
-          <p className="ka text-sm text-[#4A4A4A] mt-2">
+          <p className="ka text-sm text-ink-muted mt-2">
             {TRIAL_DAYS} დღე შენია. ისიამოვნე.
           </p>
         </div>
@@ -196,13 +196,13 @@ export default function TrialGift() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F5F0] flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <div className="min-h-screen bg-cream flex items-center justify-center px-4 py-10 relative overflow-hidden">
       {/* ambient sparkles — behind the card, low opacity, gold */}
       {sparkles.map((sp, i) => (
         <span
           key={i}
           aria-hidden
-          className="absolute rounded-full bg-[#C9A84C] pointer-events-none"
+          className="absolute rounded-full bg-gold pointer-events-none"
           style={{
             left: sp.l,
             top: sp.t,
@@ -225,9 +225,9 @@ export default function TrialGift() {
           }}
         >
           {/* dark celebratory surface */}
-          <div className="bg-gradient-to-br from-[#232323] to-[#161616] px-7 pt-9 pb-8 text-center relative">
+          <div className="bg-gradient-to-br from-panel-soft to-panel-deep px-7 pt-9 pb-8 text-center relative">
             <span
-              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-[#C9A84C] text-[#1C1C1E]"
+              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-gold text-ink"
               style={{
                 opacity: stage >= 1 ? 1 : 0,
                 transform: stage >= 1 ? "scale(1) rotate(0deg)" : "scale(.6) rotate(-12deg)",
@@ -244,15 +244,15 @@ export default function TrialGift() {
                 transition: "opacity .45s ease, transform .45s ease",
               }}
             >
-              <p className="ka text-[11px] uppercase tracking-[0.2em] text-[#C9A84C] font-semibold mt-5">
+              <p className="ka text-[11px] uppercase tracking-[0.2em] text-gold font-semibold mt-5">
                 საჩუქარი
               </p>
-              <h1 className="ka text-[26px] leading-tight font-bold text-[#F8F5F0] mt-2">
+              <h1 className="ka text-[26px] leading-tight font-bold text-on-dark mt-2">
                 {displayName ? `${displayName}, ` : ""}პრემიუმის 
                 <br />
-                <span className="text-[#C9A84C]">პირველი {TRIAL_DAYS} დღე ჩვენგან საჩუქრად</span>
+                <span className="text-gold">პირველი {TRIAL_DAYS} დღე ჩვენგან საჩუქრად</span>
               </h1>
-              <p className="ka text-[13px] text-[#F8F5F0]/70 mt-3 leading-relaxed">
+              <p className="ka text-[13px] text-on-dark/70 mt-3 leading-relaxed">
                 დატესტე და ნახე, რისი შეთავაზება შეგვიძლია საკრედიტო ინფორმაციის მითითების გარეშე.
               </p>
             </div>
@@ -260,7 +260,7 @@ export default function TrialGift() {
 
           {/* what they get */}
           <div
-            className="bg-white px-7 py-6"
+            className="bg-card px-7 py-6"
             style={{
               opacity: stage >= 3 ? 1 : 0,
               transform: stage >= 3 ? "translateY(0)" : "translateY(10px)",
@@ -287,7 +287,7 @@ export default function TrialGift() {
             {/* Naming the reminder emails here means accepting the gift is the
                   consent for them, rather than relying on the argument that they
                   are transactional. Costs one line. */}
-            <p className="ka text-[11px] text-[#8A8A8A] mt-5 leading-relaxed text-center">
+            <p className="ka text-[11px] text-ink-subtle mt-5 leading-relaxed text-center">
               საცდელი პერიოდის განმავლობაში მოგწერთ ორ შეტყობინებას პროგრესის
               შესახებ. გამოწერის გაუქმება ნებისმიერ დროს შეგიძლია.
               <br />
@@ -313,7 +313,7 @@ export default function TrialGift() {
               <button
                 onClick={accept}
                 disabled={busy}
-                className="ka w-full h-14 rounded-2xl bg-[#5C1A2E] text-[#F8F5F0] text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-[#6B1F36] transition-colors disabled:opacity-60"
+                className="ka w-full h-14 rounded-2xl bg-wine text-on-dark text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-wine-deep transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
                 {busy ? "ირთვება..." : "მადლობა"}
@@ -321,31 +321,31 @@ export default function TrialGift() {
               <button
                 onClick={() => setConfirmDecline(true)}
                 disabled={busy}
-                className="ka w-full mt-3 h-11 text-[13px] text-[#8A8A8A] hover:text-[#5C1A2E] transition-colors"
+                className="ka w-full mt-3 h-11 text-[13px] text-ink-subtle hover:text-wine transition-colors"
               >
                 არა, გმადლობთ  უფასო ვერსიით დავიწყებ
               </button>
             </>
           ) : (
-            <div className="rounded-2xl border border-[#E4E2DF] bg-white p-5 text-center">
-              <p className="ka text-sm text-[#1C1C1E] font-semibold">
+            <div className="rounded-2xl border border-line bg-card p-5 text-center">
+              <p className="ka text-sm text-ink font-semibold">
                 დარწმუნებული ხარ?
               </p>
-              <p className="ka text-xs text-[#4A4A4A] mt-1.5 leading-relaxed">
+              <p className="ka text-xs text-ink-muted mt-1.5 leading-relaxed">
                 ეს შეთავაზება მხოლოდ ერთხელ ჩნდება. მოგვიანებით ვეღარ გაააქტიურებ.
               </p>
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setConfirmDecline(false)}
                   disabled={busy}
-                  className="ka flex-1 h-11 rounded-xl bg-[#5C1A2E] text-[#F8F5F0] text-[13px] font-bold"
+                  className="ka flex-1 h-11 rounded-xl bg-wine text-on-dark text-[13px] font-bold"
                 >
                   დავბრუნდე
                 </button>
                 <button
                   onClick={decline}
                   disabled={busy}
-                  className="ka flex-1 h-11 rounded-xl border border-[#E4E2DF] text-[#4A4A4A] text-[13px] font-semibold"
+                  className="ka flex-1 h-11 rounded-xl border border-line text-ink-muted text-[13px] font-semibold"
                 >
                   {busy ? "..." : "დიახ, გამოვტოვებ"}
                 </button>
@@ -373,14 +373,14 @@ function Perk({
 }) {
   return (
     <div
-      className={`flex items-start gap-3 ${last ? "" : "pb-4 mb-4 border-b border-[#F0EEEB]"}`}
+      className={`flex items-start gap-3 ${last ? "" : "pb-4 mb-4 border-b border-cream-2"}`}
     >
-      <span className="shrink-0 w-9 h-9 rounded-xl bg-[#5C1A2E]/8 text-[#5C1A2E] grid place-items-center">
+      <span className="shrink-0 w-9 h-9 rounded-xl bg-wine/8 text-wine grid place-items-center">
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="ka text-[13px] font-bold text-[#1C1C1E]">{title}</p>
-        <p className="ka text-[11px] text-[#4A4A4A] mt-0.5 leading-relaxed">{sub}</p>
+        <p className="ka text-[13px] font-bold text-ink">{title}</p>
+        <p className="ka text-[11px] text-ink-muted mt-0.5 leading-relaxed">{sub}</p>
       </div>
     </div>
   );

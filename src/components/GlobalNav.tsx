@@ -91,8 +91,8 @@ export default function GlobalNav() {
               to={item.to!}
               className={`ka inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-[13px] font-semibold transition-colors ${
                 active
-                  ? "bg-[#232323] text-[#F5F4F2]"
-                  : "text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+                  ? "bg-panel-soft text-on-dark"
+                  : "text-ink-muted hover:text-wine hover:bg-wine/5"
               }`}
             >
               <Icon size={14} strokeWidth={2.25} />
@@ -104,7 +104,7 @@ export default function GlobalNav() {
           onClick={handleLogout}
           aria-label="გასვლა"
           title="გასვლა"
-          className="hidden lg:inline-flex items-center justify-center w-9 h-9 ml-1 rounded-md text-[#4A4A4A] hover:text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+          className="hidden lg:inline-flex items-center justify-center w-9 h-9 ml-1 rounded-md text-ink-muted hover:text-wine hover:bg-wine/5"
         >
           <LogOut size={16} strokeWidth={2.25} />
         </button>
@@ -119,7 +119,7 @@ export default function GlobalNav() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 w-9 p-0 text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+              className="h-9 w-9 p-0 text-wine hover:bg-wine/5"
               aria-label="მენიუ"
             >
               <Menu className="w-5 h-5" />
@@ -127,14 +127,14 @@ export default function GlobalNav() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="w-[300px] sm:w-[340px] p-0 bg-[#F5F4F2] border-l border-[#E4E2DF]"
+            className="w-[300px] sm:w-[340px] p-0 bg-cream border-l border-line"
           >
-            <SheetHeader className="px-5 pt-5 pb-4 border-b border-[#E4E2DF]">
-              <SheetTitle className="ka text-[#5C1A2E] text-base font-bold text-left">
+            <SheetHeader className="px-5 pt-5 pb-4 border-b border-line">
+              <SheetTitle className="ka text-wine text-base font-bold text-left">
                 {displayName ? `გამარჯობა, ${displayName}` : "ნავიგაცია"}
               </SheetTitle>
               {user?.email && (
-                <p className="ka text-xs text-[#4A4A4A] text-left break-all">
+                <p className="ka text-xs text-ink-muted text-left break-all">
                   {user.email}
                 </p>
               )}
@@ -151,8 +151,8 @@ export default function GlobalNav() {
                       onClick={() => handleItem(item)}
                       className={`ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold transition-colors ${
                         active
-                          ? "bg-[#232323] text-[#F5F4F2]"
-                          : "text-[#1C1C1E] hover:bg-[#5C1A2E]/5 hover:text-[#5C1A2E]"
+                          ? "bg-panel-soft text-on-dark"
+                          : "text-ink hover:bg-wine/5 hover:text-wine"
                       }`}
                     >
                       <Icon size={16} strokeWidth={2.25} />
@@ -162,10 +162,10 @@ export default function GlobalNav() {
                 })}
               </nav>
               {/* logout pinned at the bottom — always visible, never scrolled away */}
-              <div className="px-3 py-3 border-t border-[#E4E2DF] bg-[#F5F4F2]">
+              <div className="px-3 py-3 border-t border-line bg-cream">
                 <button
                   onClick={handleLogout}
-                  className="ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold text-[#5C1A2E] hover:bg-[#5C1A2E]/5"
+                  className="ka w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-semibold text-wine hover:bg-wine/5"
                 >
                   <LogOut size={16} strokeWidth={2.25} />
                   გასვლა

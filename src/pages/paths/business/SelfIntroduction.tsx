@@ -280,11 +280,11 @@ export default function SelfIntroduction() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
       <div className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">{"\n"}</p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი პროფესიონალური წარდგენა</h1>
-        <p className="ka text-xs text-[#4A4A4A] mt-1">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">{"\n"}</p>
+        <h1 className="ka text-2xl font-bold text-wine mt-1">შენი პროფესიონალური წარდგენა</h1>
+        <p className="ka text-xs text-ink-muted mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
-          {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-[#5C1A2E]">{biz.level.replace("business_", "")}</span></span>}
+          {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-wine">{biz.level.replace("business_", "")}</span></span>}
         </p>
       </div>
 
@@ -293,25 +293,25 @@ export default function SelfIntroduction() {
         <div className="mb-5">
           <div className="flex items-center gap-1">
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-[#232323]" : "bg-[#E4E2DF]"}`} />
+              <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-panel-soft" : "bg-line"}`} />
             ))}
           </div>
-          <p className="ka text-[11px] text-[#4A4A4A] mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
+          <p className="ka text-[11px] text-ink-muted mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
         </div>
       )}
 
       {/* STEP 0: Friendly intro */}
       {step === 0 && (
         <BizCard className="mb-4">
-          <h2 className="ka text-xl font-bold text-[#5C1A2E]">პროფესიონალური წარდგენა</h2>
-          <p className="ka text-sm text-[#1C1C1E] mt-2">
+          <h2 className="ka text-xl font-bold text-wine">პროფესიონალური წარდგენა</h2>
+          <p className="ka text-sm text-ink mt-2">
             {"\n"}
           </p>
           <div className="mt-4 space-y-2">
-            <p className="ka text-sm text-[#5C1A2E]">
+            <p className="ka text-sm text-wine">
               პროფესიონალური წარდგენა დაგჭირდება უნივერსიტეტში, გასაუბრებაზე, networking-ში, პრეზენტაციებზე და სამუშაო კომუნიკაციაში.
             </p>
-            <p className="text-sm text-[#4A4A4A] italic">
+            <p className="text-sm text-ink-muted italic">
               A strong introduction helps you present yourself clearly in interviews, university, networking, and professional settings.
             </p>
           </div>
@@ -330,7 +330,7 @@ export default function SelfIntroduction() {
               გამოტოვება
             </BizButton>
           </div>
-          <p className="ka text-[11px] text-[#4A4A4A] mt-3">
+          <p className="ka text-[11px] text-ink-muted mt-3">
             შეგიძლია ახლა გამოტოვო და მოგვიანებით დაშბორდიდან შექმნა.
           </p>
         </BizCard>
@@ -339,9 +339,9 @@ export default function SelfIntroduction() {
       {/* STEP 1: Structure */}
       {step === 1 && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">ნაბიჯი 1</p>
-          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">როგორ ავაწყოთ პროფესიონალური წარდგენა?</h2>
-          <p className="ka text-sm text-[#1C1C1E] mt-3">
+          <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">ნაბიჯი 1</p>
+          <h2 className="ka text-lg font-bold text-wine mt-1">როგორ ავაწყოთ პროფესიონალური წარდგენა?</h2>
+          <p className="ka text-sm text-ink mt-3">
             {isBeginner || isElementary
               ? "კარგი წარდგენა მოკლეა და მკაფიო. ის შედგება 5 ნაწილისგან. ჯერ წავიკითხოთ თითოეული."
               : isAdvanced
@@ -350,12 +350,12 @@ export default function SelfIntroduction() {
           </p>
           <ol className="mt-4 space-y-3">
             {STRUCTURE_PARTS.map((p, i) => (
-              <li key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
+              <li key={i} className="p-3 rounded-lg bg-cream border border-line">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="ka text-xs font-bold text-[#5C1A2E]">{i + 1}. {p.ka} <span className="text-[#4A4A4A] font-normal">({p.en})</span></p>
-                    <p className="text-sm text-[#5C1A2E] mt-1.5">{p.exEn}</p>
-                    {(isBeginner || isElementary) && <p className="ka text-xs text-[#4A4A4A] mt-1">{p.exKa}</p>}
+                    <p className="ka text-xs font-bold text-wine">{i + 1}. {p.ka} <span className="text-ink-muted font-normal">({p.en})</span></p>
+                    <p className="text-sm text-wine mt-1.5">{p.exEn}</p>
+                    {(isBeginner || isElementary) && <p className="ka text-xs text-ink-muted mt-1">{p.exKa}</p>}
                   </div>
                   <ReadAloudButton text={p.exEn} />
                 </div>
@@ -371,32 +371,32 @@ export default function SelfIntroduction() {
       {/* STEP 2: Purpose + Examples */}
       {step === 2 && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">ნაბიჯი 2</p>
-          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">აირჩიე მიზანი და ნახე მაგალითი</h2>
-          <p className="ka text-xs text-[#4A4A4A] mt-1">სხვადასხვა სიტუაცია — სხვადასხვა ტონი.</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">ნაბიჯი 2</p>
+          <h2 className="ka text-lg font-bold text-wine mt-1">აირჩიე მიზანი და ნახე მაგალითი</h2>
+          <p className="ka text-xs text-ink-muted mt-1">სხვადასხვა სიტუაცია — სხვადასხვა ტონი.</p>
 
           <div className="grid gap-2 mt-4">
             {SELF_INTRO_PURPOSES.map((p) => (
               <button key={p.id} onClick={() => set("purpose", p.id)}
                 className={`ka text-left px-4 py-2.5 rounded-xl border text-sm transition-all ${
                   inputs.purpose === p.id
-                    ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E] font-semibold"
-                    : "border-[#E4E2DF] hover:border-[#5C1A2E]/40 text-[#1C1C1E]"
+                    ? "border-wine bg-wine/5 text-wine font-semibold"
+                    : "border-line hover:border-wine/40 text-ink"
                 }`}>{p.label}</button>
             ))}
           </div>
 
           {inputs.purpose && EXAMPLES[inputs.purpose] && (
-            <div className="mt-5 p-4 rounded-xl bg-[#F5F4F2] border border-[#E4E2DF]">
-              <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold mb-2">
+            <div className="mt-5 p-4 rounded-xl bg-cream border border-line">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold mb-2">
                 მაგალითი შენი დონისთვის
               </p>
-              <p className="text-sm text-[#5C1A2E] leading-relaxed">{EXAMPLES[inputs.purpose][tier].en}</p>
+              <p className="text-sm text-wine leading-relaxed">{EXAMPLES[inputs.purpose][tier].en}</p>
               {(isBeginner || isElementary) && (
-                <p className="ka text-xs text-[#4A4A4A] mt-2">{EXAMPLES[inputs.purpose][tier].ka}</p>
+                <p className="ka text-xs text-ink-muted mt-2">{EXAMPLES[inputs.purpose][tier].ka}</p>
               )}
               {isAdvanced && EXAMPLES[inputs.purpose][tier].note && (
-                <p className="ka text-[11px] text-[#4A4A4A] mt-2 italic">{EXAMPLES[inputs.purpose][tier].note}</p>
+                <p className="ka text-[11px] text-ink-muted mt-2 italic">{EXAMPLES[inputs.purpose][tier].note}</p>
               )}
               <div className="mt-3">
                 <ReadAloudButton text={EXAMPLES[inputs.purpose][tier].en} label="მოსმენა" />
@@ -415,10 +415,10 @@ export default function SelfIntroduction() {
       {/* STEP 3: Build (info) */}
       {step === 3 && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">ნაბიჯი 3</p>
-          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">ააწყე შენი წარდგენა</h2>
+          <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">ნაბიჯი 3</p>
+          <h2 className="ka text-lg font-bold text-wine mt-1">ააწყე შენი წარდგენა</h2>
           {(isBeginner || isElementary) && (
-            <p className="ka text-xs text-[#4A4A4A] mt-1">შეავსე მოკლედ. AI შემდეგ შენთვის ააწყობს.</p>
+            <p className="ka text-xs text-ink-muted mt-1">შეავსე მოკლედ. AI შემდეგ შენთვის ააწყობს.</p>
           )}
 
           <div className="mt-4 space-y-4">
@@ -431,8 +431,8 @@ export default function SelfIntroduction() {
                   <button key={s.id} onClick={() => set("status", s.id)}
                     className={`ka text-xs px-3 py-2 rounded-lg border ${
                       inputs.status === s.id
-                        ? "border-[#5C1A2E] bg-[#5C1A2E]/5 text-[#5C1A2E] font-semibold"
-                        : "border-[#E4E2DF] text-[#1C1C1E]"}`}>{s.label}</button>
+                        ? "border-wine bg-wine/5 text-wine font-semibold"
+                        : "border-line text-ink"}`}>{s.label}</button>
                 ))}
               </div>
             </Field>
@@ -466,7 +466,7 @@ export default function SelfIntroduction() {
       {/* STEP 4: Result versions */}
       {step === 4 && result && (
         <div className="space-y-4">
-          <p className="ka text-[11px] text-[#8A8A8A] leading-relaxed">
+          <p className="ka text-[11px] text-ink-subtle leading-relaxed">
             ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ — გადაამოწმე, რომ ყველა
             ფაქტი შენს რეალურ გამოცდილებას შეესაბამება.
           </p>
@@ -490,23 +490,23 @@ export default function SelfIntroduction() {
         <div className="space-y-4">
           {result.phrases.length > 0 && (
             <BizCard>
-              <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">სასარგებლო ფრაზები</p>
-              <p className="ka text-xs text-[#4A4A4A] mt-1">
+              <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">სასარგებლო ფრაზები</p>
+              <p className="ka text-xs text-ink-muted mt-1">
                 {isBeginner ? "თითოეული ფრაზა ქართულად აგიხსნი." : "ფრაზები რომლებიც სხვა სიტუაციაშიც გამოგადგება."}
               </p>
               <div className="mt-3 space-y-3">
                 {result.phrases.map((p, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
+                  <div key={i} className="p-3 rounded-lg bg-cream border border-line">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-[#5C1A2E] text-sm">{p.en}</p>
+                      <p className="font-semibold text-wine text-sm">{p.en}</p>
                       <ReadAloudButton text={p.en} />
                     </div>
-                    <p className="ka text-xs text-[#4A4A4A] mt-1">{p.ka}</p>
-                    <p className="ka text-xs text-[#1C1C1E] mt-2">{p.explanationKa}</p>
+                    <p className="ka text-xs text-ink-muted mt-1">{p.ka}</p>
+                    <p className="ka text-xs text-ink mt-2">{p.explanationKa}</p>
                     {p.exampleEn && (
-                      <div className="mt-2 pt-2 border-t border-[#E4E2DF]">
-                        <p className="text-xs text-[#5C1A2E]">{p.exampleEn}</p>
-                        {(isBeginner || isElementary) && <p className="ka text-xs text-[#4A4A4A] mt-0.5">{p.exampleKa}</p>}
+                      <div className="mt-2 pt-2 border-t border-line">
+                        <p className="text-xs text-wine">{p.exampleEn}</p>
+                        {(isBeginner || isElementary) && <p className="ka text-xs text-ink-muted mt-0.5">{p.exampleKa}</p>}
                       </div>
                     )}
                   </div>
@@ -527,15 +527,15 @@ export default function SelfIntroduction() {
       {/* STEP 6: Save */}
       {step === 6 && result && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">ნაბიჯი 6 — შენახვა</p>
-          <h2 className="ka text-lg font-bold text-[#5C1A2E] mt-1">აირჩიე და შეინახე საბოლოო ვერსია</h2>
+          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">ნაბიჯი 6 — შენახვა</p>
+          <h2 className="ka text-lg font-bold text-wine mt-1">აირჩიე და შეინახე საბოლოო ვერსია</h2>
           <div className="mt-4 grid gap-2">
             {(["short", "standard", "polished"] as const).map((v) => (
               <button key={v} onClick={() => setSelected(v)}
                 className={`text-left px-4 py-3 rounded-xl border text-sm ${
-                  selected === v ? "border-[#5C1A2E] bg-[#5C1A2E]/5" : "border-[#E4E2DF]"}`}>
-                <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">{v}</p>
-                <p className="text-sm text-[#5C1A2E] mt-1">{result[v].en}</p>
+                  selected === v ? "border-wine bg-wine/5" : "border-line"}`}>
+                <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">{v}</p>
+                <p className="text-sm text-wine mt-1">{result[v].en}</p>
               </button>
             ))}
           </div>
@@ -565,11 +565,11 @@ export default function SelfIntroduction() {
           <div className="text-center mb-6">
             <div className="relative inline-flex items-center justify-center mb-4">
               <span
-                className="absolute inset-0 rounded-full bg-[#1C1C1E]/30"
+                className="absolute inset-0 rounded-full bg-panel/30"
                 style={{ animation: "siRingPulse 1.6s ease-out 0.3s infinite" }}
               />
               <span
-                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-[#232323] to-[#161616] shadow-[0_8px_24px_-8px_rgba(92,26,46,0.5)] ring-2 ring-[#1C1C1E]/40"
+                className="relative w-16 h-16 rounded-full grid place-items-center bg-gradient-to-br from-panel-soft to-panel-deep shadow-[0_8px_24px_-8px_rgba(92,26,46,0.5)] ring-2 ring-ink/40"
                 style={{ animation: "siCircleIn 0.5s cubic-bezier(.2,.8,.2,1) both" }}
               >
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -584,9 +584,9 @@ export default function SelfIntroduction() {
                 </svg>
               </span>
             </div>
-            <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#1C1C1E] font-semibold si-rise-1">დასრულდა</p>
-            <h2 className="ka text-2xl font-bold text-[#5C1A2E] mt-2 si-rise-1">წარდგენა მზადაა</h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-3 max-w-md mx-auto si-rise-2">
+            <p className="ka text-[11px] uppercase tracking-[0.18em] text-ink font-semibold si-rise-1">დასრულდა</p>
+            <h2 className="ka text-2xl font-bold text-wine mt-2 si-rise-1">წარდგენა მზადაა</h2>
+            <p className="ka text-sm text-ink-muted mt-3 max-w-md mx-auto si-rise-2">
               
             </p>
           </div>
@@ -595,22 +595,22 @@ export default function SelfIntroduction() {
             <>
               {/* Premium document card */}
               <div className="relative si-rise-3">
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#1C1C1E]/40 via-transparent to-[#232323]/20 blur-[2px]" aria-hidden />
-                <div className="relative rounded-2xl bg-gradient-to-br from-white to-[#F5F4F2] border border-[#E4E2DF] shadow-[0_2px_4px_rgba(92,26,46,0.04),0_20px_50px_-20px_rgba(92,26,46,0.25)] overflow-hidden">
-                  <div className="h-[3px] bg-gradient-to-r from-[#1C1C1E] via-[#C9A84C] to-[#1C1C1E]" />
+                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-panel/40 via-transparent to-panel-soft/20 blur-[2px]" aria-hidden />
+                <div className="relative rounded-2xl bg-gradient-to-br from-white to-cream border border-line shadow-[0_2px_4px_rgba(92,26,46,0.04),0_20px_50px_-20px_rgba(92,26,46,0.25)] overflow-hidden">
+                  <div className="h-[3px] bg-gradient-to-r from-panel via-gold to-panel" />
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#1C1C1E]" />
-                        <p className="ka text-[10px] uppercase tracking-[0.2em] text-[#4A4A4A] font-bold">შენი წარდგენა</p>
+                        <span className="w-1.5 h-1.5 rounded-full bg-panel" />
+                        <p className="ka text-[10px] uppercase tracking-[0.2em] text-ink-muted font-bold">შენი წარდგენა</p>
                       </div>
-                      <span className="ka text-[10px] text-[#4A4A4A] italic">{saved[0].selected}</span>
+                      <span className="ka text-[10px] text-ink-muted italic">{saved[0].selected}</span>
                     </div>
-                    <p className="text-[15px] text-[#5C1A2E] leading-[1.7] font-medium" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                    <p className="text-[15px] text-wine leading-[1.7] font-medium" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
                       "{saved[0][saved[0].selected].en}"
                     </p>
-                    <div className="mt-4 pt-4 border-t border-dashed border-[#E4E2DF] flex items-center justify-between">
-                      <p className="ka text-[10px] text-[#8A8578] italic">— შენი ხელით აშენებული</p>
+                    <div className="mt-4 pt-4 border-t border-dashed border-line flex items-center justify-between">
+                      <p className="ka text-[10px] text-ink-subtle italic">— შენი ხელით აშენებული</p>
                       <ReadAloudButton text={saved[0][saved[0].selected].en} label="მოსმენა" />
                     </div>
                   </div>
@@ -620,15 +620,15 @@ export default function SelfIntroduction() {
               {/* Phrases bonus reward */}
               {saved[0].phrases?.length > 0 && (
                 <div className="mt-5 si-rise-4">
-                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-[#F5F4F2] via-[#FAF5E8] to-[#FAF5E8] border border-[#C9A84C]/50 shadow-[0_8px_24px_-12px_rgba(28,28,30,0.35)]">
+                  <div className="relative rounded-2xl p-5 bg-gradient-to-br from-cream via-gold-soft to-gold-soft border border-gold/50 shadow-[0_8px_24px_-12px_rgba(28,28,30,0.35)]">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-base" style={{ animation: "siGoldShimmer 2s ease-in-out infinite" }}>✦</span>
-                      <p className="ka text-[11px] uppercase tracking-[0.18em] text-[#8A6A0F] font-bold">ბონუსი · ნასწავლი ფრაზები</p>
+                      <p className="ka text-[11px] uppercase tracking-[0.18em] text-gold-deep font-bold">ბონუსი · ნასწავლი ფრაზები</p>
                     </div>
                     <ul className="space-y-2">
                       {saved[0].phrases.slice(0, 5).map((p, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-[#5C1A2E]">
-                          <span className="text-[#1C1C1E] font-bold mt-0.5">{i + 1}.</span>
+                        <li key={i} className="flex items-start gap-2 text-sm text-wine">
+                          <span className="text-ink font-bold mt-0.5">{i + 1}.</span>
                           <span className="font-medium">{p.en}</span>
                         </li>
                       ))}
@@ -641,24 +641,24 @@ export default function SelfIntroduction() {
 
           {/* Next steps */}
           <div className="mt-6 si-rise-4">
-            <p className="ka text-center text-[11px] uppercase tracking-[0.18em] text-[#4A4A4A] font-semibold mb-3">შემდეგი ნაბიჯი</p>
+            <p className="ka text-center text-[11px] uppercase tracking-[0.18em] text-ink-muted font-semibold mb-3">შემდეგი ნაბიჯი</p>
             <div className="grid gap-2.5">
               <button
                 onClick={() => navigate("/path/business/home")}
-                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-[#232323] to-[#161616] text-[#F5F4F2] font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(92,26,46,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(92,26,46,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                className="ka group relative w-full px-5 py-4 rounded-2xl bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark font-semibold text-[15px] shadow-[0_8px_20px_-8px_rgba(92,26,46,0.5)] hover:shadow-[0_12px_28px_-8px_rgba(92,26,46,0.6)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
-                <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#C9A84C] to-[#1C1C1E]" />
+                <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-gold to-panel" />
                 <span className="flex items-center justify-between pl-2">
                   <span className="flex flex-col items-start gap-0.5">
                     <span>ბიზნეს გაკვეთილებზე გადასვლა</span>
-                    <span className="text-[11px] font-normal text-[#F5F4F2]/70">გააგრძელე შენი მოგზაურობა</span>
+                    <span className="text-[11px] font-normal text-on-dark/70">გააგრძელე შენი მოგზაურობა</span>
                   </span>
                   <span className="text-lg transition-transform duration-200 group-hover:translate-x-1">→</span>
                 </span>
               </button>
               <button
                 onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}
-                className="ka w-full px-5 py-3 rounded-2xl border border-[#5C1A2E]/15 bg-white/60 text-[#5C1A2E] font-medium text-sm hover:bg-white hover:border-[#5C1A2E]/30 transition-all duration-200"
+                className="ka w-full px-5 py-3 rounded-2xl border border-wine/15 bg-card/60 text-wine font-medium text-sm hover:bg-card hover:border-wine/30 transition-all duration-200"
               >
                 ჩემი წარდგენის რედაქტირება
               </button>
@@ -670,7 +670,7 @@ export default function SelfIntroduction() {
       {/* SAVED LIST */}
       {saved.length > 0 && (
         <div className="mt-8">
-          <h2 className="ka text-base font-bold text-[#5C1A2E] mb-3">ჩემი შენახული წარდგენა</h2>
+          <h2 className="ka text-base font-bold text-wine mb-3">ჩემი შენახული წარდგენა</h2>
           <div className="space-y-3">
             {saved.map((s) => {
               const v = s[s.selected];
@@ -678,23 +678,23 @@ export default function SelfIntroduction() {
                 <BizCard key={s.id}>
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="ka text-[11px] text-[#4A4A4A]">{new Date(s.createdAt).toLocaleDateString()} · {s.selected}</p>
-                      <p className="ka text-xs text-[#5C1A2E] mt-0.5 font-semibold">
+                      <p className="ka text-[11px] text-ink-muted">{new Date(s.createdAt).toLocaleDateString()} · {s.selected}</p>
+                      <p className="ka text-xs text-wine mt-0.5 font-semibold">
                         {SELF_INTRO_PURPOSES.find((p) => p.id === s.inputs.purpose)?.label || "—"}
                       </p>
                     </div>
                     <button onClick={() => { if (user) { deleteSelfIntro(user.id, s.id); setSaved(loadSelfIntros(user.id)); } }}
-                      className="text-xs text-[#C0392B] hover:underline">წაშლა</button>
+                      className="text-xs text-danger hover:underline">წაშლა</button>
                   </div>
-                  <p className="text-sm text-[#5C1A2E] mt-3 leading-relaxed">{v.en}</p>
-                  <p className="ka text-xs text-[#4A4A4A] mt-2">{v.ka}</p>
+                  <p className="text-sm text-wine mt-3 leading-relaxed">{v.en}</p>
+                  <p className="ka text-xs text-ink-muted mt-2">{v.ka}</p>
                   <div className="mt-3 flex gap-2 flex-wrap">
                     <ReadAloudButton text={v.en} label="მოსმენა" />
-                    <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E4E2DF]">კოპირება</button>
-                    <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-[#E4E2DF]">I practiced</button>
+                    <button onClick={() => copyText(v.en)} className="text-xs px-3 py-1.5 rounded-lg border border-line">კოპირება</button>
+                    <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-line">I practiced</button>
                   </div>
                   {s.practicedAt && (
-                    <p className="ka text-[10px] text-[#4A4A4A] mt-2">ბოლო ვარჯიში: {new Date(s.practicedAt).toLocaleDateString()}</p>
+                    <p className="ka text-[10px] text-ink-muted mt-2">ბოლო ვარჯიში: {new Date(s.practicedAt).toLocaleDateString()}</p>
                   )}
                 </BizCard>
               );
@@ -707,12 +707,12 @@ export default function SelfIntroduction() {
 }
 
 // ---------- subcomponents ----------
-const inputCls = "w-full px-3 py-2 rounded-lg border border-[#E4E2DF] text-sm outline-none focus:border-[#5C1A2E] bg-white";
+const inputCls = "w-full px-3 py-2 rounded-lg border border-line text-sm outline-none focus:border-wine bg-card";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="ka block text-xs font-semibold text-[#5C1A2E] mb-1.5">{label}</label>
+      <label className="ka block text-xs font-semibold text-wine mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -728,17 +728,17 @@ function VersionCard({
 }) {
   const busy = (m: string) => rewritingKey === `${vKey}:${m}`;
   return (
-    <BizCard className={isSelected ? "border-[#5C1A2E]/40 ring-1 ring-[#5C1A2E]/10" : ""}>
+    <BizCard className={isSelected ? "border-wine/40 ring-1 ring-wine/10" : ""}>
       <div className="flex items-center justify-between gap-2">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#4A4A4A] font-semibold">{label}</p>
+        <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">{label}</p>
         <button onClick={onSelect}
           className={`ka text-[11px] px-2.5 py-1 rounded-full border ${
-            isSelected ? "bg-[#232323] text-white border-[#5C1A2E]" : "border-[#E4E2DF] text-[#5C1A2E]"}`}>
+            isSelected ? "bg-panel-soft text-on-dark border-wine" : "border-line text-wine"}`}>
           {isSelected ? "არჩეული" : "Use this"}
         </button>
       </div>
-      <p className="text-sm text-[#5C1A2E] mt-3 leading-relaxed">{version.en}</p>
-      {showKa && <p className="ka text-xs text-[#4A4A4A] mt-2">{version.ka}</p>}
+      <p className="text-sm text-wine mt-3 leading-relaxed">{version.en}</p>
+      {showKa && <p className="ka text-xs text-ink-muted mt-2">{version.ka}</p>}
       <div className="mt-3 flex gap-1.5 flex-wrap items-center">
         <ReadAloudButton text={speakText} />
         <ChipBtn onClick={onCopy}>კოპირება</ChipBtn>
@@ -754,7 +754,7 @@ function VersionCard({
 function ChipBtn({ children, onClick, loading }: { children: React.ReactNode; onClick: () => void; loading?: boolean }) {
   return (
     <button onClick={onClick} disabled={loading}
-      className="text-[11px] px-2.5 py-1.5 rounded-lg border border-[#E4E2DF] text-[#5C1A2E] hover:bg-[#5C1A2E]/5 disabled:opacity-50">
+      className="text-[11px] px-2.5 py-1.5 rounded-lg border border-line text-wine hover:bg-wine/5 disabled:opacity-50">
       {loading ? "..." : children}
     </button>
   );
@@ -766,8 +766,8 @@ function PracticeExercises({ tier }: { tier: LevelTier }) {
   const list = EXERCISES.slice(0, count);
   return (
     <BizCard>
-      <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">მინი ვარჯიში</p>
-      <p className="ka text-xs text-[#4A4A4A] mt-1">გაიარე ეს მცირე სავარჯიშოები — ეხმარება დამახსოვრებას.</p>
+      <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">მინი ვარჯიში</p>
+      <p className="ka text-xs text-ink-muted mt-1">გაიარე ეს მცირე სავარჯიშოები — ეხმარება დამახსოვრებას.</p>
       <div className="mt-3 space-y-3">
         {list.map((ex, i) => <ExerciseItem key={i} ex={ex} idx={i + 1} />)}
       </div>
@@ -787,23 +787,23 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
   };
 
   return (
-    <div className="p-3 rounded-lg bg-[#F5F4F2] border border-[#E4E2DF]">
-      <p className="ka text-[11px] text-[#4A4A4A]">{idx}. {ex.promptKa}</p>
-      <p className="text-sm text-[#5C1A2E] mt-1 font-medium">{ex.prompt}</p>
+    <div className="p-3 rounded-lg bg-cream border border-line">
+      <p className="ka text-[11px] text-ink-muted">{idx}. {ex.promptKa}</p>
+      <p className="text-sm text-wine mt-1 font-medium">{ex.prompt}</p>
 
       {ex.kind === "choice" ? (
         <div className="mt-2 space-y-1.5">
           {ex.options.map((opt, i) => (
             <button key={i} onClick={() => { setPick(i); setChecked(null); }}
               className={`block w-full text-left text-xs px-3 py-2 rounded border ${
-                pick === i ? "border-[#5C1A2E] bg-white" : "border-[#E4E2DF] bg-white"}`}>
+                pick === i ? "border-wine bg-card" : "border-line bg-card"}`}>
               {opt}
             </button>
           ))}
         </div>
       ) : ex.kind === "order" ? (
         <div className="mt-2">
-          <p className="text-[11px] text-[#4A4A4A]">{ex.words.join(" · ")}</p>
+          <p className="text-[11px] text-ink-muted">{ex.words.join(" · ")}</p>
           <input value={val} onChange={(e) => { setVal(e.target.value); setChecked(null); }}
             placeholder="Type the full sentence" className={`${inputCls} mt-2`} />
         </div>
@@ -814,10 +814,10 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
 
       <div className="mt-2 flex items-center gap-2">
         <button onClick={check}
-          className="text-[11px] px-3 py-1.5 rounded-lg border border-[#5C1A2E] text-[#5C1A2E]">შემოწმება</button>
-        {checked === true && <span className="ka text-[11px] text-[#5A8A6A]">სწორია</span>}
+          className="text-[11px] px-3 py-1.5 rounded-lg border border-wine text-wine">შემოწმება</button>
+        {checked === true && <span className="ka text-[11px] text-sage">სწორია</span>}
         {checked === false && (
-          <span className="ka text-[11px] text-[#C0392B]">
+          <span className="ka text-[11px] text-danger">
             სცადე ისევ{("hintKa" in ex && ex.hintKa) ? ` — ${ex.hintKa}` : ""}
           </span>
         )}

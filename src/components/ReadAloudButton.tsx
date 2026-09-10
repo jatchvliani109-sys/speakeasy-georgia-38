@@ -168,8 +168,8 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
       className={[
         "inline-flex items-center justify-center rounded-full border transition-colors select-none",
         active
-          ? "border-[#5C1A2E]/40 bg-[#5C1A2E]/5 text-[#5C1A2E]"
-          : "border-[#E4E2DF] bg-white/70 text-[#4A4A4A] hover:text-[#5C1A2E] hover:border-[#5C1A2E]/30 hover:bg-[#5C1A2E]/5",
+          ? "border-wine/40 bg-wine/5 text-wine"
+          : "border-line bg-card/70 text-ink-muted hover:text-wine hover:border-wine/30 hover:bg-wine/5",
         sizeCls,
         className,
       ].join(" ")}
@@ -178,7 +178,7 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
         className={[
           iconCls,
           state === "loading" ? "animate-spin" : "",
-          active ? "text-[#5A8A6A]" : "",
+          active ? "text-sage" : "",
         ].join(" ")}
       />
       {label && <span className="ka text-[11px] font-medium">{label}</span>}

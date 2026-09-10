@@ -33,8 +33,8 @@ export default function Scenarios() {
       {!scenario && (
         <>
           <div className="mb-4">
-            <h1 className="ka text-2xl font-bold text-[#5C1A2E]">სცენარები</h1>
-            <p className="ka text-sm text-[#4A4A4A] mt-1">
+            <h1 className="ka text-2xl font-bold text-wine">სცენარები</h1>
+            <p className="ka text-sm text-ink-muted mt-1">
               ისწავლე სიტყვები რეალურ სამუშაო სიტუაციებში — შეხვედრები, იმეილები, გასაუბრება და სხვა.
             </p>
           </div>
@@ -45,8 +45,8 @@ export default function Scenarios() {
               onClick={() => setCategory(null)}
               className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                 ${category === null
-                  ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
-                  : "bg-white text-[#4A4A4A] border-[#E4E2DF] hover:border-[#C9A84C]"}`}
+                  ? "bg-panel-soft text-on-dark border-wine"
+                  : "bg-card text-ink-muted border-line hover:border-gold"}`}
             >
               ყველა
             </button>
@@ -57,8 +57,8 @@ export default function Scenarios() {
                 onClick={() => setCategory(cat)}
                 className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                   ${category === cat
-                    ? "bg-[#232323] text-[#F5F4F2] border-[#5C1A2E]"
-                    : "bg-white text-[#4A4A4A] border-[#E4E2DF] hover:border-[#C9A84C]"}`}
+                    ? "bg-panel-soft text-on-dark border-wine"
+                    : "bg-card text-ink-muted border-line hover:border-gold"}`}
               >
                 {CATEGORY_LABELS_KA[cat]}
               </button>
@@ -71,19 +71,19 @@ export default function Scenarios() {
                 key={c.id}
                 type="button"
                 onClick={() => setScenario(c)}
-                className="w-full text-left bg-white border border-[#E4E2DF] rounded-2xl p-4 shadow-sm hover:border-[#C9A84C] transition-colors"
+                className="w-full text-left bg-card border border-line rounded-2xl p-4 shadow-sm hover:border-gold transition-colors"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="ka text-[10px] uppercase tracking-wider text-[#C9A84C] font-bold">
+                    <p className="ka text-[10px] uppercase tracking-wider text-gold font-bold">
                       {CATEGORY_LABELS_KA[c.category]}
                     </p>
-                    <h2 className="ka text-base font-bold text-[#5C1A2E] mt-0.5">{c.titleKa}</h2>
-                    <p className="text-xs text-[#4A4A4A] mt-0.5">{c.titleEn}</p>
+                    <h2 className="ka text-base font-bold text-wine mt-0.5">{c.titleKa}</h2>
+                    <p className="text-xs text-ink-muted mt-0.5">{c.titleEn}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="ka text-[11px] text-[#4A4A4A]">{c.wordKeys.length} სიტყვა</p>
-                    <p className="text-[#5C1A2E] text-lg leading-none mt-1">→</p>
+                    <p className="ka text-[11px] text-ink-muted">{c.wordKeys.length} სიტყვა</p>
+                    <p className="text-wine text-lg leading-none mt-1">→</p>
                   </div>
                 </div>
               </button>
@@ -97,27 +97,27 @@ export default function Scenarios() {
           <button
             type="button"
             onClick={() => setScenario(null)}
-            className="ka text-xs text-[#4A4A4A] font-semibold mb-3 hover:text-[#5C1A2E] transition-colors"
+            className="ka text-xs text-ink-muted font-semibold mb-3 hover:text-wine transition-colors"
           >
             ← ყველა სცენარი
           </button>
 
           {/* Scene setup */}
-          <div className="rounded-3xl p-6 text-[#F5F4F2] bg-gradient-to-br from-[#232323] to-[#1C1C1E] shadow-lg">
-            <p className="ka text-[10px] uppercase tracking-wider text-[#C9A84C] font-bold">
+          <div className="rounded-3xl p-6 text-on-dark bg-gradient-to-br from-panel-soft to-panel shadow-lg">
+            <p className="ka text-[10px] uppercase tracking-wider text-gold font-bold">
               {CATEGORY_LABELS_KA[scenario.category]}
             </p>
             <h1 className="ka text-2xl font-bold mt-1">{scenario.titleKa}</h1>
-            <p className="text-sm text-[#F5F4F2]/80 mt-0.5">{scenario.titleEn}</p>
-            <p className="ka text-sm leading-relaxed mt-3 text-[#F5F4F2]/95">{scenario.scenarioKa}</p>
+            <p className="text-sm text-on-dark/80 mt-0.5">{scenario.titleEn}</p>
+            <p className="ka text-sm leading-relaxed mt-3 text-on-dark/95">{scenario.scenarioKa}</p>
           </div>
 
           {/* Words */}
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               სიტყვები ({scenario.wordKeys.length})
             </p>
-            <ul className="mt-2 divide-y divide-[#EFEEEC]">
+            <ul className="mt-2 divide-y divide-cream-2">
               {scenario.wordKeys.map((key) => {
                 const w = findWord(key);
                 if (!w) return null;
@@ -126,8 +126,8 @@ export default function Scenarios() {
                   <li key={key} className="py-2.5">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <span className="text-sm font-bold text-[#5C1A2E]">{w.en}</span>
-                        <span className="ka text-xs text-[#4A4A4A] ml-2">{w.ka}</span>
+                        <span className="text-sm font-bold text-wine">{w.en}</span>
+                        <span className="ka text-xs text-ink-muted ml-2">{w.ka}</span>
                       </div>
                       <ReadAloudButton text={w.en} storageKey={w.key} size="md" />
                     </div>
@@ -137,7 +137,7 @@ export default function Scenarios() {
                           <span
                             key={c.en}
                             title={c.ka}
-                            className="text-[10px] px-2 py-0.5 rounded-md bg-[#C9A84C]/15 border border-[#C9A84C]/30 text-[#5C1A2E] font-medium"
+                            className="text-[10px] px-2 py-0.5 rounded-md bg-gold/15 border border-gold/30 text-wine font-medium"
                           >
                             {c.en}
                           </span>
@@ -152,7 +152,7 @@ export default function Scenarios() {
 
           {/* Dialogue */}
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               დიალოგი
             </p>
             <div className="mt-2 space-y-3">
@@ -162,9 +162,9 @@ export default function Scenarios() {
                     <ReadAloudButton text={line.en} storageKey={`dlg-${scenario.id}-${i}`} size="md" />
                   </div>
                   <div className="min-w-0">
-                    <p className="ka text-[11px] font-bold text-[#C9A84C]">{line.speaker}</p>
-                    <p className="text-sm text-[#5C1A2E] leading-snug">{line.en}</p>
-                    <p className="ka text-xs text-[#4A4A4A] mt-0.5 leading-snug">{line.ka}</p>
+                    <p className="ka text-[11px] font-bold text-gold">{line.speaker}</p>
+                    <p className="text-sm text-wine leading-snug">{line.en}</p>
+                    <p className="ka text-xs text-ink-muted mt-0.5 leading-snug">{line.ka}</p>
                   </div>
                 </div>
               ))}
@@ -173,11 +173,11 @@ export default function Scenarios() {
 
           {/* Situation paragraph */}
           <BizCard className="mt-4">
-            <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               სიტუაცია
             </p>
-            <p className="text-sm text-[#5C1A2E] leading-relaxed mt-2">{scenario.paragraphEn}</p>
-            <p className="ka text-xs text-[#4A4A4A] leading-relaxed mt-2">{scenario.paragraphKa}</p>
+            <p className="text-sm text-wine leading-relaxed mt-2">{scenario.paragraphEn}</p>
+            <p className="ka text-xs text-ink-muted leading-relaxed mt-2">{scenario.paragraphKa}</p>
           </BizCard>
 
           {/* Practice CTA */}

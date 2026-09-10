@@ -74,17 +74,17 @@ export default function MyLexicon() {
   return (
     <BusinessShell seo={{ title: "ჩემი ლექსიკონი — SpeakBusy", description: "შენი პერსონალური ბიზნეს ლექსიკონი — სიტყვები და ფრაზები ერთ ადგილას.", path: "/path/business/lexicon" }} back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <header className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
+        <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           ბიზნეს ლექსიკონი
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ჩემი ლექსიკონი</h1>
-        <p className="ka text-sm text-[#4A4A4A] mt-1">
+        <h1 className="ka text-2xl font-bold text-wine mt-1">ჩემი ლექსიკონი</h1>
+        <p className="ka text-sm text-ink-muted mt-1">
           ფრაზები სესიებიდან და სიტყვები, რომლებიც შენ უკვე ისწავლე — ერთ ადგილას.
         </p>
       </header>
 
       {/* Tabs */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-[#F0EBE3] rounded-xl mb-4">
+      <div className="grid grid-cols-2 gap-1 p-1 bg-cream-2 rounded-xl mb-4">
         <TabBtn active={tab === "phrases"} onClick={() => setTab("phrases")}>
           ფრაზები
         </TabBtn>
@@ -112,8 +112,8 @@ function TabBtn({
       onClick={onClick}
       className={`ka text-sm font-semibold py-2 rounded-lg transition ${
         active
-          ? "bg-[#5C1A2E] text-[#F0EBE3] shadow-sm"
-          : "text-[#4A4A4A] hover:text-[#5C1A2E]"
+          ? "bg-wine text-cream-2 shadow-sm"
+          : "text-ink-muted hover:text-wine"
       }`}
     >
       {children}
@@ -199,13 +199,13 @@ function PhrasesTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep text-cream-2 border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#E5D4A8] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">
               სულ {totalPhrases} ფრაზაა შენახული
             </p>
-            <p className="ka text-[11px] text-[#F0EBE3]/70 mt-1">
+            <p className="ka text-[11px] text-cream-2/70 mt-1">
               {rows.length} სესია
             </p>
           </div>
@@ -216,12 +216,12 @@ function PhrasesTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა ფრაზებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-ink-muted">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F0EBE3] border border-[#E0D8D0] grid place-items-center text-[#5C1A2E]"><Library size={22} strokeWidth={2} /></div>
-          <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-3">ფრაზები ცარიელია</h3>
-          <p className="ka text-sm text-[#4A4A4A] mt-2 max-w-sm mx-auto">
+          <div className="mx-auto w-12 h-12 rounded-md bg-cream-2 border border-line-2 grid place-items-center text-wine"><Library size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-wine mt-3">ფრაზები ცარიელია</h3>
+          <p className="ka text-sm text-ink-muted mt-2 max-w-sm mx-auto">
             დაასრულე შენი პირველი სესია და შენახული ფრაზები აქ გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -232,7 +232,7 @@ function PhrasesTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#4A4A4A]">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-ink-muted">"{query}"-ის შესაბამისი ფრაზა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -250,44 +250,44 @@ function PhrasesTab() {
             const KindIcon = isInterview ? Briefcase : isMeeting ? Users : Mail;
             const date = formatKaDate(r.completed_at);
             return (
-              <div key={r.id} className="bg-white border border-[#E0D8D0] rounded-lg overflow-hidden transition">
+              <div key={r.id} className="bg-card border border-line-2 rounded-lg overflow-hidden transition">
                 <button
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F0EBE3] transition"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-cream-2 transition"
                 >
-                  <span className="shrink-0 w-9 h-9 rounded-md bg-[#5C1A2E]/5 border border-[#E0D8D0] text-[#5C1A2E] grid place-items-center">
+                  <span className="shrink-0 w-9 h-9 rounded-md bg-wine/5 border border-line-2 text-wine grid place-items-center">
                     <KindIcon size={16} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="ka text-sm font-semibold text-[#5C1A2E] break-words line-clamp-2">
+                    <p className="ka text-sm font-semibold text-wine break-words line-clamp-2">
                       {sectionLabel} — {title}
                     </p>
-                    <p className="ka text-[11px] text-[#4A4A4A] mt-0.5">
+                    <p className="ka text-[11px] text-ink-muted mt-0.5">
                       {date} · {vocab.length} ფრაზა
                     </p>
                   </div>
                   <ChevronDown
                     size={16}
                     strokeWidth={2.25}
-                    className={`shrink-0 text-[#4A4A4A] transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-ink-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-[#F0EBE3]">
+                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-cream-2">
                     {vocab.length === 0 ? (
-                      <p className="ka text-xs text-[#4A4A4A] py-2">ფრაზები ვერ მოიძებნა.</p>
+                      <p className="ka text-xs text-ink-muted py-2">ფრაზები ვერ მოიძებნა.</p>
                     ) : (
                       vocab.map((v, i) => (
-                        <div key={i} className="p-3 rounded-lg bg-[#F8F5F0] border border-[#E0D8D0]">
+                        <div key={i} className="p-3 rounded-lg bg-cream border border-line-2">
                           <div className="flex items-baseline justify-between gap-3">
-                            <p className="text-sm font-bold text-[#5C1A2E]">{v.en}</p>
+                            <p className="text-sm font-bold text-wine">{v.en}</p>
                           </div>
-                          <p className="ka text-xs text-[#4A4A4A] mt-0.5">{v.ka}</p>
+                          <p className="ka text-xs text-ink-muted mt-0.5">{v.ka}</p>
                           {v.exampleEn && (
-                            <p className="text-xs text-[#1C1C1E] mt-2 italic">"{v.exampleEn}"</p>
+                            <p className="text-xs text-ink mt-2 italic">"{v.exampleEn}"</p>
                           )}
                           {v.exampleKa && (
-                            <p className="ka text-[11px] text-[#4A4A4A]">{v.exampleKa}</p>
+                            <p className="ka text-[11px] text-ink-muted">{v.exampleKa}</p>
                           )}
                         </div>
                       ))
@@ -382,13 +382,13 @@ function WordsTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-[#5C1A2E] to-[#4A1525] text-[#F0EBE3] border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep text-cream-2 border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="ka text-[11px] uppercase tracking-wider text-[#E5D4A8] font-semibold">
+            <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">
               ჯერჯერობით {counts.total}&nbsp;სიტყვას "ვებრძვით" :)
             </p>
-            <p className="ka text-[11px] text-[#F0EBE3]/70 mt-1">
+            <p className="ka text-[11px] text-cream-2/70 mt-1">
               {counts.learned} ვიცი · {counts.learning} ვსწავლობ · {counts.fresh} ახალი
             </p>
           </div>
@@ -403,8 +403,8 @@ function WordsTab() {
             onClick={() => setFilter(f.id)}
             className={`ka shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition border
               ${filter === f.id
-                ? "bg-[#5C1A2E] text-[#F0EBE3] border-[#5C1A2E]"
-                : "bg-white text-[#5C1A2E] border-[#E0D8D0] hover:bg-[#F8F5F0]"}`}
+                ? "bg-wine text-cream-2 border-wine"
+                : "bg-card text-wine border-line-2 hover:bg-cream"}`}
           >
             {f.label}
             {f.id !== "all" && (
@@ -419,12 +419,12 @@ function WordsTab() {
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა სიტყვებში..." />
 
       {loading ? (
-        <BizCard><p className="ka text-sm text-[#4A4A4A]">იტვირთება...</p></BizCard>
+        <BizCard><p className="ka text-sm text-ink-muted">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
         <BizCard className="text-center py-10">
-          <div className="mx-auto w-12 h-12 rounded-md bg-[#F0EBE3] border border-[#E0D8D0] grid place-items-center text-[#5C1A2E]"><BookOpen size={22} strokeWidth={2} /></div>
-          <h3 className="ka text-lg font-bold text-[#5C1A2E] mt-3">ჯერ არ გისწავლია სიტყვა</h3>
-          <p className="ka text-sm text-[#4A4A4A] mt-2 max-w-sm mx-auto">
+          <div className="mx-auto w-12 h-12 rounded-md bg-cream-2 border border-line-2 grid place-items-center text-wine"><BookOpen size={22} strokeWidth={2} /></div>
+          <h3 className="ka text-lg font-bold text-wine mt-3">ჯერ არ გისწავლია სიტყვა</h3>
+          <p className="ka text-sm text-ink-muted mt-2 max-w-sm mx-auto">
             დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
           </p>
           <div className="mt-5">
@@ -435,7 +435,7 @@ function WordsTab() {
         </BizCard>
       ) : filtered.length === 0 ? (
         <BizCard className="text-center py-8">
-          <p className="ka text-sm text-[#4A4A4A]">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
+          <p className="ka text-sm text-ink-muted">შესაბამისი სიტყვა ვერ მოიძებნა.</p>
         </BizCard>
       ) : (
         <div className="space-y-2">
@@ -443,22 +443,22 @@ function WordsTab() {
             const w = progressToWord(r);
             if (!w) return null;
             return (
-              <div key={r.word_key} className="bg-white border border-[#E0D8D0] rounded-2xl p-4">
+              <div key={r.word_key} className="bg-card border border-line-2 rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-[#5C1A2E]">{w.en}</h3>
+                      <h3 className="text-base font-bold text-wine">{w.en}</h3>
                       <ReadAloudButton text={w.en} storageKey={w.key} size="sm" />
                     </div>
-                    <p className="ka text-xs text-[#4A4A4A] mt-0.5">{w.ka}</p>
+                    <p className="ka text-xs text-ink-muted mt-0.5">{w.ka}</p>
                     {w.pronunciation && (
-                      <p className="ka text-[10px] text-[#1C1C1E] font-mono mt-0.5">[{w.pronunciation}]</p>
+                      <p className="ka text-[10px] text-ink font-mono mt-0.5">[{w.pronunciation}]</p>
                     )}
                   </div>
                   <ConfidenceDot c={r.confidence} />
                 </div>
                 {w.explanationKa && (
-                  <p className="ka text-xs text-[#1C1C1E] mt-2">{w.explanationKa}</p>
+                  <p className="ka text-xs text-ink mt-2">{w.explanationKa}</p>
                 )}
                 {w.collocations && w.collocations.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
@@ -466,7 +466,7 @@ function WordsTab() {
                       <span
                         key={c.en}
                         title={c.ka}
-                        className="text-[10px] px-2 py-0.5 rounded-md bg-[#C9A84C]/15 border border-[#C9A84C]/35 text-[#5C1A2E] font-medium"
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-gold/15 border border-gold/35 text-wine font-medium"
                       >
                         {c.en}
                       </span>
@@ -474,13 +474,13 @@ function WordsTab() {
                   </div>
                 )}
                 {w.exampleEn && (
-                  <p className="text-xs text-[#5C1A2E] italic mt-2">"{w.exampleEn}"</p>
+                  <p className="text-xs text-wine italic mt-2">"{w.exampleEn}"</p>
                 )}
                 {w.example2En && w.example2En.trim() && (
-                  <p className="text-xs text-[#5C1A2E] italic mt-1">"{w.example2En}"</p>
+                  <p className="text-xs text-wine italic mt-1">"{w.example2En}"</p>
                 )}
-                <div className="mt-3 pt-3 border-t border-[#F0EBE3] flex items-center justify-between gap-2">
-                  <p className="ka text-[10px] text-[#4A4A4A]">
+                <div className="mt-3 pt-3 border-t border-cream-2 flex items-center justify-between gap-2">
+                  <p className="ka text-[10px] text-ink-muted">
                     წყარო: {sourceLabelKa(r.source)}
                   </p>
                   <div className="flex gap-1">
@@ -490,7 +490,7 @@ function WordsTab() {
                         onClick={() => setLabel(r, r.manual_label === l.id ? null : l.id)}
                         title={l.label}
                         className={`w-7 h-7 grid place-items-center rounded-md border transition
-                          ${r.manual_label === l.id ? "border-[#5C1A2E] bg-[#F0EBE3]" : "border-transparent hover:border-[#E0D8D0]"}`}
+                          ${r.manual_label === l.id ? "border-wine bg-cream-2" : "border-transparent hover:border-line-2"}`}
                       >
                         <span className="block w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
                       </button>
@@ -524,10 +524,10 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-[#E0D8D0] text-sm text-[#5C1A2E] placeholder:text-[#6B6B6B] outline-none focus:border-[#5C1A2E] transition"
+        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-card border border-line-2 text-sm text-wine placeholder:text-ink-muted-2 outline-none focus:border-wine transition"
       />
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A4A4A]"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
       >
         <circle cx="11" cy="11" r="7" />
@@ -542,7 +542,7 @@ function ConfidenceDot({ c }: { c: number }) {
   return (
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="w-2 h-2 rounded-full" style={{ background: colors[Math.min(5, c)] }} />
-      <span className="text-[10px] text-[#4A4A4A] font-mono">{c}/5</span>
+      <span className="text-[10px] text-ink-muted font-mono">{c}/5</span>
     </div>
   );
 }
