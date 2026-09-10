@@ -709,18 +709,16 @@ export default function InterviewModule() {
         <div className="space-y-3">
           <BizCard>
             <h2 className="ka text-lg font-bold text-[#1C1C1E]">აირჩიე გასაუბრების ტიპი</h2>
-            <p className="ka text-sm text-[#4A4A4A] mt-1">
-              სამი გზა ვარჯიშისთვის — რეალური ვაკანსიიდან შემთხვევით სცენარამდე.
-            </p>
+            <p className="ka text-sm text-[#4A4A4A] mt-1">{"\n"}</p>
             <p className="ka text-[11px] text-[#4A4A4A] mt-1.5">
-              ამ კვირაში დარჩა {aiRemaining}/{aiLimit} AI სესია — გასაუბრებები, დოკუმენტები და წარდგენა ერთ ბიუჯეტს იზიარებენ.
+              ამ კვირაში დარჩა {aiRemaining}/{aiLimit} AI სესია
             </p>
           </BizCard>
 
           <ModeCard
             titleKa="რეალური ვაკანსია"
             badgeKa="⭐ პრემიუმ"
-            descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოარგებს — სუსტ წერტილებზეც."
+            descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოერგება - სუსტ წერტილებზეც."
             emoji="🎯"
             locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser) || aiEmpty}
             lockedHintKa={
@@ -750,7 +748,7 @@ export default function InterviewModule() {
           />
           <ModeCard
             titleKa="შემთხვევითი გასაუბრება"
-            descKa="მზა როლი — გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
+            descKa="მზა როლი - გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
             emoji="🎲"
             locked={aiEmpty}
             lockedHintKa={aiLockedHint}
