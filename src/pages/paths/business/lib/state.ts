@@ -396,10 +396,10 @@ export const PRIORITY_LABELS: Record<BusinessPriority, string> = {
 };
 
 export const INTENSITY_LABELS: Record<BusinessIntensity, string> = {
-  light: "მსუბუქი რეჟიმი — 10 წუთი დღეში",
-  standard: "სტანდარტული — 20 წუთი დღეში",
-  intensive: "ინტენსიური — 30–40 წუთი დღეში",
-  deadline: "სწრაფი მიზანი — მაქვს კონკრეტული ვადა",
+  light: "მსუბუქი რეჟიმი - 10 წუთი დღეში",
+  standard: "სტანდარტული - 20 წუთი დღეში",
+  intensive: "ინტენსიური - 30–40 წუთი დღეში",
+  deadline: "სწრაფი მიზანი - მაქვს კონკრეტული ვადა",
 };
 
 export const DEADLINE_LABELS: Record<Exclude<BusinessDeadline, null>, string> = {
