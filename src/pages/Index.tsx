@@ -223,7 +223,7 @@ const Index = () => {
             </div>
           </div>
 
-          <WaveDivider fill="#F8F5F0" />
+          <WaveDivider fill="hsl(var(--cream))" />
         </section>
 
         {/* ═══════════════ VALUE CARDS ═══════════════ */}
@@ -258,7 +258,7 @@ const Index = () => {
         </section>
 
         {/* curved transition into modules */}
-        <WaveDivider fill="#F8F5F0" flip className="bg-white" />
+        <WaveDivider fill="hsl(var(--cream))" flip className="bg-white" />
 
         {/* ═══════════════ MODULES ═══════════════ */}
         <section className="bg-white py-20 sm:py-28">
@@ -292,7 +292,7 @@ const Index = () => {
         </section>
 
         {/* curved transition into CTA */}
-        <WaveDivider fill="#FFFFFF" flip className="bg-wine" />
+        <WaveDivider fill="hsl(var(--card))" flip className="bg-wine" />
 
         {/* ═══════════════ FINAL CTA ═══════════════ */}
         <section className="relative bg-wine text-white overflow-hidden">

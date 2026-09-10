@@ -235,7 +235,7 @@ export default function BusinessSetup() {
                     }`}
                   >
                     <span className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                      style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E4E2DF" }} />
+                      style={{ background: on ? "hsl(var(--wine))" : "transparent", borderColor: on ? "hsl(var(--wine))" : "hsl(var(--line))" }} />
                     {GOAL_LABELS[g]}
                   </button>
                 );
@@ -333,7 +333,7 @@ function SingleSelect<T extends string>({
             >
               <span
                 className="inline-block w-3.5 h-3.5 mr-2 rounded-full border align-middle"
-                style={{ background: on ? "#1C1C1E" : "transparent", borderColor: on ? "#1C1C1E" : "#E4E2DF" }}
+                style={{ background: on ? "hsl(var(--ink))" : "transparent", borderColor: on ? "hsl(var(--ink))" : "hsl(var(--line))" }}
               />
               {o.label}
             </button>
@@ -376,7 +376,7 @@ function MultiSelect<T extends string>({
             >
               <span
                 className="inline-block w-4 h-4 mr-2 rounded border align-middle"
-                style={{ background: on ? "#5C1A2E" : "transparent", borderColor: on ? "#5C1A2E" : "#E4E2DF" }}
+                style={{ background: on ? "hsl(var(--wine))" : "transparent", borderColor: on ? "hsl(var(--wine))" : "hsl(var(--line))" }}
               />
               {o.label}
             </button>
