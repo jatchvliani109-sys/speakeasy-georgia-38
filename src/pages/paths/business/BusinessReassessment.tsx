@@ -160,7 +160,14 @@ export default function BusinessReassessment() {
     }
 
     // Save new level — always update; preserves all other progress.
-    saveBusiness(user.id, { level: newLevel });
+    // The plan carries its own copy of the level (it is what the dashboard
+    // badge renders), so it must be updated too or the badge stays stale.
+    const cur = await pullBusinessFromSupabase(user.id);
+    saveBusiness(user.id, {
+      level: newLevel,
+      testCompleted: true,
+      ...(cur.plan ? { plan: { ...cur.plan, level: newLevel } } : {}),
+    } as any);
   };
 
   if (loading || !test) {
