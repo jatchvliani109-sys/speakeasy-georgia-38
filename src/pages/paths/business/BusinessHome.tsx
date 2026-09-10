@@ -763,7 +763,7 @@ export default function BusinessHome() {
                     შექმენი შენი პროფესიონალური წარდგენა
                   </p>
                   <p className="ka text-xs text-[#4A4A4A] mt-1">
-                    სასარგებლოა გასაუბრებებზე, networking-ზე და LinkedIn-ზე.
+                    სასარგებლოა გასაუბრებებზე, networking-ისთვის და LinkedIn-ზე.
                   </p>
                 </div>
                 <Link
