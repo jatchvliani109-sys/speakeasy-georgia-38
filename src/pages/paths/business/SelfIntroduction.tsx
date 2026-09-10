@@ -280,7 +280,7 @@ export default function SelfIntroduction() {
   return (
     <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
       <div className="mb-4">
-        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">პირველი ნაბიჯი</p>
+        <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">{"\n"}</p>
         <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი პროფესიონალური წარდგენა</h1>
         <p className="ka text-xs text-[#4A4A4A] mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
@@ -303,9 +303,9 @@ export default function SelfIntroduction() {
       {/* STEP 0: Friendly intro */}
       {step === 0 && (
         <BizCard className="mb-4">
-          <h2 className="ka text-xl font-bold text-[#5C1A2E]">პირველი ნაბიჯი: პროფესიონალური წარდგენა</h2>
+          <h2 className="ka text-xl font-bold text-[#5C1A2E]">პროფესიონალური წარდგენა</h2>
           <p className="ka text-sm text-[#1C1C1E] mt-2">
-            სანამ ბიზნეს ინგლისურის გაკვეთილებზე გადავალთ, შევქმნათ შენი მოკლე და ძლიერი ინგლისური წარდგენა.
+            {"\n"}
           </p>
           <div className="mt-4 space-y-2">
             <p className="ka text-sm text-[#5C1A2E]">
