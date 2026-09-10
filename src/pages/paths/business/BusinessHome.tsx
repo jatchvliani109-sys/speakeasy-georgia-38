@@ -325,7 +325,7 @@ export default function BusinessHome() {
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
               ? "კარგია, ასე გააგრძელე!"
-              : "დაიწყე დღეს — ერთი სესია საკმარისია";
+              : "დაიწყე დღეს - ერთი სესია საკმარისია";
   const streakDark = streakTier >= 3;
 
   // VOCAB-FIRST: vocabulary IS the daily mission — always. Interview stays a
@@ -816,7 +816,7 @@ export default function BusinessHome() {
               <MoreRow
                 icon={<FileText size={15} strokeWidth={2} />}
                 title="დოკუმენტების ასისტენტი"
-                sub="იმეილი, რეზიუმე, სამოტივაციო — შენი მონაცემებით"
+                sub="იმეილი, რეზიუმე, სამოტივაციო - შენი მონაცემებით"
                 onClick={() => navigate("/path/business/documents")}
               />
               <MoreRow
