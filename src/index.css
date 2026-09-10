@@ -132,8 +132,8 @@
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.45);
 
     /* Brand palette tokens (dark) */
-    --wine: 344 50% 56%;
-    --wine-deep: 344 45% 44%;
+    --wine: 344 42% 60%;
+    --wine-deep: 344 40% 48%;
     --wine-soft: 344 25% 30%;
     --gold: 43 62% 62%;
     --gold-soft: 43 55% 80%;
@@ -150,10 +150,10 @@
     --cream-2: 240 4% 14%;
     --line: 240 4% 24%;
     --line-2: 240 4% 28%;
-    --panel: 240 4% 16%;
-    --panel-soft: 240 3% 20%;
-    --panel-deep: 240 5% 6%;
-    --panel-line: 0 0% 28%;
+    --panel: 240 4% 22%;
+    --panel-soft: 240 4% 27%;
+    --panel-deep: 240 5% 7%;
+    --panel-line: 0 0% 34%;
     --danger: 6 70% 64%;
     --danger-deep: 8 70% 60%;
     --danger-soft: 6 40% 16%;
