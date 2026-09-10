@@ -113,7 +113,7 @@ export default function ResetPassword() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
+                className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
               />
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function ResetPassword() {
                 required
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
+                className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
               />
             </div>
             <button

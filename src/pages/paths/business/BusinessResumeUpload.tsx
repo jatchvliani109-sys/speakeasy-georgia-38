@@ -276,7 +276,7 @@ export default function BusinessResumeUpload() {
           </p>
           <div className="mt-3 p-4 rounded-xl bg-cream border border-line">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-panel-soft text-white grid place-items-center text-sm font-bold shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-panel-soft text-on-dark grid place-items-center text-sm font-bold shrink-0">
                 PDF
               </div>
               <div className="flex-1 min-w-0">
@@ -489,13 +489,13 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 rounded-lg border border-line text-sm text-wine outline-none focus:border-wine bg-white resize-none"
+          className="w-full px-3 py-2 rounded-lg border border-line text-sm text-wine outline-none focus:border-wine bg-card resize-none"
         />
       ) : (
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-line text-sm text-wine outline-none focus:border-wine bg-white"
+          className="w-full px-3 py-2 rounded-lg border border-line text-sm text-wine outline-none focus:border-wine bg-card"
         />
       )}
     </div>

@@ -46,7 +46,7 @@ export default function Scenarios() {
               className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                 ${category === null
                   ? "bg-panel-soft text-on-dark border-wine"
-                  : "bg-white text-ink-muted border-line hover:border-gold"}`}
+                  : "bg-card text-ink-muted border-line hover:border-gold"}`}
             >
               ყველა
             </button>
@@ -58,7 +58,7 @@ export default function Scenarios() {
                 className={`ka text-xs px-3 py-1.5 rounded-full border font-semibold transition-colors
                   ${category === cat
                     ? "bg-panel-soft text-on-dark border-wine"
-                    : "bg-white text-ink-muted border-line hover:border-gold"}`}
+                    : "bg-card text-ink-muted border-line hover:border-gold"}`}
               >
                 {CATEGORY_LABELS_KA[cat]}
               </button>
@@ -71,7 +71,7 @@ export default function Scenarios() {
                 key={c.id}
                 type="button"
                 onClick={() => setScenario(c)}
-                className="w-full text-left bg-white border border-line rounded-2xl p-4 shadow-sm hover:border-gold transition-colors"
+                className="w-full text-left bg-card border border-line rounded-2xl p-4 shadow-sm hover:border-gold transition-colors"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">

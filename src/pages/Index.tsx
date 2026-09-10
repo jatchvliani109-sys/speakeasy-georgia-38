@@ -170,11 +170,11 @@ const Index = () => {
 
       <main className="flex-1">
         {/* ═══════════════ HERO ═══════════════ */}
-        <section className="relative overflow-hidden bg-panel text-white">
+        <section className="relative overflow-hidden bg-panel text-on-dark">
           <CircleRing className="w-[520px] h-[520px] -top-40 -right-40" />
           <CircleRing className="w-[320px] h-[320px] top-1/2 -left-24" />
-          <Dots className="top-10 right-10 text-white opacity-40" />
-          <Dots className="bottom-14 left-10 text-white opacity-25" />
+          <Dots className="top-10 right-10 text-on-dark opacity-40" />
+          <Dots className="bottom-14 left-10 text-on-dark opacity-25" />
           <GoldLine className="top-28 left-0 w-28" />
           <GoldLine className="bottom-36 right-0 w-20" />
           <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
@@ -216,7 +216,7 @@ const Index = () => {
               </Link>
               <Link
                 to="/auth?mode=login"
-                className="text-sm font-semibold text-on-dark-subtle hover:text-white transition-colors ka underline-offset-4 hover:underline"
+                className="text-sm font-semibold text-on-dark-subtle hover:text-on-dark transition-colors ka underline-offset-4 hover:underline"
               >
                 უკვე გაქვს ანგარიში? შედი
               </Link>
@@ -244,7 +244,7 @@ const Index = () => {
               {valueCards.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="group relative bg-white border border-line-2 rounded-2xl p-8 hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
+                  className="group relative bg-card border border-line-2 rounded-2xl p-8 hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
                 >
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-wine text-gold mb-5">
                     <Icon className="w-6 h-6" />
@@ -258,10 +258,10 @@ const Index = () => {
         </section>
 
         {/* curved transition into modules */}
-        <WaveDivider fill="hsl(var(--cream))" flip className="bg-white" />
+        <WaveDivider fill="hsl(var(--cream))" flip className="bg-card" />
 
         {/* ═══════════════ MODULES ═══════════════ */}
-        <section className="bg-white py-20 sm:py-28">
+        <section className="bg-card py-20 sm:py-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-gold mb-3">
@@ -278,7 +278,7 @@ const Index = () => {
               {modules.map(({ icon: Icon, title, body }) => (
                 <div
                   key={title}
-                  className="relative bg-cream border border-line-2 rounded-2xl p-6 hover:bg-white hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
+                  className="relative bg-cream border border-line-2 rounded-2xl p-6 hover:bg-card hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
                 >
                   <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-panel text-gold mb-4">
                     <Icon className="w-5 h-5" />
@@ -295,11 +295,11 @@ const Index = () => {
         <WaveDivider fill="hsl(var(--card))" flip className="bg-wine" />
 
         {/* ═══════════════ FINAL CTA ═══════════════ */}
-        <section className="relative bg-wine text-white overflow-hidden">
-          <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-white" />
-          <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-white" />
+        <section className="relative bg-wine text-on-dark overflow-hidden">
+          <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-on-dark" />
+          <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-on-dark" />
           <GoldLine className="top-16 right-10 w-24" />
-          <Dots className="bottom-10 right-20 text-white opacity-20" />
+          <Dots className="bottom-10 right-20 text-on-dark opacity-20" />
 
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center relative z-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
@@ -340,7 +340,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy Instagram-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-white/5 hover:border-gold/50 transition-colors"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-gold/50 transition-colors"
                 >
                   <Instagram size={16} strokeWidth={2} />
                   Instagram
@@ -350,7 +350,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy TikTok-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-white/5 hover:border-gold/50 transition-colors"
+                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-gold/50 transition-colors"
                 >
                   <TikTokIcon />
                   TikTok

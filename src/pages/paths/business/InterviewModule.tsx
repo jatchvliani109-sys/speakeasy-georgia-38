@@ -777,7 +777,7 @@ export default function InterviewModule() {
               onChange={(e) => setJobPosting(e.target.value)}
               rows={10}
               placeholder="Paste the job description here..."
-              className="mt-3 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink focus:outline-none focus:border-wine"
+              className="mt-3 w-full rounded-xl border border-line bg-card p-3 text-sm text-ink focus:outline-none focus:border-wine"
             />
             <div className="mt-3 flex gap-2">
               <BizButton
@@ -850,7 +850,7 @@ export default function InterviewModule() {
               <p className="ka text-xs text-ink-muted mt-1">{previouslyLearned.topicKa}</p>
               <div className="mt-2 space-y-1.5">
                 {previouslyLearned.phrases.map((p, i) => (
-                  <div key={i} className="p-2 rounded-lg bg-white border border-line">
+                  <div key={i} className="p-2 rounded-lg bg-card border border-line">
                     <p className="text-sm text-wine font-medium">"{p.en}"</p>
                     <p className="ka text-[11px] text-ink-muted">{p.ka}</p>
                   </div>
@@ -974,7 +974,7 @@ export default function InterviewModule() {
           {/* Conversation */}
           <div
             ref={chatRef}
-            className="bg-white border border-line rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
+            className="bg-card border border-line rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
           >
             {history.map((t, i) => (
               <div
@@ -1162,7 +1162,7 @@ export default function InterviewModule() {
                   <div key={i} className="p-3 rounded-lg bg-cream border border-line">
                     <p className="text-sm font-semibold text-ink">{m.questionEn}</p>
                     <p className="ka text-[11px] text-danger mt-1">{m.theirAnswerKa}</p>
-                    <div className="mt-2 p-2 rounded-lg bg-white border border-line">
+                    <div className="mt-2 p-2 rounded-lg bg-card border border-line">
                       <p className="text-sm text-ink">{m.modelAnswerEn}</p>
                     </div>
                     <p className="ka text-[11px] text-sage mt-1.5">✓ {m.whyStrongerKa}</p>
@@ -1299,7 +1299,7 @@ function ModeCard({
         "w-full text-left p-4 rounded-2xl border transition-colors",
         locked
           ? "border-line bg-cream opacity-80"
-          : "border-line bg-white hover:border-wine/40 hover:bg-wine/5",
+          : "border-line bg-card hover:border-wine/40 hover:bg-wine/5",
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
@@ -1378,7 +1378,7 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`mt-0.5 shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] ${
-          ok ? "bg-sage text-white" : "bg-line text-ink-muted"
+          ok ? "bg-sage text-on-dark" : "bg-line text-ink-muted"
         }`}
       >
         {ok ? "✓" : "—"}

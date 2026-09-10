@@ -240,7 +240,7 @@ export default function Auth() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
+              className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
             />
           </div>
           <div>
@@ -263,7 +263,7 @@ export default function Auth() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
+              className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
             />
           </div>
           {mode === "signup" && (
@@ -346,7 +346,7 @@ export default function Auth() {
               setLoading(false);
             }
           }}
-          className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-line bg-white text-sm font-semibold text-ink hover:bg-cream transition-colors disabled:opacity-60 ka"
+          className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border border-line bg-card text-sm font-semibold text-ink hover:bg-cream transition-colors disabled:opacity-60 ka"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z" />

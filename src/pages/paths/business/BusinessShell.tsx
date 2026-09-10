@@ -45,7 +45,7 @@ export default function BusinessShell({
 
 export function BizCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`bg-white border border-line rounded-lg p-5 ${className}`}>
+    <div className={`bg-card border border-line rounded-lg p-5 ${className}`}>
       {children}
     </div>
   );

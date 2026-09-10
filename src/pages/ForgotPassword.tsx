@@ -113,7 +113,7 @@ export default function ForgotPassword() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 mt-1.5 rounded-lg bg-white border-line focus-visible:ring-ink"
+              className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
             />
           </div>
           <button

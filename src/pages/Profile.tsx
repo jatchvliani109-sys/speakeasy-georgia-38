@@ -330,7 +330,7 @@ export default function Profile() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={60}
                 placeholder="შენი სახელი"
-                className="ka mt-1 w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-white"
+                className="ka mt-1 w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
               />
             </div>
             <div className="flex items-center gap-2 text-ink-muted">
@@ -350,7 +350,7 @@ export default function Profile() {
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="ახალი ელფოსტა"
                   autoComplete="email"
-                  className="ka flex-1 min-w-0 px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-white"
+                  className="ka flex-1 min-w-0 px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
                 />
                 <button
                   onClick={handleEmailChange}
@@ -430,7 +430,7 @@ export default function Profile() {
                 className={`ka inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
                     ? "bg-panel-soft text-on-dark border-wine"
-                    : "bg-white text-ink border-line hover:border-wine/40"
+                    : "bg-card text-ink border-line hover:border-wine/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}
@@ -457,7 +457,7 @@ export default function Profile() {
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-colors border ${
                   on
                     ? "bg-panel-soft text-on-dark border-wine"
-                    : "bg-white text-ink border-line hover:border-wine/40"
+                    : "bg-card text-ink border-line hover:border-wine/40"
                 }`}
               >
                 {on && <Check size={12} strokeWidth={2.5} />}
@@ -480,7 +480,7 @@ export default function Profile() {
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="ახალი პაროლი"
             autoComplete="new-password"
-            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-white"
+            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
           />
           <input
             type="password"
@@ -488,7 +488,7 @@ export default function Profile() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="გაიმეორე ახალი პაროლი"
             autoComplete="new-password"
-            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-white"
+            className="ka w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-sm bg-card"
           />
           <button
             onClick={handlePasswordChange}
@@ -707,13 +707,13 @@ export default function Profile() {
               value={deleteConfirm}
               onChange={(e) => setDeleteConfirm(e.target.value)}
               placeholder="წაშლა"
-              className="ka w-full px-3 py-2 rounded-md border border-danger/40 focus:border-danger focus:outline-none text-ink text-sm bg-white"
+              className="ka w-full px-3 py-2 rounded-md border border-danger/40 focus:border-danger focus:outline-none text-ink text-sm bg-card"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleting || deleteConfirm.trim() !== "წაშლა"}
-                className="ka flex-1 px-3 py-2 rounded-md bg-danger text-white text-xs font-bold disabled:opacity-40"
+                className="ka flex-1 px-3 py-2 rounded-md bg-danger text-on-dark text-xs font-bold disabled:opacity-40"
               >
                 {deleting ? "იშლება..." : "საბოლოოდ წაშლა"}
               </button>

@@ -169,7 +169,7 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
         "inline-flex items-center justify-center rounded-full border transition-colors select-none",
         active
           ? "border-wine/40 bg-wine/5 text-wine"
-          : "border-line bg-white/70 text-ink-muted hover:text-wine hover:border-wine/30 hover:bg-wine/5",
+          : "border-line bg-card/70 text-ink-muted hover:text-wine hover:border-wine/30 hover:bg-wine/5",
         sizeCls,
         className,
       ].join(" ")}

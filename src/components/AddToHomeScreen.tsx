@@ -104,7 +104,7 @@ export default function AddToHomeScreen() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-      <div className="mx-auto max-w-md rounded-2xl bg-white border border-line shadow-[0_8px_30px_-8px_rgba(28,28,30,0.35)] p-4">
+      <div className="mx-auto max-w-md rounded-2xl bg-card border border-line shadow-[0_8px_30px_-8px_rgba(28,28,30,0.35)] p-4">
         <div className="flex items-start gap-3">
           <span className="w-10 h-10 rounded-xl bg-wine text-on-dark grid place-items-center shrink-0 font-bold text-sm">
             SB

@@ -658,7 +658,7 @@ export default function SelfIntroduction() {
               </button>
               <button
                 onClick={() => { setStep(1); setResult(null); setInputs(emptyInputs); }}
-                className="ka w-full px-5 py-3 rounded-2xl border border-wine/15 bg-white/60 text-wine font-medium text-sm hover:bg-white hover:border-wine/30 transition-all duration-200"
+                className="ka w-full px-5 py-3 rounded-2xl border border-wine/15 bg-card/60 text-wine font-medium text-sm hover:bg-card hover:border-wine/30 transition-all duration-200"
               >
                 ჩემი წარდგენის რედაქტირება
               </button>
@@ -707,7 +707,7 @@ export default function SelfIntroduction() {
 }
 
 // ---------- subcomponents ----------
-const inputCls = "w-full px-3 py-2 rounded-lg border border-line text-sm outline-none focus:border-wine bg-white";
+const inputCls = "w-full px-3 py-2 rounded-lg border border-line text-sm outline-none focus:border-wine bg-card";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -733,7 +733,7 @@ function VersionCard({
         <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">{label}</p>
         <button onClick={onSelect}
           className={`ka text-[11px] px-2.5 py-1 rounded-full border ${
-            isSelected ? "bg-panel-soft text-white border-wine" : "border-line text-wine"}`}>
+            isSelected ? "bg-panel-soft text-on-dark border-wine" : "border-line text-wine"}`}>
           {isSelected ? "არჩეული" : "Use this"}
         </button>
       </div>
@@ -796,7 +796,7 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
           {ex.options.map((opt, i) => (
             <button key={i} onClick={() => { setPick(i); setChecked(null); }}
               className={`block w-full text-left text-xs px-3 py-2 rounded border ${
-                pick === i ? "border-wine bg-white" : "border-line bg-white"}`}>
+                pick === i ? "border-wine bg-card" : "border-line bg-card"}`}>
               {opt}
             </button>
           ))}

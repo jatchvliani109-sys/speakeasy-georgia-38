@@ -675,7 +675,7 @@ export default function VocabularyModule() {
             type="button"
             onClick={toggleSound}
             title={soundOn ? "ხმის გამორთვა" : "ხმის ჩართვა"}
-            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-line text-ink-muted hover:text-wine hover:bg-white transition"
+            className="ka text-[11px] inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-line text-ink-muted hover:text-wine hover:bg-card transition"
           >
             {soundOn ? <Volume2 size={13} strokeWidth={2.25} /> : <VolumeX size={13} strokeWidth={2.25} />}
             <span>{soundOn ? "ხმა ჩართულია" : "ხმა გამორთულია"}</span>
@@ -685,7 +685,7 @@ export default function VocabularyModule() {
 
       {stage === "quiz" && combo >= 2 && (
         <div className="mb-3 flex items-center justify-end">
-          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-panel to-gold text-white text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
+          <div className={`ka inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-panel to-gold text-on-dark text-xs font-bold shadow-sm transition-all ${progressPulse ? "biz-progress-pulse" : ""}`}>
             <span className="biz-flame">🔥</span>
             {combo} სწორი ზედიზედ
           </div>
@@ -1054,7 +1054,7 @@ function WordCard({
 }) {
   const ctx = getContext(word.key);
   return (
-    <div key={word.key} className="biz-card-flip bg-white border border-line rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
+    <div key={word.key} className="biz-card-flip bg-card border border-line rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-3xl font-bold text-wine tracking-tight">{word.en}</h2>
@@ -1073,7 +1073,7 @@ function WordCard({
           className={`ka mt-3 text-[11px] px-3 py-1.5 rounded-full border font-semibold transition-colors
             ${claimed
               ? "border-gold bg-gold/15 text-wine"
-              : "border-line bg-white text-ink-muted hover:border-gold hover:text-wine"}
+              : "border-line bg-card text-ink-muted hover:border-gold hover:text-wine"}
           `}
         >
           {claimed ? "✓ ვიცი — ქვიზში დავადასტურებ" : "ვიცი ეს სიტყვა"}
@@ -1230,7 +1230,7 @@ function ReportWordButton({ word }: { word: VocabWord }) {
           rows={2}
           maxLength={300}
           placeholder="დამატებითი დეტალი (არასავალდებულო)"
-          className="ka mt-2 w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-xs bg-white resize-none"
+          className="ka mt-2 w-full px-3 py-2 rounded-md border border-line focus:border-wine focus:outline-none text-ink text-xs bg-card resize-none"
         />
       )}
       <div className="flex items-center gap-2 mt-2">
@@ -1430,8 +1430,8 @@ function QuestionCard({
               ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
               ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
               ${!revealed && isSelected ? "border-wine bg-cream text-wine" : ""}
-              ${!revealed && !isSelected ? "border-line bg-white text-wine hover:bg-cream" : ""}
-              ${revealed && !isCorrect && !isWrongPick ? "border-line bg-white text-ink-muted opacity-60" : ""}
+              ${!revealed && !isSelected ? "border-line bg-card text-wine hover:bg-cream" : ""}
+              ${revealed && !isCorrect && !isWrongPick ? "border-line bg-card text-ink-muted opacity-60" : ""}
             `}
           >
             <span className={typeof label === "string" && label.match(/[ა-ჰ]/) ? "ka" : ""}>{label}</span>
@@ -1445,7 +1445,7 @@ function QuestionCard({
   switch (q.type) {
     case "mc_meaning":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">აირჩიე სწორი თარგმანი</p>
           <div className="mt-3 flex items-center gap-2">
             <h3 className="text-2xl font-bold text-wine">{q.en}</h3>
@@ -1456,7 +1456,7 @@ function QuestionCard({
       );
     case "tr_en_to_ka":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">English → ქართული</p>
           <h3 className="text-2xl font-bold text-wine mt-3">{q.en}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1464,7 +1464,7 @@ function QuestionCard({
       );
     case "tr_ka_to_en":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">ქართული → English</p>
           <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1472,7 +1472,7 @@ function QuestionCard({
       );
     case "fill_blank":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი</p>
           <p className="text-lg text-wine mt-3 leading-relaxed">{q.sentence}</p>
           <p className="ka text-xs text-ink-muted mt-1">{q.ka}</p>
@@ -1481,7 +1481,7 @@ function QuestionCard({
       );
     case "true_false":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">სწორი თუ არასწორი თარგმანი?</p>
           <div className="mt-3 p-4 rounded-xl bg-cream border border-line">
             <p className="text-xl font-bold text-wine">{q.en}</p>
@@ -1498,7 +1498,7 @@ function QuestionCard({
       );
     case "sentence_correct":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-sm text-wine">{q.promptKa}</p>
           {renderChoices(
             q.choices.map((c, i) => ({ label: c, value: i })),
@@ -1508,7 +1508,7 @@ function QuestionCard({
       );
     case "georgian_mistake":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">გავრცელებული შეცდომა</p>
           <p className="ka text-sm text-wine mt-2">{q.promptKa}</p>
           {renderChoices(
@@ -1522,7 +1522,7 @@ function QuestionCard({
       );
     case "odd_one_out":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           {renderChoices(
             q.options.map((o, i) => ({ label: `${o.en} — ${o.ka}`, value: i })),
@@ -1532,7 +1532,7 @@ function QuestionCard({
       );
     case "synonym_match":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1540,7 +1540,7 @@ function QuestionCard({
       );
     case "sentence_definition":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="text-lg text-ink mt-3 leading-relaxed">
             {q.before}
@@ -1554,7 +1554,7 @@ function QuestionCard({
       );
     case "definition_match":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="ka text-base text-ink mt-3 leading-relaxed">{q.definitionKa}</p>
           {renderChoices(q.choices, q.correct)}
@@ -1562,7 +1562,7 @@ function QuestionCard({
       );
     case "collocation":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="text-2xl font-bold text-wine mt-3 tracking-tight">{q.phraseEn}</p>
           <p className="ka text-xs text-ink-muted mt-1">{q.hintKa}</p>
@@ -1571,7 +1571,7 @@ function QuestionCard({
       );
     case "listening":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">მოისმინე და აირჩიე მნიშვნელობა</p>
           <div className="mt-4 flex flex-col items-center gap-2">
             <div className="p-5 rounded-full bg-cream border border-line">
@@ -1594,7 +1594,7 @@ function QuestionCard({
       return <TypeWordCard q={q} revealed={revealed} submit={(v) => setSelected(v)} />;
     case "context_cloze":
       return (
-        <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი სიტუაციაში</p>
           <span className="ka inline-block mt-2 text-[11px] text-wine bg-gold/20 border border-gold/35 px-2 py-0.5 rounded-md font-semibold">
             {q.titleKa}
@@ -1626,7 +1626,7 @@ function TypeWordCard({
   };
 
   return (
-    <div className="bg-white border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+    <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
       <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">დაწერე სიტყვა ინგლისურად</p>
       <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
       <p className="text-lg font-mono tracking-[0.25em] text-ink-muted mt-2">{q.hint}</p>
@@ -1646,7 +1646,7 @@ function TypeWordCard({
           className={`ka flex-1 min-w-0 px-4 py-3 rounded-xl border text-base outline-none transition-colors
             ${revealed && isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900" : ""}
             ${revealed && !isCorrect ? "border-red-400 bg-red-50 text-red-900" : ""}
-            ${!revealed ? "border-line bg-white text-ink focus:border-wine" : ""}
+            ${!revealed ? "border-line bg-card text-ink focus:border-wine" : ""}
           `}
         />
         {!revealed && (
@@ -1882,7 +1882,7 @@ function Results({
 
 function SummaryStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white border border-line rounded-xl p-3 text-center">
+    <div className="bg-card border border-line rounded-xl p-3 text-center">
       <p className="text-xl font-bold text-wine">{value}</p>
       <p className="ka text-[10px] text-ink-muted uppercase tracking-wider mt-0.5">{label}</p>
     </div>

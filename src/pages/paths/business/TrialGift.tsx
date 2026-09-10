@@ -260,7 +260,7 @@ export default function TrialGift() {
 
           {/* what they get */}
           <div
-            className="bg-white px-7 py-6"
+            className="bg-card px-7 py-6"
             style={{
               opacity: stage >= 3 ? 1 : 0,
               transform: stage >= 3 ? "translateY(0)" : "translateY(10px)",
@@ -327,7 +327,7 @@ export default function TrialGift() {
               </button>
             </>
           ) : (
-            <div className="rounded-2xl border border-line bg-white p-5 text-center">
+            <div className="rounded-2xl border border-line bg-card p-5 text-center">
               <p className="ka text-sm text-ink font-semibold">
                 დარწმუნებული ხარ?
               </p>

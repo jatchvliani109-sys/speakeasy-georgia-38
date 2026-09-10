@@ -395,7 +395,7 @@ export default function BusinessHome() {
             onKeyDown={(e) => { if (e.key === "Enter") submitName(); }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka bg-white border-line"
+            className="ka bg-card border-line"
           />
           <DialogFooter>
             <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
@@ -415,7 +415,7 @@ export default function BusinessHome() {
             გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
           </h1>
           {plan && (
-            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-ink-muted border border-line bg-white px-2 py-0.5 rounded-full">
+            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-ink-muted border border-line bg-card px-2 py-0.5 rounded-full">
               {LEVEL_LABELS[s.level ?? plan.level]}
             </span>
           )}
@@ -448,8 +448,8 @@ export default function BusinessHome() {
                     : streakTier === 2
                       ? "bg-gradient-to-br from-gold/30 to-white border-gold"
                       : streakTier === 1
-                        ? "bg-white border-gold/60"
-                        : "bg-white border-line"
+                        ? "bg-card border-gold/60"
+                        : "bg-card border-line"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
@@ -742,7 +742,7 @@ export default function BusinessHome() {
                     onClick={() =>
                       navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
                     }
-                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-white hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-on-dark hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                   >
                     {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                     <ArrowRight size={14} strokeWidth={2.25} />
@@ -805,7 +805,7 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1">
               მეტი
             </p>
-            <div className="bg-white border border-line rounded-lg divide-y divide-cream">
+            <div className="bg-card border border-line rounded-lg divide-y divide-cream">
               <MoreRow
                 icon={<Briefcase size={15} strokeWidth={2} />}
                 title="გასაუბრება"
@@ -1076,7 +1076,7 @@ function SocialRow() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="SpeakBusy Instagram-ზე"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white text-wine text-xs font-semibold hover:border-wine/40 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-card text-wine text-xs font-semibold hover:border-wine/40 transition-colors"
         >
           <Instagram size={14} strokeWidth={2.25} />
           Instagram
@@ -1086,7 +1086,7 @@ function SocialRow() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="SpeakBusy TikTok-ზე"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white text-wine text-xs font-semibold hover:border-wine/40 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-card text-wine text-xs font-semibold hover:border-wine/40 transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 1 1 .77-5.06V9.7a5.66 5.66 0 0 0-.77-.05 5.68 5.68 0 1 0 5.68 5.68V8.99a7.35 7.35 0 0 0 4.29 1.37V7.27a4.29 4.29 0 0 1-3.23-1.45z" />

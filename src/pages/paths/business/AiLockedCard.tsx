@@ -23,7 +23,7 @@ export default function AiLockedCard({
   trialAvailable?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-white p-6 text-center">
+    <div className="rounded-2xl border border-line bg-card p-6 text-center">
       <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-wine/8 text-wine">
         <Lock size={20} strokeWidth={2} />
       </span>

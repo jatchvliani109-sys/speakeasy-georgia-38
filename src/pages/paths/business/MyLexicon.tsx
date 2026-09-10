@@ -250,7 +250,7 @@ function PhrasesTab() {
             const KindIcon = isInterview ? Briefcase : isMeeting ? Users : Mail;
             const date = formatKaDate(r.completed_at);
             return (
-              <div key={r.id} className="bg-white border border-line-2 rounded-lg overflow-hidden transition">
+              <div key={r.id} className="bg-card border border-line-2 rounded-lg overflow-hidden transition">
                 <button
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-cream-2 transition"
@@ -404,7 +404,7 @@ function WordsTab() {
             className={`ka shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition border
               ${filter === f.id
                 ? "bg-wine text-cream-2 border-wine"
-                : "bg-white text-wine border-line-2 hover:bg-cream"}`}
+                : "bg-card text-wine border-line-2 hover:bg-cream"}`}
           >
             {f.label}
             {f.id !== "all" && (
@@ -443,7 +443,7 @@ function WordsTab() {
             const w = progressToWord(r);
             if (!w) return null;
             return (
-              <div key={r.word_key} className="bg-white border border-line-2 rounded-2xl p-4">
+              <div key={r.word_key} className="bg-card border border-line-2 rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -524,7 +524,7 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-white border border-line-2 text-sm text-wine placeholder:text-ink-muted-2 outline-none focus:border-wine transition"
+        className="ka w-full pl-9 pr-3 py-3 rounded-xl bg-card border border-line-2 text-sm text-wine placeholder:text-ink-muted-2 outline-none focus:border-wine transition"
       />
       <svg
         className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted"

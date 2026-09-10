@@ -215,7 +215,7 @@ function HomeView({
             <button
               key={t.id}
               onClick={() => onTool(t.id)}
-              className="text-left bg-white border border-line rounded-lg p-4 hover:border-wine/50 transition-colors"
+              className="text-left bg-card border border-line rounded-lg p-4 hover:border-wine/50 transition-colors"
             >
               <span className="w-9 h-9 rounded-md bg-panel-soft text-on-dark grid place-items-center mb-3">
                 <Icon size={16} strokeWidth={2} />
@@ -261,7 +261,7 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-line rounded-md p-3 hover:border-wine/50 transition-colors flex items-center gap-3"
+      className="w-full text-left bg-card border border-line rounded-md p-3 hover:border-wine/50 transition-colors flex items-center gap-3"
     >
       <span className="w-9 h-9 rounded-md bg-wine/5 border border-line text-wine grid place-items-center shrink-0">
         <Icon size={16} strokeWidth={2} />
@@ -318,7 +318,7 @@ function LibraryView({
             className={`ka text-xs px-3 py-1.5 rounded-full border ${
               filter === f
                 ? "bg-panel-soft text-on-dark border-wine"
-                : "bg-white text-wine border-line hover:border-wine/40"
+                : "bg-card text-wine border-line hover:border-wine/40"
             }`}
           >
             {f === "all" ? "ყველა" : DOC_TYPE_LABELS[f]}
@@ -494,7 +494,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             onChange={(e) => setIntent(e.target.value)}
             rows={4}
             placeholder="მაგ. მინდა მენეჯერს ვუთხრა რომ პროექტი ერთი კვირით გადადება..."
-            className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+            className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
           />
           <div className="flex justify-end mt-3">
             <BizButton onClick={() => setStep(1)} disabled={!intent.trim()}>
@@ -511,7 +511,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             placeholder="მაგ. ჩემს მენეჯერს, კლიენტს, HR-ს..."
-            className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+            className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
           />
           <Label className="mt-4">ურთიერთობა</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
@@ -542,7 +542,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
             onChange={(e) => setOutcome(e.target.value)}
             rows={3}
             placeholder="მაგ. დასტური ან თანხმობა გადადებაზე, შეხვედრის დანიშვნა..."
-            className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+            className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
           />
           <Label className="mt-4">ტონი</Label>
           <div className="grid grid-cols-2 gap-2 mt-2">
@@ -636,14 +636,14 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
           onChange={(e) => setOriginal(e.target.value)}
           rows={10}
           placeholder="ჩასვი აქ შენი არსებული იმეილი..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <Label className="mt-4">ვის ეგზავნება? (არასავალდებულო)</Label>
         <input
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
           placeholder="მაგ. მენეჯერი, კლიენტი, HR..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <Label className="mt-4">რა არის მიზანი? (არასავალდებულო)</Label>
         <textarea
@@ -651,7 +651,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
           onChange={(e) => setPurpose(e.target.value)}
           rows={2}
           placeholder="რის გადაცემა გინდა ან რა შედეგი გინდა მიიღო..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <Label className="mt-4">ტონი</Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
@@ -743,7 +743,7 @@ function CoverLetterFlow({
           value={jobTitle}
           onChange={(e) => setJobTitle(e.target.value)}
           placeholder="Product Manager"
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <Label className="mt-4">სამუშაოს აღწერა (არასავალდებულო)</Label>
         <textarea
@@ -751,7 +751,7 @@ function CoverLetterFlow({
           onChange={(e) => setJobDescription(e.target.value)}
           rows={6}
           placeholder="ჩასვი ვაკანსიის ტექსტი — წერილი უფრო კარგად მოერგება..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <div className="flex justify-end mt-4">
           <BizButton onClick={generate} disabled={loading || !jobTitle.trim()}>
@@ -837,7 +837,7 @@ function ResumeImproveFlow({
           onChange={(e) => setResumeText(e.target.value)}
           rows={8}
           placeholder="ჩასვი რეზიუმეს ტექსტი..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-xs font-mono focus:outline-none focus:border-wine"
         />
         <Label className="mt-4">სამიზნე პოზიცია (არასავალდებულო)</Label>
         <textarea
@@ -845,7 +845,7 @@ function ResumeImproveFlow({
           onChange={(e) => setJobDescription(e.target.value)}
           rows={4}
           placeholder="ვაკანსიის აღწერა — keywords უფრო ზუსტი იქნება..."
-          className="w-full mt-2 rounded-xl border border-line bg-white px-3 py-2 text-sm focus:outline-none focus:border-wine"
+          className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <div className="flex justify-end mt-4">
           <BizButton onClick={generate} disabled={loading || !resumeText.trim()}>
@@ -1103,7 +1103,7 @@ function DocView({
 
       {/* Document — hidden for bio (BioVersions covers all three) */}
       {!(doc.doc_type === "bio" && !editing) && (
-        <article className="bg-white border border-line rounded-2xl p-6 shadow-[0_1px_2px_rgba(92,26,46,0.04),0_8px_24px_-12px_rgba(92,26,46,0.12)]">
+        <article className="bg-card border border-line rounded-2xl p-6 shadow-[0_1px_2px_rgba(92,26,46,0.04),0_8px_24px_-12px_rgba(92,26,46,0.12)]">
           {editing ? (
             <textarea
               value={editContent}
@@ -1148,11 +1148,11 @@ function DocView({
                 შედარება — ორიგინალი / გაუმჯობესებული
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-white border border-line rounded-2xl p-4">
+                <div className="bg-card border border-line rounded-2xl p-4">
                   <p className="ka text-[10px] uppercase tracking-wider text-danger font-semibold mb-2">ორიგინალი</p>
                   <p className="text-xs whitespace-pre-wrap font-serif text-wine leading-relaxed">{original}</p>
                 </div>
-                <div className="bg-white border border-sage-line rounded-2xl p-4">
+                <div className="bg-card border border-sage-line rounded-2xl p-4">
                   <p className="ka text-[10px] uppercase tracking-wider text-sage font-semibold mb-2">გაუმჯობესებული</p>
                   <p className="text-xs whitespace-pre-wrap font-serif text-wine leading-relaxed">{doc.content}</p>
                 </div>
@@ -1165,7 +1165,7 @@ function DocView({
                 </p>
                 <ul className="space-y-2">
                   {changes.map((c, i) => (
-                    <li key={i} className="bg-white border border-line rounded-xl p-3">
+                    <li key={i} className="bg-card border border-line rounded-xl p-3">
                       <div className="text-[11px] grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div className="bg-danger-soft rounded-md px-2 py-1.5">
                           <span className="ka font-semibold text-danger">Before: </span>
@@ -1230,7 +1230,7 @@ function DocView({
                 key={o.id}
                 disabled={adjusting}
                 onClick={() => adjust(o.id)}
-                className="ka text-xs px-3 py-1.5 rounded-full border border-line bg-white hover:border-wine/40 text-wine disabled:opacity-50"
+                className="ka text-xs px-3 py-1.5 rounded-full border border-line bg-card hover:border-wine/40 text-wine disabled:opacity-50"
               >
                 {o.label}
               </button>
@@ -1286,7 +1286,7 @@ function Chip({
       className={`ka text-xs px-3 py-2 rounded-xl border text-left ${
         active
           ? "bg-panel-soft text-on-dark border-wine"
-          : "bg-white text-wine border-line hover:border-wine/40"
+          : "bg-card text-wine border-line hover:border-wine/40"
       }`}
     >
       {children}
@@ -1394,7 +1394,7 @@ function BioVersions({
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={k === "full" ? 10 : k === "medium" ? 6 : 4}
-                  className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm font-serif text-wine focus:outline-none focus:border-wine"
+                  className="w-full rounded-xl border border-line bg-card px-3 py-2 text-sm font-serif text-wine focus:outline-none focus:border-wine"
                 />
                 <div className="flex justify-end gap-2 mt-2">
                   <BizButton variant="ghost" onClick={() => setEditingKey(null)}>გაუქმება</BizButton>
