@@ -209,9 +209,9 @@ export default function BusinessSetup() {
         <p className="ka text-[11px] uppercase tracking-wider text-[#1C1C1E] font-semibold">
           ნაბიჯი {step + 2} / 4
         </p>
-        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">ბიზნეს ინგლისურის დაყენება</h1>
+        <h1 className="ka text-2xl font-bold text-[#5C1A2E] mt-1">შენი მიზანი</h1>
         <p className="ka text-sm text-[#4A4A4A] mt-1">
-          {displayName ? `${displayName}, მ` : "მ"}ითხარი რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
+          niniebi, გვითხარი&nbsp;რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
       </div>
 
