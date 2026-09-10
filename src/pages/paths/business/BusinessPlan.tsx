@@ -105,7 +105,7 @@ export default function BusinessPlan() {
       </BizCard>
 
       <BizButton className="w-full" onClick={() => navigate("/path/business/resume", { replace: true })}>
-        გეგმის დაწყება — პირველი ნაბიჯი
+         გაგრძელება
       </BizButton>
     </BusinessShell>
   );
