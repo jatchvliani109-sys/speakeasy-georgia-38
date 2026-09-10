@@ -425,8 +425,7 @@ export default function BusinessHome() {
       {levelUnmeasured && (
         <BizCard className="mb-4 border-l-2 border-l-[#C9A84C]">
           <p className="ka text-sm text-[#1C1C1E]">
-            შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი
-            (თუ არ გინდა გამოტოვე :)&nbsp; no pressure!)
+            შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი (no pressure!)
           </p>
           <div className="mt-3">
             <BizButton variant="outline" onClick={() => navigate("/path/business/test")}>
@@ -647,7 +646,7 @@ export default function BusinessHome() {
                   <p className="ka text-[13px] font-bold text-[#F5F4F2] truncate">
                     {trialEndingSoon(s)
                       ? `პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
-                      : `პრემიუმი გააქტიურებულია — დარჩა ${trialDaysLeft(s)} დღე`}
+                       : `პრემიუმი გააქტიურებულია - დარჩა ${trialDaysLeft(s)} დღე`}
                   </p>
                   <p className="ka text-[11px] text-[#F5F4F2]/70 truncate">
                     {trialEndingSoon(s)
