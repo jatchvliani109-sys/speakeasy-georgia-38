@@ -305,12 +305,12 @@ export function shouldShowTrialEnd(state: BusinessState | null | undefined, now:
 }
 
 /**
- * Words that must be learned before AI unlocks during the trial.
+ * Words that must be at ვიცი level before AI unlocks during the trial.
  *
- * Confidence 2 means a word has been answered correctly on two separate days,
- * so 20 of them is genuine, sustained use. Deliberately NOT mastery: mastery
- * needs a fourth correct answer that the review schedule does not surface until
- * around day 12, so no trial user could ever reach it.
+ * Confidence 4 is what the lexicon shows as ვიცი, so this is the same thing
+ * the user already sees, not a hidden second metric. Reaching it takes several
+ * clean sessions per word: any wrong answer knocks the word back down, so 20 of
+ * them cannot be rushed.
  *
  * The point is that AI sessions go to people actually learning, not to
  * throwaway accounts made to sample them.
@@ -322,7 +322,9 @@ export function trialUnlockProgress(
   rows: { confidence: number; manual_label?: string | null }[] | null | undefined,
 ): number {
   if (!rows?.length) return 0;
-  return rows.filter((r) => r.manual_label === "easy" || (r.confidence ?? 0) >= 2).length;
+  // confidence 4+ is the ვიცი tab. A claimed word counts too: claiming
+  // requires a typed proof in the quiz, so it is not a free pass.
+  return rows.filter((r) => r.manual_label === "easy" || (r.confidence ?? 0) >= 4).length;
 }
 
 /**
