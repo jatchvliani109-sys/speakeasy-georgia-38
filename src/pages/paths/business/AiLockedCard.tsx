@@ -16,12 +16,60 @@ export default function AiLockedCard({
   title,
   description,
   trialAvailable,
+  unlockProgress,
+  unlockTarget,
 }: {
   title: string;
   description: string;
   /** True if the 7-day gift has not been used yet. */
   trialAvailable?: boolean;
+  /** During the trial: words learned so far toward the AI unlock. */
+  unlockProgress?: number;
+  unlockTarget?: number;
 }) {
+  // Trial user who has not yet earned AI access. Framed as a target rather
+  // than a refusal: they already have the trial, this is the next step in it.
+  if (typeof unlockProgress === "number" && typeof unlockTarget === "number") {
+    const pct = Math.min(100, Math.round((unlockProgress / unlockTarget) * 100));
+    return (
+      <div className="rounded-2xl border border-line bg-card p-6 text-center">
+        <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-gold/15 text-gold">
+          <Sparkles size={20} strokeWidth={2} />
+        </span>
+
+        <h3 className="ka text-base font-bold text-wine mt-4">{title}</h3>
+        <p className="ka text-sm text-ink-muted mt-2 leading-relaxed max-w-sm mx-auto">
+          {description}
+        </p>
+
+        <div className="mt-5 rounded-xl bg-cream border border-line p-4">
+          <p className="ka text-sm font-bold text-ink">
+            ისწავლე {unlockTarget} სიტყვა და გაიხსნება
+          </p>
+
+          <div className="mt-3 h-2 rounded-full bg-line overflow-hidden">
+            <div
+              className="h-full bg-gold transition-all duration-700"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+
+          <p className="ka text-[13px] text-ink-muted mt-2 tabular-nums">
+            {unlockProgress} / {unlockTarget}
+          </p>
+        </div>
+
+        <Link
+          to="/path/business/vocabulary"
+          className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
+        >
+          სესიის დაწყება
+          <ArrowRight size={16} strokeWidth={2.25} />
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-line bg-card p-6 text-center">
       <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-wine/8 text-wine">

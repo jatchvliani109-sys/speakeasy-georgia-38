@@ -304,6 +304,40 @@ export function shouldShowTrialEnd(state: BusinessState | null | undefined, now:
   return !!ends && now >= ends;
 }
 
+/**
+ * Words that must be learned before AI unlocks during the trial.
+ *
+ * Confidence 2 means a word has been answered correctly on two separate days,
+ * so 20 of them is genuine, sustained use. Deliberately NOT mastery: mastery
+ * needs a fourth correct answer that the review schedule does not surface until
+ * around day 12, so no trial user could ever reach it.
+ *
+ * The point is that AI sessions go to people actually learning, not to
+ * throwaway accounts made to sample them.
+ */
+export const TRIAL_AI_UNLOCK_WORDS = 20;
+
+/** How many words currently count toward the unlock. */
+export function trialUnlockProgress(
+  rows: { confidence: number; manual_label?: string | null }[] | null | undefined,
+): number {
+  if (!rows?.length) return 0;
+  return rows.filter((r) => r.manual_label === "easy" || (r.confidence ?? 0) >= 2).length;
+}
+
+/**
+ * Is AI unlocked for a trial user? Applies ONLY during the trial: paying users
+ * are never gated, and free users have no AI at all regardless.
+ */
+export function trialAiUnlocked(
+  state: BusinessState | null | undefined,
+  rows: { confidence: number; manual_label?: string | null }[] | null | undefined,
+): boolean {
+  if (state?.mockPro === true) return true;
+  if (!isTrialActive(state)) return true;
+  return trialUnlockProgress(rows) >= TRIAL_AI_UNLOCK_WORDS;
+}
+
 /** True when the user has no AI access at all — free tier, no active trial. */
 export function aiLocked(state: BusinessState | null | undefined): boolean {
   return state?.mockPro !== true && !isTrialActive(state);

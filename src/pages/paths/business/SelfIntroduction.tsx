@@ -23,6 +23,9 @@ import {
   aiLocked,
   shouldOfferTrial,
   type BusinessState,
+  trialUnlockProgress,
+  TRIAL_AI_UNLOCK_WORDS,
+  isTrialActive,
 } from "./lib/state";
 import AiLockedCard from "./AiLockedCard";
 
@@ -131,6 +134,27 @@ export default function SelfIntroduction() {
   // Business state decides AI access. It was previously fetched and discarded —
   // only its side effects were used.
   const [biz, setBiz] = useState<BusinessState | null>(() => null);
+  // Trial users unlock AI by learning 20 words. Computed from vocabulary
+  // progress, not from the state blob.
+  const [unlockWords, setUnlockWords] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase
+          .from("business_vocab_progress")
+          .select("confidence, manual_label")
+          .eq("user_id", user.id);
+        if (!cancelled) setUnlockWords(trialUnlockProgress(data ?? []));
+      } catch {
+        if (!cancelled) setUnlockWords(0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
 
   useEffect(() => {
     if (!user) return;
@@ -265,6 +289,21 @@ export default function SelfIntroduction() {
 
   // No AI access — locked but visible, so the value stays legible rather than
   // the feature simply vanishing from the app.
+  // Trial user who has not yet earned AI access.
+  if (!aiLocked(biz) && isTrialActive(biz) && unlockWords !== null &&
+      unlockWords < TRIAL_AI_UNLOCK_WORDS) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="თვითპრეზენტაცია"
+          description="შექმენი პროფესიონალური თვითპრეზენტაცია ინგლისურად."
+          unlockProgress={unlockWords}
+          unlockTarget={TRIAL_AI_UNLOCK_WORDS}
+        />
+      </BusinessShell>
+    );
+  }
+
   if (aiLocked(biz)) {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>

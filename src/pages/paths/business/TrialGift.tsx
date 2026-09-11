@@ -10,6 +10,7 @@ import {
   pullBusinessFromSupabase,
   saveBusinessAsync,
   shouldOfferTrial,
+  TRIAL_AI_UNLOCK_WORDS,
 } from "./lib/state";
 
 /**
@@ -275,7 +276,7 @@ export default function TrialGift() {
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
               title={`${TRIAL_AI_TOTAL} AI სესია`}
-              sub="გასაუბრების სიმულაცია, დოკუმენტები, თვითპრეზენტაცია - პრემიუმში 7 სესია ყოველ კვირას"
+              sub={`იხსნება ${TRIAL_AI_UNLOCK_WORDS} სიტყვის სწავლის შემდეგ. გასაუბრება, დოკუმენტები, თვითპრეზენტაცია`}
             />
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}

@@ -19,7 +19,7 @@ import {
   saveDocument,
   updateDocument,
 } from "./lib/docs";
-import { aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, type BusinessState } from "./lib/state";
+import { aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, type BusinessState, trialUnlockProgress, TRIAL_AI_UNLOCK_WORDS, isTrialActive} from "./lib/state";
 import AiLockedCard from "./AiLockedCard";
 
 // Every document generation draws one session from the unified weekly AI
@@ -57,6 +57,26 @@ export default function DocumentHelper() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<DocsProfile | null>(null);
   const [state, setState] = useState<BusinessState | null>(null);
+  // Trial users unlock AI by learning 20 words.
+  const [unlockWords, setUnlockWords] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase
+          .from("business_vocab_progress")
+          .select("confidence, manual_label")
+          .eq("user_id", user.id);
+        if (!cancelled) setUnlockWords(trialUnlockProgress(data ?? []));
+      } catch {
+        if (!cancelled) setUnlockWords(0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   const [resumeReady, setResumeReady] = useState(false);
   const [docs, setDocs] = useState<BusinessDocument[]>([]);
   const [searchParams] = useSearchParams();
@@ -155,6 +175,17 @@ export default function DocumentHelper() {
         </BizCard>
       )}
 
+      {/* Trial user who has not yet earned AI access. */}
+      {!aiLocked(state) && isTrialActive(state) && unlockWords !== null &&
+        unlockWords < TRIAL_AI_UNLOCK_WORDS && (
+        <AiLockedCard
+          title="დოკუმენტების ასისტენტი"
+          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით."
+          unlockProgress={unlockWords}
+          unlockTarget={TRIAL_AI_UNLOCK_WORDS}
+        />
+      )}
+
       {aiLocked(state) && (
         <AiLockedCard
           title="დოკუმენტების ასისტენტი"
@@ -163,7 +194,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && view.kind === "home" && (
+      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && !(isTrialActive(state) && unlockWords !== null && unlockWords < TRIAL_AI_UNLOCK_WORDS) && view.kind === "home" && (
         <HomeView
           docs={docs}
           onTool={(t) => setView({ kind: "tool", tool: t })}
@@ -184,7 +215,7 @@ export default function DocumentHelper() {
         />
       )}
 
-      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && view.kind === "tool" && (
+      {!aiLocked(state) && aiSessionsRemaining(state) > 0 && !(isTrialActive(state) && unlockWords !== null && unlockWords < TRIAL_AI_UNLOCK_WORDS) && view.kind === "tool" && (
         <ToolView
           tool={view.tool}
           profile={profile}

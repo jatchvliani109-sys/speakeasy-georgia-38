@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
-import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, tryConsumeAiSession } from "./lib/state";
+import { BusinessState, FIELD_LABELS, PRIORITY_LABELS, aiSessionsRemaining, aiWeeklyLimit, aiLocked, shouldOfferTrial, pullBusinessFromSupabase, tryConsumeAiSession, trialUnlockProgress, TRIAL_AI_UNLOCK_WORDS, isTrialActive} from "./lib/state";
 import AiLockedCard from "./AiLockedCard";
 import { interviewStep, extractPreviouslyLearned, type CurriculumStep, type PreviouslyLearned } from "./lib/curriculum";
 import { randomRoleCard, type RoleCard } from "./lib/roleCards";
@@ -120,6 +120,32 @@ export default function InterviewModule() {
   // No AI access at all (free tier, no active trial) — show the locked card
   // rather than a spent-quota message, which would imply they once had some.
   const noAiAccess = aiLocked(biz);
+  // Trial users unlock AI by learning 20 words. Loaded here because the gate is
+  // computed from vocabulary progress, not from the state blob.
+  const [unlockWords, setUnlockWords] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase
+          .from("business_vocab_progress")
+          .select("confidence, manual_label")
+          .eq("user_id", user.id);
+        if (!cancelled) setUnlockWords(trialUnlockProgress(data ?? []));
+      } catch {
+        if (!cancelled) setUnlockWords(0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Gate applies only during an active trial; paying users are never gated.
+  const trialGateClosed =
+    !noAiAccess && isTrialActive(biz) && unlockWords !== null &&
+    unlockWords < TRIAL_AI_UNLOCK_WORDS;
+
   const [session, setSession] = useState<SessionData | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -652,6 +678,19 @@ export default function InterviewModule() {
   // ---- No AI access: locked, but visible ----
   // Placed after the loading state (so `biz` is populated) and before every
   // interactive step, so no path into the interview bypasses it.
+  if (trialGateClosed) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="გასაუბრების სიმულაცია"
+          description="ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება."
+          unlockProgress={unlockWords ?? 0}
+          unlockTarget={TRIAL_AI_UNLOCK_WORDS}
+        />
+      </BusinessShell>
+    );
+  }
+
   if (noAiAccess) {
     return (
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
