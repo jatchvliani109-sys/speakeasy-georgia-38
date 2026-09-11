@@ -994,32 +994,20 @@ function makeContextCloze(word: VocabWord): QuizQuestion | null {
   };
 }
 
-// ---- Odd-one-out: three words share a field/theme, one doesn't belong. ----
-// Uses field grouping when available, else falls back to "same source" cohort.
-// Bank-wide: works for any word that has at least 3 field/cohort peers.
-function makeOddOneOut(word: VocabWord, pool: VocabWord[]): QuizQuestion | null {
-  // Only FIELD words carry a real semantic category (marketing, finance, hr...).
-  // Core words were previously grouped by curriculum WEEK, which means nothing
-  // semantically — that produced genuinely unanswerable sets such as
-  // "Next steps / Leverage point / Risk / Downsizing". Skip those entirely.
-  if (!word.field) return null;
-  const peers = pool.filter((w) => w.key !== word.key && w.field === word.field);
-  // The odd one must come from a DIFFERENT named field, so the contrast is
-  // category-vs-category rather than "one random word".
-  const outsiders = pool.filter((w) => w.field && w.field !== word.field);
-  if (peers.length < 2 || outsiders.length < 1) return null;
-  const group = [word, ...pick(peers, 2)]; // 3 that belong (incl. the target)
-  const odd = pick(outsiders, 1)[0];
-  const options = shuffle([...group, odd]).map((w) => ({ en: w.en, ka: w.ka }));
-  const correctIndex = options.findIndex((o) => o.en === odd.en);
-  return {
-    type: "odd_one_out",
-    wordKey: word.key,
-    promptKa: "რომელი სიტყვა არ ერგება დანარჩენებს?",
-    options,
-    correctIndex,
-  };
-}
+// ---- Odd-one-out: REMOVED ----
+//
+// Scored against the word being practised, but the correct answer was a
+// DIFFERENT word: the one that did not belong. A learner could answer
+// correctly without knowing the target word at all, and the confidence gain
+// landed on a word they had never engaged with. That is weak evidence of
+// knowledge anywhere, and actively wrong now that confidence gates AI access.
+//
+// The grouping was also invisible: options were grouped by professional field,
+// which is internal metadata, so the question gave no way to tell what kind of
+// "fitting" was meant.
+//
+// The QuizQuestion type and the UI cases are left in place: they are simply
+// unreachable now, and removing them would touch files for no benefit.
 
 // ---- Sentence definition: infer meaning from CONTEXT. ----
 // Shows a real example sentence with the target word highlighted and asks which
@@ -1131,9 +1119,9 @@ function makeSynonymMatch(word: VocabWord, pool: VocabWord[]): QuizQuestion {
 // (type_word, context_cloze, fill_blank) fall back to safe formats in buildQuiz.
 type Generator = (w: VocabWord, p: VocabWord[]) => QuizQuestion | null;
 const NEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeOddOneOut, makeSynonymMatch, makeDefinitionMatch],
-  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeOddOneOut, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
-  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeOddOneOut, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
+  1: [makeMcMeaning, makeListening, makeTrueFalse, makeTrEnToKa, makeSynonymMatch, makeDefinitionMatch],
+  2: [makeMcMeaning, makeFillBlank, makeListening, makeSentenceCorrect, makeTrEnToKa, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
+  3: [makeFillBlank, makeContextCloze, makeListening, makeSentenceCorrect, makeTrKaToEn, makeCollocation, makeDefinitionMatch, makeSentenceDefinition],
 };
 // Second-pass generators for NEW words: retrieval-heavier than the first pass,
 // so each new word is first recognized, then actively recalled/produced.
@@ -1143,8 +1131,8 @@ const NEW_SECOND_PASS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
   3: [makeTypeWord, makeContextCloze, makeTrKaToEn, makeFillBlank, makeCollocation],
 };
 const REVIEW_GENERATORS_BY_TIER: Record<1 | 2 | 3, Generator[]> = {
-  1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse, makeOddOneOut, makeSynonymMatch],
-  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeOddOneOut, makeCollocation, makeSentenceDefinition],
+  1: [makeMcMeaning, makeListening, makeTrKaToEn, makeTrueFalse, makeSynonymMatch],
+  2: [makeFillBlank, makeTypeWord, makeListening, makeTrKaToEn, makeContextCloze, makeCollocation, makeSentenceDefinition],
   3: [makeTypeWord, makeContextCloze, makeFillBlank, makeTrKaToEn, makeListening, makeCollocation],
 };
 
