@@ -6,18 +6,22 @@ import { Share, Plus, X, Download } from "lucide-react";
  *
  * Deliberately restrained:
  * - never on desktop, never once already installed
- * - not on the very first visit — asking a stranger to install is a bad trade;
+ * - not on the very first visit, since asking a stranger to install is a bad trade;
  *   we wait until someone has come back, which signals actual interest
- * - dismissible, and the dismissal is remembered for 60 days
+ * - shown once per session, not once ever: a prompt seen a single time is
+ *   easy to dismiss reflexively and then never see again, and for a website
+ *   with no notifications the home screen icon is the main way anyone comes
+ *   back
+ * - permanently dismissible, but only if the user explicitly asks for that
  *
  * Android/Chrome exposes `beforeinstallprompt`, so there we can offer a real
- * one-tap install. iOS Safari has no such API — Apple requires the user to go
- * through the Share menu — so there we can only show instructions.
+ * one-tap install. iOS Safari has no such API. Apple requires the user to go
+ * through the Share menu, so there we can only show instructions.
  */
 
-const DISMISS_KEY = "speakbusy:a2hs-dismissed-at";
+const NEVER_KEY = "speakbusy:a2hs-never";      // "აღარ მაჩვენო" was ticked
+const SESSION_KEY = "speakbusy:a2hs-seen";     // shown already this session
 const VISITS_KEY = "speakbusy:visits";
-const DISMISS_DAYS = 60;
 const MIN_VISITS = 2;
 
 type Platform = "ios" | "android" | "other";
@@ -38,12 +42,23 @@ function isStandalone(): boolean {
   return (navigator as unknown as { standalone?: boolean }).standalone === true;
 }
 
-function dismissedRecently(): boolean {
+/** The user asked never to see this again. Permanent, and per device. */
+function dismissedForever(): boolean {
   try {
-    const raw = localStorage.getItem(DISMISS_KEY);
-    if (!raw) return false;
-    const days = (Date.now() - Number(raw)) / 86_400_000;
-    return days < DISMISS_DAYS;
+    return localStorage.getItem(NEVER_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Already shown this session. sessionStorage, not localStorage, so it clears
+ * when the tab closes: the prompt returns on the next visit but does not
+ * reappear while the user moves between pages.
+ */
+function seenThisSession(): boolean {
+  try {
+    return sessionStorage.getItem(SESSION_KEY) === "1";
   } catch {
     return false;
   }
@@ -63,12 +78,13 @@ export default function AddToHomeScreen() {
   const [show, setShow] = useState(false);
   const [platform, setPlatform] = useState<Platform>("other");
   const [installEvent, setInstallEvent] = useState<any>(null);
+  const [never, setNever] = useState(false);
 
   useEffect(() => {
     const p = detectPlatform();
     setPlatform(p);
 
-    if (p === "other" || isStandalone() || dismissedRecently()) return;
+    if (p === "other" || isStandalone() || dismissedForever() || seenThisSession()) return;
     const visits = bumpVisits();
     if (visits < MIN_VISITS) return;
 
@@ -79,16 +95,34 @@ export default function AddToHomeScreen() {
     };
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
 
-    // Let the page settle first — appearing mid-render feels like an ad.
-    const t = window.setTimeout(() => setShow(true), 2500);
+    // Let the page settle first. Appearing mid-render feels like an ad.
+    const t = window.setTimeout(() => {
+      setShow(true);
+      // Marked when it is SHOWN, not when dismissed: otherwise navigating away
+      // before dismissing would make it reappear on the next page.
+      try { sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
+    }, 2500);
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.clearTimeout(t);
     };
   }, []);
 
+  /**
+   * Closing hides it for this session. It only stops coming back if the user
+   * explicitly asked for that, which is the whole point of the change: a
+   * reflexive dismissal should not silently remove the prompt forever.
+   */
   const dismiss = () => {
-    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch { /* ignore */ }
+    if (never) {
+      try { localStorage.setItem(NEVER_KEY, "1"); } catch { /* ignore */ }
+    }
+    setShow(false);
+  };
+
+  /** Installing means they never need the prompt again. */
+  const dismissPermanently = () => {
+    try { localStorage.setItem(NEVER_KEY, "1"); } catch { /* ignore */ }
     setShow(false);
   };
 
@@ -97,7 +131,7 @@ export default function AddToHomeScreen() {
     installEvent.prompt();
     try { await installEvent.userChoice; } catch { /* ignore */ }
     setInstallEvent(null);
-    dismiss();
+    dismissPermanently();
   };
 
   if (!show) return null;
@@ -114,7 +148,7 @@ export default function AddToHomeScreen() {
               დაამატე SpeakBusy მთავარ ეკრანზე
             </p>
             <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
-              გაიხსნება აპივით — სწრაფად, ბრაუზერის ზოლის გარეშე.
+              გაიხსნება აპივით, სწრაფად და ბრაუზერის ზოლის გარეშე.
             </p>
           </div>
           <button
@@ -161,6 +195,18 @@ export default function AddToHomeScreen() {
             </li>
           </ol>
         )}
+
+        {/* Opt out permanently. Without this the prompt would return every
+            session with no way to stop it, which is worse than showing it once. */}
+        <label className="flex items-center gap-2 mt-3 pt-3 border-t border-line cursor-pointer">
+          <input
+            type="checkbox"
+            checked={never}
+            onChange={(e) => setNever(e.target.checked)}
+            className="w-4 h-4 shrink-0 accent-wine cursor-pointer"
+          />
+          <span className="ka text-xs text-ink-muted">აღარ მაჩვენო</span>
+        </label>
       </div>
     </div>
   );
