@@ -19,6 +19,7 @@ import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import TikiCat from "@/components/TikiCat";
+import TikiWake from "@/components/TikiWake";
 import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -98,6 +99,17 @@ export default function BusinessHome() {
   // the dashboard to a celebration reads as the app noticing, rather than as
   // one more panel at the end of a session.
   const [milestoneCelebration, setMilestoneCelebration] = useState<number | null>(null);
+
+  // Tiki: walks in, sleeps above the focus card, then after a while wakes,
+  // stretches and jumps down the page to sit at the bottom. Two components
+  // because they are two sheets; the handover is a single timer.
+  //
+  // TikiCat runs 8s (5 walk cycles plus the settle), so the nap starts then.
+  const [tikiAwake, setTikiAwake] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setTikiAwake(true), 26000);
+    return () => window.clearTimeout(t);
+  }, []);
   // A broken Streak previously passed in silence: 40 days became 1 with no
   // acknowledgement, at exactly the moment a user is most likely to give up.
   // Held here so the dashboard can say something once, then move on.
@@ -686,7 +698,16 @@ export default function BusinessHome() {
             {/* Tiki walks in from the left and lies down above the right-hand
                 end of the card, where he stays asleep until the page unmounts.
                 Keyed on the mount so he replays each time the dashboard opens. */}
-            <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
+            {!tikiAwake ? (
+              <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
+            ) : (
+              // Starts where TikiCat left him: same size, same 76% across.
+              <div className="relative w-full" style={{ height: 36 }}>
+                <div className="absolute" style={{ left: "76%", transform: "translateX(-34px)" }}>
+                  <TikiWake size={34} dropDistance={300} driftX={20} delay={0} />
+                </div>
+              </div>
+            )}
             <div className="relative overflow-hidden rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
