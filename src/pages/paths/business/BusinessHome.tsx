@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
+import TikiCat from "@/components/TikiCat";
 import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -318,9 +319,9 @@ export default function BusinessHome() {
     streakTier === 4
       ? "ლეგენდარული Streak 👑"
       : streakTier === 3
-        ? "ორ კვირაზე მეტი — სერიოზული ხარ 🏆"
+        ? "ორ კვირაზე მეტი, სერიოზული ხარ 🏆"
         : streakTier === 2
-          ? "კვირაზე მეტი — შთამბეჭდავია!"
+          ? "კვირაზე მეტი, შთამბეჭდავია!"
           : streakTier === 1
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
@@ -379,13 +380,13 @@ export default function BusinessHome() {
     : "ჯერ არ გაგივლია";
 
   return (
-    <BusinessShell seo={{ title: "ჩემი სწავლება — SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა — დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
+    <BusinessShell seo={{ title: "ჩემი სწავლება, SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა, დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
       <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
         <DialogContent className="bg-cream border-line">
           <DialogHeader>
             <DialogTitle className="ka text-wine">როგორ დაგიძახოთ?</DialogTitle>
             <DialogDescription className="ka text-ink-muted">
-              შეიყვანე შენი სახელი — ამ სახელით მოგმართავთ აპლიკაციაში.
+              შეიყვანე შენი სახელი, ამ სახელით მოგმართავთ აპლიკაციაში.
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -437,7 +438,7 @@ export default function BusinessHome() {
 
       {plan && (
         <>
-          {/* Daily streak — drama scales with the count. */}
+          {/* Daily streak, drama scales with the count. */}
           <section className="mb-5">
             <div
               className={`rounded-lg p-4 border transition-colors ${
@@ -630,7 +631,7 @@ export default function BusinessHome() {
             </BizCard>
           )}
 
-          {/* Trial banner — shown INSTEAD of the upgrade prompt while the trial
+          {/* Trial banner, shown INSTEAD of the upgrade prompt while the trial
               is live. Framed around what they currently have, not what they are
               about to lose; the countdown supplies the urgency on its own. */}
           {s && isTrialActive(s) && (
@@ -650,7 +651,7 @@ export default function BusinessHome() {
                   </p>
                   <p className="ka text-[11px] text-on-dark/70 truncate">
                     {trialEndingSoon(s)
-                      ? "შეინარჩუნე ულიმიტო წვდომა — ნახე პრემიუმი"
+                      ? "შეინარჩუნე ულიმიტო წვდომა, ნახე პრემიუმი"
                       : `ულიმიტო სესიები · ${aiSessionsRemaining(s)} AI სესია დარჩა`}
                   </p>
                 </div>
@@ -659,7 +660,7 @@ export default function BusinessHome() {
             </button>
           )}
 
-          {/* Premium banner — persistent, small, gone once premium or on trial */}
+          {/* Premium banner, persistent, small, gone once premium or on trial */}
           {s && !s.mockPro && !isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
@@ -668,7 +669,7 @@ export default function BusinessHome() {
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-gold shrink-0"><Star size={16} className="fill-gold" /></span>
                 <div className="min-w-0">
-                  <p className="ka text-[13px] font-bold text-on-dark truncate">პრემიუმი — ულიმიტო სესიები</p>
+                  <p className="ka text-[13px] font-bold text-on-dark truncate">პრემიუმი, ულიმიტო სესიები</p>
                   <p className="ka text-[11px] text-on-dark/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
@@ -681,6 +682,11 @@ export default function BusinessHome() {
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <Target size={12} strokeWidth={2.25} /> დღევანდელი ფოკუსი
             </p>
+
+            {/* Tiki walks in from the left and lies down above the right-hand
+                end of the card, where he stays asleep until the page unmounts.
+                Keyed on the mount so he replays each time the dashboard opens. */}
+            <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
             <div className="relative overflow-hidden rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -705,7 +711,7 @@ export default function BusinessHome() {
                 </p>
                 {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
                   <p className="ka text-[11px] font-semibold text-gold-soft mt-2">
-                    🎬 შემდეგი სესია — სცენარი: {scenarioToday.titleKa}
+                    🎬 შემდეგი სესია, სცენარი: {scenarioToday.titleKa}
                   </p>
                 )}
                 {!focusDoneToday && (
@@ -723,12 +729,12 @@ export default function BusinessHome() {
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
                         ? `${vocabReviewToday} გასამეორებელი სიტყვა`
-                        : "გამეორების დღე — ყველაზე რთული სიტყვები"}
+                        : "გამეორების დღე, ყველაზე რთული სიტყვები"}
                     </p>
                   </div>
                 )}
                 <div className="mt-5 flex flex-col sm:flex-row gap-2">
-                  {/* Premium: the day is never "over" — offer the next session. */}
+                  {/* Premium: the day is never "over", offer the next session. */}
                   {focusDoneToday && (s?.mockPro || isTrialActive(s)) && (
                     <button
                       onClick={() => navigate("/path/business/module/vocabulary")}
@@ -800,7 +806,7 @@ export default function BusinessHome() {
             </BizCard>
           )}
 
-          {/* 5. More — compact rows for everything that used to be big cards */}
+          {/* 5. More, compact rows for everything that used to be big cards */}
           <section className="mb-5">
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1">
               მეტი
@@ -845,7 +851,7 @@ export default function BusinessHome() {
               <BarChart2 size={12} strokeWidth={2.25} /> პროგრესი
             </p>
             <BizCard>
-              {/* Overall vocabulary progress — the number that makes months of
+              {/* Overall vocabulary progress, the number that makes months of
                   work visible. Weighted rather than mastered-only: mastery needs
                   correct answers across three separate days, so a user with
                   weeks of effort can still have very few "known" words. Showing
@@ -987,7 +993,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
 
         <p className="ka text-2xl font-bold mt-4">{pct}% დაძლეულია</p>
 
-        {/* Earned letters in gold, the rest faded — progress you can see. */}
+        {/* Earned letters in gold, the rest faded, progress you can see. */}
         <p className="mt-5 text-3xl font-extrabold tracking-wide">
           <span className="text-gold">{earned}</span>
           <span className="text-on-dark/25">{rest}</span>
@@ -999,7 +1005,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
 
         {pct === 100 && (
           <p className="ka text-sm text-gold font-bold mt-3">
-            სრული ლექსიკა დაძლეულია — გილოცავ!
+            სრული ლექსიკა დაძლეულია, გილოცავ!
           </p>
         )}
 
