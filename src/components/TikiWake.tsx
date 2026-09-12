@@ -1,82 +1,80 @@
 import { useMemo } from "react";
 
 /**
- * Tiki wakes, stretches, turns to face you, jumps down the page and sits.
+ * Tiki wakes, stretches, turns to face you, drops down the card and sits.
  *
- * 46 illustrated frames at 11fps. The artwork is already in sequence order, so
- * this plays straight through; only the VERTICAL drop needs timing, and it is
- * pinned to the leap frames rather than guessed.
+ * 47 illustrated frames. Two playback phases at DIFFERENT rates, because one
+ * rate does not suit both: a stretch is slow and deliberate, a leap is not.
  *
- * Frame phases, derived from the frame heights rather than by eye:
- *   0-11   curled asleep, waking, sitting up
- *   12-22  the stretch
- *   23-27  turning to face the camera
- *   28-34  the leap            <- the drop happens here
- *   35-45  landing, then sitting
+ *   0-22   waking and stretching        8 fps, unhurried
+ *   23-46  turning, the leap, landing  12 fps
  *
- * Meant to follow TikiCat, which leaves him asleep. Same sheet dimensions and
- * the same 11fps, so the two read as one continuous animation.
- *
- * POSITIONING: this one moves DOWN the page, so it needs a container tall
- * enough to hold the fall. It renders absolutely and drops `dropDistance` px
- * from wherever it is placed.
+ * The DROP is expressed as a percentage of the parent, not a pixel count, so he
+ * lands exactly on the bottom edge of whatever he is placed over rather than at
+ * a distance guessed at build time. Give the parent `position: relative` and a
+ * height, and he will land on its lower edge.
  */
 
 const SHEET = "/tiki-wake.png";
-const TOTAL_FRAMES = 46;
-const LEAP_START = 28;
-const LEAP_END = 34;
-const FPS = 11;
+const TOTAL = 47;
+const STRETCH_END = 23;      // frames 0-22 are the wake and stretch
+const LEAP_START = 33;       // measured from frame heights: the leap frames
+const LEAP_END = 40;
+
+const WAKE_FPS = 8;
+const ACTION_FPS = 12;
 const CELL_W = 72;
 const CELL_H = 104;
 
 export default function TikiWake({
   size = 34,
-  delay = 0.4,
-  /** How far he falls, in px. */
-  dropDistance = 260,
-  /** Nudge sideways as he jumps, in px. Cats do not fall straight down. */
-  driftX = 24,
+  delay = 0.3,
+  /** Sideways drift during the jump, px. Cats do not fall straight down. */
+  driftX = 18,
   onDone,
 }: {
   size?: number;
   delay?: number;
-  dropDistance?: number;
   driftX?: number;
   onDone?: () => void;
 }) {
   const uid = useMemo(() => `tw${Math.random().toString(36).slice(2, 8)}`, []);
   const w = Math.round((CELL_W / CELL_H) * size);
-  const totalSec = TOTAL_FRAMES / FPS;
 
-  // The drop is keyed to the leap frames, so it can never drift out of sync
-  // with the artwork the way a hand-picked percentage would.
-  const dropFrom = (LEAP_START / TOTAL_FRAMES) * 100;
-  const dropTo = (LEAP_END / TOTAL_FRAMES) * 100;
+  const wakeSec = STRETCH_END / WAKE_FPS;               // 2.875s
+  const actionFrames = TOTAL - STRETCH_END;             // 24
+  const actionSec = actionFrames / ACTION_FPS;          // 2.0s
+  const totalSec = wakeSec + actionSec;
+
+  // The fall is pinned to the leap frames, so it can never drift out of step
+  // with the artwork the way a hand-tuned percentage would.
+  const dropFrom = ((wakeSec + (LEAP_START - STRETCH_END) / ACTION_FPS) / totalSec) * 100;
+  const dropTo = ((wakeSec + (LEAP_END - STRETCH_END) / ACTION_FPS) / totalSec) * 100;
 
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute left-0 right-0 top-0"
-      style={{ height: size + dropDistance }}
+      className="pointer-events-none absolute inset-0"
+      // Above the card he is jumping down the front of.
+      style={{ zIndex: 30 }}
     >
       <style>{`
-        @keyframes ${uid}frames {
+        @keyframes ${uid}wake {
           from { background-position-x: 0px; }
-          /* ends ON the last frame: with plain steps() and fill-forwards the
-             held value is one frame past the sheet and he disappears */
-          to   { background-position-x: -${w * (TOTAL_FRAMES - 1)}px; }
+          to   { background-position-x: -${w * STRETCH_END}px; }
+        }
+        @keyframes ${uid}action {
+          from { background-position-x: -${w * STRETCH_END}px; }
+          /* ends ON the last frame: plain steps() with fill-forwards holds one
+             frame past the sheet and he vanishes */
+          to   { background-position-x: -${w * (TOTAL - 1)}px; }
         }
         @keyframes ${uid}drop {
-          0%, ${dropFrom.toFixed(2)}% {
-            transform: translate(0, 0);
-          }
-          /* a slight rise before the fall reads as a push-off */
-          ${(dropFrom + 2).toFixed(2)}% {
-            transform: translate(${Math.round(driftX * 0.15)}px, -8px);
-          }
+          0%, ${dropFrom.toFixed(2)}% { transform: translate(0, 0); }
+          ${(dropFrom + 1.5).toFixed(2)}% { transform: translate(${Math.round(driftX*0.2)}px, -7px); }
+          /* 100% of the PARENT height, less his own, lands him on its bottom edge */
           ${dropTo.toFixed(2)}%, 100% {
-            transform: translate(${driftX}px, ${dropDistance}px);
+            transform: translate(${driftX}px, calc(100% - ${size}px));
           }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -87,7 +85,7 @@ export default function TikiWake({
       <div
         className={`${uid}root absolute left-0 top-0`}
         style={{
-          // gravity: slow off the edge, fast into the landing
+          height: "100%",
           animation: `${uid}drop ${totalSec}s cubic-bezier(.4,0,.75,1) ${delay}s 1 forwards`,
         }}
         onAnimationEnd={onDone}
@@ -97,9 +95,11 @@ export default function TikiWake({
             width: w,
             height: size,
             backgroundImage: `url(${SHEET})`,
-            backgroundSize: `${w * TOTAL_FRAMES}px ${size}px`,
+            backgroundSize: `${w * TOTAL}px ${size}px`,
             backgroundRepeat: "no-repeat",
-            animation: `${uid}frames ${totalSec}s steps(${TOTAL_FRAMES}, jump-none) ${delay}s 1 forwards`,
+            animation:
+              `${uid}wake ${wakeSec}s steps(${STRETCH_END}) ${delay}s 1 forwards, ` +
+              `${uid}action ${actionSec}s steps(${actionFrames}, jump-none) ${delay + wakeSec}s 1 forwards`,
           }}
         />
       </div>

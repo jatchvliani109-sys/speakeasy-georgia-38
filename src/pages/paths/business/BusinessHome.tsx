@@ -708,7 +708,15 @@ export default function BusinessHome() {
                 </div>
               </div>
             )}
-            <div className="relative overflow-hidden rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
+            {/* relative + Tiki inside = he jumps down the FRONT of this card and
+                lands on its bottom edge. overflow-hidden is deliberately absent
+                here, or he would be clipped mid-jump. */}
+            <div className="relative rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
+              {tikiAwake && (
+                <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
+                  <TikiWake size={34} driftX={16} delay={0.2} />
+                </div>
+              )}
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="ka text-[10px] uppercase tracking-wider text-on-dark/70 font-semibold">
