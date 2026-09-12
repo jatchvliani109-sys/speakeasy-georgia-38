@@ -712,7 +712,10 @@ export default function BusinessHome() {
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
                       been unmounted and the waking one has not yet appeared. */}
-                  <TikiWake size={34} driftX={16} delay={0} />
+                  {/* startX/startY put frame 0 exactly where TikiCat left him
+                      asleep: 34px left (the two sheets anchor differently) and
+                      34px up (he sleeps in the strip above this card). */}
+                  <TikiWake size={34} startX={-34} startY={-34} driftX={16} delay={0} />
                 </div>
               )}
               <div className="relative">

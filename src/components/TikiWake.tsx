@@ -21,7 +21,7 @@ const STRETCH_END = 23;      // frames 0-22 are the wake and stretch
 const LEAP_START = 33;       // measured from frame heights: the leap frames
 const LEAP_END = 40;
 
-const WAKE_FPS = 8;
+const WAKE_FPS = 5;   // a cat waking and stretching is unhurried
 const ACTION_FPS = 12;
 const CELL_W = 72;
 const CELL_H = 104;
@@ -29,12 +29,25 @@ const CELL_H = 104;
 export default function TikiWake({
   size = 34,
   delay = 0.3,
+  /**
+   * Where frame 0 sits, relative to this component's own box.
+   *
+   * The sleeping cat is handed over from TikiCat, which uses a different sheet
+   * with different cell dimensions and head-alignment rather than centring, and
+   * which lives in the strip ABOVE this card. Without an offset the waking cat
+   * appears somewhere other than where the sleeping one was, and the handover
+   * reads as a teleport.
+   */
+  startX = 0,
+  startY = 0,
   /** Sideways drift during the jump, px. Cats do not fall straight down. */
   driftX = 18,
   onDone,
 }: {
   size?: number;
   delay?: number;
+  startX?: number;
+  startY?: number;
   driftX?: number;
   onDone?: () => void;
 }) {
@@ -70,11 +83,13 @@ export default function TikiWake({
           to   { background-position-x: -${w * (TOTAL - 1)}px; }
         }
         @keyframes ${uid}drop {
-          0%, ${dropFrom.toFixed(2)}% { transform: translate(0, 0); }
-          ${(dropFrom + 1.5).toFixed(2)}% { transform: translate(${Math.round(driftX*0.2)}px, -7px); }
+          0%, ${dropFrom.toFixed(2)}% { transform: translate(${startX}px, ${startY}px); }
+          ${(dropFrom + 1.5).toFixed(2)}% {
+            transform: translate(${startX + Math.round(driftX*0.2)}px, ${startY - 7}px);
+          }
           /* 100% of the PARENT height, less his own, lands him on its bottom edge */
           ${dropTo.toFixed(2)}%, 100% {
-            transform: translate(${driftX}px, calc(100% - ${size}px));
+            transform: translate(${startX + driftX}px, calc(100% - ${size}px));
           }
         }
         @media (prefers-reduced-motion: reduce) {
