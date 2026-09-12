@@ -698,23 +698,21 @@ export default function BusinessHome() {
             {/* Tiki walks in from the left and lies down above the right-hand
                 end of the card, where he stays asleep until the page unmounts.
                 Keyed on the mount so he replays each time the dashboard opens. */}
-            {!tikiAwake ? (
-              <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
-            ) : (
-              // Starts where TikiCat left him: same size, same 76% across.
-              <div className="relative w-full" style={{ height: 36 }}>
-                <div className="absolute" style={{ left: "76%", transform: "translateX(-34px)" }}>
-                  <TikiWake size={34} dropDistance={300} driftX={20} delay={0} />
-                </div>
-              </div>
-            )}
+            {/* The nap lives in this strip above the card. Once he wakes, the
+                strip becomes an empty spacer and the wake animation takes over
+                INSIDE the card below, so he jumps down its face. */}
+            {!tikiAwake
+              ? <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
+              : <div style={{ height: 36 }} />}
             {/* relative + Tiki inside = he jumps down the FRONT of this card and
                 lands on its bottom edge. overflow-hidden is deliberately absent
                 here, or he would be clipped mid-jump. */}
             <div className="relative rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
               {tikiAwake && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
-                  <TikiWake size={34} driftX={16} delay={0.2} />
+                  {/* No delay: any pause here is a gap where the sleeping cat has
+                      been unmounted and the waking one has not yet appeared. */}
+                  <TikiWake size={34} driftX={16} delay={0} />
                 </div>
               )}
               <div className="relative">

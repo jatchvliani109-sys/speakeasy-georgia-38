@@ -86,7 +86,7 @@ export default function TikiWake({
         className={`${uid}root absolute left-0 top-0`}
         style={{
           height: "100%",
-          animation: `${uid}drop ${totalSec}s cubic-bezier(.4,0,.75,1) ${delay}s 1 forwards`,
+          animation: `${uid}drop ${totalSec}s cubic-bezier(.4,0,.75,1) ${delay}s 1 both`,
         }}
         onAnimationEnd={onDone}
       >
@@ -97,8 +97,11 @@ export default function TikiWake({
             backgroundImage: `url(${SHEET})`,
             backgroundSize: `${w * TOTAL}px ${size}px`,
             backgroundRepeat: "no-repeat",
+            // `both`, not `forwards`: with forwards alone nothing is painted
+            // during the delay, so the cat blinks out between falling asleep
+            // and waking. `both` shows frame 0 from the start.
             animation:
-              `${uid}wake ${wakeSec}s steps(${STRETCH_END}) ${delay}s 1 forwards, ` +
+              `${uid}wake ${wakeSec}s steps(${STRETCH_END}) ${delay}s 1 both, ` +
               `${uid}action ${actionSec}s steps(${actionFrames}, jump-none) ${delay + wakeSec}s 1 forwards`,
           }}
         />
