@@ -21,6 +21,7 @@ import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import TikiCat from "@/components/TikiCat";
 import TikiWake from "@/components/TikiWake";
 import TikiBox from "@/components/TikiBox";
+import TikiYawn from "@/components/TikiYawn";
 import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -113,7 +114,7 @@ export default function BusinessHome() {
   //
   // Each stage ends in the pose the next begins from, so the handovers are
   // invisible. Timings are the animation lengths plus a beat sitting still.
-  type TikiStage = "sleep" | "wake" | "box";
+  type TikiStage = "sleep" | "wake" | "box" | "yawn";
   const [tikiStage, setTikiStage] = useState<TikiStage>("sleep");
 
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
@@ -121,7 +122,7 @@ export default function BusinessHome() {
   // most of the blink, and no amount of timing fixes it.
   const tikiSheets = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
-    tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].map((src) => {
+    tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => {
       const img = new Image();
       img.src = src;
       // decode() forces the work up front rather than at first paint
@@ -143,7 +144,9 @@ export default function BusinessHome() {
     };
     const a = window.setTimeout(() => go("wake"), 26000);
     const b = window.setTimeout(() => go("box"), 26000 + 6600 + 5000);
-    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+    // the routine runs 7s; then he sits a moment and yawns
+    const c = window.setTimeout(() => go("yawn"), 26000 + 6600 + 5000 + 7000 + 2500);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); window.clearTimeout(c); };
   }, []);
   // A broken Streak previously passed in silence: 40 days became 1 with no
   // acknowledgement, at exactly the moment a user is most likely to give up.
@@ -740,7 +743,7 @@ export default function BusinessHome() {
                 first paint of a sheet can stall for a frame, which showed as an
                 intermittent gap at the stage handovers. */}
             <div aria-hidden className="absolute opacity-0 pointer-events-none" style={{ width: 1, height: 1, overflow: "hidden" }}>
-              {["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].map((src) => (
+              {["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => (
                 <span key={src} style={{ display: "block", width: 1, height: 1, backgroundImage: `url(${src})` }} />
               ))}
             </div>
@@ -792,7 +795,20 @@ export default function BusinessHome() {
                   {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
                       against 0.98 in the wake sheet, so the same number renders him
                       at 65%. 68 makes the sitting cat match at the handover. */}
-                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0} loop />
+                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0} />
+                </div>
+              )}
+
+              {/* Yawn, on the spot the routine leaves him. size 44 not 68: the
+                  cat fills 0.985 of the cell in this sheet against 0.641 in the
+                  boxing one, so equal numbers would shrink him by a third.
+                  translateX(-13) computed from both sheets' base positions. */}
+              {tikiStage === "yawn" && (
+                <div
+                  className="pointer-events-none absolute"
+                  style={{ left: "76%", bottom: 0, transform: "translateX(-13px)" }}
+                >
+                  <TikiYawn size={44} fps={6} delay={0.2} loop />
                 </div>
               )}
               <div className="relative">
