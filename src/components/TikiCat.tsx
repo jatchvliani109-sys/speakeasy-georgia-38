@@ -35,6 +35,8 @@ const CELL_W = 87;
 const CELL_H = 88;
 
 export default function TikiCat({
+  /** Floating z's once he is asleep. */
+  zzz = true,
   /** Gait cycles before he settles. Each is one second. */
   walkCycles = 4,
   size = 58,
@@ -43,6 +45,7 @@ export default function TikiCat({
   /** Where he lies down, as a percentage across the container. */
   restAt = 55,
 }: {
+  zzz?: boolean;
   walkCycles?: number;
   size?: number;
   delay?: number;
@@ -84,6 +87,14 @@ export default function TikiCat({
           from { background-position-x: -${w * SETTLE_START}px; }
           to   { background-position-x: -${w * (TOTAL_FRAMES - 1)}px; }
         }
+        /* Each z rises, drifts slightly right and fades. Staggered delays make
+           it read as a lazy stream rather than three things moving in lockstep. */
+        @keyframes ${uid}z {
+          0%   { opacity: 0; transform: translate(0, 0) scale(0.6) rotate(-8deg); }
+          15%  { opacity: 0.55; }
+          70%  { opacity: 0.35; }
+          100% { opacity: 0; transform: translate(9px, -22px) scale(1.05) rotate(10deg); }
+        }
         @media (prefers-reduced-motion: reduce) {
           .${uid}root { display: none; }
         }
@@ -93,6 +104,7 @@ export default function TikiCat({
         className={`${uid}root absolute bottom-0 left-0 w-full`}
         style={{ animation: `${uid}cross ${totalSec}s linear ${delay}s ${iter} both` }}
       >
+        <div className="relative" style={{ width: w, height: size }}>
         <div
           style={{
             width: w,
@@ -106,6 +118,36 @@ export default function TikiCat({
               `${uid}settle ${settleSec}s steps(${settleFrames}, jump-none) ${delay + walkSec}s 1 forwards`,
           }}
         />
+
+        {/* Sleep z's. Positioned relative to the mover, so they travel with him
+            and settle where he does. They only begin once the settle has
+            finished: z's over a walking cat would be nonsense. */}
+        {zzz && (
+          <div
+            className="absolute"
+            // Just above his head, not above the CELL. He is lying down, so the
+            // top of the cell is a long way over him and the z's looked detached.
+            style={{ left: w * 0.68, top: size * 0.35, lineHeight: 1 }}
+          >
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                style={{
+                  position: "absolute",
+                  fontSize: Math.max(8, Math.round(size * 0.26)) - i * 1.5,
+                  fontWeight: 700,
+                  color: "currentColor",
+                  opacity: 0,
+                  fontFamily: "ui-rounded, system-ui, sans-serif",
+                  animation: `${uid}z 2.8s ease-out ${delay + walkSec + settleSec + i * 0.9}s infinite both`,
+                }}
+              >
+                z
+              </span>
+            ))}
+          </div>
+        )}
+        </div>
       </div>
     </div>
   );
