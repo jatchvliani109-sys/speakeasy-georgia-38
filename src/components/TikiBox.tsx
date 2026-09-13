@@ -11,6 +11,12 @@ import { useMemo } from "react";
  * A cat does not grow as it turns, so each of those frames was rescaled to a
  * constant cat height before being spliced in.
  *
+ * Frames are anchored on the cat's BASE, not the centre of the bounding box.
+ * A frame with the tail extended sideways is far wider than one without, so
+ * centring made the cat slide left and right as it turned. Anchoring on the
+ * bottom fifth of the mass, which is legs and haunches, holds him still:
+ * measured drift across all 50 frames is 1px.
+ *
  * Played in THREE phases at different rates. One rate
  * does not suit the whole routine: the boxing wants pace, the flex wants to be
  * held long enough to register.
@@ -30,7 +36,7 @@ const SHEET = "/tiki-box.png";
 const TOTAL = 50;
 const FLEX_START = 35;    // shifted by the 4 turnaround frames
 const FLEX_END = 38;      // exclusive
-const CELL_W = 77;
+const CELL_W = 96;   // widened: frames are now aligned by the cat's BASE
 const CELL_H = 104;
 
 export default function TikiBox({

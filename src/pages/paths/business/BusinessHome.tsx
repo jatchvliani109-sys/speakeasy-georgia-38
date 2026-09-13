@@ -141,7 +141,9 @@ export default function BusinessHome() {
       // neither painted, which reads as a blink.
       setTikiPrev(tikiStageRef.current);
       setTikiStage(next);
-      window.setTimeout(() => setTikiPrev(null), 250);
+      // 600ms, not 250: the outgoing stage must still be painted when the
+      // incoming one takes over, and 250 was leaving a visible flash.
+      window.setTimeout(() => setTikiPrev(null), 600);
     };
     const a = window.setTimeout(() => go("wake"), 26000);
     const b = window.setTimeout(() => go("box"), 26000 + 6600 + 5000);
@@ -778,12 +780,14 @@ export default function BusinessHome() {
               {tikiStage === "box" && (
                 <div
                   className="pointer-events-none absolute"
-                  style={{ left: "76%", bottom: 0, transform: "translateX(-18px)" }}
+                  // -25 computed, not guessed: the wake cat's base lands at 76% + 4.8px,
+                    // and the box cat's base sits 30.2px into its own 63px cell.
+                    style={{ left: "76%", bottom: 0, transform: "translateX(-25px)" }}
                 >
                   {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
                       against 0.98 in the wake sheet, so the same number renders him
                       at 65%. 68 makes the sitting cat match at the handover. */}
-                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0.3} loop />
+                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0} loop />
                 </div>
               )}
               <div className="relative">
