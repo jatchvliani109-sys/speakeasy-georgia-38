@@ -756,7 +756,12 @@ export default function BusinessHome() {
                   {/* startX/startY put frame 0 exactly where TikiCat left him
                       asleep: 34px left (the two sheets anchor differently) and
                       34px up (he sleeps in the strip above this card). */}
-                  <TikiWake size={34} startX={-34} startY={-34} driftX={16} delay={0} />
+                  {/* size 44, not 34: each sheet was normalised so its tallest
+                      frame fills the cell, and the tallest pose differs between
+                      sheets, so the same number renders the cat at 77% here.
+                      44 makes him the same physical size as the walking cat.
+                      startY is -size so his feet sit on the card's top edge. */}
+                  <TikiWake size={44} startX={-26} startY={-44} driftX={16} delay={0} rim />
                 </div>
               )}
 
@@ -765,9 +770,9 @@ export default function BusinessHome() {
               {tikiStage === "box" && (
                 <div
                   className="pointer-events-none absolute"
-                  style={{ left: "76%", bottom: 0, transform: "translateX(-18px)" }}
+                  style={{ left: "76%", bottom: 0, transform: "translateX(-10px)" }}
                 >
-                  <TikiBox size={34} fps={8} flexSlowdown={3} delay={0.3} loop />
+                  <TikiBox size={44} fps={8} flexSlowdown={3} delay={0.3} loop rim />
                 </div>
               )}
               <div className="relative">
