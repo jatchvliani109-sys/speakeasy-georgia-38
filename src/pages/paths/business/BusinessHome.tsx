@@ -748,7 +748,13 @@ export default function BusinessHome() {
             {/* relative + Tiki inside = he jumps down the FRONT of this card and
                 lands on its bottom edge. overflow-hidden is deliberately absent
                 here, or he would be clipped mid-jump. */}
-            <div className="relative rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
+            <div className="relative rounded-lg p-6 border border-wine/30 text-ink"
+              style={{
+                // Soft champagne rather than the old dark charcoal: the cat is
+                // dark grey and vanished against it. Warm and low-contrast
+                // enough to sit under text without glaring.
+                background: "linear-gradient(135deg, #EFEAE0 0%, #E3DACA 55%, #D8CDB8 100%)",
+              }}>
               {(tikiStage === "wake" || tikiPrev === "wake") && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
@@ -761,7 +767,7 @@ export default function BusinessHome() {
                       sheets, so the same number renders the cat at 77% here.
                       44 makes him the same physical size as the walking cat.
                       startY is -size so his feet sit on the card's top edge. */}
-                  <TikiWake size={44} startX={-26} startY={-44} driftX={16} delay={0} rim />
+                  <TikiWake size={44} startX={-26} startY={-44} driftX={16} delay={0} />
                 </div>
               )}
 
@@ -770,22 +776,25 @@ export default function BusinessHome() {
               {tikiStage === "box" && (
                 <div
                   className="pointer-events-none absolute"
-                  style={{ left: "76%", bottom: 0, transform: "translateX(-10px)" }}
+                  style={{ left: "76%", bottom: 0, transform: "translateX(-18px)" }}
                 >
-                  <TikiBox size={44} fps={8} flexSlowdown={3} delay={0.3} loop rim />
+                  {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
+                      against 0.98 in the wake sheet, so the same number renders him
+                      at 65%. 68 makes the sitting cat match at the handover. */}
+                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0.3} loop />
                 </div>
               )}
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className="ka text-[10px] uppercase tracking-wider text-on-dark/70 font-semibold">
+                  <span className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
                   {focusDoneToday ? (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-cream/20 text-on-dark/85 px-2 py-0.5 rounded-md font-semibold">
+                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-wine/25 text-ink-muted px-2 py-0.5 rounded-md font-semibold">
                       <Check size={11} strokeWidth={2.5} /> დასრულდა
                     </span>
                   ) : (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 text-on-dark/70">
+                    <span className="ka text-[10px] inline-flex items-center gap-1 text-ink-muted">
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
@@ -793,7 +802,7 @@ export default function BusinessHome() {
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
-                <p className="ka text-sm text-on-dark/80 mt-2 leading-relaxed">
+                <p className="ka text-sm text-ink/80 mt-2 leading-relaxed">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
                 {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
@@ -808,10 +817,10 @@ export default function BusinessHome() {
                         🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
-                    <p className="ka text-[11px] text-on-dark/85">
+                    <p className="ka text-[11px] text-ink-muted">
                       დღეს {vocabWordCount} სიტყვა იცი
                     </p>
-                    <p className="ka text-[11px] text-on-dark/75">
+                    <p className="ka text-[11px] text-ink/75">
                       {vocabNewToday > 0
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
@@ -835,7 +844,7 @@ export default function BusinessHome() {
                     onClick={() =>
                       navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
                     }
-                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-on-dark hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-ink hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                   >
                     {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                     <ArrowRight size={14} strokeWidth={2.25} />

@@ -33,8 +33,6 @@ export default function TikiBox({
   flexSlowdown = 3,
   delay = 0.4,
   loop = false,
-  /** Faint light outline, for dark backgrounds. */
-  rim = false,
   onDone,
 }: {
   size?: number;
@@ -42,7 +40,6 @@ export default function TikiBox({
   flexSlowdown?: number;
   delay?: number;
   loop?: boolean;
-  rim?: boolean;
   onDone?: () => void;
 }) {
   const uid = useMemo(() => `tb${Math.random().toString(36).slice(2, 8)}`, []);
@@ -82,10 +79,6 @@ export default function TikiBox({
           backgroundImage: `url(${SHEET})`,
           backgroundSize: `${w * TOTAL}px ${size}px`,
           backgroundRepeat: "no-repeat",
-            // A faint light rim. The cat is dark grey on a dark card and all but
-            // vanishes against it; a rim separates him without touching the
-            // card's colour, which would have to work in both themes.
-            filter: rim ? "drop-shadow(0 0 1.5px rgba(255,255,255,.55))" : undefined,
           // Later animations win while they are running, so the three phases
           // hand over cleanly without any gap.
           animation:

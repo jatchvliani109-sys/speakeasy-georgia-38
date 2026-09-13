@@ -42,8 +42,6 @@ export default function TikiWake({
   startY = 0,
   /** Sideways drift during the jump, px. Cats do not fall straight down. */
   driftX = 18,
-  /** Faint light outline, for dark backgrounds. */
-  rim = false,
   onDone,
 }: {
   size?: number;
@@ -51,7 +49,6 @@ export default function TikiWake({
   startX?: number;
   startY?: number;
   driftX?: number;
-  rim?: boolean;
   onDone?: () => void;
 }) {
   const uid = useMemo(() => `tw${Math.random().toString(36).slice(2, 8)}`, []);
@@ -115,10 +112,6 @@ export default function TikiWake({
             backgroundImage: `url(${SHEET})`,
             backgroundSize: `${w * TOTAL}px ${size}px`,
             backgroundRepeat: "no-repeat",
-            // A faint light rim. The cat is dark grey on a dark card and all but
-            // vanishes against it; a rim separates him without touching the
-            // card's colour, which would have to work in both themes.
-            filter: rim ? "drop-shadow(0 0 1.5px rgba(255,255,255,.55))" : undefined,
             // `both`, not `forwards`: with forwards alone nothing is painted
             // during the delay, so the cat blinks out between falling asleep
             // and waking. `both` shows frame 0 from the start.
