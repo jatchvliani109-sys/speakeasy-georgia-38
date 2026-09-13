@@ -3,11 +3,15 @@ import { useMemo } from "react";
 /**
  * Tiki wakes, stretches, turns to face you, drops down the card and sits.
  *
- * 47 illustrated frames. Two playback phases at DIFFERENT rates, because one
+ * 46 illustrated frames. Two playback phases at DIFFERENT rates, because one
  * rate does not suit both: a stretch is slow and deliberate, a leap is not.
  *
  *   0-22   waking and stretching        8 fps, unhurried
  *   23-46  turning, the leap, landing  12 fps
+ *
+ * NOTE: an earlier version split one blob in two on a width heuristic and
+ * produced two half-cats. Pixel counts show every blob here is a single cat
+ * (10-14k px, widest 1.26x the median, not 2x), so nothing needs splitting.
  *
  * The DROP is expressed as a percentage of the parent, not a pixel count, so he
  * lands exactly on the bottom edge of whatever he is placed over rather than at
@@ -16,10 +20,10 @@ import { useMemo } from "react";
  */
 
 const SHEET = "/tiki-wake.png";
-const TOTAL = 47;
+const TOTAL = 46;
 const STRETCH_END = 23;      // frames 0-22 are the wake and stretch
 const LEAP_START = 33;       // measured from frame heights: the leap frames
-const LEAP_END = 40;
+const LEAP_END = 39;
 
 const WAKE_FPS = 5;   // a cat waking and stretching is unhurried
 const ACTION_FPS = 12;
