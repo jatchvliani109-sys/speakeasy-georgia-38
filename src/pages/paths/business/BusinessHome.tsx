@@ -748,13 +748,15 @@ export default function BusinessHome() {
             {/* relative + Tiki inside = he jumps down the FRONT of this card and
                 lands on its bottom edge. overflow-hidden is deliberately absent
                 here, or he would be clipped mid-jump. */}
-            <div className="relative rounded-lg p-6 border border-wine/30 text-ink"
-              style={{
-                // Soft champagne rather than the old dark charcoal: the cat is
-                // dark grey and vanished against it. Warm and low-contrast
-                // enough to sit under text without glaring.
-                background: "linear-gradient(135deg, #EFEAE0 0%, #E3DACA 55%, #D8CDB8 100%)",
-              }}>
+            {/* Deliberately THEME-INDEPENDENT. Fixed background and fixed text
+                colours, so contrast holds in BOTH light and dark mode: theme
+                tokens would flip the text light in dark mode and leave it
+                unreadable on this pale card.
+                Measured contrast: body 8.6:1, muted 5.2:1, both above AA. */}
+            <div
+              className="relative rounded-lg p-6 border"
+              style={{ background: "#C4BBA8", borderColor: "rgba(92,26,46,.35)", color: "#241F1A" }}
+            >
               {(tikiStage === "wake" || tikiPrev === "wake") && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
@@ -786,15 +788,15 @@ export default function BusinessHome() {
               )}
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold">
+                  <span className="ka text-[10px] uppercase tracking-wider font-semibold" style={{ color: "#4A4238" }}>
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
                   {focusDoneToday ? (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-wine/25 text-ink-muted px-2 py-0.5 rounded-md font-semibold">
+                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-wine/25 px-2 py-0.5 rounded-md font-semibold" style={{ color: "#4A4238" }}>
                       <Check size={11} strokeWidth={2.5} /> დასრულდა
                     </span>
                   ) : (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 text-ink-muted">
+                    <span className="ka text-[10px] inline-flex items-center gap-1" style={{ color: "#4A4238" }}>
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
@@ -802,7 +804,7 @@ export default function BusinessHome() {
                 <h2 className="ka text-xl font-bold leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
-                <p className="ka text-sm text-ink/80 mt-2 leading-relaxed">
+                <p className="ka text-sm mt-2 leading-relaxed" style={{ color: "#4A4238" }}>
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
                 {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
@@ -817,10 +819,10 @@ export default function BusinessHome() {
                         🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
-                    <p className="ka text-[11px] text-ink-muted">
+                    <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
                       დღეს {vocabWordCount} სიტყვა იცი
                     </p>
-                    <p className="ka text-[11px] text-ink/75">
+                    <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
                       {vocabNewToday > 0
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
