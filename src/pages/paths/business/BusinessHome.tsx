@@ -119,10 +119,14 @@ export default function BusinessHome() {
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
   // background image that has not been decoded yet paints as nothing: that is
   // most of the blink, and no amount of timing fixes it.
+  const tikiSheets = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
-    ["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].forEach((src) => {
+    tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].map((src) => {
       const img = new Image();
       img.src = src;
+      // decode() forces the work up front rather than at first paint
+      void img.decode?.().catch(() => {});
+      return img;
     });
   }, []);
 
@@ -732,6 +736,15 @@ export default function BusinessHome() {
             {/* The nap lives in this strip above the card. Once he wakes, the
                 strip becomes an empty spacer and the wake animation takes over
                 INSIDE the card below, so he jumps down its face. */}
+            {/* Keeps all three sheets decoded and rasterised. Without this the
+                first paint of a sheet can stall for a frame, which showed as an
+                intermittent gap at the stage handovers. */}
+            <div aria-hidden className="absolute opacity-0 pointer-events-none" style={{ width: 1, height: 1, overflow: "hidden" }}>
+              {["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].map((src) => (
+                <span key={src} style={{ display: "block", width: 1, height: 1, backgroundImage: `url(${src})` }} />
+              ))}
+            </div>
+
             {tikiStage === "sleep" ? (
               <div className="relative" style={{ height: 36 }}>
                 <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
