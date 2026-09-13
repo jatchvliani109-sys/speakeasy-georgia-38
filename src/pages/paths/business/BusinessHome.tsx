@@ -113,10 +113,38 @@ export default function BusinessHome() {
   //
   // Each stage ends in the pose the next begins from, so the handovers are
   // invisible. Timings are the animation lengths plus a beat sitting still.
-  const [tikiStage, setTikiStage] = useState<"sleep" | "wake" | "box">("sleep");
+  type TikiStage = "sleep" | "wake" | "box";
+  const [tikiStage, setTikiStage] = useState<TikiStage>("sleep");
+  // The stage just left, kept on screen for a moment so the swap does not show
+  // a gap. Unmounting the old component and mounting the new one in the same
+  // tick leaves one frame with neither painted, which reads as a blink.
+  const [tikiPrev, setTikiPrev] = useState<TikiStage | null>(null);
+
+  // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
+  // background image that has not been decoded yet paints as nothing: that is
+  // most of the blink, and no amount of timing fixes it.
   useEffect(() => {
-    const a = window.setTimeout(() => setTikiStage("wake"), 26000);
-    const b = window.setTimeout(() => setTikiStage("box"), 26000 + 6600 + 5000);
+    ["/tiki.png", "/tiki-wake.png", "/tiki-box.png"].forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+  // Declared before the timers that read it, so the ordering is obvious.
+  const tikiStageRef = useRef<TikiStage>("sleep");
+  useEffect(() => { tikiStageRef.current = tikiStage; }, [tikiStage]);
+
+  useEffect(() => {
+    const go = (next: TikiStage) => {
+      // Keep the outgoing stage on screen for a moment. Unmounting one
+      // component and mounting the next in the same tick leaves a frame with
+      // neither painted, which reads as a blink.
+      setTikiPrev(tikiStageRef.current);
+      setTikiStage(next);
+      window.setTimeout(() => setTikiPrev(null), 250);
+    };
+    const a = window.setTimeout(() => go("wake"), 26000);
+    const b = window.setTimeout(() => go("box"), 26000 + 6600 + 5000);
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, []);
   // A broken Streak previously passed in silence: 40 days became 1 with no
@@ -710,14 +738,18 @@ export default function BusinessHome() {
             {/* The nap lives in this strip above the card. Once he wakes, the
                 strip becomes an empty spacer and the wake animation takes over
                 INSIDE the card below, so he jumps down its face. */}
-            {tikiStage === "sleep"
-              ? <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
-              : <div style={{ height: 36 }} />}
+            {tikiStage === "sleep" || tikiPrev === "sleep" ? (
+              <div className="relative" style={{ height: 36 }}>
+                <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
+              </div>
+            ) : (
+              <div style={{ height: 36 }} />
+            )}
             {/* relative + Tiki inside = he jumps down the FRONT of this card and
                 lands on its bottom edge. overflow-hidden is deliberately absent
                 here, or he would be clipped mid-jump. */}
             <div className="relative rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
-              {tikiStage === "wake" && (
+              {(tikiStage === "wake" || tikiPrev === "wake") && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
                       been unmounted and the waking one has not yet appeared. */}
