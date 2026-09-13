@@ -115,10 +115,6 @@ export default function BusinessHome() {
   // invisible. Timings are the animation lengths plus a beat sitting still.
   type TikiStage = "sleep" | "wake" | "box";
   const [tikiStage, setTikiStage] = useState<TikiStage>("sleep");
-  // The stage just left, kept on screen for a moment so the swap does not show
-  // a gap. Unmounting the old component and mounting the new one in the same
-  // tick leaves one frame with neither painted, which reads as a blink.
-  const [tikiPrev, setTikiPrev] = useState<TikiStage | null>(null);
 
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
   // background image that has not been decoded yet paints as nothing: that is
@@ -139,11 +135,7 @@ export default function BusinessHome() {
       // Keep the outgoing stage on screen for a moment. Unmounting one
       // component and mounting the next in the same tick leaves a frame with
       // neither painted, which reads as a blink.
-      setTikiPrev(tikiStageRef.current);
       setTikiStage(next);
-      // 600ms, not 250: the outgoing stage must still be painted when the
-      // incoming one takes over, and 250 was leaving a visible flash.
-      window.setTimeout(() => setTikiPrev(null), 600);
     };
     const a = window.setTimeout(() => go("wake"), 26000);
     const b = window.setTimeout(() => go("box"), 26000 + 6600 + 5000);
@@ -740,7 +732,7 @@ export default function BusinessHome() {
             {/* The nap lives in this strip above the card. Once he wakes, the
                 strip becomes an empty spacer and the wake animation takes over
                 INSIDE the card below, so he jumps down its face. */}
-            {tikiStage === "sleep" || tikiPrev === "sleep" ? (
+            {tikiStage === "sleep" ? (
               <div className="relative" style={{ height: 36 }}>
                 <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
               </div>
@@ -759,7 +751,7 @@ export default function BusinessHome() {
               className="relative rounded-lg p-6 border"
               style={{ background: "#C4BBA8", borderColor: "rgba(92,26,46,.35)", color: "#241F1A" }}
             >
-              {(tikiStage === "wake" || tikiPrev === "wake") && (
+              {tikiStage === "wake" && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
                       been unmounted and the waking one has not yet appeared. */}
