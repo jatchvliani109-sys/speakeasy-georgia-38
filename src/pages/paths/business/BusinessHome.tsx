@@ -114,22 +114,72 @@ export default function BusinessHome() {
   //
   // Each stage ends in the pose the next begins from, so the handovers are
   // invisible. Timings are the animation lengths plus a beat sitting still.
+  /**
+   * Tiki shows ONE animation per visit, in order, resetting each day:
+   *
+   *   1st visit today  walks in and goes to sleep
+   *   2nd              wakes, stretches, jumps down, sits
+   *   3rd              stands up, boxes, flexes, sits
+   *   4th and after    yawns four times, thirty seconds apart, then just sits
+   *
+   * Each animation plays from its own first frame, so nothing has to line up
+   * with the end of the previous one. The starting pose of each happens to be
+   * the ending pose of the one before, so the story still reads in order across
+   * visits without needing seamless joins.
+   */
   type TikiStage = "sleep" | "wake" | "box" | "yawn";
-  const [tikiStage, setTikiStage] = useState<TikiStage>("sleep");
+  const TIKI_KEY = "speakbusy:tiki-visits";
+  const YAWN_COUNT = 4;
+  const YAWN_GAP_MS = 30000;
 
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
-  // background image that has not been decoded yet paints as nothing: that is
-  // most of the blink, and no amount of timing fixes it.
+  // background image that has not been decoded yet paints as nothing, which
+  // showed as an intermittent gap when a stage first appeared.
   const tikiSheets = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
     tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => {
       const img = new Image();
       img.src = src;
-      // decode() forces the work up front rather than at first paint
       void img.decode?.().catch(() => {});
       return img;
     });
   }, []);
+
+  const [tikiStage, setTikiStage] = useState<TikiStage | null>(null);
+  const [yawnRound, setYawnRound] = useState(0);
+  const tikiCounted = useRef(false);
+
+  useEffect(() => {
+    // React mounts twice in development; without this the visit count doubles
+    // and the first day skips straight to the boxing.
+    if (tikiCounted.current) return;
+    tikiCounted.current = true;
+
+    const today = new Date().toISOString().slice(0, 10);
+    let visits = 1;
+    try {
+      const raw = localStorage.getItem(TIKI_KEY);
+      if (raw) {
+        const p = JSON.parse(raw) as { d?: string; n?: number };
+        visits = p.d === today ? (p.n ?? 0) + 1 : 1;
+      }
+      localStorage.setItem(TIKI_KEY, JSON.stringify({ d: today, n: visits }));
+    } catch {
+      // private mode or storage disabled: just show the first animation
+    }
+
+    setTikiStage(visits === 1 ? "sleep" : visits === 2 ? "wake" : visits === 3 ? "box" : "yawn");
+  }, []);
+
+  // Yawns are spaced out rather than looped: remounting the component restarts
+  // it, and its final frame is the seated pose, so he simply sits in between.
+  useEffect(() => {
+    if (tikiStage !== "yawn") return;
+    if (yawnRound >= YAWN_COUNT - 1) return;
+    const t = window.setTimeout(() => setYawnRound((r) => r + 1), YAWN_GAP_MS);
+    return () => window.clearTimeout(t);
+  }, [tikiStage, yawnRound]);
+
 
   // Declared before the timers that read it, so the ordering is obvious.
   const tikiStageRef = useRef<TikiStage>("sleep");
@@ -748,6 +798,8 @@ export default function BusinessHome() {
               ))}
             </div>
 
+            {/* tikiStage is null until the visit count is read, so nothing
+                renders for a tick rather than flashing the wrong animation. */}
             {tikiStage === "sleep" ? (
               <div className="relative" style={{ height: 36 }}>
                 <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
@@ -779,7 +831,7 @@ export default function BusinessHome() {
                       sheets, so the same number renders the cat at 77% here.
                       44 makes him the same physical size as the walking cat.
                       startY is -size so his feet sit on the card's top edge. */}
-                  <TikiWake size={44} startX={-26} startY={-44} driftX={16} delay={0} />
+                  <TikiWake size={44} startX={-26} startY={-44} driftX={16} delay={3.5} />
                 </div>
               )}
 
@@ -795,7 +847,7 @@ export default function BusinessHome() {
                   {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
                       against 0.98 in the wake sheet, so the same number renders him
                       at 65%. 68 makes the sitting cat match at the handover. */}
-                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={0} />
+                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={4} />
                 </div>
               )}
 
@@ -808,7 +860,7 @@ export default function BusinessHome() {
                   className="pointer-events-none absolute"
                   style={{ left: "76%", bottom: 0, transform: "translateX(-13px)" }}
                 >
-                  <TikiYawn size={44} fps={6} delay={0.2} loop />
+                  <TikiYawn key={yawnRound} size={44} fps={6} delay={yawnRound === 0 ? 4 : 0} />
                 </div>
               )}
               <div className="relative">
