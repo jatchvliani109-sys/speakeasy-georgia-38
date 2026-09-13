@@ -1,15 +1,23 @@
 import { useMemo } from "react";
 
 /**
- * Tiki stands up, shadow boxes, flexes for the camera, and sits back down.
+ * Tiki turns side on, stands up, shadow boxes, flexes, and sits back down.
  *
- * 46 illustrated frames, played in THREE phases at different rates. One rate
+ * 50 frames: 4 turnaround frames then the 46-frame routine. The turnaround
+ * bridges the pose TikiWake ends on (sitting, facing you) to the one the
+ * routine starts from (sitting, side on), which was a visible jump before.
+ *
+ * The turnaround artwork drew the front view 1.21x taller than the side view.
+ * A cat does not grow as it turns, so each of those frames was rescaled to a
+ * constant cat height before being spliced in.
+ *
+ * Played in THREE phases at different rates. One rate
  * does not suit the whole routine: the boxing wants pace, the flex wants to be
  * held long enough to register.
  *
- *   0-30   standing up and shadow boxing        base speed
- *   31-33  the double bicep, facing you         much slower, this is the joke
- *   34-45  turning back and sitting down        base speed
+ *   0-34   turning to face side on, standing up, shadow boxing   base speed
+ *   35-37  the double bicep, facing you        much slower, this is the joke
+ *   38-49  turning back and sitting down       base speed
  *
  * The flex frames were identified by measuring horizontal symmetry: the
  * front-facing poses are near mirror-symmetric (0.87 to 0.97) while every side
@@ -19,9 +27,9 @@ import { useMemo } from "react";
  */
 
 const SHEET = "/tiki-box.png";
-const TOTAL = 46;
-const FLEX_START = 31;
-const FLEX_END = 34;      // exclusive
+const TOTAL = 50;
+const FLEX_START = 35;    // shifted by the 4 turnaround frames
+const FLEX_END = 38;      // exclusive
 const CELL_W = 77;
 const CELL_H = 104;
 
@@ -45,7 +53,7 @@ export default function TikiBox({
   const uid = useMemo(() => `tb${Math.random().toString(36).slice(2, 8)}`, []);
   const w = Math.round((CELL_W / CELL_H) * size);
 
-  const nBox = FLEX_START;                 // 31
+  const nBox = FLEX_START;                 // 35
   const nFlex = FLEX_END - FLEX_START;     // 3
   const nSit = TOTAL - FLEX_END;           // 12
 
