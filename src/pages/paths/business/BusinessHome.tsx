@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import TikiCat from "@/components/TikiCat";
 import TikiWake from "@/components/TikiWake";
+import TikiBox from "@/components/TikiBox";
 import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -105,10 +106,18 @@ export default function BusinessHome() {
   // because they are two sheets; the handover is a single timer.
   //
   // TikiCat runs 8s (5 walk cycles plus the settle), so the nap starts then.
-  const [tikiAwake, setTikiAwake] = useState(false);
+  // Tiki runs three stages on one timeline:
+  //   sleep  walks in, settles above the focus card, naps
+  //   wake   stretches, jumps down the card, sits at its bottom edge
+  //   box    stands up, shadow boxes, flexes, sits back down
+  //
+  // Each stage ends in the pose the next begins from, so the handovers are
+  // invisible. Timings are the animation lengths plus a beat sitting still.
+  const [tikiStage, setTikiStage] = useState<"sleep" | "wake" | "box">("sleep");
   useEffect(() => {
-    const t = window.setTimeout(() => setTikiAwake(true), 26000);
-    return () => window.clearTimeout(t);
+    const a = window.setTimeout(() => setTikiStage("wake"), 26000);
+    const b = window.setTimeout(() => setTikiStage("box"), 26000 + 6600 + 5000);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, []);
   // A broken Streak previously passed in silence: 40 days became 1 with no
   // acknowledgement, at exactly the moment a user is most likely to give up.
@@ -701,14 +710,14 @@ export default function BusinessHome() {
             {/* The nap lives in this strip above the card. Once he wakes, the
                 strip becomes an empty spacer and the wake animation takes over
                 INSIDE the card below, so he jumps down its face. */}
-            {!tikiAwake
+            {tikiStage === "sleep"
               ? <TikiCat size={34} restAt={76} walkCycles={5} delay={0.9} />
               : <div style={{ height: 36 }} />}
             {/* relative + Tiki inside = he jumps down the FRONT of this card and
                 lands on its bottom edge. overflow-hidden is deliberately absent
                 here, or he would be clipped mid-jump. */}
             <div className="relative rounded-lg bg-panel-soft text-on-dark p-6 border border-wine">
-              {tikiAwake && (
+              {tikiStage === "wake" && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
                       been unmounted and the waking one has not yet appeared. */}
@@ -716,6 +725,17 @@ export default function BusinessHome() {
                       asleep: 34px left (the two sheets anchor differently) and
                       34px up (he sleeps in the strip above this card). */}
                   <TikiWake size={34} startX={-34} startY={-34} driftX={16} delay={0} />
+                </div>
+              )}
+
+              {/* The routine, on the spot TikiWake left him: bottom edge of this
+                  card, offset by the 16px the jump drifted him right. */}
+              {tikiStage === "box" && (
+                <div
+                  className="pointer-events-none absolute"
+                  style={{ left: "76%", bottom: 0, transform: "translateX(-18px)" }}
+                >
+                  <TikiBox size={34} fps={8} flexSlowdown={3} delay={0.3} loop />
                 </div>
               )}
               <div className="relative">
