@@ -181,23 +181,7 @@ export default function BusinessHome() {
   }, [tikiStage, yawnRound]);
 
 
-  // Declared before the timers that read it, so the ordering is obvious.
-  const tikiStageRef = useRef<TikiStage>("sleep");
-  useEffect(() => { tikiStageRef.current = tikiStage; }, [tikiStage]);
 
-  useEffect(() => {
-    const go = (next: TikiStage) => {
-      // Keep the outgoing stage on screen for a moment. Unmounting one
-      // component and mounting the next in the same tick leaves a frame with
-      // neither painted, which reads as a blink.
-      setTikiStage(next);
-    };
-    const a = window.setTimeout(() => go("wake"), 26000);
-    const b = window.setTimeout(() => go("box"), 26000 + 6600 + 5000);
-    // the routine runs 7s; then he sits a moment and yawns
-    const c = window.setTimeout(() => go("yawn"), 26000 + 6600 + 5000 + 7000 + 2500);
-    return () => { window.clearTimeout(a); window.clearTimeout(b); window.clearTimeout(c); };
-  }, []);
   // A broken Streak previously passed in silence: 40 days became 1 with no
   // acknowledgement, at exactly the moment a user is most likely to give up.
   // Held here so the dashboard can say something once, then move on.
