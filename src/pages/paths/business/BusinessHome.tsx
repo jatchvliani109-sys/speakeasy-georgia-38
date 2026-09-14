@@ -128,9 +128,12 @@ export default function BusinessHome() {
    * visits without needing seamless joins.
    */
   type TikiStage = "sleep" | "wake" | "box" | "yawn";
-  const TIKI_KEY = "speakbusy:tiki-visits";
-  const YAWN_COUNT = 4;
-  const YAWN_GAP_MS = 30000;
+  // Keyed per USER, not per browser: two accounts on the same machine were
+  // sharing a counter, so signing in as someone else carried on mid-story.
+  const TIKI_KEY = `speakbusy:tiki-visits:${user?.id ?? "anon"}`;
+  const YAWN_BURST = 4;        // yawns close together when he first settles
+  const YAWN_GAP_MS = 30000;   // between those
+  const YAWN_IDLE_MS = 240000; // and an occasional one after that
 
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
   // background image that has not been decoded yet paints as nothing, which
@@ -147,15 +150,18 @@ export default function BusinessHome() {
 
   const [tikiStage, setTikiStage] = useState<TikiStage | null>(null);
   const [yawnRound, setYawnRound] = useState(0);
-  const tikiCounted = useRef(false);
+  const tikiCounted = useRef<string | null>(null);
 
   useEffect(() => {
     // React mounts twice in development; without this the visit count doubles
     // and the first day skips straight to the boxing.
-    if (tikiCounted.current) return;
-    tikiCounted.current = true;
+    if (tikiCounted.current === user?.id) return;
+    tikiCounted.current = user?.id ?? "anon";
 
-    const today = new Date().toISOString().slice(0, 10);
+    // Local date. toISOString() is UTC, so in Georgia the day would have
+    // rolled over at 4am rather than midnight.
+    const d = new Date();
+    const today = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
     let visits = 1;
     try {
       const raw = localStorage.getItem(TIKI_KEY);
@@ -169,14 +175,17 @@ export default function BusinessHome() {
     }
 
     setTikiStage(visits === 1 ? "sleep" : visits === 2 ? "wake" : visits === 3 ? "box" : "yawn");
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Yawns are spaced out rather than looped: remounting the component restarts
   // it, and its final frame is the seated pose, so he simply sits in between.
   useEffect(() => {
     if (tikiStage !== "yawn") return;
-    if (yawnRound >= YAWN_COUNT - 1) return;
-    const t = window.setTimeout(() => setYawnRound((r) => r + 1), YAWN_GAP_MS);
+    // Four yawns close together, then one every few minutes. Stopping dead
+    // makes him look frozen; yawning every thirty seconds forever is worse.
+    const gap = yawnRound < YAWN_BURST - 1 ? YAWN_GAP_MS : YAWN_IDLE_MS;
+    const t = window.setTimeout(() => setYawnRound((r) => r + 1), gap);
     return () => window.clearTimeout(t);
   }, [tikiStage, yawnRound]);
 
@@ -826,7 +835,7 @@ export default function BusinessHome() {
                   className="pointer-events-none absolute"
                   // -25 computed, not guessed: the wake cat's base lands at 76% + 4.8px,
                     // and the box cat's base sits 30.2px into its own 63px cell.
-                    style={{ left: "76%", bottom: 0, transform: "translateX(-25px)" }}
+                    style={{ left: "76%", bottom: 0, transform: "translateX(-25px)", zIndex: 30 }}
                 >
                   {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
                       against 0.98 in the wake sheet, so the same number renders him
@@ -842,7 +851,7 @@ export default function BusinessHome() {
               {tikiStage === "yawn" && (
                 <div
                   className="pointer-events-none absolute"
-                  style={{ left: "76%", bottom: 0, transform: "translateX(-13px)" }}
+                  style={{ left: "76%", bottom: 0, transform: "translateX(-13px)", zIndex: 30 }}
                 >
                   <TikiYawn key={yawnRound} size={44} fps={6} delay={yawnRound === 0 ? 4 : 0} />
                 </div>
