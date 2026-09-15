@@ -191,7 +191,7 @@ export default function BusinessSetup() {
             }}
             maxLength={60}
             placeholder="მაგ. ნინო"
-            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-line focus:border-wine focus:outline-none text-ink text-base"
+            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-line focus:border-wine focus:outline-none bg-card text-ink placeholder:text-ink-subtle text-base"
           />
           <div className="flex justify-end mt-6">
             <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
