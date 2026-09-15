@@ -137,6 +137,20 @@ export default function BusinessHome() {
   // Decode every sheet up front. Each stage uses a DIFFERENT png, and a
   // background image that has not been decoded yet paints as nothing, which
   // showed as an intermittent gap when a stage first appeared.
+  // Replay anything a dropped connection left unsaved. The dashboard is the
+  // screen people land on after a session, so it is the natural place to do it:
+  // it runs once on mount and again whenever the browser comes back online.
+  useEffect(() => {
+    let stop: (() => void) | undefined;
+    (async () => {
+      const { watchConnection } = await import("./lib/offlineQueue");
+      stop = watchConnection(({ sent }) => {
+        if (sent > 0) toast.success("შენახული პროგრესი აიტვირთა");
+      });
+    })();
+    return () => stop?.();
+  }, []);
+
   const tikiSheets = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
     tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => {

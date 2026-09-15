@@ -217,7 +217,7 @@ export async function loadProgress(userId: string): Promise<ProgressRow[]> {
   return (data || []) as any;
 }
 
-export type SaveResult = { ok: boolean; error?: string };
+export type SaveResult = { ok: boolean; error?: string; queued?: boolean };
 
 /**
  * Saves session progress.
@@ -254,6 +254,14 @@ export async function upsertProgress(userId: string, rows: ProgressRow[]): Promi
   if (!res.ok) {
     await new Promise((r) => setTimeout(r, 1200));   // one retry for a blip
     res = await attempt();
+  }
+  if (!res.ok) {
+    // Still failing after a retry: this is a real loss of connection, not a
+    // blip. Park the rows and replay them when the network returns, rather
+    // than throwing away the whole session.
+    const { queueProgress } = await import("./offlineQueue");
+    queueProgress(userId, payload as Record<string, unknown>[]);
+    return { ok: false, queued: true, error: res.error };
   }
   return res;
 }
