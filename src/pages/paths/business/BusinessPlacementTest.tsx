@@ -169,17 +169,6 @@ function levelFromPercent(pct: number): BusinessLevel {
   return "business_beginner";
 }
 
-const LEVEL_BLURB: Record<BusinessLevel, string> = {
-  business_beginner:
-    "შენ ახლა იწყებ ბიზნეს ინგლისურს. შენი გეგმა ფოკუსირდება საბაზისო ლექსიკაზე, მარტივ იმეილებზე და ყოველდღიურ სამუშაო ფრაზებზე.",
-  business_elementary:
-    "შენ უკვე გესმის ბიზნეს ინგლისურის საფუძვლები. შენი გეგმა ფოკუსირდება უფრო თავაზიან ფორმულირებებზე, იმეილების სტრუქტურაზე და გავრცელებულ სამუშაო სიტუაციებზე.",
-  business_intermediate:
-    "შენ კარგად მართავ ბიზნეს კომუნიკაციას. შენი გეგმა გააძლიერებს ნუანსს, ტონს, შეხვედრებსა და პრეზენტაციებში თავდაჯერებას.",
-  business_advanced:
-    "შენ მაღალ დონეზე ფლობ ბიზნეს ინგლისურს. შენი გეგმა გაასწავლის გამოცდილ ნიუანსებს, idiom-ებს, რთულ მოლაპარაკებებსა და დახვეწილ წერას.",
-};
-
 export default function BusinessPlacementTest() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -269,9 +258,6 @@ export default function BusinessPlacementTest() {
           </h1>
           <p className="text-sm text-ink-muted mt-1">
             Score: {resultPct}% (weighted)
-          </p>
-          <p className="ka text-sm text-ink mt-4 leading-relaxed">
-            {LEVEL_BLURB[resultLevel]}
           </p>
           <div className="mt-6">
             <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>

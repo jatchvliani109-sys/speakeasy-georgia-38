@@ -12,8 +12,7 @@ import {
   Check,
   ArrowRight,
   Instagram,
-  X,
-} from "lucide-react";
+  X, User} from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
@@ -456,7 +455,6 @@ export default function BusinessHome() {
   // Nudge only about the TEST, and only when the level was never measured.
   // Setup cannot be incomplete here — the gate requires it.
   const levelUnmeasured = !s.testCompleted;
-  const showIntroCard = !!plan && !s.businessSelfIntroductionCompleted;
 
   const focusCopy = MODULE_FOCUS.vocabulary;
   const focusMinutes = plan ? INTENSITY_MINUTES[plan.intensity] : "15 წუთი";
@@ -926,29 +924,6 @@ export default function BusinessHome() {
             </div>
           </section>
 
-          {showIntroCard && (
-            <BizCard className="mb-5 border-dashed">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
-                    რეკომენდაცია
-                  </p>
-                  <p className="ka text-sm font-semibold text-wine mt-1">
-                    შექმენი შენი პროფესიონალური წარდგენა
-                  </p>
-                  <p className="ka text-xs text-ink-muted mt-1">
-                    სასარგებლოა გასაუბრებებზე, networking-ისთვის და LinkedIn-ზე.
-                  </p>
-                </div>
-                <Link
-                  to="/path/business/self-introduction"
-                  className="ka text-xs text-wine underline underline-offset-2 shrink-0 mt-1 inline-flex items-center gap-1"
-                >
-                  დაწყება <ArrowRight size={12} strokeWidth={2.25} />
-                </Link>
-              </div>
-            </BizCard>
-          )}
 
           {!hasResume && (
             <BizCard className="mb-5 border-dashed">
@@ -991,6 +966,12 @@ export default function BusinessHome() {
                 title="დოკუმენტების ასისტენტი"
                 sub="იმეილი, რეზიუმე, სამოტივაციო - შენი მონაცემებით"
                 onClick={() => navigate("/path/business/documents")}
+              />
+              <MoreRow
+                icon={<User size={15} strokeWidth={2} />}
+                title="თვითპრეზენტაცია"
+                sub="წარადგინე თავი გასაუბრებაზე, networking-ზე და LinkedIn-ზე"
+                onClick={() => navigate("/path/business/self-introduction")}
               />
               <MoreRow
                 icon={<Award size={15} strokeWidth={2} />}
