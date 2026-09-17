@@ -19,7 +19,6 @@ import { supabase } from "@/integrations/supabase/client";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import TikiCat from "@/components/TikiCat";
 import TikiWake from "@/components/TikiWake";
-import TikiBox from "@/components/TikiBox";
 import TikiYawn from "@/components/TikiYawn";
 import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -126,7 +125,7 @@ export default function BusinessHome() {
    * the ending pose of the one before, so the story still reads in order across
    * visits without needing seamless joins.
    */
-  type TikiStage = "sleep" | "wake" | "box" | "yawn";
+  type TikiStage = "sleep" | "wake" | "yawn";
   // Keyed per USER, not per browser: two accounts on the same machine were
   // sharing a counter, so signing in as someone else carried on mid-story.
   const TIKI_KEY = `speakbusy:tiki-visits:${user?.id ?? "anon"}`;
@@ -153,7 +152,7 @@ export default function BusinessHome() {
 
   const tikiSheets = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
-    tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => {
+    tikiSheets.current = ["/tiki.png", "/tiki-wake.png", "/tiki-yawn.png"].map((src) => {
       const img = new Image();
       img.src = src;
       void img.decode?.().catch(() => {});
@@ -187,7 +186,7 @@ export default function BusinessHome() {
       // private mode or storage disabled: just show the first animation
     }
 
-    setTikiStage(visits === 1 ? "sleep" : visits === 2 ? "wake" : visits === 3 ? "box" : "yawn");
+    setTikiStage(visits === 1 ? "sleep" : visits === 2 ? "wake" : "yawn");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -798,7 +797,7 @@ export default function BusinessHome() {
                 first paint of a sheet can stall for a frame, which showed as an
                 intermittent gap at the stage handovers. */}
             <div aria-hidden className="absolute opacity-0 pointer-events-none" style={{ width: 1, height: 1, overflow: "hidden" }}>
-              {["/tiki.png", "/tiki-wake.png", "/tiki-box.png", "/tiki-yawn.png"].map((src) => (
+              {["/tiki.png", "/tiki-wake.png", "/tiki-yawn.png"].map((src) => (
                 <span key={src} style={{ display: "block", width: 1, height: 1, backgroundImage: `url(${src})` }} />
               ))}
             </div>
@@ -842,19 +841,6 @@ export default function BusinessHome() {
 
               {/* The routine, on the spot TikiWake left him: bottom edge of this
                   card, offset by the 16px the jump drifted him right. */}
-              {tikiStage === "box" && (
-                <div
-                  className="pointer-events-none absolute"
-                  // -25 computed, not guessed: the wake cat's base lands at 76% + 4.8px,
-                    // and the box cat's base sits 30.2px into its own 63px cell.
-                    style={{ left: "76%", bottom: 0, transform: "translateX(-25px)", zIndex: 30 }}
-                >
-                  {/* size 68, not 44: the sitting pose is 0.64 of the cell in this sheet
-                      against 0.98 in the wake sheet, so the same number renders him
-                      at 65%. 68 makes the sitting cat match at the handover. */}
-                  <TikiBox size={68} fps={8} flexSlowdown={3} delay={4} />
-                </div>
-              )}
 
               {/* Yawn, on the spot the routine leaves him. size 44 not 68: the
                   cat fills 0.985 of the cell in this sheet against 0.641 in the
