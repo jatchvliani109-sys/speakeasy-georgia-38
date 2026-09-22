@@ -1,7 +1,9 @@
 // Quiz generators + spaced repetition logic for the Business Vocabulary module.
 // All quiz questions are produced client-side from the static word bank + DB-tracked
 // progress. Spaced repetition follows simple buckets: wrong → +1 day, ok → +3 days,
-// easy → +7 days, mastered (confidence ≥ 4 streak) → +14 days.
+// easy → +7 days, mastered → 14 days, then 30, then 60 after each correct
+// check-up. Mastered words DO come back: a miss on a check-up drops the word
+// out of mastery and back into regular review.
 //
 // Session sizing (free vs paid):
 // - free: 6 new words + up to 8 review words per session.
@@ -113,8 +115,16 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
     correct_count: newCorrectTotal,
     meta,
   });
+  // Check-up spacing for mastered words: 14 days when first mastered, then 30,
+  // then 60 after each correct check-up. Any miss resets the ladder.
+  const MASTERED_DAYS = [14, 30, 60];
+  const wasMastered = checkMastery(p);
+  const prevStep = typeof p.meta?.masteryStep === "number" ? p.meta.masteryStep : 0;
+  const masteryStep = mastered
+    ? wasMastered ? Math.min(prevStep + 1, MASTERED_DAYS.length - 1) : 0
+    : 0;
   const days = mastered
-    ? 14
+    ? MASTERED_DAYS[masteryStep]
     : fastTracked
     ? 7
     : sessionCorrect
@@ -133,7 +143,7 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
     wrong_count: p.wrong_count + wrongCount,
     last_seen_at: new Date().toISOString(),
     due_at: new Date(Date.now() + days * DAY_MS).toISOString(),
-    meta,
+    meta: { ...meta, masteryStep },
   };
 }
 
@@ -630,8 +640,9 @@ export function planSession(
   // ---- Review selection: three layers, filled up to reviewTarget ----------
 
   // Layer 1: overdue words (real spaced repetition) — hardest first.
+  // Mastered words are included once their check-up date arrives; weaker
+  // words still sort ahead of them.
   const dueRows = progress
-    .filter((p) => !checkMastery(p))
     .filter((p) => new Date(p.due_at).getTime() <= now)
     .sort((a, b) => a.confidence - b.confidence
       || new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
@@ -1534,7 +1545,7 @@ export function pickLowestConfidenceWords(progress: ProgressRow[], n = 10): Voca
 export function dueToday(progress: ProgressRow[]): VocabWord[] {
   const now = Date.now();
   return progress
-    .filter((p) => !checkMastery(p) && p.last_seen_at !== null)
+    .filter((p) => p.last_seen_at !== null)
     .filter((p) => new Date(p.due_at).getTime() <= now)
     .sort(
       (a, b) =>
