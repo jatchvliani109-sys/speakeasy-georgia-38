@@ -189,7 +189,7 @@ const Index = () => {
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ისწავლე ბიზნეს ინგლისური მარტივად
+              ისწავლე ბიზნეს ინგლისური მარტივად{"\n"}
               <span className="block mt-2 text-gold">შენს ტემპში.</span>
             </h1>
 
