@@ -1491,7 +1491,11 @@ function QuestionCard({
         <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი</p>
           <p className="text-lg text-[#5C1A2E] mt-3 leading-relaxed">{q.sentence}</p>
-          <p className="ka text-xs text-[#4A4A4A] mt-1">{q.ka}</p>
+          {/* Georgian shown only after answering: some translations contain the
+              English term itself (abbreviations), which would give the answer away. */}
+          {revealed && (
+            <p className="ka text-xs text-[#4A4A4A] mt-1 animate-[bizFade_.3s_ease-out_both]">{q.ka}</p>
+          )}
           {renderChoices(q.choices, q.correct)}
         </div>
       );
@@ -1581,7 +1585,9 @@ function QuestionCard({
         <div className="bg-white border border-[#E4E2DF] rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-[#4A4A4A] uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="text-2xl font-bold text-[#5C1A2E] mt-3 tracking-tight">{q.phraseEn}</p>
-          <p className="ka text-xs text-[#4A4A4A] mt-1">{q.hintKa}</p>
+          {revealed && (
+            <p className="ka text-xs text-[#4A4A4A] mt-1 animate-[bizFade_.3s_ease-out_both]">{q.hintKa}</p>
+          )}
           {renderChoices(q.choices, q.correct)}
         </div>
       );
