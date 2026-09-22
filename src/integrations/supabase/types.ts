@@ -886,10 +886,12 @@ export type Database = {
       subscriptions: {
         Row: {
           cancelled_at: string | null
+          charge_attempts: number
           consent_at: string | null
           consent_terms: string | null
           created_at: string
           current_period_end: string | null
+          last_charge_attempt: string | null
           masked_card: string | null
           next_notice_sent: string | null
           order_id: string
@@ -900,10 +902,12 @@ export type Database = {
         }
         Insert: {
           cancelled_at?: string | null
+          charge_attempts?: number
           consent_at?: string | null
           consent_terms?: string | null
           created_at?: string
           current_period_end?: string | null
+          last_charge_attempt?: string | null
           masked_card?: string | null
           next_notice_sent?: string | null
           order_id: string
@@ -914,10 +918,12 @@ export type Database = {
         }
         Update: {
           cancelled_at?: string | null
+          charge_attempts?: number
           consent_at?: string | null
           consent_terms?: string | null
           created_at?: string
           current_period_end?: string | null
+          last_charge_attempt?: string | null
           masked_card?: string | null
           next_notice_sent?: string | null
           order_id?: string
