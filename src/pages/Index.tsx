@@ -74,7 +74,7 @@ const WaveDivider = ({
 const valueCards = [
   {
     icon: BookOpen,
-    title: "980 სიტყვა, ქართულად ახსნილი",
+    title: "980 ბიზნეს სიტყვა, ქართულად ახსნილი",
     body:
       "ყოველი სიტყვა ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით. ",
   },
@@ -189,12 +189,12 @@ const Index = () => {
             </div>
 
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ისწავლე ბიზნეს ინგლისური
-              <span className="block mt-2 text-gold">ერთ სივრცეში.</span>
+              ისწავლე ბიზნეს ინგლისური მარტივად
+              <span className="block mt-2 text-gold">შენს ტემპში.</span>
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-on-dark-subtle leading-relaxed max-w-2xl ka">
-              980 ბიზნეს სიტყვა, ქართული ახსნებით, დღეში ხუთ წუთში.
+              {"\n"}
             </p>
 
             {/* Price and trial stated up front. The previous page mentioned
@@ -202,8 +202,8 @@ const Index = () => {
                 cheap or expensive, and unanswered price questions are a
                 reason to leave. */}
             <p className="mt-5 ka text-sm text-on-dark-subtle">
-              პრემიუმის
-              <span className="text-gold font-semibold"> პირველი 7 დღე უფასოდ</span>
+              გამოცადე პრემიუმ სერვისის&nbsp;
+              <span className="text-gold font-semibold">პირველი 7 დღე უფასოდ საკრედიტო ინფორმაციის მითითების გარეშე</span>
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
