@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { Check, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { suggestEmail } from "@/lib/emailTypo";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { pullBusinessFromSupabase, saveBusinessAsync } from "./lib/state";
 
@@ -186,10 +187,36 @@ export default function BusinessPremium() {
               </label>
             </div>
 
+            {/* Last chance to catch a mistyped address. Registration no longer
+                waits for a confirmation email, so this is the first moment the
+                address is actually needed: the receipt and every charge notice
+                go here, and a wrong one means a customer who paid and heard
+                nothing. */}
+            {user?.email && (
+              <div className="mt-4 rounded-xl bg-on-dark/5 border border-on-dark/10 p-3">
+                <p className="ka text-[11px] text-on-dark/70 leading-relaxed">
+                  ქვითარი და გადახდის შეტყობინებები გამოგეგზავნება აქ:
+                </p>
+                <p className="text-[13px] font-semibold text-on-dark mt-1 break-all">
+                  {user.email}
+                </p>
+                {suggestEmail(user.email) ? (
+                  <p className="ka text-[11px] text-gold mt-1.5 leading-relaxed">
+                    დარწმუნდი, რომ სწორია. იქნებ {suggestEmail(user.email)}? შეცვლა
+                    პროფილის გვერდიდან შეგიძლია.
+                  </p>
+                ) : (
+                  <p className="ka text-[11px] text-on-dark/50 mt-1.5 leading-relaxed">
+                    არასწორია? შეცვალე პროფილის გვერდიდან გამოწერამდე.
+                  </p>
+                )}
+              </div>
+            )}
+
             <button
               onClick={subscribe}
               disabled={busy || !cardConsent || (sub?.status === "active")}
-              className="ka w-full py-3.5 rounded-xl bg-gold text-ink text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
+              className="ka w-full mt-4 py-3.5 rounded-xl bg-gold text-ink text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
             </button>

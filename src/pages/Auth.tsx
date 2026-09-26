@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ArrowRight, Mail, CheckCircle2 } from "lucide-react";
 import { track, resetTrackedUser } from "@/lib/track";
+import { suggestEmail } from "@/lib/emailTypo";
 
 const loginSchema = z.object({
   email: z.string().trim().email("არასწორი ელ-ფოსტა").max(255),
@@ -24,6 +25,10 @@ export default function Auth() {
   const [params] = useSearchParams();
   const [mode, setMode] = useState<"signup" | "login">(params.get("mode") === "login" ? "login" : "signup");
   const [email, setEmail] = useState("");
+  // "Did you mean gmail.com?" — signup does not wait for a confirmation email
+  // any more, so a typo is never caught by the person failing to receive it.
+  // Shown only once they have stopped typing (blur), never while mid-address.
+  const [emailHint, setEmailHint] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,6 +70,17 @@ export default function Auth() {
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
+    }
+    // One last check before an account is created on a mistyped address.
+    // Never blocks twice: showing the suggestion is enough, and the second
+    // press goes through whatever they chose.
+    if (mode === "signup" && !emailHint) {
+      const hint = suggestEmail(email);
+      if (hint) {
+        setEmailHint(hint);
+        toast.error(`შეამოწმე ელ-ფოსტა — იქნებ ${hint}?`);
+        return;
+      }
     }
     setLoading(true);
     if (mode === "signup") track("signup_started");
@@ -239,9 +255,29 @@ export default function Auth() {
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailHint) setEmailHint(null);
+              }}
+              onBlur={(e) => setEmailHint(suggestEmail(e.target.value))}
               className="h-11 mt-1.5 rounded-lg bg-card border-line focus-visible:ring-ink"
             />
+            {emailHint && (
+              <p className="ka mt-1.5 text-xs text-ink-muted">
+                იქნებ იგულისხმე{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail(emailHint);
+                    setEmailHint(null);
+                  }}
+                  className="font-semibold text-wine underline underline-offset-2"
+                >
+                  {emailHint}
+                </button>
+                ?
+              </p>
+            )}
           </div>
           <div>
             <div className="flex items-center justify-between">

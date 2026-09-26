@@ -20,6 +20,13 @@ import { supabase } from "@/integrations/supabase/client";
 export type TrackEvent =
   // acquisition / onboarding funnel
   | "landing_viewed"
+  // the try-before-signup session on the landing page. The whole point of the
+  // landing page is now this demo, so its funnel needs its own events:
+  // how many start it, how many finish, how many sign up afterwards.
+  | "demo_started"
+  | "demo_completed"
+  | "demo_abandoned"
+  | "demo_signup_clicked"
   | "signup_started"
   | "login_started"
   | "signup_completed"

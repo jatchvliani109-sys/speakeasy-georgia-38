@@ -12,6 +12,7 @@ import {
   Instagram,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import DemoSession from "@/components/demo/DemoSession";
 import Wordmark from "@/components/Wordmark";
 import SEO from "@/components/SEO";
 import { track } from "@/lib/track";
@@ -180,7 +181,7 @@ const Index = () => {
           <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
           <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-gold opacity-40" aria-hidden />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-28 sm:pt-28 sm:pb-36 relative z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20 sm:pt-24 sm:pb-28 relative z-10">
             <div className="flex items-center gap-3 mb-8">
               <span className="h-px w-8 bg-gold" />
               <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold ka">
@@ -188,32 +189,32 @@ const Index = () => {
               </span>
             </div>
 
+            {/* The headline is the line that made people click the ad. A
+                visitor who arrives on a different thought than the one they
+                clicked has to be re-convinced, and they will not wait. */}
             <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ისწავლე ბიზნეს ინგლისური მარტივად{"\n"}
-              <span className="block mt-2 text-gold">შენს ტემპში.</span>
+              ბიზნეს ინგლისურს{"\n"}
+              <span className="block mt-2">არსად გასწავლიან</span>
+              <span className="block mt-2 text-gold">ნორმალურად.</span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-on-dark-subtle leading-relaxed max-w-2xl ka">
-              {"\n"}
+            <p className="mt-6 text-base sm:text-lg text-on-dark-subtle leading-relaxed max-w-xl ka">
+              980 სიტყვა და ფრაზა, რომლებიც სამსახურში ყოველდღე ხმარებაშია.
+              ქართული ახსნებით, აუდიოთი და რეალური მაგალითებით.
             </p>
 
-            {/* Price and trial stated up front. The previous page mentioned
-                neither, so a visitor could not tell whether this was free,
-                cheap or expensive, and unanswered price questions are a
-                reason to leave. */}
-            <p className="mt-5 ka text-sm text-on-dark-subtle">
-              გამოცადე პრემიუმ სერვისის&nbsp;
-              <span className="text-gold font-semibold">პირველი 7 დღე უფასოდ საკრედიტო ინფორმაციის მითითების გარეშე</span>
-            </p>
-
+            {/* The button no longer asks for an account. It scrolls to the
+                demo below, because nobody registers to find out what a product
+                is: 250 visitors from the first ad, 8 reached the signup form,
+                0 finished. */}
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <Link
-                to="/auth?mode=signup"
+              <a
+                href="#demo"
                 className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
-                უფასოდ დაიწყე
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+                გამოსცადე რეგისტრაციის გარეშე
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-y-0.5 sm:group-hover:translate-x-0.5" />
+              </a>
               <Link
                 to="/auth?mode=login"
                 className="text-sm font-semibold text-on-dark-subtle hover:text-on-dark transition-colors ka underline-offset-4 hover:underline"
@@ -221,9 +222,36 @@ const Index = () => {
                 უკვე გაქვს ანგარიში? შედი
               </Link>
             </div>
+
+            <p className="mt-5 ka text-sm text-on-dark-subtle">
+              12 კითხვა, ორი წუთი. ანგარიში არ სჭირდება.
+            </p>
           </div>
 
           <WaveDivider fill="hsl(var(--cream))" />
+        </section>
+
+        {/* ═══════════════ DEMO ═══════════════ */}
+        {/* The product IS the advert. This is the first thing under the fold,
+            and the only call to action above it. */}
+        <section id="demo" className="bg-cream pt-4 pb-16 sm:pb-24 scroll-mt-16">
+          <div className="max-w-xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-wine mb-3">
+                <span className="h-px w-6 bg-wine" />
+                DEMO
+                <span className="h-px w-6 bg-wine" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight ka text-ink">
+                სცადე ახლავე
+              </h2>
+              <p className="ka mt-2 text-sm text-ink-muted">
+                ნამდვილი სესია, ისეთივე როგორიც აპლიკაციაშია.
+              </p>
+            </div>
+
+            <DemoSession />
+          </div>
         </section>
 
         {/* ═══════════════ VALUE CARDS ═══════════════ */}
