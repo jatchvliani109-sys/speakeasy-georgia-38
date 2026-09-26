@@ -177,7 +177,7 @@ const Index = () => {
           <Dots className="top-10 right-10 text-on-dark opacity-40" />
           <Dots className="bottom-14 left-10 text-on-dark opacity-25" />
           <GoldLine className="top-28 left-0 w-28" />
-          <GoldLine className="bottom-36 right-0 w-20" />
+          <GoldLine className="bottom-10 right-0 w-20" />
           <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
           <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-gold opacity-40" aria-hidden />
 
@@ -210,10 +210,10 @@ const Index = () => {
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <a
                 href="#demo"
-                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
+                className="group w-full sm:w-auto inline-flex items-center justify-center text-center gap-2 px-6 sm:px-8 py-4 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
-                გამოსცადე რეგისტრაციის გარეშე
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-y-0.5 sm:group-hover:translate-x-0.5" />
+                <span>გამოსცადე რეგისტრაციის გარეშე</span>
+                <ArrowRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-y-0.5 sm:group-hover:translate-x-0.5" />
               </a>
               <Link
                 to="/auth?mode=login"
@@ -223,7 +223,7 @@ const Index = () => {
               </Link>
             </div>
 
-            <p className="mt-5 ka text-sm text-on-dark-subtle">
+            <p className="mt-5 ka text-sm text-on-dark-subtle relative z-10">
               12 კითხვა, ორი წუთი. ანგარიში არ სჭირდება.
             </p>
           </div>

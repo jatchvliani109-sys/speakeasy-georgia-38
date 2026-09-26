@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { Share, Plus, X, Download } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 /**
  * Invites phone users to install SpeakBusy to their home screen.
  *
  * Deliberately restrained:
  * - never on desktop, never once already installed
+ * - NEVER for a logged-out visitor. It used to appear over the landing page's
+ *   main button, so an Instagram visitor's first sight of SpeakBusy was a
+ *   stranger asking to be installed. Only people with an account see it.
  * - not on the very first visit, since asking a stranger to install is a bad trade;
  *   we wait until someone has come back, which signals actual interest
  * - shown once per session, not once ever: a prompt seen a single time is
@@ -75,12 +79,14 @@ function bumpVisits(): number {
 }
 
 export default function AddToHomeScreen() {
+  const { user } = useAuth();
   const [show, setShow] = useState(false);
   const [platform, setPlatform] = useState<Platform>("other");
   const [installEvent, setInstallEvent] = useState<any>(null);
   const [never, setNever] = useState(false);
 
   useEffect(() => {
+    if (!user) return;                       // signed-out visitors: never
     const p = detectPlatform();
     setPlatform(p);
 
@@ -106,7 +112,7 @@ export default function AddToHomeScreen() {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.clearTimeout(t);
     };
-  }, []);
+  }, [user]);
 
   /**
    * Closing hides it for this session. It only stops coming back if the user

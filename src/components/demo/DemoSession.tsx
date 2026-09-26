@@ -105,7 +105,7 @@ export default function DemoSession() {
   if (done) {
     const verdict = demoVerdict(score);
     return (
-      <div className="rounded-3xl border border-line bg-white p-6 sm:p-8 shadow-[0_2px_12px_-2px_rgba(28,28,30,0.08)]">
+      <div className="rounded-3xl border border-line bg-card p-6 sm:p-8 shadow-[0_2px_12px_-2px_rgba(28,28,30,0.08)]">
         <p className="ka text-[11px] uppercase tracking-[0.2em] text-ink-muted font-semibold">
           შედეგი
         </p>
@@ -118,7 +118,7 @@ export default function DemoSession() {
         <h3 className="ka mt-4 text-xl font-extrabold text-ink">{verdict.titleKa}</h3>
         <p className="ka mt-2 text-sm text-ink-muted leading-relaxed">{verdict.bodyKa}</p>
 
-        <div className="mt-6 rounded-2xl bg-cream border border-line p-4">
+        <div className="mt-6 rounded-2xl bg-cream-2 border border-line p-4">
           <p className="ka text-sm text-ink leading-relaxed">
             რეგისტრაციის შემდეგ სესიები შენს დონეს მოერგება, ნასწავლი სიტყვები კი
             პერიოდულად დაგიბრუნდება გასამეორებლად, რომ არ დაგავიწყდეს.
@@ -136,7 +136,7 @@ export default function DemoSession() {
 
         <button
           onClick={restart}
-          className="ka mt-3 w-full h-11 rounded-xl border border-line text-sm font-semibold text-ink-muted hover:bg-cream transition-colors"
+          className="ka mt-3 w-full h-11 rounded-xl border border-line text-sm font-semibold text-ink-muted hover:bg-cream-2 transition-colors"
         >
           თავიდან სცადე
         </button>
@@ -146,7 +146,7 @@ export default function DemoSession() {
 
   /* ─────────────── question ─────────────── */
   return (
-    <div className="rounded-3xl border border-line bg-white p-5 sm:p-7 shadow-[0_2px_12px_-2px_rgba(28,28,30,0.08)]">
+    <div className="rounded-3xl border border-line bg-card p-5 sm:p-7 shadow-[0_2px_12px_-2px_rgba(28,28,30,0.08)]">
       {/* progress */}
       <div className="flex items-center justify-between gap-4">
         <p className="ka text-[11px] uppercase tracking-[0.2em] text-ink-muted font-semibold">
@@ -156,7 +156,7 @@ export default function DemoSession() {
           {idx + 1}/{DEMO_TOTAL}
         </p>
       </div>
-      <div className="mt-3 h-1.5 rounded-full bg-cream overflow-hidden">
+      <div className="mt-3 h-1.5 rounded-full bg-cream-2 overflow-hidden">
         <div
           className="h-full rounded-full bg-gold transition-[width] duration-300"
           style={{ width: `${((idx + (revealed ? 1 : 0)) / DEMO_TOTAL) * 100}%` }}
@@ -182,7 +182,7 @@ export default function DemoSession() {
 
         {q.type === "listening" && (
           <div className="flex flex-col items-center gap-3 py-2">
-            <div className="p-5 rounded-full bg-cream border border-line">
+            <div className="p-5 rounded-full bg-cream-2 border border-line">
               <ReadAloudButton text={q.en} storageKey={q.key} size="md" />
             </div>
             {revealed ? (
@@ -197,7 +197,7 @@ export default function DemoSession() {
         )}
 
         {q.type === "trueFalse" && (
-          <div className="rounded-2xl bg-cream border border-line p-4 text-center">
+          <div className="rounded-2xl bg-cream-2 border border-line p-4 text-center">
             <p className="text-2xl font-extrabold text-wine">{q.en}</p>
             <p className="ka text-base text-ink-muted mt-1">= {q.claimKa}</p>
           </div>
@@ -212,12 +212,12 @@ export default function DemoSession() {
           const base =
             "w-full text-left px-4 py-3.5 rounded-xl border text-[15px] font-semibold transition-colors flex items-center justify-between gap-3";
           const state = !revealed
-            ? "border-line bg-white text-ink hover:border-wine hover:bg-cream"
+            ? "border-line bg-card text-ink hover:border-wine hover:bg-cream-2"
             : isCorrect
-            ? "border-success bg-success/10 text-ink"
+            ? "border-sage-line bg-sage-soft text-ink"
             : isPicked
-            ? "border-destructive bg-destructive/10 text-ink"
-            : "border-line bg-white text-ink-subtle";
+            ? "border-danger-line bg-danger-soft text-ink"
+            : "border-line bg-card text-ink-subtle";
           // Georgian answers need the ka font; English ones must not have it.
           const font =
             q.type === "meaning" || q.type === "listening" || q.type === "trueFalse" ? "ka" : "";
@@ -229,9 +229,9 @@ export default function DemoSession() {
               className={`${base} ${state} ${font}`}
             >
               <span>{c.label}</span>
-              {revealed && isCorrect && <Check className="w-4 h-4 shrink-0 text-success" />}
+              {revealed && isCorrect && <Check className="w-4 h-4 shrink-0 text-sage" />}
               {revealed && isPicked && !isCorrect && (
-                <X className="w-4 h-4 shrink-0 text-destructive" />
+                <X className="w-4 h-4 shrink-0 text-danger" />
               )}
             </button>
           );
@@ -240,7 +240,7 @@ export default function DemoSession() {
 
       {/* what the app teaches after every answer: the meaning and a real sentence */}
       {revealed && (
-        <div className="mt-5 rounded-2xl bg-cream border border-line p-4">
+        <div className="mt-5 rounded-2xl bg-cream-2 border border-line p-4">
           <p className="ka text-sm font-bold text-wine">
             {gotIt ? "სწორია" : "სწორი პასუხი:"}{" "}
             {!gotIt && (
@@ -262,7 +262,7 @@ export default function DemoSession() {
       {revealed && (
         <button
           onClick={next}
-          className="ka mt-5 w-full py-4 rounded-xl bg-ink text-on-dark text-base font-bold hover:bg-panel transition-colors inline-flex items-center justify-center gap-2"
+          className="ka mt-5 w-full py-4 rounded-xl bg-panel text-on-dark text-base font-bold hover:bg-panel-soft transition-colors inline-flex items-center justify-center gap-2"
         >
           {idx + 1 >= DEMO_TOTAL ? "შედეგის ნახვა" : "შემდეგი"}
           <ArrowRight className="w-4 h-4" />
