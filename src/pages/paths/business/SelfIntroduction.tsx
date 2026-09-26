@@ -68,37 +68,37 @@ const EXAMPLES: Record<string, Record<LevelTier, Example>> = {
     beginner: { en: "Hi, my name is Nino. I am a Business Administration student. I am interested in marketing.", ka: "გამარჯობა, მე მქვია ნინო. ვარ ბიზნეს ადმინისტრირების სტუდენტი. მაინტერესებს მარკეტინგი." },
     elementary: { en: "Hello, I'm Nino. I study Business Administration and I'm interested in marketing and customer communication.", ka: "გამარჯობა, მე ვარ ნინო. ვსწავლობ ბიზნეს ადმინისტრირებას და მაინტერესებს მარკეტინგი და კომუნიკაცია." },
     intermediate: { en: "Hi, I'm Nino, a Business Administration student focusing on marketing. I enjoy learning how brands communicate with customers.", ka: "გამარჯობა, ნინო ვარ, ბიზნეს ადმინისტრირების სტუდენტი მარკეტინგის მიმართულებით." },
-    advanced: { en: "Hi, I'm Nino — a Business Administration student with a focus on marketing and consumer behavior. I'm exploring how data-driven decisions shape brand strategy.", ka: "გამარჯობა, ნინო ვარ — ბიზნეს ადმინისტრირების სტუდენტი მარკეტინგისა და მომხმარებლის ქცევის მიმართულებით.", note: "Tone: confident, specific." },
+    advanced: { en: "Hi, I'm Nino, a Business Administration student with a focus on marketing and consumer behavior. I'm exploring how data-driven decisions shape brand strategy.", ka: "გამარჯობა, ნინო ვარ, ბიზნეს ადმინისტრირების სტუდენტი მარკეტინგისა და მომხმარებლის ქცევის მიმართულებით.", note: "Tone: confident, specific." },
   },
   interview: {
     beginner: { en: "My name is Nino. I have one year of customer service experience. I want to work in your team.", ka: "მე მქვია ნინო. მაქვს ერთი წლის გამოცდილება customer service-ში. მინდა ვიმუშაო თქვენს გუნდში." },
     elementary: { en: "I'm Nino. I have one year of customer service experience and good communication skills. I'd like to grow in a professional team.", ka: "ნინო ვარ. მაქვს 1 წლის გამოცდილება customer service-ში და კარგი კომუნიკაცია. მინდა გავიზარდო პროფესიულ გუნდში." },
-    intermediate: { en: "I'm Nino. For the past year I've worked in customer service, where I learned how to handle clients calmly and clearly. I'm looking for a role where I can grow.", ka: "ნინო ვარ. ბოლო ერთი წელია ვმუშაობ customer service-ში — ვისწავლე კლიენტებთან მუშაობა მშვიდად და ნათლად." },
+    intermediate: { en: "I'm Nino. For the past year I've worked in customer service, where I learned how to handle clients calmly and clearly. I'm looking for a role where I can grow.", ka: "ნინო ვარ. ბოლო ერთი წელია ვმუშაობ customer service-ში, ვისწავლე კლიენტებთან მუშაობა მშვიდად და ნათლად." },
     advanced: { en: "I'm Nino. Over the past year in customer service I learned how to stay calm under pressure and turn difficult conversations into solutions. I'm now looking for a role where I can take more ownership.", ka: "ნინო ვარ. ერთი წლის განმავლობაში customer service-ში ვისწავლე როგორ მოვაგვარო რთული საუბრები.", note: "Tone: calm, ownership-focused." },
   },
   networking: {
     beginner: { en: "Hi, I'm Nino. I work in marketing. Nice to meet you.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში. სასიამოვნოა." },
     elementary: { en: "Hi, I'm Nino. I work in marketing and I'm here to meet people from the same field.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და მინდა გავიცნო იგივე სფეროს ხალხი." },
-    intermediate: { en: "Hi, I'm Nino — I work in marketing, mostly on social campaigns. I'm here to meet people working on similar challenges.", ka: "გამარჯობა, ნინო ვარ — ვმუშაობ მარკეტინგში, ძირითადად სოციალურ კამპანიებზე." },
+    intermediate: { en: "Hi, I'm Nino, I work in marketing, mostly on social campaigns. I'm here to meet people working on similar challenges.", ka: "გამარჯობა, ნინო ვარ, ვმუშაობ მარკეტინგში, ძირითადად სოციალურ კამპანიებზე." },
     advanced: { en: "Hi, I'm Nino. I lead social campaigns at a small marketing team. Always curious to hear how others approach audience growth.", ka: "გამარჯობა, ნინო ვარ. ვუძღვები სოციალურ კამპანიებს მცირე მარკეტინგ გუნდში.", note: "Tone: open, curious." },
   },
   freelance: {
     beginner: { en: "Hi, I'm Nino. I am a freelance designer. I work with small companies.", ka: "გამარჯობა, ნინო ვარ. ვარ ფრილანსერი დიზაინერი. ვმუშაობ პატარა კომპანიებთან." },
     elementary: { en: "Hi, I'm Nino. I'm a freelance designer and I help small businesses with branding and visuals.", ka: "გამარჯობა, ნინო ვარ. ვარ ფრილანსერი დიზაინერი, ვეხმარები პატარა ბიზნესებს ბრენდინგსა და ვიზუალში." },
-    intermediate: { en: "Hi, I'm Nino — a freelance designer who helps small businesses build a clear brand and clean visuals.", ka: "გამარჯობა, ნინო ვარ — ფრილანსერი დიზაინერი, რომელიც ეხმარება პატარა ბიზნესებს მკაფიო ბრენდის შექმნაში." },
-    advanced: { en: "Hi, I'm Nino. I work with early-stage teams as a freelance designer — usually on brand identity and product visuals that need to ship fast.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ ადრეული ეტაპის გუნდებთან ფრილანს დიზაინერად — ძირითადად ბრენდსა და პროდუქტ-ვიზუალზე.", note: "Tone: specific, outcome-driven." },
+    intermediate: { en: "Hi, I'm Nino, a freelance designer who helps small businesses build a clear brand and clean visuals.", ka: "გამარჯობა, ნინო ვარ, ფრილანსერი დიზაინერი, რომელიც ეხმარება პატარა ბიზნესებს მკაფიო ბრენდის შექმნაში." },
+    advanced: { en: "Hi, I'm Nino. I work with early-stage teams as a freelance designer, usually on brand identity and product visuals that need to ship fast.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ ადრეული ეტაპის გუნდებთან ფრილანს დიზაინერად, ძირითადად ბრენდსა და პროდუქტ-ვიზუალზე.", note: "Tone: specific, outcome-driven." },
   },
   presentation: {
     beginner: { en: "Hello everyone. My name is Nino. Today I will talk about our project.", ka: "გამარჯობა ყველას. მე მქვია ნინო. დღეს ვისაუბრებ ჩვენს პროექტზე." },
     elementary: { en: "Hello everyone, I'm Nino. Today I'd like to share a short update about our project.", ka: "გამარჯობა ყველას, ნინო ვარ. დღეს მოკლედ გავაცნობ ჩვენი პროექტის სტატუსს." },
-    intermediate: { en: "Good morning, everyone. I'm Nino, and today I'd like to walk you through what our team has been working on this month.", ka: "გამარჯობა ყველას. ნინო ვარ — დღეს გაჩვენებთ რაზე მუშაობდა ჩვენი გუნდი ამ თვეში." },
+    intermediate: { en: "Good morning, everyone. I'm Nino, and today I'd like to walk you through what our team has been working on this month.", ka: "გამარჯობა ყველას. ნინო ვარ, დღეს გაჩვენებთ რაზე მუშაობდა ჩვენი გუნდი ამ თვეში." },
     advanced: { en: "Good morning. I'm Nino. In the next ten minutes I'll walk you through our progress, the key decisions we made, and what we need from this room.", ka: "გამარჯობა. ნინო ვარ. შემდეგი 10 წუთის განმავლობაში გაჩვენებთ პროგრესს, მნიშვნელოვან გადაწყვეტილებებსა და რა გვჭირდება თქვენგან.", note: "Tone: clear agenda upfront." },
   },
   general: {
     beginner: { en: "Hi, I'm Nino. I work in marketing. I want to learn more English for my job.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში. მინდა ვისწავლო მეტი ინგლისური სამსახურისთვის." },
     elementary: { en: "Hi, I'm Nino. I work in marketing and I'm improving my English to communicate better at work.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვიუმჯობესებ ინგლისურს სამსახურისთვის." },
     intermediate: { en: "Hi, I'm Nino. I work in marketing and I'm focused on building stronger professional English for daily work and emails.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვაუმჯობესებ პროფესიულ ინგლისურს ყოველდღიური სამუშაოსთვის." },
-    advanced: { en: "Hi, I'm Nino — I work in marketing and I'm sharpening my professional English to communicate more clearly in meetings and writing.", ka: "გამარჯობა, ნინო ვარ — ვმუშაობ მარკეტინგში და ვაუმჯობესებ ინგლისურს შეხვედრებსა და წერაში.", note: "Tone: concise, professional." },
+    advanced: { en: "Hi, I'm Nino, I work in marketing and I'm sharpening my professional English to communicate more clearly in meetings and writing.", ka: "გამარჯობა, ნინო ვარ, ვმუშაობ მარკეტინგში და ვაუმჯობესებ ინგლისურს შეხვედრებსა და წერაში.", note: "Tone: concise, professional." },
   },
 };
 
@@ -209,7 +209,7 @@ export default function SelfIntroduction() {
       // (The rewrite buttons refine THIS session and don't consume more.)
       const budget = await tryConsumeAiSession(user.id);
       if (!budget.ok) {
-        toast.error("ამ კვირის AI სესიები ამოწურულია — ⭐ პრემიუმი გაძლევს 7-ს კვირაში.");
+        toast.error("ამ კვირის AI სესიები ამოწურულია, ⭐ პრემიუმი გაძლევს 7-ს კვირაში.");
         setLoading(false);
         return;
       }
@@ -309,7 +309,7 @@ export default function SelfIntroduction() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <AiLockedCard
           title="თვითპრეზენტაცია"
-          description="შექმენი პროფესიონალური თვითპრეზენტაცია ინგლისურად — გასაუბრებისთვის, ქსელური შეხვედრებისთვის ან LinkedIn-ისთვის."
+          description="შექმენი პროფესიონალური თვითპრეზენტაცია ინგლისურად, გასაუბრებისთვის, ქსელური შეხვედრებისთვის ან LinkedIn-ისთვის."
           trialAvailable={shouldOfferTrial(biz)}
         />
       </BusinessShell>
@@ -335,7 +335,7 @@ export default function SelfIntroduction() {
               <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i + 1 ? "bg-panel-soft" : "bg-line"}`} />
             ))}
           </div>
-          <p className="ka text-[11px] text-ink-muted mt-2">ნაბიჯი {step} / {TOTAL_STEPS} — {STEP_LABELS[step - 1]}</p>
+          <p className="ka text-[11px] text-ink-muted mt-2">ნაბიჯი {step} / {TOTAL_STEPS}, {STEP_LABELS[step - 1]}</p>
         </div>
       )}
 
@@ -385,7 +385,7 @@ export default function SelfIntroduction() {
               ? "კარგი წარდგენა მოკლეა და მკაფიო. ის შედგება 5 ნაწილისგან. ჯერ წავიკითხოთ თითოეული."
               : isAdvanced
               ? "A strong self-introduction is short, specific, and confident. It usually covers 5 parts:"
-              : "კარგი წარდგენა ხშირად შედგება 5 ნაწილისგან — სახელი, სტატუსი, სფერო, უნარები და მიზანი."}
+              : "კარგი წარდგენა ხშირად შედგება 5 ნაწილისგან, სახელი, სტატუსი, სფერო, უნარები და მიზანი."}
           </p>
           <ol className="mt-4 space-y-3">
             {STRUCTURE_PARTS.map((p, i) => (
@@ -412,7 +412,7 @@ export default function SelfIntroduction() {
         <BizCard className="mb-4">
           <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">ნაბიჯი 2</p>
           <h2 className="ka text-lg font-bold text-wine mt-1">აირჩიე მიზანი და ნახე მაგალითი</h2>
-          <p className="ka text-xs text-ink-muted mt-1">სხვადასხვა სიტუაცია — სხვადასხვა ტონი.</p>
+          <p className="ka text-xs text-ink-muted mt-1">სხვადასხვა სიტუაცია, სხვადასხვა ტონი.</p>
 
           <div className="grid gap-2 mt-4">
             {SELF_INTRO_PURPOSES.map((p) => (
@@ -506,12 +506,12 @@ export default function SelfIntroduction() {
       {step === 4 && result && (
         <div className="space-y-4">
           <p className="ka text-[11px] text-ink-subtle leading-relaxed">
-            ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ — გადაამოწმე, რომ ყველა
+            ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ, გადაამოწმე, რომ ყველა
             ფაქტი შენს რეალურ გამოცდილებას შეესაბამება.
           </p>
           {(["short", "standard", "polished"] as const).map((v) => (
             <VersionCard key={v}
-              label={v === "short" ? "Short — 20-30 წამი" : v === "standard" ? "Standard — 45-60 წამი" : "Polished — პროფესიონალური"}
+              label={v === "short" ? "Short, 20-30 წამი" : v === "standard" ? "Standard, 45-60 წამი" : "Polished, პროფესიონალური"}
               version={result[v]} isSelected={selected === v} onSelect={() => setSelected(v)}
               speakText={result[v].en} onCopy={() => copyText(result[v].en)}
               onRewrite={(mode) => rewrite(v, mode)} rewritingKey={rewriting} vKey={v}
@@ -519,7 +519,7 @@ export default function SelfIntroduction() {
           ))}
           <div className="flex justify-between">
             <BizButton variant="ghost" onClick={() => setStep(3)}>უკან</BizButton>
-            <BizButton onClick={() => setStep(5)}>გაგრძელება — ფრაზები</BizButton>
+            <BizButton onClick={() => setStep(5)}>გაგრძელება, ფრაზები</BizButton>
           </div>
         </div>
       )}
@@ -558,7 +558,7 @@ export default function SelfIntroduction() {
 
           <div className="flex justify-between">
             <BizButton variant="ghost" onClick={() => setStep(4)}>უკან</BizButton>
-            <BizButton onClick={() => setStep(6)}>გაგრძელება — შენახვა</BizButton>
+            <BizButton onClick={() => setStep(6)}>გაგრძელება, შენახვა</BizButton>
           </div>
         </div>
       )}
@@ -566,7 +566,7 @@ export default function SelfIntroduction() {
       {/* STEP 6: Save */}
       {step === 6 && result && (
         <BizCard className="mb-4">
-          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">ნაბიჯი 6 — შენახვა</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">ნაბიჯი 6, შენახვა</p>
           <h2 className="ka text-lg font-bold text-wine mt-1">აირჩიე და შეინახე საბოლოო ვერსია</h2>
           <div className="mt-4 grid gap-2">
             {(["short", "standard", "polished"] as const).map((v) => (
@@ -649,7 +649,7 @@ export default function SelfIntroduction() {
                       "{saved[0][saved[0].selected].en}"
                     </p>
                     <div className="mt-4 pt-4 border-t border-dashed border-line flex items-center justify-between">
-                      <p className="ka text-[10px] text-ink-subtle italic">— შენი ხელით აშენებული</p>
+                      <p className="ka text-[10px] text-ink-subtle italic">, შენი ხელით აშენებული</p>
                       <ReadAloudButton text={saved[0][saved[0].selected].en} label="მოსმენა" />
                     </div>
                   </div>
@@ -806,7 +806,7 @@ function PracticeExercises({ tier }: { tier: LevelTier }) {
   return (
     <BizCard>
       <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">მინი ვარჯიში</p>
-      <p className="ka text-xs text-ink-muted mt-1">გაიარე ეს მცირე სავარჯიშოები — ეხმარება დამახსოვრებას.</p>
+      <p className="ka text-xs text-ink-muted mt-1">გაიარე ეს მცირე სავარჯიშოები, ეხმარება დამახსოვრებას.</p>
       <div className="mt-3 space-y-3">
         {list.map((ex, i) => <ExerciseItem key={i} ex={ex} idx={i + 1} />)}
       </div>
@@ -857,7 +857,7 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
         {checked === true && <span className="ka text-[11px] text-sage">სწორია</span>}
         {checked === false && (
           <span className="ka text-[11px] text-danger">
-            სცადე ისევ{("hintKa" in ex && ex.hintKa) ? ` — ${ex.hintKa}` : ""}
+            სცადე ისევ{("hintKa" in ex && ex.hintKa) ? `, ${ex.hintKa}` : ""}
           </span>
         )}
       </div>

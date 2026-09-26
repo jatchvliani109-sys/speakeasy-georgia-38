@@ -78,7 +78,7 @@ export default function Auth() {
       const hint = suggestEmail(email);
       if (hint) {
         setEmailHint(hint);
-        toast.error(`შეამოწმე ელ-ფოსტა — იქნებ ${hint}?`);
+        toast.error(`შეამოწმე ელ-ფოსტა, იქნებ ${hint}?`);
         return;
       }
     }
@@ -116,13 +116,13 @@ export default function Auth() {
       const raw = String(err?.message ?? "");
       const ka =
         /already registered|already exists/i.test(raw)
-          ? "ეს ელ-ფოსტა უკვე დარეგისტრირებულია — სცადე შესვლა"
+          ? "ეს ელ-ფოსტა უკვე დარეგისტრირებულია, სცადე შესვლა"
           : /invalid login credentials/i.test(raw)
           ? "ელ-ფოსტა ან პაროლი არასწორია"
           : /rate limit|too many/i.test(raw)
-          ? "ძალიან ბევრი მცდელობა — სცადე ცოტა ხანში"
+          ? "ძალიან ბევრი მცდელობა, სცადე ცოტა ხანში"
           : /network|fetch/i.test(raw)
-          ? "კავშირი ვერ დამყარდა — შეამოწმე ინტერნეტი"
+          ? "კავშირი ვერ დამყარდა, შეამოწმე ინტერნეტი"
           : raw || "შეცდომა";
       toast.error(ka);
     } finally {
@@ -152,7 +152,7 @@ export default function Auth() {
     return (
       <Layout showLogout={false}>
         <SEO
-          title="დაადასტურე ელ-ფოსტა — SpeakBusy"
+          title="დაადასტურე ელ-ფოსტა, SpeakBusy"
           description="შეამოწმე შენი ელ-ფოსტა და დაადასტურე SpeakBusy-ის ანგარიში, რომ დაიწყო ბიზნეს ინგლისურის სწავლა."
           path="/auth"
         />
@@ -165,7 +165,7 @@ export default function Auth() {
               შეამოწმეთ თქვენი ელ-ფოსტა
             </h1>
             <p className="text-sm text-ink-muted mt-3 ka leading-relaxed">
-              გთხოვთ შეამოწმოთ თქვენი ელ-ფოსტა. გამოგვიგზავნეთ დადასტურების ბმული —
+              გთხოვთ შეამოწმოთ თქვენი ელ-ფოსტა. გამოგვიგზავნეთ დადასტურების ბმული ,
               გთხოვთ გადახედოთ inbox-ს და დააჭიროთ ბმულს.
             </p>
             <p className="text-xs text-ink-muted-2 mt-3 ka">
@@ -219,7 +219,7 @@ export default function Auth() {
         }
       `}</style>
       <SEO
-        title={mode === "signup" ? "რეგისტრაცია — SpeakBusy" : "შესვლა — SpeakBusy"}
+        title={mode === "signup" ? "რეგისტრაცია, SpeakBusy" : "შესვლა, SpeakBusy"}
         description={
           mode === "signup"
             ? "შექმენი უფასო SpeakBusy ანგარიში და დაიწყე ბიზნეს ინგლისურის სწავლა AI-powered პლატფორმით."

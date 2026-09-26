@@ -58,7 +58,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "B",
             text: "Well, I like working with people and I'm a very hard worker.",
             isBetter: false,
-            whyKa: "ზოგადი კლიშეებია — არაფერს ამბობს რეალურ შედეგებზე.",
+            whyKa: "ზოგადი კლიშეებია, არაფერს ამბობს რეალურ შედეგებზე.",
           },
         ],
       },
@@ -74,7 +74,7 @@ export const ROLE_CARDS: RoleCard[] = [
           },
           {
             label: "B",
-            text: "Honestly, I'm a perfectionist — I just work too hard.",
+            text: "Honestly, I'm a perfectionist, I just work too hard.",
             isBetter: false,
             whyKa: "გაცვეთილი პასუხია, რომელსაც ინტერვიუერები აღარ ენდობიან.",
           },
@@ -82,7 +82,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hi, thanks for coming in today! I'm Sarah, Regional Sales Director here at Brightline. Before we dive in — how has your day been so far?",
+      "Hi, thanks for coming in today! I'm Sarah, Regional Sales Director here at Brightline. Before we dive in, how has your day been so far?",
     estimatedMinutes: 20,
   },
   {
@@ -109,7 +109,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I reconcile accounts weekly and use a checklist before submitting any report.",
             isBetter: true,
-            whyKa: "კონკრეტული სისტემა და პროცესი — სანდოობის ნიშანი.",
+            whyKa: "კონკრეტული სისტემა და პროცესი, სანდოობის ნიშანი.",
           },
           {
             label: "B",
@@ -127,7 +127,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "During tax season I prioritized filings by risk, worked with two colleagues, and we submitted everything a day early.",
             isBetter: true,
-            whyKa: "კონკრეტული სიტუაცია, ქმედება და შედეგი — სრულყოფილი სტრუქტურა.",
+            whyKa: "კონკრეტული სიტუაცია, ქმედება და შედეგი, სრულყოფილი სტრუქტურა.",
           },
           {
             label: "B",
@@ -139,7 +139,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Good morning! I'm David, the Finance Manager at Meridian. Thanks for making the time — did you find our office easily?",
+      "Good morning! I'm David, the Finance Manager at Meridian. Thanks for making the time, did you find our office easily?",
     estimatedMinutes: 20,
   },
   {
@@ -166,7 +166,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I ran an Instagram campaign that doubled engagement and brought a 20% rise in leads in two months.",
             isBetter: true,
-            whyKa: "შედეგები ციფრებით — მარკეტინგში ეს ყველაზე ძლიერი ენაა.",
+            whyKa: "შედეგები ციფრებით, მარკეტინგში ეს ყველაზე ძლიერი ენაა.",
           },
           {
             label: "B",
@@ -196,7 +196,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hey, welcome to Pulse! I'm Emma, Head of Marketing. We're pretty informal here — grab a seat. How are you doing today?",
+      "Hey, welcome to Pulse! I'm Emma, Head of Marketing. We're pretty informal here, grab a seat. How are you doing today?",
     estimatedMinutes: 20,
   },
   {
@@ -223,7 +223,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I identify the blocker, re-plan with the team, and inform stakeholders early with a revised timeline.",
             isBetter: true,
-            whyKa: "პროაქტიული კომუნიკაცია და მკაფიო გეგმა — სწორედ ამას ეძებენ.",
+            whyKa: "პროაქტიული კომუნიკაცია და მკაფიო გეგმა, სწორედ ამას ეძებენ.",
           },
           {
             label: "B",
@@ -253,7 +253,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hi there, I'm Michael — I run delivery here at Nexa. Great to meet you. Can I get you a coffee or water before we start?",
+      "Hi there, I'm Michael, I run delivery here at Nexa. Great to meet you. Can I get you a coffee or water before we start?",
     estimatedMinutes: 20,
   },
   {
@@ -278,7 +278,7 @@ export const ROLE_CARDS: RoleCard[] = [
         options: [
           {
             label: "A",
-            text: "I listen fully, take notes, and explain the process — then gather facts before any conclusions.",
+            text: "I listen fully, take notes, and explain the process, then gather facts before any conclusions.",
             isBetter: true,
             whyKa: "ნეიტრალურობა და პროცესის დაცვა HR-ის საფუძველია.",
           },
@@ -302,7 +302,7 @@ export const ROLE_CARDS: RoleCard[] = [
           },
           {
             label: "B",
-            text: "I usually trust my gut feeling about people — I'm rarely wrong.",
+            text: "I usually trust my gut feeling about people, I'm rarely wrong.",
             isBetter: false,
             whyKa: "მხოლოდ ინტუიციაზე დაყრდნობა არაპროფესიონალურად ჟღერს.",
           },
@@ -310,7 +310,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Welcome! I'm Laura, HR Director at Vertex. It's always interesting to interview someone for an HR role — you know all the tricks. How are you feeling?",
+      "Welcome! I'm Laura, HR Director at Vertex. It's always interesting to interview someone for an HR role, you know all the tricks. How are you feeling?",
     estimatedMinutes: 20,
   },
   {
@@ -335,9 +335,9 @@ export const ROLE_CARDS: RoleCard[] = [
         options: [
           {
             label: "A",
-            text: "I'm really sorry about this — let me look into it right now and fix it for you.",
+            text: "I'm really sorry about this, let me look into it right now and fix it for you.",
             isBetter: true,
-            whyKa: "ემპათია + დაუყოვნებელი ქმედება — მხარდაჭერის ოქროს წესი.",
+            whyKa: "ემპათია + დაუყოვნებელი ქმედება, მხარდაჭერის ოქროს წესი.",
           },
           {
             label: "B",
@@ -367,7 +367,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hi! James here, I head up operations at Cloudmile. Thanks for hopping on. So — before the serious stuff, what got you into customer support?",
+      "Hi! James here, I head up operations at Cloudmile. Thanks for hopping on. So, before the serious stuff, what got you into customer support?",
     estimatedMinutes: 20,
   },
   {
@@ -392,7 +392,7 @@ export const ROLE_CARDS: RoleCard[] = [
         options: [
           {
             label: "A",
-            text: "I ask what specifically isn't working for them and what feeling they want instead — then I iterate.",
+            text: "I ask what specifically isn't working for them and what feeling they want instead, then I iterate.",
             isBetter: true,
             whyKa: "კრიტიკას ინფორმაციად აქცევს და პროფესიონალურ პროცესს აჩვენებს.",
           },
@@ -410,13 +410,13 @@ export const ROLE_CARDS: RoleCard[] = [
         options: [
           {
             label: "A",
-            text: "I redesigned a café brand — the goal was a warmer feel, and after launch their Instagram following grew 40%.",
+            text: "I redesigned a café brand, the goal was a warmer feel, and after launch their Instagram following grew 40%.",
             isBetter: true,
             whyKa: "მიზანი, გადაწყვეტა და გაზომვადი შედეგი ერთ პასუხში.",
           },
           {
             label: "B",
-            text: "I did a logo I really love — the colors and typography are just beautiful.",
+            text: "I did a logo I really love, the colors and typography are just beautiful.",
             isBetter: false,
             whyKa: "მხოლოდ ესთეტიკაზე საუბარი ბიზნეს ღირებულებას ტოვებს გარეთ.",
           },
@@ -424,7 +424,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hi, come on in! I'm Nina, Creative Director at Studio Form. I had a quick look at your portfolio earlier — but first, tell me a bit about yourself.",
+      "Hi, come on in! I'm Nina, Creative Director at Studio Form. I had a quick look at your portfolio earlier, but first, tell me a bit about yourself.",
     estimatedMinutes: 20,
   },
   {
@@ -440,7 +440,7 @@ export const ROLE_CARDS: RoleCard[] = [
       aboutCompanyKa:
         "Arclight Labs საკუთარ პროდუქტზე მომუშავე ტექნოლოგიური კომპანიაა. ეძებენ დეველოპერს, რომელიც კოდის ხარისხზეც ზრუნავს და გუნდურ მუშაობაზეც.",
       whatToExpectKa:
-        "ელოდე კითხვებს პროექტებზე, გუნდურ მუშაობაზე და პრობლემების გადაჭრაზე — არა ტექნიკურ ტესტს.",
+        "ელოდე კითხვებს პროექტებზე, გუნდურ მუშაობაზე და პრობლემების გადაჭრაზე, არა ტექნიკურ ტესტს.",
     },
     warmUp: [
       {
@@ -457,7 +457,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "B",
             text: "There was a really complex race condition in the async pipeline with the mutex handling...",
             isBetter: false,
-            whyKa: "ზედმეტად ტექნიკური ჟარგონი მსმენელს კარგავს — ადაპტირება ვერ აჩვენა.",
+            whyKa: "ზედმეტად ტექნიკური ჟარგონი მსმენელს კარგავს, ადაპტირება ვერ აჩვენა.",
           },
         ],
       },
@@ -467,7 +467,7 @@ export const ROLE_CARDS: RoleCard[] = [
         options: [
           {
             label: "A",
-            text: "I ask about their reasoning first — sometimes they see something I missed. If I still disagree, we discuss trade-offs.",
+            text: "I ask about their reasoning first, sometimes they see something I missed. If I still disagree, we discuss trade-offs.",
             isBetter: true,
             whyKa: "ღიაობა და პატივისცემა საკუთარი აზრის შენარჩუნებით.",
           },
@@ -481,7 +481,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hey, thanks for joining! I'm Tom, one of the engineering managers at Arclight. Don't worry — no live coding today, just a conversation. How's your week going?",
+      "Hey, thanks for joining! I'm Tom, one of the engineering managers at Arclight. Don't worry, no live coding today, just a conversation. How's your week going?",
     estimatedMinutes: 20,
   },
   {
@@ -508,7 +508,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I start with the conclusion, then show only the two or three numbers that drive it, with a simple chart.",
             isBetter: true,
-            whyKa: "დასკვნით დაწყება და გამარტივება — ანალიტიკოსის მთავარი უნარი.",
+            whyKa: "დასკვნით დაწყება და გამარტივება, ანალიტიკოსის მთავარი უნარი.",
           },
           {
             label: "B",
@@ -526,7 +526,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I verify the correct figure, send a short correction immediately, and add a check so it can't repeat.",
             isBetter: true,
-            whyKa: "სისწრაფე, გამჭვირვალობა და პრევენცია — ნდობა ასე შენდება.",
+            whyKa: "სისწრაფე, გამჭვირვალობა და პრევენცია, ნდობა ასე შენდება.",
           },
           {
             label: "B",
@@ -538,7 +538,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Good afternoon, I'm Rachel — I lead the analytics team here at Crestline. Thanks for coming in. Shall we get started?",
+      "Good afternoon, I'm Rachel, I lead the analytics team here at Crestline. Thanks for coming in. Shall we get started?",
     estimatedMinutes: 20,
   },
   {
@@ -565,7 +565,7 @@ export const ROLE_CARDS: RoleCard[] = [
             label: "A",
             text: "I reroute the most urgent orders to other vehicles, inform affected clients with new times, and arrange a backup truck.",
             isBetter: true,
-            whyKa: "პრიორიტეტიზაცია + კომუნიკაცია + გადაწყვეტა — სამივე ერთ პასუხში.",
+            whyKa: "პრიორიტეტიზაცია + კომუნიკაცია + გადაწყვეტა, სამივე ერთ პასუხში.",
           },
           {
             label: "B",
@@ -595,7 +595,7 @@ export const ROLE_CARDS: RoleCard[] = [
       },
     ],
     openingLineEn:
-      "Hello! Karen Doyle, COO at Swiftline. I'll be honest — this role is not for everyone, but let's see if it's for you. Ready?",
+      "Hello! Karen Doyle, COO at Swiftline. I'll be honest, this role is not for everyone, but let's see if it's for you. Ready?",
     estimatedMinutes: 20,
   },
 ];

@@ -1263,7 +1263,7 @@ function DocView({
             {doc.highlights.map((h, i) => (
               <li key={i} className="text-xs">
                 <span className="font-semibold text-wine">"{h.phrase}"</span>
-                <span className="ka text-ink-muted"> — {h.whyKa}</span>
+                <span className="ka text-ink-muted">, {h.whyKa}</span>
               </li>
             ))}
           </ul>

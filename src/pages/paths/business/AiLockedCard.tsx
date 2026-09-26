@@ -105,7 +105,7 @@ export default function AiLockedCard({
             disappointment on the fourth AI session. */}
         {trialAvailable && (
           <p className="ka text-[11px] text-ink-muted mt-3 pt-3 border-t border-line leading-relaxed">
-            უფასო კვირაში <b className="text-wine">3 AI სესიაა</b> ჯამში —
+            უფასო კვირაში <b className="text-wine">3 AI სესიაა</b> ჯამში ,
             რომ ნახო, როგორ მუშაობს. პრემიუმში კი <b className="text-wine">7 ყოველ კვირას</b>.
           </p>
         )}

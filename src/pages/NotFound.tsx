@@ -12,7 +12,7 @@ const NotFound = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <SEO
-        title="გვერდი ვერ მოიძებნა (404) — SpeakBusy"
+        title="გვერდი ვერ მოიძებნა (404), SpeakBusy"
         description="მოთხოვნილი გვერდი არ არსებობს. დაბრუნდი მთავარ გვერდზე და გააგრძელე ბიზნეს ინგლისურის სწავლა SpeakBusy-ით."
         path={location.pathname}
       />

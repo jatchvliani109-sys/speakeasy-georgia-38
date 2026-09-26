@@ -156,7 +156,7 @@ export default function BusinessReassessment() {
       open_text: openText,
     });
     if (saveErr) {
-      toast.error("შეფასების შედეგი ვერ შეინახა — დონე განახლდა, ისტორია არა");
+      toast.error("შეფასების შედეგი ვერ შეინახა, დონე განახლდა, ისტორია არა");
     }
 
     // Save new level — always update; preserves all other progress.
@@ -188,17 +188,17 @@ export default function BusinessReassessment() {
     let blurb = "";
     if (!levelBefore) {
       title = `შენი დონე: ${LEVEL_LABELS[resultLevel]}`;
-      blurb = "კარგი დასაწყისია — განაგრძე ვარჯიში და მომდევნო შეფასებაზე დავინახავთ შენს პროგრესს.";
+      blurb = "კარგი დასაწყისია, განაგრძე ვარჯიში და მომდევნო შეფასებაზე დავინახავთ შენს პროგრესს.";
     } else if (went > 0) {
       title = `შენი დონე გაიზარდა: ${LEVEL_LABELS[levelBefore]} → ${LEVEL_LABELS[resultLevel]}`;
       blurb =
-        "შესანიშნავი შედეგია. შემდეგი სესიები ავტომატურად მოერგება ახალ დონეს — გელოდება უფრო ნუანსირებული მასალა.";
+        "შესანიშნავი შედეგია. შემდეგი სესიები ავტომატურად მოერგება ახალ დონეს, გელოდება უფრო ნუანსირებული მასალა.";
     } else if (went < 0) {
       title = `შენი დონე: ${LEVEL_LABELS[resultLevel]}`;
       blurb =
-        "ზოგჯერ ეს ხდება — შენი წინა პროგრესი, სიტყვები და ფრაზები სრულად შენახულია. განაგრძე ვარჯიში, შემდეგი შეფასება მალე გაბრუნებს ფორმაში.";
+        "ზოგჯერ ეს ხდება, შენი წინა პროგრესი, სიტყვები და ფრაზები სრულად შენახულია. განაგრძე ვარჯიში, შემდეგი შეფასება მალე გაბრუნებს ფორმაში.";
     } else {
-      title = `შენი დონე იგივე დარჩა: ${LEVEL_LABELS[resultLevel]} — განაგრძე ვარჯიში!`;
+      title = `შენი დონე იგივე დარჩა: ${LEVEL_LABELS[resultLevel]}, განაგრძე ვარჯიში!`;
       blurb = "კარგ გზაზე ხარ. ცოტა მეტი ვარჯიში სუსტ სფეროებზე და მომდევნო შეფასებაზე გადახვალ ზევით.";
     }
 
@@ -288,7 +288,7 @@ export default function BusinessReassessment() {
               className="mt-4 w-full px-4 py-3 rounded-xl border border-line focus:border-wine outline-none text-sm bg-card"
             />
             <p className="ka text-xs text-ink-muted mt-2">
-              ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
+              ეს კითხვა არასავალდებულოა, შეგიძლია გამოტოვო.
             </p>
           </>
         )}

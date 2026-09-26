@@ -115,7 +115,7 @@ export default function InterviewModule() {
   const aiLimit = aiWeeklyLimit(biz);
   const aiEmpty = aiRemaining <= 0;
   const aiLockedHint = isPaidUser
-    ? "ამ კვირის AI სესიები ამოწურულია — ორშაბათს განახლდება"
+    ? "ამ კვირის AI სესიები ამოწურულია, ორშაბათს განახლდება"
     : "ამ კვირის AI სესიები ამოწურულია";
   // No AI access at all (free tier, no active trial) — show the locked card
   // rather than a spent-quota message, which would imply they once had some.
@@ -263,7 +263,7 @@ export default function InterviewModule() {
 
     if (!budget.ok) {
       setError(isPaidUser
-        ? "ამ კვირის 7 AI სესია ამოწურულია — ორშაბათს განახლდება."
+        ? "ამ კვირის 7 AI სესია ამოწურულია, ორშაბათს განახლდება."
         : "ამ კვირის AI სესია გამოყენებულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში.");
       setStarting(false);
       return;
@@ -316,7 +316,7 @@ export default function InterviewModule() {
         // Without an id the final save is skipped silently and the whole
         // interview is lost — say so now rather than at the end.
         if (insErr || !inserted) {
-          toast.error("სესია ვერ შეიქმნა — შეამოწმე ინტერნეტი და სცადე ხელახლა");
+          toast.error("სესია ვერ შეიქმნა, შეამოწმე ინტერნეტი და სცადე ხელახლა");
         } else {
           setSessionId(inserted.id);
         }
@@ -376,7 +376,7 @@ export default function InterviewModule() {
         .select("id")
         .single();
       if (insErr || !inserted) {
-        toast.error("სესია ვერ შეიქმნა — შეამოწმე ინტერნეტი და სცადე ხელახლა");
+        toast.error("სესია ვერ შეიქმნა, შეამოწმე ინტერნეტი და სცადე ხელახლა");
       } else {
         setSessionId(inserted.id);
       }
@@ -477,7 +477,7 @@ export default function InterviewModule() {
   async function submitAnswer() {
     if (!session || !candidateText.trim() || thinking) return;
     if (!sessionId) {
-      setError("სესია ვერ შეინახა — დაბრუნდი და დაიწყე ხელახლა.");
+      setError("სესია ვერ შეინახა, დაბრუნდი და დაიწყე ხელახლა.");
       return;
     }
     const answer = candidateText.trim();
@@ -649,11 +649,11 @@ export default function InterviewModule() {
         ({ error: upErr } = await saveInterview());
       }
       if (upErr) {
-        toast.error("შედეგები ვერ შეინახა — გადაუღე ეკრანს სურათი, სანამ დახურავ");
+        toast.error("შედეგები ვერ შეინახა, გადაუღე ეკრანს სურათი, სანამ დახურავ");
       }
     } else {
       // No session id means the initial insert failed — results have nowhere to go.
-      toast.error("სესია ვერ შეინახა — შედეგები მხოლოდ ამ ეკრანზეა");
+      toast.error("სესია ვერ შეინახა, შედეგები მხოლოდ ამ ეკრანზეა");
     }
     setStep("done");
   }
@@ -696,7 +696,7 @@ export default function InterviewModule() {
       <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
         <AiLockedCard
           title="გასაუბრების სიმულაცია"
-          description="ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება — რა გამოგივიდა და რა უნდა გააუმჯობესო."
+          description="ივარჯიშე რეალურ გასაუბრებაზე AI-სთან და მიიღე დეტალური შეფასება, რა გამოგივიდა და რა უნდა გააუმჯობესო."
           trialAvailable={shouldOfferTrial(biz)}
         />
       </BusinessShell>
@@ -722,7 +722,7 @@ export default function InterviewModule() {
             </h2>
             <p className="ka text-sm text-ink-muted mt-2">
               ბოლო გასაუბრება შეწყდა {answered} პასუხის შემდეგ. შეგიძლია იქიდან
-              გააგრძელო, სადაც გაჩერდი — ახალი AI სესია არ დაგეხარჯება.
+              გააგრძელო, სადაც გაჩერდი, ახალი AI სესია არ დაგეხარჯება.
             </p>
             <div className="mt-4 space-y-2">
               <BizButton onClick={() => resumeSession(resumable)}>

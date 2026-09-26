@@ -68,7 +68,7 @@ const TEST_1: ReassessmentTest = {
       promptKa: "რომელია საუკეთესო პროფესიონალური პასუხი?",
       options: [
         "Don't worry about it.",
-        "Thank you for raising this — let me walk you through where we are and the next steps.",
+        "Thank you for raising this, let me walk you through where we are and the next steps.",
         "We're on schedule, no issues.",
         "Why are you worried?",
       ],
@@ -150,7 +150,7 @@ const TEST_1: ReassessmentTest = {
       promptKa: "აირჩიე საუკეთესო შეტყობინება.",
       options: [
         "Sorry, late again.",
-        "Quick update: I'll need until tomorrow noon to finalize this — I'll send a draft tonight.",
+        "Quick update: I'll need until tomorrow noon to finalize this, I'll send a draft tonight.",
         "Can't finish today.",
         "It's not done, my bad.",
       ],
@@ -162,7 +162,7 @@ const TEST_1: ReassessmentTest = {
       promptKa: "რა იქნება საუკეთესო პასუხი?",
       options: [
         "It's exactly what we agreed.",
-        "Thanks for flagging this — could you point me to the specific part so we can align?",
+        "Thanks for flagging this, could you point me to the specific part so we can align?",
         "We can change everything.",
         "That's not my responsibility.",
       ],
@@ -211,7 +211,7 @@ const TEST_2: ReassessmentTest = {
       options: [
         "Hi",
         "Follow-up",
-        "Follow-up: Q3 marketing plan — next steps",
+        "Follow-up: Q3 marketing plan, next steps",
         "Important!!!",
       ],
       correct: 2,
@@ -222,7 +222,7 @@ const TEST_2: ReassessmentTest = {
       promptKa: "თავაზიანი უარის ფორმულირება.",
       options: [
         "I can't make it.",
-        "Thanks for the invite — unfortunately I have a conflict at that time, but I'd be glad to join the next one.",
+        "Thanks for the invite, unfortunately I have a conflict at that time, but I'd be glad to join the next one.",
         "No.",
         "Send notes after instead.",
       ],
@@ -235,7 +235,7 @@ const TEST_2: ReassessmentTest = {
       promptKa: "შეხვედრის სწორი დასაწყისი.",
       options: [
         "Let's just dive in.",
-        "Thanks everyone for joining — quick agenda for today:…",
+        "Thanks everyone for joining, quick agenda for today:…",
         "Who is missing?",
         "I have nothing prepared.",
       ],
@@ -256,7 +256,7 @@ const TEST_2: ReassessmentTest = {
     {
       type: "mcq", area: "interview_meeting", weight: 3,
       prompt: "In a meeting you didn't follow a point. The most professional response:",
-      promptKa: "ვერ გაიგე — როგორ ჰკითხო?",
+      promptKa: "ვერ გაიგე, როგორ ჰკითხო?",
       options: [
         "What?",
         "Sorry, could you clarify what you meant by 'integrated rollout'?",
@@ -279,7 +279,7 @@ const TEST_2: ReassessmentTest = {
       promptKa: "რას ნიშნავს KPI?",
       options: [
         "A type of contract",
-        "Key Performance Indicator — a measurable goal",
+        "Key Performance Indicator, a measurable goal",
         "A project manager",
         "A budget line",
       ],
@@ -304,7 +304,7 @@ const TEST_2: ReassessmentTest = {
       promptKa: "მოკლე მადლობის შეტყობინება.",
       options: [
         "ok thanks",
-        "Really appreciate your help on this — saved me a lot of time.",
+        "Really appreciate your help on this, saved me a lot of time.",
         "thx",
         "Sure",
       ],
@@ -356,7 +356,7 @@ const TEST_3: ReassessmentTest = {
       promptKa: "როგორ დაუდასტურო მიღება?",
       options: [
         "got it",
-        "Thanks — received and will review by Thursday.",
+        "Thanks, received and will review by Thursday.",
         "ok",
         "yes",
       ],
@@ -369,7 +369,7 @@ const TEST_3: ReassessmentTest = {
       options: [
         "Sorry for the mess.",
         "I apologize for the inconvenience and appreciate your patience as we resolve this.",
-        "My bad — won't happen again.",
+        "My bad, won't happen again.",
         "Oops, sorry.",
       ],
       correct: 1,
@@ -380,7 +380,7 @@ const TEST_3: ReassessmentTest = {
       promptKa: "აირჩიე საუკეთესო დასკვნითი წინადადება.",
       options: [
         "Bye.",
-        "Happy to discuss further — let me know what works for a quick call this week.",
+        "Happy to discuss further, let me know what works for a quick call this week.",
         "That's all.",
         "Reply if you want.",
       ],
@@ -405,7 +405,7 @@ const TEST_3: ReassessmentTest = {
       promptKa: "როგორ ისაუბრო წარუმატებლობაზე?",
       options: [
         "I've never failed.",
-        "I missed a launch deadline once — afterwards I introduced weekly checkpoints and we shipped the next two on time.",
+        "I missed a launch deadline once, afterwards I introduced weekly checkpoints and we shipped the next two on time.",
         "It was the team's fault.",
         "It wasn't really a failure.",
       ],
@@ -462,7 +462,7 @@ const TEST_3: ReassessmentTest = {
       promptKa: "თავის წარდგენა networking-ზე.",
       options: [
         "Hey, I'm Nika.",
-        "Hi, I'm Nika — I work in product marketing at a fintech startup. Nice to meet you.",
+        "Hi, I'm Nika, I work in product marketing at a fintech startup. Nice to meet you.",
         "I want a job.",
         "Who are you?",
       ],
@@ -474,7 +474,7 @@ const TEST_3: ReassessmentTest = {
       promptKa: "უთანხმოება მენეჯერთან.",
       options: [
         "You're wrong.",
-        "I see it slightly differently — can I share another angle?",
+        "I see it slightly differently, can I share another angle?",
         "I don't agree at all.",
         "No way.",
       ],
@@ -521,7 +521,7 @@ const TEST_4: ReassessmentTest = {
       promptKa: "შეხსენების თავაზიანი ფორმა.",
       options: [
         "Did you forget?",
-        "Just a gentle reminder about the report due tomorrow — let me know if you need anything from me.",
+        "Just a gentle reminder about the report due tomorrow, let me know if you need anything from me.",
         "Where is it?",
         "You haven't sent it.",
       ],
@@ -529,7 +529,7 @@ const TEST_4: ReassessmentTest = {
     },
     {
       type: "mcq", area: "emails", weight: 3,
-      prompt: "An email opens with 'Per my last email…' — the tone is:",
+      prompt: "An email opens with 'Per my last email…', the tone is:",
       promptKa: "რა ტონია 'per my last email'?",
       options: [
         "Warm and friendly.",
@@ -558,7 +558,7 @@ const TEST_4: ReassessmentTest = {
       promptKa: "როგორ დააბრუნო შეხვედრა თემაზე?",
       options: [
         "Stop talking.",
-        "These are great points — can we park them and return to the agenda for now?",
+        "These are great points, can we park them and return to the agenda for now?",
         "Be quiet please.",
         "We're off topic, focus.",
       ],
@@ -615,7 +615,7 @@ const TEST_4: ReassessmentTest = {
       promptKa: "დახმარების თხოვნა პროფესიონალურად.",
       options: [
         "I can't do this.",
-        "I'm hitting a blocker on X — could you take a look when you have a moment?",
+        "I'm hitting a blocker on X, could you take a look when you have a moment?",
         "Help me!",
         "I don't understand anything.",
       ],
@@ -627,7 +627,7 @@ const TEST_4: ReassessmentTest = {
       promptKa: "ფიდბექის მიცემა.",
       options: [
         "It's fine.",
-        "Overall solid — one suggestion: tighten the intro paragraph so the main point lands faster.",
+        "Overall solid, one suggestion: tighten the intro paragraph so the main point lands faster.",
         "Looks bad.",
         "I don't have time.",
       ],
@@ -691,7 +691,7 @@ const TEST_5: ReassessmentTest = {
       promptKa: "ყველაზე პროფესიონალური გადაწერა.",
       options: [
         "Why didn't you respond?",
-        "Just floating this to the top of your inbox in case it got buried — happy to help with any open questions.",
+        "Just floating this to the top of your inbox in case it got buried, happy to help with any open questions.",
         "Please answer me.",
         "I'm still waiting.",
       ],
@@ -704,7 +704,7 @@ const TEST_5: ReassessmentTest = {
       promptKa: "თავაზიანი ჩარევა შეხვედრაში.",
       options: [
         "Stop, listen to me.",
-        "Sorry to jump in — could I add one quick point on that?",
+        "Sorry to jump in, could I add one quick point on that?",
         "Wait!",
         "Let me speak!",
       ],
@@ -728,7 +728,7 @@ const TEST_5: ReassessmentTest = {
       promptKa: "გრძელი შეხვედრის დასრულება.",
       options: [
         "We have to stop now.",
-        "We're at time — let's lock in the two decisions we've made and take the rest async.",
+        "We're at time, let's lock in the two decisions we've made and take the rest async.",
         "I have to leave.",
         "Bye everyone.",
       ],
@@ -778,7 +778,7 @@ const TEST_5: ReassessmentTest = {
       promptKa: "კოლეგის წარმატებაზე რეაგირება.",
       options: [
         "ok",
-        "Congrats — that's a great result, well deserved!",
+        "Congrats, that's a great result, well deserved!",
         "Nice for you.",
         "Whatever.",
       ],
@@ -790,7 +790,7 @@ const TEST_5: ReassessmentTest = {
       promptKa: "უფროსისგან მოთხოვნაზე უარის თქმა.",
       options: [
         "No, I won't do that.",
-        "Happy to take this on — given the current priorities, would it work if I delivered by Friday instead of tomorrow?",
+        "Happy to take this on, given the current priorities, would it work if I delivered by Friday instead of tomorrow?",
         "I'm too busy.",
         "Ask someone else.",
       ],

@@ -39,7 +39,7 @@ export default function ForgotPassword() {
     return (
       <Layout showLogout={false}>
         <SEO
-          title="პაროლის აღდგენა — SpeakBusy"
+          title="პაროლის აღდგენა, SpeakBusy"
           description="აღადგინე SpeakBusy-ის პაროლი ელფოსტაზე გამოგზავნილი ბმულით."
           path="/forgot-password"
         />
@@ -80,7 +80,7 @@ export default function ForgotPassword() {
   return (
     <Layout showLogout={false}>
       <SEO
-        title="პაროლის აღდგენა — SpeakBusy"
+        title="პაროლის აღდგენა, SpeakBusy"
         description="აღადგინე SpeakBusy-ის პაროლი ელფოსტაზე გამოგზავნილი ბმულით."
         path="/forgot-password"
       />

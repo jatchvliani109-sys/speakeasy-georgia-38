@@ -260,7 +260,7 @@ function PhrasesTab() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="ka text-sm font-semibold text-wine break-words line-clamp-2">
-                      {sectionLabel} — {title}
+                      {sectionLabel}, {title}
                     </p>
                     <p className="ka text-[11px] text-ink-muted mt-0.5">
                       {date} · {vocab.length} ფრაზა

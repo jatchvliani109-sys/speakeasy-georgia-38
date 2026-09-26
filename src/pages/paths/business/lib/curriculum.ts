@@ -15,9 +15,9 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     key: "introduction",
     titleKa: "გაცნობის წერილი",
     shortKa: "გაცნობა",
-    focusKa: "პროფესიონალური გაცნობა — სტრუქტურა, მისალმება, მკაფიო შესავალი.",
+    focusKa: "პროფესიონალური გაცნობა, სტრუქტურა, მისალმება, მკაფიო შესავალი.",
     guidanceEn:
-      "INTRODUCTION emails — basic structure, professional greeting, simple but clear opener. Keep tone friendly + professional. Foundation skill.",
+      "INTRODUCTION emails, basic structure, professional greeting, simple but clear opener. Keep tone friendly + professional. Foundation skill.",
   },
   {
     key: "follow_up",
@@ -25,7 +25,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "Follow-up",
     focusKa: "წინა კონტაქტზე მითითება, თავაზიანი დაჟინება, მკაფიო next step.",
     guidanceEn:
-      "FOLLOW-UP emails — referencing previous contact/meeting, polite persistence, clear next step. Build on greeting + structure from intro lesson.",
+      "FOLLOW-UP emails, referencing previous contact/meeting, polite persistence, clear next step. Build on greeting + structure from intro lesson.",
   },
   {
     key: "request",
@@ -33,7 +33,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "მოთხოვნა",
     focusKa: "პროფესიონალური ტონი, ნათელი მოთხოვნა, შესაბამისი ფორმალურობა.",
     guidanceEn:
-      "MAKING REQUESTS — professional tone, clear specific ask, appropriate formality (modal verbs, softeners). Builds on opener + follow-up framing.",
+      "MAKING REQUESTS, professional tone, clear specific ask, appropriate formality (modal verbs, softeners). Builds on opener + follow-up framing.",
   },
   {
     key: "update",
@@ -41,7 +41,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "სტატუსი/მოხსენება",
     focusKa: "სტრუქტურირებული ინფორმაცია, მკაფიო ფორმატი, ნათელი დასკვნა.",
     guidanceEn:
-      "SHARING UPDATES & REPORTS — structured information, clear formatting (bullets / short paragraphs), TL;DR + detail. Reuse polite opener.",
+      "SHARING UPDATES & REPORTS, structured information, clear formatting (bullets / short paragraphs), TL;DR + detail. Reuse polite opener.",
   },
   {
     key: "complaint",
@@ -49,7 +49,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "საჩივარი",
     focusKa: "ემპათია, პრობლემის მკაფიო აღწერა, გადაწყვეტაზე ფოკუსი.",
     guidanceEn:
-      "HANDLING COMPLAINTS PROFESSIONALLY — empathy, neutral language, solution-focused. Avoid blame. Builds on clear-ask skills from request lesson.",
+      "HANDLING COMPLAINTS PROFESSIONALLY, empathy, neutral language, solution-focused. Avoid blame. Builds on clear-ask skills from request lesson.",
   },
   {
     key: "negotiation",
@@ -57,7 +57,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "მოლაპარაკება",
     focusKa: "დარწმუნება პროფესიონალური ტონით, ალტერნატივების შეთავაზება.",
     guidanceEn:
-      "NEGOTIATING AND PROPOSING — persuasive but professional, offer alternatives, hedge language, value framing. Builds on request + complaint tone.",
+      "NEGOTIATING AND PROPOSING, persuasive but professional, offer alternatives, hedge language, value framing. Builds on request + complaint tone.",
   },
   {
     key: "closing",
@@ -65,7 +65,7 @@ export const EMAIL_CURRICULUM: CurriculumTopic[] = [
     shortKa: "დახურვა",
     focusKa: "გადამწყვეტი, მკაფიო, პროფესიონალური დახურვა და დადასტურება.",
     guidanceEn:
-      "CLOSING DEALS AND CONFIRMING — decisive, clear, confirming details (dates, scope, next actions). Caps the negotiation arc.",
+      "CLOSING DEALS AND CONFIRMING, decisive, clear, confirming details (dates, scope, next actions). Caps the negotiation arc.",
   },
 ];
 
@@ -76,23 +76,23 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
     shortKa: "Background",
     focusKa: "Tell me about yourself, experience overview, მკაფიო structure.",
     guidanceEn:
-      "BACKGROUND questions — 'Tell me about yourself', experience overview. Heavy weight on small_talk + background stages. Foundation.",
+      "BACKGROUND questions, 'Tell me about yourself', experience overview. Heavy weight on small_talk + background stages. Foundation.",
   },
   {
     key: "motivation",
     titleKa: "მოტივაცია",
     shortKa: "Motivation",
-    focusKa: "რატომ ეს კომპანია, რატომ ეს როლი — specific + authentic პასუხები.",
+    focusKa: "რატომ ეს კომპანია, რატომ ეს როლი, specific + authentic პასუხები.",
     guidanceEn:
-      "MOTIVATION questions — 'Why this company?', 'Why this role?'. Push for specifics about company, not generic answers. Build on intro skills.",
+      "MOTIVATION questions, 'Why this company?', 'Why this role?'. Push for specifics about company, not generic answers. Build on intro skills.",
   },
   {
     key: "situational",
     titleKa: "სიტუაციური კითხვები",
     shortKa: "Situational",
-    focusKa: "'Tell me about a time when…' — STAR struktura, კონკრეტული მაგალითები.",
+    focusKa: "'Tell me about a time when…', STAR struktura, კონკრეტული მაგალითები.",
     guidanceEn:
-      "SITUATIONAL questions — 'Tell me about a time when…'. Heavy situational stage, push for STAR-style answers (Situation, Task, Action, Result).",
+      "SITUATIONAL questions, 'Tell me about a time when…'. Heavy situational stage, push for STAR-style answers (Situation, Task, Action, Result).",
   },
   {
     key: "competency",
@@ -100,7 +100,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
     shortKa: "Skills",
     focusKa: "Skill-based კითხვები, კონკრეტული უნარების მაგალითები.",
     guidanceEn:
-      "SKILL AND COMPETENCY questions — demonstrate specific abilities, technical/role skills. Probe for evidence + outcomes. Builds on STAR from situational.",
+      "SKILL AND COMPETENCY questions, demonstrate specific abilities, technical/role skills. Probe for evidence + outcomes. Builds on STAR from situational.",
   },
   {
     key: "pressure",
@@ -108,15 +108,15 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
     shortKa: "Pressure",
     focusKa: "რთული follow-up-ების მართვა, თავდაცვა პროფესიონალურად.",
     guidanceEn:
-      "PRESSURE AND PUSHBACK — interviewer pushes back hard on every answer, plays skeptical, asks 'why should I believe you?'. Heavy curveball stage.",
+      "PRESSURE AND PUSHBACK, interviewer pushes back hard on every answer, plays skeptical, asks 'why should I believe you?'. Heavy curveball stage.",
   },
   {
     key: "salary",
     titleKa: "ხელფასი და მოლაპარაკება",
     shortKa: "Salary",
-    focusKa: "სენსიტიური თემების მართვა — ხელფასი, ბენეფიტები, ვადები.",
+    focusKa: "სენსიტიური თემების მართვა, ხელფასი, ბენეფიტები, ვადები.",
     guidanceEn:
-      "SALARY AND NEGOTIATION — professional handling of compensation, benefits, start date. Hedging language, ranges, value justification.",
+      "SALARY AND NEGOTIATION, professional handling of compensation, benefits, start date. Hedging language, ranges, value justification.",
   },
   {
     key: "closing",
@@ -124,7 +124,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
     shortKa: "Closing",
     focusKa: "ძლიერი ბოლო შთაბეჭდილება, კარგი კითხვები ინტერვიუერისთვის.",
     guidanceEn:
-      "CLOSING AND QUESTIONS FOR INTERVIEWER — leave a strong final impression, ask thoughtful questions about role/team/company. Heavy closing stage.",
+      "CLOSING AND QUESTIONS FOR INTERVIEWER, leave a strong final impression, ask thoughtful questions about role/team/company. Heavy closing stage.",
   },
 ];
 

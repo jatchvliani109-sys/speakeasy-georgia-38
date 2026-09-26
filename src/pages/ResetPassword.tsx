@@ -69,7 +69,7 @@ export default function ResetPassword() {
   return (
     <Layout showLogout={false}>
       <SEO
-        title="ახალი პაროლი — SpeakBusy"
+        title="ახალი პაროლი, SpeakBusy"
         description="დააყენე SpeakBusy-ის ახალი პაროლი."
         path="/reset-password"
       />

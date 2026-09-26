@@ -327,7 +327,7 @@ export default function BusinessPlacementTest() {
               className="mt-4 w-full px-4 py-3 rounded-xl border border-line-2 focus:border-wine outline-none text-sm bg-card"
             />
             <p className="ka text-xs text-ink-muted mt-2">
-              ეს კითხვა არასავალდებულოა — შეგიძლია გამოტოვო.
+              ეს კითხვა არასავალდებულოა, შეგიძლია გამოტოვო.
             </p>
           </>
         )}

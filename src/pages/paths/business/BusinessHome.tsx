@@ -759,7 +759,7 @@ export default function BusinessHome() {
                   <p className="ka text-[13px] font-bold text-on-dark truncate">
                     {trialEndingSoon(s)
                       ? `უფასო პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
-                       : `უფასო პრემიუმი აქტიურია, დარჩა ${trialDaysLeft(s)} დღე`}
+                       : `უფასო პრემიუმი · დარჩა ${trialDaysLeft(s)} დღე`}
                   </p>
                   <p className="ka text-[11px] text-on-dark/70 truncate">
                     {trialEndingSoon(s)
@@ -1021,7 +1021,11 @@ export default function BusinessHome() {
                         ბიზნეს ლექსიკა
                       </p>
                       <p className="ka text-[11px] text-ink-subtle mt-0.5">
-                        {vocabSummary.known} ვიცი · {vocabSummary.learning} ვსწავლობ ·{" "}
+                        {/* "ვსწავლობ" counts every word met but not yet known.
+                            Splitting out the weak ones left them in no bucket
+                            at all: after a first session the line read
+                            "0 ვიცი · 0 ვსწავლობ" with six words in progress. */}
+                        {vocabSummary.known} ვიცი · {vocabSummary.learning + vocabSummary.fresh} ვსწავლობ ·{" "}
                         {vocabSummary.total} სულ
                       </p>
                     </div>

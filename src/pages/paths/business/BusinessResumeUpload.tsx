@@ -111,8 +111,8 @@ export default function BusinessResumeUpload() {
       f.name.toLowerCase().endsWith(".pdf") ||
       f.name.toLowerCase().endsWith(".docx");
     if (!ok) return "მხოლოდ PDF ან Word (.docx) ფაილებია ნებადართული";
-    if (f.size > MAX_BYTES) return "ფაილი ძალიან დიდია — მაქსიმუმ 10MB";
-    if (f.size === 0) return "ფაილი ცარიელია — სცადე სხვა";
+    if (f.size > MAX_BYTES) return "ფაილი ძალიან დიდია, მაქსიმუმ 10MB";
+    if (f.size === 0) return "ფაილი ცარიელია, სცადე სხვა";
     return null;
   };
 
@@ -340,7 +340,7 @@ export default function BusinessResumeUpload() {
             <p className="ka text-sm font-semibold text-wine">
               {parsing ? "ვამუშავებ..." : "გადმოაგდე ფაილი ან აირჩიე"}
             </p>
-            <p className="ka text-xs text-ink-muted mt-1">PDF ან Word (.docx) — მაქს. 10MB</p>
+            <p className="ka text-xs text-ink-muted mt-1">PDF ან Word (.docx), მაქს. 10MB</p>
             <input
               ref={inputRef}
               type="file"
@@ -356,7 +356,7 @@ export default function BusinessResumeUpload() {
 
           {parsing && (
             <p className="ka text-xs text-ink-muted mt-3 text-center">
-              მონაცემების ამოღება — შეიძლება დასჭირდეს რამდენიმე წამი...
+              მონაცემების ამოღება, შეიძლება დასჭირდეს რამდენიმე წამი...
             </p>
           )}
 
@@ -366,7 +366,7 @@ export default function BusinessResumeUpload() {
                 onClick={skip}
                 className="ka text-xs text-ink-muted hover:text-wine underline underline-offset-2"
               >
-                გამოტოვება — შემდეგ ვცადო
+                გამოტოვება, შემდეგ ვცადო
               </button>
             </div>
           )}
@@ -431,7 +431,7 @@ export default function BusinessResumeUpload() {
             onChange={setLanguagesInput}
           />
           <Field
-            label="განათლება — ხარისხი და უნივერსიტეტი"
+            label="განათლება, ხარისხი და უნივერსიტეტი"
             value={extracted.education}
             onChange={(v) => setExtracted({ ...extracted, education: v })}
             textarea

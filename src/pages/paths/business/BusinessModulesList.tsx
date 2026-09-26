@@ -44,7 +44,7 @@ export default function BusinessModulesList() {
   const recommended = useMemo(() => recommendedModuleSlugs(goals), [goals]);
 
   return (
-    <BusinessShell seo={{ title: "მოდულები — SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ლექსიკა, სცენარები და გასაუბრება.", path: "/path/business/modules" }}>
+    <BusinessShell seo={{ title: "მოდულები, SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ლექსიკა, სცენარები და გასაუბრება.", path: "/path/business/modules" }}>
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-wider text-ink-muted font-bold">
           SpeakBusy
@@ -71,7 +71,7 @@ export default function BusinessModulesList() {
                   სცენარები
                 </h2>
                 <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
-                  ისწავლე სიტყვები რეალურ სამუშაო სიტუაციებში — დიალოგებით, აუდიოთი და ვარჯიშით.
+                  ისწავლე სიტყვები რეალურ სამუშაო სიტუაციებში, დიალოგებით, აუდიოთი და ვარჯიშით.
                 </p>
                 <span className="ka inline-flex items-center gap-1 text-[11px] font-semibold text-wine mt-3 group-hover:gap-1.5 transition-all">
                   გახსნა <ArrowRight size={12} strokeWidth={2.25} />

@@ -212,11 +212,11 @@ export default function VocabularyModule() {
           (k) => !scenarioReview.includes(k),
         );
 
-        newW = [...scenarioNew, ...planNewFiltered].slice(0, Math.max(8, plan.newWords.length));
-        revK = [...scenarioReview, ...planReviewFiltered].slice(
-          0,
-          Math.max(8, plan.reviewKeys.length),
-        );
+        // The scenario decides WHICH words, never HOW MANY. The old floor of
+        // "at least 8" quietly overrode the pacing: a learner who had just
+        // scored 9% was still handed 8 new words on scenario days.
+        newW = [...scenarioNew, ...planNewFiltered].slice(0, plan.newWords.length);
+        revK = [...scenarioReview, ...planReviewFiltered].slice(0, plan.reviewKeys.length);
       }
       setNewWords(newW);
       setReviewKeys(revK);
@@ -1552,7 +1552,7 @@ function QuestionCard({
         <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           {renderChoices(
-            q.options.map((o, i) => ({ label: `${o.en} — ${o.ka}`, value: i })),
+            q.options.map((o, i) => ({ label: `${o.en}, ${o.ka}`, value: i })),
             q.correctIndex,
           )}
         </div>
