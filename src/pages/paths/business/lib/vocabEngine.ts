@@ -695,10 +695,17 @@ export function planSession(
   // the day, when nothing has come due yet), top the session back up with new
   // words — never past the governor ceiling. This is what stopped session 1 from
   // being a 6-word stub while session 2 ballooned.
+  // ...but never past what the learner has earned. This top-up used to fill to
+  // the ceiling, which quietly undid the pacing exactly where it matters most:
+  // a beginner with six shaky words has almost nothing to review, so the
+  // session filled itself with eight NEW words no matter how badly they were
+  // doing. A short session is better than a flood; buildQuiz's own floor keeps
+  // it from collapsing by asking the same words in different formats.
+  const earnedCap = Math.min(newCeiling, earnedNew);
   const questionsPlanned = MISTAKE_ALLOWANCE + QUESTIONS_PER_NEW * newTarget + reviewKeys.length;
   if (questionsPlanned < sessionTarget) {
     const extraNew = Math.ceil((sessionTarget - questionsPlanned) / QUESTIONS_PER_NEW);
-    newTarget = Math.min(newCeiling, newTarget + extraNew);
+    newTarget = Math.min(earnedCap, newTarget + extraNew);
   }
 
   // ---- New word selection in strict tier order ---------------------------

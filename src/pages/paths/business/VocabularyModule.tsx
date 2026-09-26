@@ -114,6 +114,8 @@ export default function VocabularyModule() {
   } | null>(null);
   const [reviewWords, setReviewWords] = useState<VocabWord[]>([]);
   const [reviewMode, setReviewMode] = useState(false);
+  /** How many missed questions have been appended to THIS session so far. */
+  const requeuedRef = useRef(0);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
@@ -280,6 +282,7 @@ export default function VocabularyModule() {
 
   const startSession = () => {
     if (dailyLimitReached) return;
+    requeuedRef.current = 0;
     clearSessionSnapshot();   // starting fresh on purpose
     setResumed(false);
     // Resume audio on user gesture (browsers require it).
@@ -387,7 +390,14 @@ export default function VocabularyModule() {
   // Duolingo-style mistake requeue: a missed question is appended to the END of
   // the session and must be answered again, so the session grows by one item per
   // mistake. A question is a RETRY if the same item already appeared earlier in
-  // the queue — that also caps it at exactly one repeat (a retry never requeues).
+  // the queue, which also caps it at exactly one repeat (a retry never requeues).
+  //
+  // The total is capped as well. Without a cap the session grew by one item for
+  // EVERY mistake: a learner scoring 3% turned a 23-question session into 39,
+  // the last sixteen of which were all repeats. The person having the worst
+  // session gets the longest one, which is exactly backwards. Missed words are
+  // already due immediately, so the rest come back in the next session anyway.
+  const MAX_REQUEUED = 5;
   const qid = (q: QuizQuestion) => `${q.type}:${"wordKey" in q ? q.wordKey : (q as any).key}`;
   const isRetry = !isReviewing && !!liveQ && quiz.slice(0, qIdx).some((q) => qid(q) === qid(liveQ));
 
@@ -441,7 +451,10 @@ export default function VocabularyModule() {
       setCombo(0);
       playWrong();
       // Requeue the missed question once, at the end of this session.
-      if (!isRetry) setQuiz((qs) => [...qs, liveQ]);
+      if (!isRetry && requeuedRef.current < MAX_REQUEUED) {
+        requeuedRef.current += 1;
+        setQuiz((qs) => [...qs, liveQ]);
+      }
       // Wrong: do not auto-advance — let user review and click next.
     }
   };
@@ -1741,9 +1754,12 @@ function Results({
     perWord.set(a.wordKey, cur);
   });
 
+  // "Went well today", minus anything already celebrated in the ვიცი card
+  // directly above it — the same word in both lists read like a bug.
+  const justKnown = new Set(newlyMastered.map((w) => w.key));
   const mastered = newWords.filter((w) => {
     const s = perWord.get(w.key);
-    return s && s.c > s.w;
+    return s && s.c > s.w && !justKnown.has(w.key);
   });
   const needsReview = newWords.filter((w) => {
     const s = perWord.get(w.key);
@@ -1792,7 +1808,7 @@ function Results({
             <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold text-panel-deep">
               <span className="text-sm">✦</span>
               <span className="ka text-[13px] font-bold">
-                {masteredMilestone} სრულად ნასწავლი სიტყვა
+                {masteredMilestone} სიტყვა უკვე იცი
               </span>
             </div>
           )}
@@ -1814,16 +1830,16 @@ function Results({
         <SummaryStat label="სულ ლექსიკაში" value={totalVocab} />
       </div>
 
-      {/* TRUE mastery — words that crossed the full bar this session: 4+ correct
-          answers, on 3+ separate days, including 2 production-type answers.
-          Distinct from the list below, which is simply what went well today.
-          This is the app's most meaningful achievement and was previously
-          invisible — only silent confetti every ten words. */}
+      {/* Words that reached the "ვიცი" bar this session (confidence 4+, or
+          marked easy by the learner). It used to be captioned "სრულად ნასწავლი"
+          — fully learned — which overclaimed: a word can pass this bar inside a
+          single day, while real mastery needs correct answers on three separate
+          days. The list below is simply what went well today. */}
       {newlyMastered.length > 0 && (
         <BizCard className="border-gold/50 bg-cream">
           <div className="flex items-center justify-between">
             <p className="ka text-[11px] uppercase tracking-wider text-gold-deep font-semibold">
-              ✦ სრულად ნასწავლი
+              ✦ უკვე იცი
             </p>
             <p className="ka text-[11px] text-gold-deep">
               სულ {masteredTotal}
@@ -1831,8 +1847,8 @@ function Results({
           </div>
           <p className="ka text-xs text-ink-muted mt-1.5 leading-relaxed">
             {newlyMastered.length === 1
-              ? "ეს სიტყვა უკვე ხარისხიანად იცი"
-              : "ეს სიტყვები უკვე ხარისხიანად იცი"}
+              ? "ეს სიტყვა „ვიცი“ სიაში გადავიდა"
+              : "ეს სიტყვები „ვიცი“ სიაში გადავიდა"}
           </p>
           <ul className="mt-3 space-y-1.5">
             {newlyMastered.map((w) => (

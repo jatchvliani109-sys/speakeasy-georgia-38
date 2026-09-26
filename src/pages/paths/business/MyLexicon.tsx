@@ -480,16 +480,25 @@ function WordsTab() {
                   <p className="ka text-[10px] text-ink-muted">
                     წყარო: {sourceLabelKa(r.source)}
                   </p>
+                  {/* These three were coloured dots whose only explanation was a
+                      `title` tooltip, which a phone never shows: three unlabelled
+                      dots that silently change how a word is scheduled. The word
+                      is on the button now. */}
                   <div className="flex gap-1">
                     {LABELS.map((l) => (
                       <button
                         key={l.id}
                         onClick={() => setLabel(r, r.manual_label === l.id ? null : l.id)}
                         title={l.label}
-                        className={`w-7 h-7 grid place-items-center rounded-md border transition
-                          ${r.manual_label === l.id ? "border-wine bg-cream-2" : "border-transparent hover:border-line-2"}`}
+                        aria-label={l.label}
+                        aria-pressed={r.manual_label === l.id}
+                        className={`ka inline-flex items-center gap-1 h-7 px-2 rounded-md border text-[10px] transition
+                          ${r.manual_label === l.id
+                            ? "border-wine bg-cream-2 text-ink font-semibold"
+                            : "border-transparent text-ink-muted hover:border-line-2"}`}
                       >
-                        <span className="block w-2.5 h-2.5 rounded-full" style={{ background: l.dot }} />
+                        <span className="block w-2 h-2 rounded-full shrink-0" style={{ background: l.dot }} />
+                        {l.label}
                       </button>
                     ))}
                   </div>
