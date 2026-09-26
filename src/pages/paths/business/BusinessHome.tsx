@@ -12,7 +12,7 @@ import {
   Check,
   ArrowRight,
   Instagram,
-  X, User} from "lucide-react";
+  X, User, RefreshCw } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +37,7 @@ import {
   trialDaysLeft,
   aiSessionsRemaining,
   hasUnlimitedVocab,
+  shouldShowTrialEnd,
 } from "./lib/state";
 import {
   computeStreakWithFreezes,
@@ -223,6 +224,13 @@ export default function BusinessHome() {
   useEffect(() => {
     if (nameLoaded && !profileName) setNameDialogOpen(true);
   }, [nameLoaded, profileName]);
+
+  // The goodbye screen used to be reachable only through /path/business, so
+  // anyone opening the dashboard directly (home-screen shortcut, bookmark,
+  // in-app link) could roll off the trial without ever being told.
+  useEffect(() => {
+    if (s && shouldShowTrialEnd(s)) navigate("/path/business/trial-ended", { replace: true });
+  }, [s, navigate]);
 
   const submitName = async () => {
     const clean = nameInput.trim();
@@ -963,6 +971,15 @@ export default function BusinessHome() {
               მეტი
             </p>
             <div className="bg-card border border-line rounded-lg divide-y divide-cream">
+              {/* Review-only practice. The mode existed in the code for months
+                  with nothing able to start it. Unlimited for everyone: it
+                  hands out no new words, so there is nothing to meter. */}
+              <MoreRow
+                icon={<RefreshCw size={15} strokeWidth={2} />}
+                title="გამეორება"
+                sub="მხოლოდ ნასწავლი სიტყვები, ახალი არ დაემატება"
+                onClick={() => navigate("/path/business/vocabulary?mode=review")}
+              />
               <MoreRow
                 icon={<Briefcase size={15} strokeWidth={2} />}
                 title="გასაუბრება"
@@ -1025,8 +1042,8 @@ export default function BusinessHome() {
                             Splitting out the weak ones left them in no bucket
                             at all: after a first session the line read
                             "0 ვიცი · 0 ვსწავლობ" with six words in progress. */}
-                        {vocabSummary.known} ვიცი · {vocabSummary.learning + vocabSummary.fresh} ვსწავლობ ·{" "}
-                        {vocabSummary.total} სულ
+                        {vocabSummary.known} ვიცი · {vocabSummary.learning} ვსწავლობ ·{" "}
+                        {vocabSummary.fresh} ახალი
                       </p>
                     </div>
                     <p className="text-2xl font-extrabold text-wine tabular-nums leading-none">

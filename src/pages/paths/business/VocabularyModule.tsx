@@ -24,6 +24,7 @@ import {
   loadProgress,
   loadRecentSessions,
   pickLowestConfidenceWords,
+  pickReviewWords,
   planSession,
   progressToWord,
   SESSION_QUESTION_TARGET,
@@ -72,6 +73,11 @@ export default function VocabularyModule() {
   // session to that scenario's words (from vocabContext).
   const [searchParams] = useSearchParams();
   const scenarioId = searchParams.get("scenario");
+  // ?mode=review — a session built only from words already met. Free users can
+  // take these without limit: no new words are handed out, so there is nothing
+  // to meter, and it gives the habit somewhere to live on a day when the one
+  // free session is already spent.
+  const reviewOnly = searchParams.get("mode") === "review";
   const [scenario, setScenario] = useState<SituationCluster | null>(null);
   const [tierLevel, setTierLevel] = useState<1 | 2 | 3>(1);
   // Question-format difficulty — escalates above tierLevel automatically when
@@ -194,7 +200,7 @@ export default function VocabularyModule() {
         const words = sc.wordKeys.map(findWord).filter(Boolean) as VocabWord[];
         const seenKeys = new Set(p.map((r) => r.word_key));
         const mastered = new Set(
-          p.filter((r) => r.confidence >= 4 || r.manual_label === "easy").map((r) => r.word_key),
+          p.filter((r) => r.confidence >= 4).map((r) => r.word_key),
         );
 
         // Scenario words the user has not met yet lead the new-word list.
@@ -242,6 +248,14 @@ export default function VocabularyModule() {
         setLoading(false);
         return;
       }
+      if (reviewOnly) {
+        const words = pickReviewWords(p, REVIEW_FALLBACK_SIZE);
+        setReviewWords(words);
+        setReviewMode(true);
+        setStage(words.length ? "reviewIntro" : "empty");
+        setLoading(false);
+        return;
+      }
       if (!newW.length && !revK.length) {
         const fallback = pickLowestConfidenceWords(p, REVIEW_FALLBACK_SIZE);
         if (fallback.length) {
@@ -255,7 +269,7 @@ export default function VocabularyModule() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [user, scenarioId]);
+  }, [user, scenarioId, reviewOnly]);
 
   // Snapshot the in-flight session so leaving the page doesn't discard it.
   useEffect(() => {
@@ -278,7 +292,7 @@ export default function VocabularyModule() {
   // Trial users get premium session behaviour too, so this must not test
   // mockPro directly — that would promise unlimited sessions and then deny them.
   const isPaidUser = hasUnlimitedVocab(state);
-  const dailyLimitReached = !isPaidUser && sessionsToday >= FREE_DAILY_SESSIONS;
+  const dailyLimitReached = !isPaidUser && !reviewOnly && sessionsToday >= FREE_DAILY_SESSIONS;
 
   const startSession = () => {
     if (dailyLimitReached) return;
@@ -550,8 +564,9 @@ export default function VocabularyModule() {
       completed: true,
       completed_at: new Date().toISOString(),
       session_data: {
-        wordKeys: newWords.map((w) => w.key),
+        wordKeys: (reviewMode ? reviewWords : newWords).map((w) => w.key),
         answers: finalAnswers,
+        ...(reviewMode ? { mode: "review" } : {}),
       },
     };
     const { error: sessErr } = await supabase
@@ -561,8 +576,9 @@ export default function VocabularyModule() {
       const { queueSession } = await import("./lib/offlineQueue");
       queueSession(user.id, sessionRow as Record<string, unknown>);
     }
-    // Count it now so the daily cap applies within this visit too.
-    setSessionsToday((x) => x + 1);
+    // Count it now so the daily cap applies within this visit too. A
+    // review-only session is free and does not count.
+    if (!reviewMode) setSessionsToday((x) => x + 1);
 
     // Mastery recognition.
     //
@@ -572,19 +588,19 @@ export default function VocabularyModule() {
     // reached. Mastery is the app's most meaningful number; it should not be
     // something the user has to infer.
     const wasMastered = new Set(
-      progress.filter((p) => p.confidence >= 4 || p.manual_label === "easy").map((p) => p.word_key),
+      progress.filter((p) => p.confidence >= 4).map((p) => p.word_key),
     );
     const crossed = newProgress
       .filter(
         (p) =>
-          (p.confidence >= 4 || p.manual_label === "easy") && !wasMastered.has(p.word_key),
+          p.confidence >= 4 && !wasMastered.has(p.word_key),
       )
       .map((p) => findWord(p.word_key))
       .filter(Boolean) as VocabWord[];
     setNewlyMastered(crossed);
 
     const newMastered = newProgress.filter(
-      (p) => p.confidence >= 4 || p.manual_label === "easy",
+      (p) => p.confidence >= 4,
     ).length;
     setMasteredTotal(newMastered);
 
@@ -890,20 +906,24 @@ export default function VocabularyModule() {
       {stage === "quiz" && currentQ && (
         <>
           <ProgressBar value={qIdx + (revealed ? 1 : 0)} total={quiz.length} label={`კითხვა ${qIdx + 1}/${quiz.length}`} pulse={progressPulse} />
-          {scenario && (
-            <p className="ka text-[11px] font-semibold text-wine -mt-1">
-              🎬 {scenario.titleKa}
-            </p>
-          )}
-          {resumed && (
-            <p className="ka text-[11px] font-semibold text-wine -mt-1">
-              ⏵ გაგრძელდა იქიდან, სადაც შეწყვიტე
-            </p>
-          )}
-          {isRetry && (
-            <p className="ka text-[11px] font-semibold text-gold -mt-1">
-              🔁 გამეორება, ეს კითხვა ადრე გამოგრჩა
-            </p>
+          {/* These three sat flush against the progress bar with a negative
+              margin, so on a phone they read as one squashed block. */}
+          {(scenario || resumed || isRetry) && (
+            <div className="mt-1.5 mb-1 space-y-1">
+              {scenario && (
+                <p className="ka text-[11px] font-semibold text-wine">🎬 {scenario.titleKa}</p>
+              )}
+              {resumed && (
+                <p className="ka text-[11px] font-semibold text-wine">
+                  ⏵ გაგრძელდა იქიდან, სადაც შეწყვიტე
+                </p>
+              )}
+              {isRetry && (
+                <p className="ka text-[11px] font-semibold text-gold">
+                  🔁 გამეორება, ეს კითხვა ადრე გამოგრჩა
+                </p>
+              )}
+            </div>
           )}
           <div key={isReviewing ? `r${reviewIdx}` : qIdx} className="biz-question-slide">
             {isReviewing ? (
@@ -1864,7 +1884,7 @@ function Results({
       {mastered.length > 0 && (
         <BizCard>
           <p className="ka text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">
-            დღეს კარგად გამოვიდა
+            კარგია
           </p>
           <ul className="mt-2 space-y-1.5">
             {mastered.map((w) => (

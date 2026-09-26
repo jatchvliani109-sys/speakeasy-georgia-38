@@ -57,6 +57,13 @@ export default function AiLockedCard({
           <p className="ka text-[13px] text-ink-muted mt-2 tabular-nums">
             {unlockProgress} / {unlockTarget}
           </p>
+
+          {/* A word rises one level a day at most, so this is a few days of
+              practice, not a number you can rush in one evening. Saying so
+              stops it reading as an arbitrary wall. */}
+          <p className="ka text-[11px] text-ink-subtle mt-2 leading-relaxed">
+            ყოველდღიური ვარჯიშით რამდენიმე დღეში გაიხსნება
+          </p>
         </div>
 
         <Link

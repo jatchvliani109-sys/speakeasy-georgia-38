@@ -322,9 +322,11 @@ export function trialUnlockProgress(
   rows: { confidence: number; manual_label?: string | null }[] | null | undefined,
 ): number {
   if (!rows?.length) return 0;
-  // confidence 4+ is the ვიცი tab. A claimed word counts too: claiming
-  // requires a typed proof in the quiz, so it is not a free pass.
-  return rows.filter((r) => r.manual_label === "easy" || (r.confidence ?? 0) >= 4).length;
+  // confidence 4+ is the ვიცი tab, and it is the only thing that counts.
+  // Marking a word "ადვილი" in the lexicon used to count as well, which made
+  // the unlock self-declarable: twenty taps and the AI opened. That label is
+  // now a scheduling hint only.
+  return rows.filter((r) => (r.confidence ?? 0) >= 4).length;
 }
 
 /**

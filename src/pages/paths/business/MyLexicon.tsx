@@ -343,9 +343,24 @@ function WordsTab() {
     return () => { cancelled = true; };
   }, [user]);
 
+  /**
+   * The label is a SCHEDULING hint, nothing more. It used to decide whether a
+   * word counted as "ვიცი" (and, during the trial, whether the AI unlocked),
+   * which meant a learner could promote twenty words with twenty taps. Now it
+   * only changes when the word comes back:
+   *
+   *   ადვილი   -> push it three weeks out and stop using it as filler
+   *   რთული    -> bring it back in the next session
+   *   საშუალო / cleared -> leave the spaced repetition schedule alone
+   */
   const setLabel = async (row: ProgressRow, label: string | null) => {
     if (!user) return;
-    const updated = { ...row, manual_label: label };
+    const DAY = 86_400_000;
+    const due =
+      label === "easy" ? new Date(Date.now() + 21 * DAY).toISOString()
+      : label === "difficult" ? new Date().toISOString()
+      : row.due_at;
+    const updated = { ...row, manual_label: label, due_at: due };
     setRows((rs) => rs.map((r) => (r.word_key === row.word_key ? updated : r)));
     await upsertProgress(user.id, [updated]);
   };
@@ -355,11 +370,11 @@ function WordsTab() {
     if (filter === "difficult") {
       list = list.filter((r) => r.manual_label === "difficult" || r.wrong_count > r.correct_count);
     } else if (filter === "learned") {
-      list = list.filter((r) => r.confidence >= 4 || r.manual_label === "easy");
+      list = list.filter((r) => r.confidence >= 4);
     } else if (filter === "learning") {
-      list = list.filter((r) => r.confidence >= 2 && r.confidence <= 3 && r.manual_label !== "easy");
+      list = list.filter((r) => r.confidence >= 2 && r.confidence <= 3);
     } else if (filter === "fresh") {
-      list = list.filter((r) => r.confidence <= 1 && r.manual_label !== "easy");
+      list = list.filter((r) => r.confidence <= 1);
     }
     const q = query.trim().toLowerCase();
     if (q) {
@@ -374,9 +389,9 @@ function WordsTab() {
 
   const counts = useMemo(() => {
     const difficult = rows.filter((r) => r.manual_label === "difficult" || r.wrong_count > r.correct_count).length;
-    const learned = rows.filter((r) => r.confidence >= 4 || r.manual_label === "easy").length;
-    const learning = rows.filter((r) => r.confidence >= 2 && r.confidence <= 3 && r.manual_label !== "easy").length;
-    const fresh = rows.filter((r) => r.confidence <= 1 && r.manual_label !== "easy").length;
+    const learned = rows.filter((r) => r.confidence >= 4).length;
+    const learning = rows.filter((r) => r.confidence >= 2 && r.confidence <= 3).length;
+    const fresh = rows.filter((r) => r.confidence <= 1).length;
     return { total: rows.length, difficult, learned, learning, fresh };
   }, [rows]);
 

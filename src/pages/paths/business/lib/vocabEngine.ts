@@ -90,9 +90,23 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
     ? p.meta.history
     : [];
   const history = [...prevHistory, { date: today, correct: sessionCorrect }].slice(-30);
+
+  // UP IS SLOW, DOWN IS INSTANT.
+  //
+  // Confidence may rise at most ONE step per calendar day per word. Premium and
+  // trial users can take several sessions a day, and without this a word could
+  // go from unseen to "ვიცი" in a single afternoon — the bar the progress
+  // percentage, the ვიცი list and the AI unlock are all built on. Extra
+  // sessions still teach, still review and still introduce new words; they just
+  // do not re-bank the same word twice in one day.
+  //
+  // A miss always costs a level immediately, on any session. Forgetting is
+  // information, and it should land the moment it happens.
+  const lastGainDate = typeof p.meta?.lastGainDate === "string" ? p.meta.lastGainDate : null;
+  const gainedToday = lastGainDate === today;
   const confidence = Math.max(
     0,
-    Math.min(5, sessionCorrect ? p.confidence + 1 : p.confidence - 1),
+    Math.min(5, sessionCorrect ? (gainedToday ? p.confidence : p.confidence + 1) : p.confidence - 1),
   );
   const newCorrectTotal = p.correct_count + correctCount;
   const meta = {
@@ -123,6 +137,12 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
   const masteryStep = mastered
     ? wasMastered ? Math.min(prevStep + 1, MASTERED_DAYS.length - 1) : 0
     : 0;
+  // A word's first-ever session is the one exception to the daily cap: the
+  // fast-track exists so a learner who already knows "manager" is not walked up
+  // the ladder from zero. It still only happens once, on day one for that word.
+  const raisedToday = effConfidence > p.confidence;
+  const nextGainDate = raisedToday ? today : lastGainDate;
+
   const days = mastered
     ? MASTERED_DAYS[masteryStep]
     : fastTracked
@@ -143,7 +163,7 @@ export function applySessionResults(p: ProgressRow, results: boolean[], prodCorr
     wrong_count: p.wrong_count + wrongCount,
     last_seen_at: new Date().toISOString(),
     due_at: new Date(Date.now() + days * DAY_MS).toISOString(),
-    meta: { ...meta, masteryStep },
+    meta: { ...meta, masteryStep, lastGainDate: nextGainDate },
   };
 }
 
@@ -195,7 +215,7 @@ export function applyKnownWordFastTrack(
     correct_count: p.correct_count + results.length,
     last_seen_at: new Date().toISOString(),
     due_at: new Date(Date.now() + 14 * DAY_MS).toISOString(),
-    meta,
+    meta: { ...meta, lastGainDate: new Date().toISOString().slice(0, 10) },
   };
 }
 
@@ -437,7 +457,7 @@ export function pickDailyScenario(
 
   const seen = new Set(progress.map((p) => p.word_key));
   const mastered = new Set(
-    progress.filter((p) => p.confidence >= 4 || p.manual_label === "easy").map((p) => p.word_key),
+    progress.filter((p) => p.confidence >= 4).map((p) => p.word_key),
   );
 
   // Score each cluster by remaining value: unseen words are worth most,
@@ -469,13 +489,37 @@ export function pickDailyScenario(
 export async function countSessionsToday(userId: string): Promise<number> {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
-  const { count } = await supabase
+  // Review-only sessions are deliberately NOT counted: they teach no new words,
+  // so they cost nothing to give away, and the free tier needs somewhere to put
+  // the habit on a day its one real session is spent.
+  const { data } = await supabase
     .from("business_vocab_sessions")
-    .select("id", { count: "exact", head: true })
+    .select("session_data")
     .eq("user_id", userId)
     .eq("completed", true)
-    .gte("completed_at", startOfDay.toISOString());
-  return count ?? 0;
+    .gte("completed_at", startOfDay.toISOString())
+    .limit(50);
+  return (data || []).filter((r: any) => r?.session_data?.mode !== "review").length;
+}
+
+/**
+ * Words for a review-only session: whatever is due, hardest first, then the
+ * weakest words the learner has met. Never introduces anything new.
+ */
+export function pickReviewWords(progress: ProgressRow[], n = 10): VocabWord[] {
+  const now = Date.now();
+  const seen = progress.filter((p) => p.last_seen_at !== null);
+  const due = seen
+    .filter((p) => new Date(p.due_at).getTime() <= now)
+    .sort((a, b) => a.confidence - b.confidence
+      || new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
+  // Words the learner marked "ადვილი" are not used as filler. They still come
+  // back when they are genuinely due, just not a day early.
+  const rest = seen
+    .filter((p) => new Date(p.due_at).getTime() > now && p.manual_label !== "easy")
+    .sort((a, b) => a.confidence - b.confidence || b.wrong_count - a.wrong_count);
+  const keys = [...due, ...rest].slice(0, n);
+  return keys.map(progressToWord).filter(Boolean) as VocabWord[];
 }
 
 /** Last `n` completed vocab sessions (score/total), newest first. */
@@ -684,7 +728,9 @@ export function planSession(
   if (reviewKeys.length < reviewTarget) {
     const chosen = new Set(reviewKeys);
     const weakest = progress
-      .filter((p) => !checkMastery(p) && !chosen.has(p.word_key))
+      // "ადვილი" means show it less often, so it is not dragged back in as
+      // filler when it is not actually due.
+      .filter((p) => !checkMastery(p) && !chosen.has(p.word_key) && p.manual_label !== "easy")
       .sort((a, b) => a.confidence - b.confidence || b.wrong_count - a.wrong_count)
       .slice(0, reviewTarget - reviewKeys.length)
       .map((p) => p.word_key);
@@ -1456,8 +1502,7 @@ export function summarizeVocabProgress(
   let known = 0, learning = 0, fresh = 0;
 
   for (const r of rows) {
-    const easy = r.manual_label === "easy";
-    if (r.confidence >= 4 || easy) known++;
+    if (r.confidence >= 4) known++;
     else if (r.confidence >= 2) learning++;
     else fresh++;
   }
@@ -1465,7 +1510,6 @@ export function summarizeVocabProgress(
   // Weighted by exact confidence, so every level-up moves the number.
   let weighted = 0;
   for (const r of rows) {
-    if (r.manual_label === "easy") { weighted += 1; continue; }
     const c = Math.max(0, Math.min(5, Math.round(r.confidence ?? 0)));
     weighted += CONFIDENCE_WEIGHT[c] ?? 0;
   }
