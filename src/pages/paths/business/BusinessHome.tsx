@@ -62,9 +62,9 @@ const INTENSITY_MINUTES: Record<BusinessIntensity, string> = {
 
 const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle: string; doneSubtitle: string }> = {
   vocabulary: {
-    title: "დღევანდელი ბიზნეს სიტყვები",
+    title: "ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
-    doneTitle: "ყოჩაღ! დღევანდელი „Streak“ დაცულია.",
+    doneTitle: "ყოჩაღ! „Streak“ დაცულია.",
     doneSubtitle: " ხვალ ახალი სიტყვები გელოდება.",
   },
 };
@@ -447,7 +447,7 @@ export default function BusinessHome() {
             ? "ჩვევა ყალიბდება 💪"
             : streak > 0
               ? "კარგია, ასე გააგრძელე!"
-              : "დაიწყე დღეს - ერთი სესია საკმარისია";
+              : "დაიწყე დღეს, ერთი სესია საკმარისია";
   const streakDark = streakTier >= 3;
 
   // VOCAB-FIRST: vocabulary IS the daily mission — always. Interview stays a
@@ -644,6 +644,11 @@ export default function BusinessHome() {
                       style={{ width: `${Math.min(100, Math.round((streak / nextMilestone) * 100))}%` }}
                     />
                   </div>
+                  {/* The bar used to be unlabelled: a gold line under the streak
+                      that filled up for no stated reason. Say what it is. */}
+                  <p className={`ka text-[10px] mt-1.5 ${streakDark ? "text-on-dark/70" : "text-ink-muted"}`}>
+                    კიდევ {Math.max(1, nextMilestone - streak)} დღე → {nextMilestone}-დღიანი „Streak“
+                  </p>
                 </div>
               )}
             </div>
@@ -695,7 +700,7 @@ export default function BusinessHome() {
                       }}
                       className="ka inline-flex items-center justify-center gap-2 bg-panel text-gold hover:bg-panel-soft transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
                     >
-                      ხელახალი შეფასების დაწყება <ArrowRight size={14} strokeWidth={2.25} />
+                      შეფასების ხელახლა გავლა <ArrowRight size={14} strokeWidth={2.25} />
                     </button>
                     <button
                       onClick={() => {
@@ -747,7 +752,7 @@ export default function BusinessHome() {
                 onClick={() => setBrokenStreak(null)}
                 className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold"
               >
-                დღევანდელი სესია
+                სესიის დაწყება
                 <ArrowRight size={15} strokeWidth={2.25} />
               </Link>
             </BizCard>
@@ -902,18 +907,18 @@ export default function BusinessHome() {
                   <div className="mt-3 space-y-2">
                     {scenarioToday && (
                       <p className="ka text-[11px] font-semibold" style={{ color: "#4A4238" }}>
-                        🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
+                        🎬 სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
                     <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
-                      დღეს {vocabWordCount} სიტყვა იცი
+                      ლექსიკონში {vocabWordCount} სიტყვა გაქვს
                     </p>
                     <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
                       {vocabNewToday > 0
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
                         ? `${vocabReviewToday} გასამეორებელი სიტყვა`
-                        : "გამეორების დღე, ყველაზე რთული სიტყვები"}
+                        : "გამეორების სესია, ყველაზე რთული სიტყვები"}
                     </p>
                   </div>
                 )}

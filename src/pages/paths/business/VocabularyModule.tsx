@@ -747,8 +747,8 @@ export default function VocabularyModule() {
           {stage === "results"
             ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
             : stage === "reviewIntro"
-            ? "გამეორების დღე"
-            : "დღევანდელი სიტყვები"}
+            ? "გამეორების სესია"
+            : "ახალი სიტყვები"}
         </h1>
         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
           <Link to="/path/business/lexicon?tab=words" className="ka text-xs text-wine underline underline-offset-2 inline-flex items-center gap-1">
@@ -849,7 +849,7 @@ export default function VocabularyModule() {
           {scenario && (
             <div className="mb-3 text-center">
               <div className="rounded-2xl border-2 border-gold bg-gold/10 p-4 text-left">
-                <p className="ka text-sm font-bold text-wine">🎬 დღევანდელი სცენარი: {scenario.titleKa}</p>
+                <p className="ka text-sm font-bold text-wine">🎬 სცენარი: {scenario.titleKa}</p>
                 <p className="ka text-xs text-ink-muted mt-1.5 leading-relaxed">
                   {scenario.scenarioKa}
                 </p>
@@ -873,7 +873,7 @@ export default function VocabularyModule() {
             <BizCard className="mt-4">
               <div className="flex items-baseline justify-between">
                 <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
-                  დღეს გასამეორებელი
+                  გასამეორებელი სიტყვები
                 </p>
                 <p className="text-[11px] text-ink-muted font-mono">{sessionReviewList.length}</p>
               </div>
@@ -904,7 +904,7 @@ export default function VocabularyModule() {
           <div className="mx-auto w-14 h-14 rounded-full bg-cream border border-line grid place-items-center text-2xl">
             🎉
           </div>
-          <h3 className="ka text-lg font-bold text-wine mt-3">დღევანდელი სიტყვები მზად არ არის</h3>
+          <h3 className="ka text-lg font-bold text-wine mt-3">ახალი სიტყვები ჯერ არ არის</h3>
           <p className="ka text-sm text-ink-muted mt-2 max-w-sm mx-auto">
             ყველა მიმდინარე სიტყვა შესწავლილია. შემოამოწმე ხვალ ან გადახედე რვეულს.
           </p>
@@ -1853,7 +1853,7 @@ function Results({
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark p-6 text-center">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-panel/15 blur-2xl pointer-events-none" />
         <div className="relative">
-          <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">დღევანდელი შედეგი</p>
+          <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">სესიის შედეგი</p>
           <p className="text-6xl font-bold mt-2 tabular-nums"><CountUp to={pct} duration={1200} />%</p>
           <p className="ka text-sm text-on-dark/80 mt-2"><CountUp to={correct} duration={1200} /> / {total} სწორი პასუხი</p>
           <p className="ka text-sm text-gold-soft mt-3 font-semibold">{message}</p>
@@ -1950,7 +1950,7 @@ function Results({
       <div className="space-y-2 pt-2">
         {canPracticeMore ? (
           <BizButton className="w-full" onClick={onPracticeMore}>
-            დღეს კიდევ ვივარჯიშოთ →
+            კიდევ ერთი სავარჯიშო →
           </BizButton>
         ) : (
           <div className="text-center space-y-1.5">

@@ -895,7 +895,7 @@ export default function InterviewModule() {
                   </div>
                 ))}
               </div>
-              <p className="ka text-[11px] text-ink mt-2">↑ დღეს ამაზე ავაშენებთ</p>
+              <p className="ka text-[11px] text-ink mt-2">↑ ამაზე ავაშენებთ სესიას</p>
             </BizCard>
           )}
           <BizCard className="border-l-4 border-l-ink">
@@ -1251,7 +1251,7 @@ export default function InterviewModule() {
 
           <BizCard className="mt-4">
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
-              დღევანდელი შედეგი
+              სესიის შედეგი
             </p>
             <ul className="mt-3 space-y-2">
               <SumRow ok label={`როლი: ${b.roleTitle}`} />
