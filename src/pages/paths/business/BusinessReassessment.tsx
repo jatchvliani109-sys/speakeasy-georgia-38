@@ -209,7 +209,7 @@ export default function BusinessReassessment() {
             შედეგი · ტესტი #{test.version}
           </p>
           <h1 className="ka text-2xl font-bold text-wine mt-1">{title}</h1>
-          <p className="text-sm text-ink-muted mt-1">Score: {resultPct}%</p>
+          <p className="ka text-sm text-ink-muted mt-1">ქულა: {resultPct}%</p>
           <p className="ka text-sm text-ink mt-4 leading-relaxed">{blurb}</p>
 
           {weakAreas.length > 0 && went <= 0 && (
@@ -219,7 +219,7 @@ export default function BusinessReassessment() {
               </p>
               <p className="ka text-sm text-wine mt-1">{weakAreas.join(" · ")}</p>
               <p className="ka text-[11px] text-ink-muted mt-1">
-                გირჩევთ შესაბამის მოდულში დამატებითი სესიების გაკეთებას.
+                გირჩევ, შესაბამის მოდულში გააკეთო დამატებითი სესიები.
               </p>
             </div>
           )}
@@ -241,7 +241,7 @@ export default function BusinessReassessment() {
           კითხვა {idx + 1} / {total}
           {q?.type === "mcq" && (
             <span className="ml-2 text-ink-muted normal-case tracking-normal">
-              · {q.weight} pt
+              · {q.weight} ქულა
             </span>
           )}
         </p>

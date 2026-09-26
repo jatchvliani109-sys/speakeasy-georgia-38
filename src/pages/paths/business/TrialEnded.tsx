@@ -40,19 +40,17 @@ export default function TrialEnded() {
       // Mark the farewell as shown so BusinessGate stops routing here.
       await saveBusinessAsync(user.id, { trialEndSeen: true });
 
-      // Best-effort stats from progress table.
+      // The two numbers on the page someone decides to pay from, so they have
+      // to be the ones the app itself shows. This used to query a
+      // `vocabulary_progress` table that does not exist in this project and
+      // divide by a 1500-word curriculum that does not either: the query threw,
+      // the catch swallowed it, and the farewell screen told every single user
+      // they had learned 0 words and covered 0%.
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
-        const { count } = await (supabase as any)
-          .from("vocabulary_progress")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("status", "learned");
-        const learned = count ?? 0;
-        setStats({
-          words: learned,
-          percent: Math.min(Math.round((learned / 1500) * 1000) / 10, 100),
-        });
+        const { loadProgress, summarizeVocabProgress } = await import("./lib/vocabEngine");
+        const rows = await loadProgress(user.id);
+        const sum = summarizeVocabProgress(rows, st?.field || [], st?.mainPriority || []);
+        setStats({ words: sum.started, percent: sum.percent });
       } catch {
         // Stats are decorative; do not block the screen.
       } finally {
@@ -92,7 +90,7 @@ export default function TrialEnded() {
           </h1>
 
           <p className="text-on-dark-muted leading-relaxed mb-6">
-            პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა, ყველა ნასწავლი სიტყვა, streak-ი და ლექსიკონი შენთან რჩება.
+            პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა, ყველა ნასწავლი სიტყვა, „Streak“ და ლექსიკონი შენთან რჩება.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -126,7 +124,7 @@ export default function TrialEnded() {
               track("trial_end_upgrade_clicked", { source: "trial_ended" });
               navigate("/path/business/premium");
             }}
-            className="w-full h-12 bg-gold hover:bg-gold-deep text-ink font-bold rounded-full text-base"
+            className="w-full h-12 bg-gold hover:bg-gold-2 text-ink dark:text-panel-deep font-bold rounded-full text-base"
           >
             პრემიუმის ნახვა, 13.99 ლარი/თვე
           </Button>

@@ -149,7 +149,7 @@ export function ReadAloudButton({ text, storageKey, className = "", size = "sm",
   };
 
   const Icon = state === "loading" ? Loader2 : state === "playing" ? Square : Volume2;
-  const aria = state === "playing" ? "Stop audio" : "Read aloud";
+  const aria = state === "playing" ? "ხმის გაჩერება" : "მოსმენა";
 
   const sizeCls = label
     ? size === "md" ? "h-9 px-3 gap-1.5" : "h-7 px-2.5 gap-1"

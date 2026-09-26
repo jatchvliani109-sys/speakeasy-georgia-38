@@ -112,7 +112,7 @@ function TabBtn({
       onClick={onClick}
       className={`ka text-sm font-semibold py-2 rounded-lg transition ${
         active
-          ? "bg-wine text-cream-2 shadow-sm"
+          ? "bg-wine dark:bg-wine-soft text-cream-2 shadow-sm"
           : "text-ink-muted hover:text-wine"
       }`}
     >
@@ -199,7 +199,7 @@ function PhrasesTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep text-cream-2 border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-cream-2 dark:text-on-dark-muted border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">
@@ -397,11 +397,11 @@ function WordsTab() {
 
   return (
     <>
-      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep text-cream-2 border-transparent">
+      <BizCard className="mb-3 bg-gradient-to-br from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-cream-2 dark:text-on-dark-muted border-transparent">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">
-              ჯერჯერობით {counts.total}&nbsp;სიტყვას "ვებრძვით" :)
+              ჯერჯერობით {counts.total}&nbsp;სიტყვას „ვებრძვით“ :)
             </p>
             <p className="ka text-[11px] text-cream-2/70 mt-1">
               {counts.learned} ვიცი · {counts.learning} ვსწავლობ · {counts.fresh} ახალი
@@ -418,7 +418,7 @@ function WordsTab() {
             onClick={() => setFilter(f.id)}
             className={`ka shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition border
               ${filter === f.id
-                ? "bg-wine text-cream-2 border-wine"
+                ? "bg-wine dark:bg-wine-soft text-cream-2 border-wine"
                 : "bg-card text-wine border-line-2 hover:bg-cream"}`}
           >
             {f.label}

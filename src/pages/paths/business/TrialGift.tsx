@@ -181,7 +181,7 @@ export default function TrialGift() {
     return (
       <div className="min-h-screen bg-cream grid place-items-center px-4">
         <div className="text-center animate-[giftPop_.5s_cubic-bezier(.2,.8,.2,1)_both]">
-          <span className="inline-grid place-items-center w-20 h-20 rounded-full bg-wine text-gold">
+          <span className="inline-grid place-items-center w-20 h-20 rounded-full bg-wine dark:bg-wine-soft text-gold">
             <Check size={38} strokeWidth={2.5} />
           </span>
           <h1 className="ka text-2xl font-bold text-wine mt-5">
@@ -228,7 +228,7 @@ export default function TrialGift() {
           {/* dark celebratory surface */}
           <div className="bg-gradient-to-br from-panel-soft to-panel-deep px-7 pt-9 pb-8 text-center relative">
             <span
-              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-gold text-ink"
+              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-gold text-ink dark:text-panel-deep"
               style={{
                 opacity: stage >= 1 ? 1 : 0,
                 transform: stage >= 1 ? "scale(1) rotate(0deg)" : "scale(.6) rotate(-12deg)",
@@ -280,7 +280,7 @@ export default function TrialGift() {
             />
             <Perk
               icon={<Sparkles size={16} strokeWidth={2.25} />}
-              title={'ყველა ფუნქცია ხელმისაწვდომი შენთვის რადგან გვინდა რომ გქონდეს "full picture". '}
+              title={'ყველა ფუნქცია ხელმისაწვდომი შენთვის რადგან გვინდა რომ გქონდეს „full picture“.'}
               sub={"\n"}
               last
             />
@@ -314,7 +314,7 @@ export default function TrialGift() {
               <button
                 onClick={accept}
                 disabled={busy}
-                className="ka w-full h-14 rounded-2xl bg-wine text-on-dark dark:text-panel-deep text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-wine-deep transition-colors disabled:opacity-60"
+                className="ka w-full h-14 rounded-2xl bg-wine dark:bg-wine-soft text-on-dark text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-wine-deep transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
                 {busy ? "ირთვება..." : "მადლობა"}
@@ -324,7 +324,7 @@ export default function TrialGift() {
                 disabled={busy}
                 className="ka w-full mt-3 h-11 text-[13px] text-ink-subtle hover:text-wine transition-colors"
               >
-                არა, გმადლობთ  უფასო ვერსიით დავიწყებ
+                არა, გმადლობთ, უფასო ვერსიით დავიწყებ
               </button>
             </>
           ) : (
@@ -339,7 +339,7 @@ export default function TrialGift() {
                 <button
                   onClick={() => setConfirmDecline(false)}
                   disabled={busy}
-                  className="ka flex-1 h-11 rounded-xl bg-wine text-on-dark dark:text-panel-deep text-[13px] font-bold"
+                  className="ka flex-1 h-11 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-[13px] font-bold"
                 >
                   დავბრუნდე
                 </button>

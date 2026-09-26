@@ -73,7 +73,7 @@ export default function OAuthConsent() {
     <Layout showLogout={false}>
       <div className="max-w-md mx-auto py-10">
         {error && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-800 ka">
+          <div className="p-4 rounded-xl bg-danger-soft border border-danger-line text-sm text-danger-deep ka">
             {error}
           </div>
         )}

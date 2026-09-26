@@ -61,14 +61,14 @@ export default function AiLockedCard({
           {/* A word rises one level a day at most, so this is a few days of
               practice, not a number you can rush in one evening. Saying so
               stops it reading as an arbitrary wall. */}
-          <p className="ka text-[11px] text-ink-subtle mt-2 leading-relaxed">
+          <p className="ka text-[11px] text-ink-muted mt-2 leading-relaxed">
             ყოველდღიური ვარჯიშით რამდენიმე დღეში გაიხსნება
           </p>
         </div>
 
         <Link
           to="/path/business/vocabulary"
-          className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
+          className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
         >
           სესიის დაწყება
           <ArrowRight size={16} strokeWidth={2.25} />
@@ -120,7 +120,7 @@ export default function AiLockedCard({
 
       <Link
         to="/path/business/premium"
-        className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
+        className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
       >
         {trialAvailable ? "7 დღით პრემიუმის უფასოდ დატესტვა" : "პრემიუმის ნახვა"}
         <ArrowRight size={16} strokeWidth={2.25} />

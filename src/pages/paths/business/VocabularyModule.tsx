@@ -122,6 +122,8 @@ export default function VocabularyModule() {
   const [reviewMode, setReviewMode] = useState(false);
   /** How many missed questions have been appended to THIS session so far. */
   const requeuedRef = useRef(0);
+  /** True once this session's results are being saved, so it cannot save twice. */
+  const finishingRef = useRef(false);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [soundOn, setSoundOnState] = useState<boolean>(() => isSoundEnabled());
@@ -140,6 +142,13 @@ export default function VocabularyModule() {
   // Words due for review today — shown on the intro screen so the learner
   // sees exactly what today's session will strengthen.
   const dueList = useMemo(() => dueToday(progress), [progress]);
+  // What THIS session will actually revise. Not the same as dueList: the
+  // planner tops the session up with the weakest words when fewer are due, so
+  // the intro used to promise "16 გასამეორებელი" above a list headed "10".
+  const sessionReviewList = useMemo(
+    () => reviewKeys.map((k) => findWord(k)).filter(Boolean) as VocabWord[],
+    [reviewKeys],
+  );
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -232,8 +241,11 @@ export default function VocabularyModule() {
       setFormatTier(computeFormatTier(plan.tierLevel, recent));
 
       // Resume an interrupted session rather than silently starting a new one.
+      // Only a snapshot of the SAME kind, though: tapping "გამეორება" used to
+      // drop the learner back into this morning's unfinished normal session,
+      // scenario banner and all, which is not what they asked for.
       const saved = loadSessionSnapshot(user.id);
-      if (saved) {
+      if (saved && !!saved.reviewMode === reviewOnly) {
         setQuiz(saved.quiz);
         setQIdx(saved.qIdx);
         setAnswers(saved.answers);
@@ -297,6 +309,7 @@ export default function VocabularyModule() {
   const startSession = () => {
     if (dailyLimitReached) return;
     requeuedRef.current = 0;
+    finishingRef.current = false;
     clearSessionSnapshot();   // starting fresh on purpose
     setResumed(false);
     // Resume audio on user gesture (browsers require it).
@@ -498,6 +511,14 @@ export default function VocabularyModule() {
 
   const finishSession = async (finalAnswers: { wordKey: string; correct: boolean; production: boolean }[]) => {
     if (!user) return;
+    // Exactly once per session. Without this guard a second call — a double tap
+    // on the last "შემდეგი", or an auto-advance timer landing on top of a tap —
+    // re-ran the whole save: progress applied twice and a duplicate row in
+    // business_vocab_sessions. Found in the wild: one finished session had been
+    // written four times, which inflates the streak, the daily session count
+    // and the accuracy the pacing reads.
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     // Aggregate per word
     const perWord = new Map<string, { correct: boolean; production: boolean }[]>();
     finalAnswers.forEach((a) => {
@@ -559,8 +580,12 @@ export default function VocabularyModule() {
       user_id: user.id,
       score,
       total: finalAnswers.length,
-      new_words: newWords.length,
-      review_words: reviewKeys.length,
+      // A review session teaches nothing new, and the words it drilled are
+      // reviewWords, not the planner's selection — reporting the planner's
+      // numbers here made review sessions look like they had introduced words
+      // the learner was never shown.
+      new_words: reviewMode ? 0 : newWords.length,
+      review_words: reviewMode ? reviewWords.length : reviewKeys.length,
       completed: true,
       completed_at: new Date().toISOString(),
       session_data: {
@@ -662,7 +687,10 @@ export default function VocabularyModule() {
       if (d > 0) setSessionDelta(d);
     } catch { /* display only — never block the results screen */ }
 
-    setLastResults({ answers: finalAnswers, newWords });
+    // In a review session there are no new words, and the per-word lists on the
+    // results screen are built from them, so a review session ended with a score
+    // and nothing else. Feed it the words that were actually practised.
+    setLastResults({ answers: finalAnswers, newWords: reviewMode ? reviewWords : newWords });
     setStage("results");
   };
 
@@ -784,7 +812,7 @@ export default function VocabularyModule() {
             <div className="text-4xl">✓</div>
             <h2 className="ka text-xl font-bold mt-2">დღევანდელი ვარჯიში დასრულებულია</h2>
             <p className="ka text-sm text-on-dark/80 mt-2 leading-relaxed">
-              "Streak" შენარჩუნებულია 🔥 ხვალ ახალი სიტყვები და გამეორება გელოდება.
+              „Streak“ შენარჩუნებულია 🔥 ხვალ ახალი სიტყვები და გამეორება გელოდება.
             </p>
             <Link
               to="/path/business/home"
@@ -841,24 +869,26 @@ export default function VocabularyModule() {
               📈 ბოლო შედეგების მიხედვით კითხვები ოდნავ გართულდა
             </p>
           )}
-          {dueList.length > 0 && (
+          {sessionReviewList.length > 0 && (
             <BizCard className="mt-4">
               <div className="flex items-baseline justify-between">
                 <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
                   დღეს გასამეორებელი
                 </p>
-                <p className="text-[11px] text-ink-muted font-mono">{dueList.length}</p>
+                <p className="text-[11px] text-ink-muted font-mono">{sessionReviewList.length}</p>
               </div>
               <ul className="mt-2 space-y-1.5">
-                {dueList.slice(0, 6).map((w) => (
+                {sessionReviewList.slice(0, 6).map((w) => (
                   <li key={w.key} className="flex items-baseline justify-between gap-3">
                     <span className="text-sm font-semibold text-wine">{w.en}</span>
                     <span className="ka text-xs text-ink-muted truncate">{w.ka}</span>
                   </li>
                 ))}
               </ul>
-              {dueList.length > 6 && (
-                <p className="ka text-xs text-ink-muted mt-2">+{dueList.length - 6} სხვა სიტყვა</p>
+              {sessionReviewList.length > 6 && (
+                <p className="ka text-xs text-ink-muted mt-2">
+                  +{sessionReviewList.length - 6} სხვა სიტყვა
+                </p>
               )}
             </BizCard>
           )}
@@ -1050,13 +1080,13 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-panel/15 blur-2xl pointer-events-none" />
       <div className="relative">
         <p className="ka text-[10px] uppercase tracking-wider bg-panel/20 text-gold-soft px-2 py-1 rounded-md font-semibold inline-block">
-          გამეორების დღე
+          გამეორება
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
           {words.length} სიტყვის გამეორება
         </h2>
         <p className="ka text-sm text-on-dark/80 mt-2 leading-relaxed">
-          ახალი სიტყვები ხვალ გემატება. დღეს გაიმეორე ის სიტყვები, რომლებიც ყველაზე მეტ გამეორებას საჭიროებს.
+          ამ სესიაში ახალი სიტყვები არ დაემატება. მხოლოდ ის სიტყვები, რომლებსაც ყველაზე მეტად სჭირდება გამეორება.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           <Mini label="სიტყვები" value={`${words.length}`} />
@@ -1293,7 +1323,7 @@ function ReportWordButton({ word }: { word: VocabWord }) {
         <button
           onClick={submit}
           disabled={!reason || sending}
-          className="ka px-3 py-1.5 rounded-md bg-wine text-cream text-[11px] font-semibold disabled:opacity-40"
+          className="ka px-3 py-1.5 rounded-md bg-wine dark:bg-wine-soft text-cream dark:text-on-dark text-[11px] font-semibold disabled:opacity-40"
         >
           {sending ? "იგზავნება..." : "გაგზავნა"}
         </button>
@@ -1372,6 +1402,10 @@ const randomOf = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 // session on return. We snapshot the in-flight session locally so it can be
 // resumed exactly where it stopped. Local (not Supabase) on purpose: it needs
 // to survive a tab close, not sync across devices, and costs no round trip.
+// Must stay in step with SESSION_SNAPSHOT_KEY in lib/offlineQueue.ts, which
+// clears this snapshot once a queued session finally reaches the server.
+// Kept as a literal rather than an import so the offline queue (and the
+// supabase client it pulls in) stays a dynamic import on this route.
 const SESSION_KEY = "speakbusy:vocab-session";
 const SESSION_VERSION = 2;          // bump when QuizQuestion shape changes
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -1483,8 +1517,8 @@ function QuestionCard({
             disabled={revealed}
             onClick={() => setSelected(value)}
             className={`relative overflow-visible text-left px-4 py-3 rounded-xl border text-sm transition-all
-              ${isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 biz-bounce" : ""}
-              ${isWrongPick ? "border-red-400 bg-red-50 text-red-900 biz-shake" : ""}
+              ${isCorrect ? "border-sage bg-sage-soft text-ink biz-bounce" : ""}
+              ${isWrongPick ? "border-danger bg-danger-soft text-ink biz-shake" : ""}
               ${!revealed && isSelected ? "border-wine bg-cream text-wine" : ""}
               ${!revealed && !isSelected ? "border-line bg-card text-wine hover:bg-cream" : ""}
               ${revealed && !isCorrect && !isWrongPick ? "border-line bg-card text-ink-muted opacity-60" : ""}
@@ -1706,8 +1740,8 @@ function TypeWordCard({
           autoComplete="off"
           spellCheck={false}
           className={`ka flex-1 min-w-0 px-4 py-3 rounded-xl border text-base outline-none transition-colors
-            ${revealed && isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900" : ""}
-            ${revealed && !isCorrect ? "border-red-400 bg-red-50 text-red-900" : ""}
+            ${revealed && isCorrect ? "border-sage bg-sage-soft text-ink" : ""}
+            ${revealed && !isCorrect ? "border-danger bg-danger-soft text-ink" : ""}
             ${!revealed ? "border-line bg-card text-ink focus:border-wine" : ""}
           `}
         />
@@ -1723,11 +1757,11 @@ function TypeWordCard({
       </div>
 
       {revealed && (
-        <div className={`mt-3 p-3 rounded-xl border animate-[bizFade_.3s_ease-out_both] ${isCorrect ? "border-emerald-200 bg-emerald-50" : "border-red-200 bg-red-50"}`}>
+        <div className={`mt-3 p-3 rounded-xl border animate-[bizFade_.3s_ease-out_both] ${isCorrect ? "border-sage-line bg-sage-soft" : "border-danger-line bg-danger-soft"}`}>
           {isCorrect ? (
-            <p className="ka text-sm text-emerald-800 font-semibold">სწორია! ✓ {q.correct}</p>
+            <p className="ka text-sm text-sage-deep font-semibold">სწორია! ✓ {q.correct}</p>
           ) : (
-            <p className="ka text-sm text-red-800">სწორი პასუხი: <span className="font-bold">{q.correct}</span></p>
+            <p className="ka text-sm text-danger-deep">სწორი პასუხი: <span className="font-bold">{q.correct}</span></p>
           )}
         </div>
       )}
@@ -1810,7 +1844,7 @@ function Results({
                 <span className="ka text-sm font-semibold ml-1.5">დღე ზედიზედ</span>
               </p>
               <p className="ka text-[11px] text-on-dark/80 mt-1">
-                {streakGrew ? "\"Streak\" გაიზარდა, ასე განაგრძე! 💪" : "\"Streak\" შენარჩუნებულია, ხვალაც შემოიარე 🔥"}
+                {streakGrew ? "„Streak“ გაიზარდა, ასე განაგრძე! 💪" : "„Streak“ შენარჩუნებულია, ხვალაც შემოიარე 🔥"}
               </p>
             </div>
           </div>
@@ -1883,7 +1917,7 @@ function Results({
 
       {mastered.length > 0 && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-sage-deep font-semibold">
             კარგია
           </p>
           <ul className="mt-2 space-y-1.5">
@@ -1899,7 +1933,7 @@ function Results({
 
       {needsReview.length > 0 && (
         <BizCard>
-          <p className="ka text-[11px] uppercase tracking-wider text-amber-700 font-semibold">
+          <p className="ka text-[11px] uppercase tracking-wider text-gold-deep font-semibold">
             გასამეორებელი სიტყვები
           </p>
           <ul className="mt-2 space-y-1.5">
@@ -1923,6 +1957,11 @@ function Results({
             <p className="ka text-xs text-ink-muted">
               დღევანდელი ვარჯიში დასრულებულია, ხვალ ახალი სესია გელოდება 🔥
             </p>
+            {/* The daily session is spent, but review is always open.
+                Without this the free tier's day just ends here. */}
+            <Link to="/path/business/vocabulary?mode=review" className="ka block text-xs font-semibold text-wine underline underline-offset-4">
+              გამეორება, ნასწავლი სიტყვები
+            </Link>
             {!isPaid && (
               <Link to="/path/business/premium" className="ka block text-xs font-semibold text-wine underline underline-offset-4">
                 ⭐ პრემიუმით მეორე სესია ახლავე, ულიმიტოდ

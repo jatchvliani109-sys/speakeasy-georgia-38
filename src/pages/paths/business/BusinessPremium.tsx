@@ -25,7 +25,7 @@ const PRICE_GEL = "13.99";
 const FEATURES: { titleKa: string; subKa: string }[] = [
   { titleKa: "ულიმიტო ლექსიკის სესიები", subKa: "იმდენი სესია დღეში, რამდენიც გინდა, ლიმიტის გარეშე" },
   { titleKa: "AI სესიები, კვირაში 7", subKa: "გასაუბრებები, დოკუმენტები და თვითპრეზენტაცია. უფასო ვერსიაში AI არ არის; საცდელ კვირაში 3 ჯამში" },
-  { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და \"Streak\", რჩება" },
+  { titleKa: "ყველაფერი უფასო ვერსიიდან", subKa: "დღიური სესია, სცენარები, ბლოკნოტი და „Streak“, რჩება" },
 ];
 
 /**
@@ -216,7 +216,7 @@ export default function BusinessPremium() {
             <button
               onClick={subscribe}
               disabled={busy || !cardConsent || (sub?.status === "active")}
-              className="ka w-full mt-4 py-3.5 rounded-xl bg-gold text-ink text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
+              className="ka w-full mt-4 py-3.5 rounded-xl bg-gold text-ink dark:text-panel-deep text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}
             </button>

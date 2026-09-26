@@ -18,9 +18,9 @@ const NotFound = () => {
       />
       <div className="text-center">
         <h1 className="mb-4 text-4xl font-bold text-foreground">404</h1>
-        <p className="mb-4 text-xl text-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
+        <p className="ka mb-4 text-xl text-foreground">გვერდი ვერ მოიძებნა</p>
+        <a href="/" className="ka text-primary underline hover:text-primary/90">
+          მთავარ გვერდზე დაბრუნება
         </a>
       </div>
     </div>

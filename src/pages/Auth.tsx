@@ -165,8 +165,8 @@ export default function Auth() {
               შეამოწმეთ თქვენი ელ-ფოსტა
             </h1>
             <p className="text-sm text-ink-muted mt-3 ka leading-relaxed">
-              გთხოვთ შეამოწმოთ თქვენი ელ-ფოსტა. გამოგვიგზავნეთ დადასტურების ბმული ,
-              გთხოვთ გადახედოთ inbox-ს და დააჭიროთ ბმულს.
+              დადასტურების ბმული გამოგიგზავნეთ. გთხოვთ, გადახედოთ inbox-ს და
+              დააჭიროთ ბმულს.
             </p>
             <p className="text-xs text-ink-muted-2 mt-3 ka">
               გავაგზავნეთ: <span className="font-semibold text-wine">{pendingEmail}</span>
@@ -319,7 +319,7 @@ export default function Auth() {
                 id="terms"
                 checked={termsAccepted}
                 onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                className={`mt-0.5 shrink-0 h-5 w-5 border-2 transition-colors data-[state=checked]:bg-wine data-[state=checked]:border-wine data-[state=checked]:text-on-dark ${
+                className={`mt-0.5 shrink-0 h-5 w-5 border-2 transition-colors data-[state=checked]:bg-wine dark:data-[state=checked]:bg-wine-soft data-[state=checked]:border-wine data-[state=checked]:text-on-dark ${
                   termsShake ? "border-danger" : "border-wine/40"
                 }`}
               />

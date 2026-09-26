@@ -256,8 +256,8 @@ export default function BusinessPlacementTest() {
             შენი დონე:{" "}
             <span className="text-sage">{LEVEL_LABELS[resultLevel]}</span>
           </h1>
-          <p className="text-sm text-ink-muted mt-1">
-            Score: {resultPct}% (weighted)
+          <p className="ka text-sm text-ink-muted mt-1">
+            ქულა: {resultPct}%
           </p>
           <div className="mt-6">
             <BizButton onClick={() => navigate("/path/business/setup", { replace: true })}>

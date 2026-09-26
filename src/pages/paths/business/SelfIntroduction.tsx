@@ -773,7 +773,7 @@ function VersionCard({
         <button onClick={onSelect}
           className={`ka text-[11px] px-2.5 py-1 rounded-full border ${
             isSelected ? "bg-panel-soft text-on-dark border-wine" : "border-line text-wine"}`}>
-          {isSelected ? "არჩეული" : "Use this"}
+          {isSelected ? "არჩეული" : "ამის გამოყენება"}
         </button>
       </div>
       <p className="text-sm text-wine mt-3 leading-relaxed">{version.en}</p>
@@ -781,10 +781,10 @@ function VersionCard({
       <div className="mt-3 flex gap-1.5 flex-wrap items-center">
         <ReadAloudButton text={speakText} />
         <ChipBtn onClick={onCopy}>კოპირება</ChipBtn>
-        <ChipBtn onClick={() => onRewrite("improve")} loading={busy("improve")}>Improve</ChipBtn>
-        <ChipBtn onClick={() => onRewrite("simpler")} loading={busy("simpler")}>Simpler</ChipBtn>
-        <ChipBtn onClick={() => onRewrite("more_professional")} loading={busy("more_professional")}>More pro</ChipBtn>
-        <ChipBtn onClick={() => onRewrite("shorter")} loading={busy("shorter")}>Shorter</ChipBtn>
+        <ChipBtn onClick={() => onRewrite("improve")} loading={busy("improve")}>გაუმჯობესება</ChipBtn>
+        <ChipBtn onClick={() => onRewrite("simpler")} loading={busy("simpler")}>გამარტივება</ChipBtn>
+        <ChipBtn onClick={() => onRewrite("more_professional")} loading={busy("more_professional")}>პროფესიონალურად</ChipBtn>
+        <ChipBtn onClick={() => onRewrite("shorter")} loading={busy("shorter")}>შემოკლება</ChipBtn>
       </div>
     </BizCard>
   );
@@ -793,7 +793,7 @@ function VersionCard({
 function ChipBtn({ children, onClick, loading }: { children: React.ReactNode; onClick: () => void; loading?: boolean }) {
   return (
     <button onClick={onClick} disabled={loading}
-      className="text-[11px] px-2.5 py-1.5 rounded-lg border border-line text-wine hover:bg-wine/5 disabled:opacity-50">
+      className="ka text-[11px] px-2.5 py-1.5 rounded-lg border border-line text-wine hover:bg-wine/5 disabled:opacity-50">
       {loading ? "..." : children}
     </button>
   );

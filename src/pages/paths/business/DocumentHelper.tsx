@@ -167,7 +167,7 @@ export default function DocumentHelper() {
             </button>
             <Link
               to="/path/business/premium"
-              className="ka px-3 py-2 rounded-md bg-wine text-[#F8F5F0] text-xs font-bold"
+              className="ka px-3 py-2 rounded-md bg-wine dark:bg-wine-soft text-[#F8F5F0] text-xs font-bold"
             >
               პრემიუმის ნახვა
             </Link>
@@ -404,7 +404,7 @@ function LibraryView({
                         onClick={async () => {
                           if (confirm("წავშალო ეს დოკუმენტი?")) await onDelete(d.id);
                         }}
-                        className="text-ink-muted hover:text-red-600 text-xs px-2"
+                        className="text-ink-muted hover:text-danger text-xs px-2"
                         aria-label="წაშლა"
                       >
                         🗑
@@ -425,7 +425,7 @@ function LibraryView({
                 onClick={async () => {
                   if (confirm("წავშალო ეს დოკუმენტი?")) await onDelete(d.id);
                 }}
-                className="text-ink-muted hover:text-red-600 text-xs px-2"
+                className="text-ink-muted hover:text-danger text-xs px-2"
                 aria-label="წაშლა"
               >
                 🗑
@@ -623,7 +623,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
         <BizCard className="mt-4">
           <p className="ka text-sm text-wine font-semibold">მზად ხართ?</p>
           <p className="ka text-xs text-ink-muted mt-1">
-            AI გენერირებს იმეილს თქვენი მონაცემებითა და კონტექსტით.
+            AI გენერირებს იმეილს შენი მონაცემებითა და კონტექსტით.
           </p>
           <div className="flex justify-between mt-4">
             <BizButton variant="ghost" onClick={() => setStep(2)}>
@@ -1115,7 +1115,7 @@ function DocView({
               <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2">Keywords რომელიც აკლია</p>
               <div className="flex flex-wrap gap-1.5">
                 {resumeMeta.missingKeywords.map((k: string, i: number) => (
-                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-gold-soft text-wine border border-gold-soft">
+                  <span key={i} className="text-[11px] px-2 py-1 rounded-full bg-gold-soft text-wine dark:text-panel-deep border border-gold-soft">
                     {k}
                   </span>
                 ))}

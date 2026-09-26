@@ -591,7 +591,7 @@ export default function Profile() {
                 </p>
                 <Link
                   to="/path/business/premium"
-                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-wine text-on-dark dark:text-panel-deep text-xs font-bold"
+                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-wine dark:bg-wine-soft text-on-dark text-xs font-bold"
                 >
                   პრემიუმის ნახვა
                 </Link>
@@ -645,7 +645,7 @@ export default function Profile() {
                 {!active && (
                   <Link
                     to="/path/business/premium"
-                    className="ka px-3 py-2 rounded-md bg-wine text-on-dark dark:text-panel-deep text-xs font-bold"
+                    className="ka px-3 py-2 rounded-md bg-wine dark:bg-wine-soft text-on-dark text-xs font-bold"
                   >
                     გამოწერის განახლება
                   </Link>
@@ -722,7 +722,7 @@ export default function Profile() {
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleting || deleteConfirm.trim() !== "წაშლა"}
-                className="ka flex-1 px-3 py-2 rounded-md bg-danger text-on-dark text-xs font-bold disabled:opacity-40"
+                className="ka flex-1 px-3 py-2 rounded-md bg-danger text-on-dark dark:text-panel-deep text-xs font-bold disabled:opacity-40"
               >
                 {deleting ? "იშლება..." : "საბოლოოდ წაშლა"}
               </button>

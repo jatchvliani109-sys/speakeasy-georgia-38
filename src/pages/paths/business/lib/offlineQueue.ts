@@ -20,6 +20,17 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const KEY = "speakbusy:pending-writes";
+
+/**
+ * The interrupted-session snapshot VocabularyModule writes so a session can be
+ * resumed where it stopped. It is declared here because this file is what
+ * finally proves a session reached the server: the save path deliberately KEEPS
+ * the snapshot when a save fails, so nothing is lost, and without the clear
+ * below the snapshot outlived the queued session — the learner came back, was
+ * dropped into the last question of a session that had already synced, and
+ * finishing it wrote that session a second time.
+ */
+export const SESSION_SNAPSHOT_KEY = "speakbusy:vocab-session";
 const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;   // a fortnight
 const MAX_ITEMS = 400;
 
@@ -111,6 +122,10 @@ export async function flushQueue(): Promise<{ sent: number; left: number }> {
         if (error && !String(error.message).includes("duplicate")) {
           remaining.push(item); continue;
         }
+        // The session is on the server now, so the resume snapshot that belongs
+        // to it is stale: leaving it would offer to "continue" a session that is
+        // already finished and saved.
+        try { localStorage.removeItem(SESSION_SNAPSHOT_KEY); } catch { /* ignore */ }
       }
       sent++;
     } catch {

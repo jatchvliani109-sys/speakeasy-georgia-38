@@ -77,7 +77,7 @@ const valueCards = [
     icon: BookOpen,
     title: "980 ბიზნეს სიტყვა, ქართულად ახსნილი",
     body:
-      "ყოველი სიტყვა ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით. ",
+      "ყოველი სიტყვა ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით.",
   },
   {
     icon: Target,
@@ -110,12 +110,12 @@ const modules = [
   {
     icon: Mail,
     title: "დოკუმენტები",
-    body: "რეზიუმე, სამოტივაციო წერილი და ბიო  შენი გამოცდილებით, პროფესიონალური ინგლისურით. ",
+    body: "რეზიუმე, სამოტივაციო წერილი და ბიო, შენი გამოცდილებით, პროფესიონალური ინგლისურით.",
   },
   {
     icon: Users,
     title: "თვითპრეზენტაცია",
-    body: "მოამზადე შენი „tell me about yourself“ - გასაუბრებისთვის ან ქსელური შეხვედრებისთვის.",
+    body: "მოამზადე შენი „tell me about yourself“ გასაუბრებისთვის ან ქსელური შეხვედრებისთვის.",
   },
 ];
 
@@ -210,7 +210,7 @@ const Index = () => {
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <a
                 href="#demo"
-                className="group w-full sm:w-auto inline-flex items-center justify-center text-center gap-2 px-6 sm:px-8 py-4 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
+                className="group w-full sm:w-auto inline-flex items-center justify-center text-center gap-2 px-6 sm:px-8 py-4 rounded-xl bg-gold text-ink dark:text-panel-deep text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
                 <span>გამოსცადე რეგისტრაციის გარეშე</span>
                 <ArrowRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-y-0.5 sm:group-hover:translate-x-0.5" />
@@ -274,7 +274,7 @@ const Index = () => {
                   key={title}
                   className="group relative bg-card border border-line-2 rounded-2xl p-8 hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
                 >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-wine text-gold mb-5">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-wine dark:bg-wine-soft text-gold mb-5">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold ka text-ink mb-2">{title}</h3>
@@ -323,7 +323,7 @@ const Index = () => {
         <WaveDivider fill="hsl(var(--card))" flip className="bg-wine" />
 
         {/* ═══════════════ FINAL CTA ═══════════════ */}
-        <section className="relative bg-wine text-on-dark overflow-hidden">
+        <section className="relative bg-wine dark:bg-wine-soft text-on-dark overflow-hidden">
           <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-on-dark" />
           <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-on-dark" />
           <GoldLine className="top-16 right-10 w-24" />
@@ -339,7 +339,7 @@ const Index = () => {
             <div className="mt-10">
               <Link
                 to="/auth?mode=signup"
-                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink text-base font-bold hover:bg-gold-2 transition-colors ka"
+                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink dark:text-panel-deep text-base font-bold hover:bg-gold-2 transition-colors ka"
               >
                 დაიწყე ახლავე უფასოდ
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />

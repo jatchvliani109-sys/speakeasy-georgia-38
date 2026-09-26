@@ -44,7 +44,7 @@ export default function BusinessModulesList() {
   const recommended = useMemo(() => recommendedModuleSlugs(goals), [goals]);
 
   return (
-    <BusinessShell seo={{ title: "მოდულები, SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ლექსიკა, სცენარები და გასაუბრება.", path: "/path/business/modules" }}>
+    <BusinessShell seo={{ title: "მოდულები, SpeakBusy", description: "ბიზნეს ინგლისურის მოდულები: ლექსიკა და გასაუბრება.", path: "/path/business/modules" }}>
       <header className="mb-6">
         <p className="text-[11px] uppercase tracking-wider text-ink-muted font-bold">
           SpeakBusy
@@ -56,30 +56,6 @@ export default function BusinessModulesList() {
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Link to="/path/business/scenarios" className="group sm:col-span-2">
-          <BizCard className="h-full border-gold/45 hover:border-gold transition-colors">
-            <div className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-md bg-panel-soft text-gold grid place-items-center shrink-0 text-base">
-                🎬
-              </span>
-              <div className="flex-1 min-w-0">
-                <span className="ka inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-wine bg-gold/20 border border-gold/35 rounded-full px-2 py-0.5 mb-1.5">
-                  <Sparkles size={10} strokeWidth={2.5} />
-                  ახალი
-                </span>
-                <h2 className="ka font-bold text-wine text-base leading-snug">
-                  სცენარები
-                </h2>
-                <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
-                  ისწავლე სიტყვები რეალურ სამუშაო სიტუაციებში, დიალოგებით, აუდიოთი და ვარჯიშით.
-                </p>
-                <span className="ka inline-flex items-center gap-1 text-[11px] font-semibold text-wine mt-3 group-hover:gap-1.5 transition-all">
-                  გახსნა <ArrowRight size={12} strokeWidth={2.25} />
-                </span>
-              </div>
-            </div>
-          </BizCard>
-        </Link>
         {orderedModules.map((m) => {
           const Icon = m.icon;
           const isRecommended = recommended.has(m.slug);

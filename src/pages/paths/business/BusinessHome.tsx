@@ -64,7 +64,7 @@ const MODULE_FOCUS: Record<string, { title: string; subtitle: string; doneTitle:
   vocabulary: {
     title: "დღევანდელი ბიზნეს სიტყვები",
     subtitle: "ახალი სიტყვები მაგალითებითა და ქართული ახსნებით.",
-    doneTitle: "ყოჩაღ! დღევანდელი \"Streak\" დაცულია. ",
+    doneTitle: "ყოჩაღ! დღევანდელი „Streak“ დაცულია.",
     doneSubtitle: " ხვალ ახალი სიტყვები გელოდება.",
   },
 };
@@ -620,7 +620,7 @@ export default function BusinessHome() {
                         {d.done ? "✓" : d.frozen ? "❄" : "·"}
                       </span>
                       <span
-                        className={`ka text-[8px] ${
+                        className={`ka text-[10px] ${
                           d.isToday
                             ? streakDark
                               ? "font-bold text-gold"
@@ -664,7 +664,9 @@ export default function BusinessHome() {
                     გილოცავ!
                   </h2>
                   <p className="ka text-sm text-on-dark/80 mt-2 leading-relaxed">
-                    შენ შეასრულე 7 სავარჯიშო სესია.
+                    {/* Was hardcoded as "7", which sat next to a tile showing
+                        the real count and contradicted it. */}
+                    შენ შეასრულე {interviewCount + vocabSessionsCount} სავარჯიშო სესია.
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     <div className="border border-cream/15 rounded-md px-2 py-3">
@@ -683,7 +685,7 @@ export default function BusinessHome() {
                     </div>
                   </div>
                   <p className="ka text-sm font-semibold text-on-dark/85 mt-4">
-                    შეამოწმე რამდენად მოგემატა ცოდნა - გაიარე ხელახალი შეფასება(თუ არ გინდა გამოტოვე :), no pressure!)
+                    შეამოწმე, რამდენად მოგემატა ცოდნა: გაიარე ხელახალი შეფასება. არ გინდა? გამოტოვე, no pressure :)
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row gap-2">
                     <button
@@ -691,7 +693,7 @@ export default function BusinessHome() {
                         if (user) saveBusiness(user.id, { firstMilestoneAcknowledged: true });
                         navigate("/path/business/reassessment");
                       }}
-                      className="ka inline-flex items-center justify-center gap-2 bg-panel text-gold hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
+                      className="ka inline-flex items-center justify-center gap-2 bg-panel text-gold hover:bg-panel-soft transition-colors px-5 py-2.5 rounded-md font-bold text-sm"
                     >
                       ხელახალი შეფასების დაწყება <ArrowRight size={14} strokeWidth={2.25} />
                     </button>
@@ -743,7 +745,7 @@ export default function BusinessHome() {
               <Link
                 to="/path/business/vocabulary"
                 onClick={() => setBrokenStreak(null)}
-                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine text-on-dark dark:text-panel-deep text-sm font-bold"
+                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold"
               >
                 დღევანდელი სესია
                 <ArrowRight size={15} strokeWidth={2.25} />
@@ -757,7 +759,7 @@ export default function BusinessHome() {
           {s && isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
-              className={`w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-wine to-wine-deep text-left shadow-sm hover:opacity-95 transition-opacity mb-4 ${
+              className={`w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-left shadow-sm hover:opacity-95 transition-opacity mb-4 ${
                 trialEndingSoon(s) ? "ring-1 ring-gold/60" : ""
               }`}
             >
@@ -892,14 +894,14 @@ export default function BusinessHome() {
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
                 {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
-                  <p className="ka text-[11px] font-semibold text-gold-soft mt-2">
+                  <p className="ka text-[11px] font-semibold mt-2" style={{ color: "#4A4238" }}>
                     🎬 შემდეგი სესია, სცენარი: {scenarioToday.titleKa}
                   </p>
                 )}
                 {!focusDoneToday && (
                   <div className="mt-3 space-y-2">
                     {scenarioToday && (
-                      <p className="ka text-[11px] font-semibold text-gold-soft">
+                      <p className="ka text-[11px] font-semibold" style={{ color: "#4A4238" }}>
                         🎬 დღევანდელი სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
@@ -920,7 +922,7 @@ export default function BusinessHome() {
                   {focusDoneToday && (s?.mockPro || isTrialActive(s)) && (
                     <button
                       onClick={() => navigate("/path/business/module/vocabulary")}
-                      className="ka inline-flex items-center justify-center gap-2 bg-gold text-ink hover:bg-gold-2 transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                      className="ka inline-flex items-center justify-center gap-2 bg-gold text-ink dark:text-panel-deep hover:bg-gold-2 transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                     >
                       კიდევ ერთი სესია ⭐
                       <ArrowRight size={14} strokeWidth={2.25} />
@@ -1164,7 +1166,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
     >
       <MilestoneConfetti />
       <div
-        className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-wine to-wine-deep text-on-dark p-7 text-center shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]"
+        className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-on-dark p-7 text-center shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-5xl">🎉</div>
@@ -1189,7 +1191,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
 
         <button
           onClick={onClose}
-          className="ka mt-6 w-full h-12 rounded-2xl bg-gold text-ink text-sm font-bold"
+          className="ka mt-6 w-full h-12 rounded-2xl bg-gold text-ink dark:text-panel-deep text-sm font-bold"
         >
           გავაგრძელოთ
         </button>
