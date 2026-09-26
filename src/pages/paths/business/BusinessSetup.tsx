@@ -11,6 +11,7 @@ import {
   BusinessGoal,
   BusinessIntensity,
   DEADLINE_LABELS,
+  FIELD_CHOICES,
   FIELD_LABELS,
   GOAL_LABELS,
   INTENSITY_LABELS,
@@ -25,7 +26,7 @@ type Step = 0 | 1 | 2;
 const GOAL_KEYS = Object.keys(GOAL_LABELS) as BusinessGoal[];
 const INTENSITY_KEYS = Object.keys(INTENSITY_LABELS) as BusinessIntensity[];
 const DEADLINE_KEYS = Object.keys(DEADLINE_LABELS) as Exclude<BusinessDeadline, null>[];
-const FIELD_KEYS = Object.keys(FIELD_LABELS) as BusinessField[];
+const FIELD_KEYS = FIELD_CHOICES;
 
 export default function BusinessSetup() {
   const { user } = useAuth();
@@ -209,7 +210,7 @@ export default function BusinessSetup() {
         <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           ნაბიჯი {step + 2} / 4
         </p>
-        <h1 className="ka text-2xl font-bold text-wine mt-1">შენი მიზანი</h1>
+        <h1 className="ka text-2xl font-bold text-wine mt-1">პერსონალიზაცია</h1>
         <p className="ka text-sm text-ink-muted mt-1">
           niniebi, გვითხარი&nbsp;რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
@@ -327,13 +328,17 @@ function SingleSelect<T extends string>({
               onClick={() => onChange(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-wine bg-wine/5 text-wine"
+                  // Selected has to look STRONGER than unselected. It used to
+                  // set the label to the brand colour, which in dark mode is
+                  // dimmer than ordinary text, so the chosen option read as
+                  // the disabled one.
+                  ? "border-wine bg-wine/10 ring-1 ring-wine/40 text-ink font-semibold"
                   : "border-line hover:border-wine/40 text-ink"
               }`}
             >
               <span
                 className="inline-block w-3.5 h-3.5 mr-2 rounded-full border align-middle"
-                style={{ background: on ? "hsl(var(--ink))" : "transparent", borderColor: on ? "hsl(var(--ink))" : "hsl(var(--line))" }}
+                style={{ background: on ? "hsl(var(--wine))" : "transparent", borderColor: on ? "hsl(var(--wine))" : "hsl(var(--line))" }}
               />
               {o.label}
             </button>
@@ -370,7 +375,11 @@ function MultiSelect<T extends string>({
               onClick={() => onToggle(o.value)}
               className={`ka w-full text-left px-4 py-3 rounded-xl border transition-colors text-sm ${
                 on
-                  ? "border-wine bg-wine/5 text-wine"
+                  // Selected has to look STRONGER than unselected. It used to
+                  // set the label to the brand colour, which in dark mode is
+                  // dimmer than ordinary text, so the chosen option read as
+                  // the disabled one.
+                  ? "border-wine bg-wine/10 ring-1 ring-wine/40 text-ink font-semibold"
                   : "border-line hover:border-wine/40 text-ink"
               }`}
             >

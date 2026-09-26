@@ -135,7 +135,7 @@ export default function BusinessPremium() {
         <div className="mt-5 space-y-3">
           {FEATURES.map((f) => (
             <div key={f.titleKa} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-gold text-wine grid place-items-center shrink-0 mt-0.5">
+              <span className="w-5 h-5 rounded-full bg-gold text-panel-deep grid place-items-center shrink-0 mt-0.5">
                 <Check size={13} strokeWidth={3} />
               </span>
               <div>

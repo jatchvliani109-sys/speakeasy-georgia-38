@@ -72,14 +72,14 @@ export default function MyLexicon() {
   }, [tab]);
 
   return (
-    <BusinessShell seo={{ title: "ჩემი ლექსიკონი — SpeakBusy", description: "შენი პერსონალური ბიზნეს ლექსიკონი — სიტყვები და ფრაზები ერთ ადგილას.", path: "/path/business/lexicon" }} back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+    <BusinessShell seo={{ title: "ჩემი ლექსიკონი, SpeakBusy", description: "შენი პერსონალური ბიზნეს ლექსიკონი, სიტყვები და ფრაზები ერთ ადგილას.", path: "/path/business/lexicon" }} back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <header className="mb-4">
         <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           ბიზნეს ლექსიკონი
         </p>
         <h1 className="ka text-2xl font-bold text-wine mt-1">ჩემი ლექსიკონი</h1>
         <p className="ka text-sm text-ink-muted mt-1">
-          ფრაზები სესიებიდან და სიტყვები, რომლებიც შენ უკვე ისწავლე — ერთ ადგილას.
+          ფრაზები სესიებიდან და სიტყვები, რომლებიც შენ უკვე ისწავლე, ერთ ადგილას.
         </p>
       </header>
 
@@ -425,7 +425,7 @@ function WordsTab() {
           <div className="mx-auto w-12 h-12 rounded-md bg-cream-2 border border-line-2 grid place-items-center text-wine"><BookOpen size={22} strokeWidth={2} /></div>
           <h3 className="ka text-lg font-bold text-wine mt-3">ჯერ არ გისწავლია სიტყვა</h3>
           <p className="ka text-sm text-ink-muted mt-2 max-w-sm mx-auto">
-            დაასრულე ლექსიკის სესია — სიტყვები აქ ავტომატურად გამოჩნდება.
+            დაასრულე ლექსიკის სესია, სიტყვები აქ ავტომატურად გამოჩნდება.
           </p>
           <div className="mt-5">
             <Link to="/path/business/module/vocabulary">
@@ -451,9 +451,6 @@ function WordsTab() {
                       <ReadAloudButton text={w.en} storageKey={w.key} size="sm" />
                     </div>
                     <p className="ka text-xs text-ink-muted mt-0.5">{w.ka}</p>
-                    {w.pronunciation && (
-                      <p className="ka text-[10px] text-ink font-mono mt-0.5">[{w.pronunciation}]</p>
-                    )}
                   </div>
                   <ConfidenceDot c={r.confidence} />
                 </div>

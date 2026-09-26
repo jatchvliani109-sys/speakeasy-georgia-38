@@ -36,10 +36,12 @@ import {
   trialEndingSoon,
   trialDaysLeft,
   aiSessionsRemaining,
+  hasUnlimitedVocab,
 } from "./lib/state";
 import {
   computeStreakWithFreezes,
   loadProgress,
+  loadRecentSessions,
   pickDailyScenario,
   planSession,
   summarizeVocabProgress,
@@ -307,10 +309,16 @@ export default function BusinessHome() {
         if (!cancelled) {
           const sc = pickDailyScenario(vp, totalVocabSessions ?? 0);
           setScenarioToday(sc ? { titleKa: sc.titleKa } : null);
-          const plan = planSession(vp, cur.field || [], cur.mainPriority || []);
+          const recentForPlan = await loadRecentSessions(user.id);
+          const plan = planSession(vp, cur.field || [], cur.mainPriority || [], {
+            plan: hasUnlimitedVocab(cur) ? "paid" : "free",
+            recentScores: recentForPlan,
+          });
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);
-          const summary = summarizeVocabProgress(vp);
+          // Counted against what THIS learner can be served (core + their own
+          // fields), not all 980 — otherwise 100% is unreachable.
+          const summary = summarizeVocabProgress(vp, cur.field || [], cur.mainPriority || []);
           setVocabSummary(summary);
 
           // Has a new 10% milestone been reached since we last celebrated?
@@ -597,7 +605,7 @@ export default function BusinessHome() {
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
                         className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
-                          ${d.done ? "bg-gold text-wine" : d.frozen ? "bg-info/30 border border-info/60" : streakDark ? "border border-cream/30 text-transparent" : "border border-line text-transparent"}
+                          ${d.done ? "bg-gold text-panel-deep" : d.frozen ? "bg-info/30 border border-info/60" : streakDark ? "border border-cream/30 text-transparent" : "border border-line text-transparent"}
                           ${d.isToday && !d.done && !d.frozen ? (streakDark ? "border-gold border-dashed" : "border-wine/50 border-dashed") : ""}`}
                         title={d.frozen ? "გაყინვა გამოყენებულია" : undefined}
                       >
@@ -727,7 +735,7 @@ export default function BusinessHome() {
               <Link
                 to="/path/business/vocabulary"
                 onClick={() => setBrokenStreak(null)}
-                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine text-on-dark text-sm font-bold"
+                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine text-on-dark dark:text-panel-deep text-sm font-bold"
               >
                 დღევანდელი სესია
                 <ArrowRight size={15} strokeWidth={2.25} />
@@ -750,8 +758,8 @@ export default function BusinessHome() {
                 <div className="min-w-0">
                   <p className="ka text-[13px] font-bold text-on-dark truncate">
                     {trialEndingSoon(s)
-                      ? `პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
-                       : `პრემიუმი გააქტიურებულია - დარჩა ${trialDaysLeft(s)} დღე`}
+                      ? `უფასო პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
+                       : `უფასო პრემიუმი აქტიურია, დარჩა ${trialDaysLeft(s)} დღე`}
                   </p>
                   <p className="ka text-[11px] text-on-dark/70 truncate">
                     {trialEndingSoon(s)
@@ -914,7 +922,7 @@ export default function BusinessHome() {
                     onClick={() =>
                       navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
                     }
-                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-ink hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-on-dark hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
                   >
                     {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                     <ArrowRight size={14} strokeWidth={2.25} />
@@ -1261,4 +1269,3 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-

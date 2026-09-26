@@ -8,10 +8,13 @@ import {
   BusinessField,
   BusinessPriority,
   BusinessState,
+  FIELD_CHOICES,
   FIELD_LABELS,
   LEVEL_LABELS,
   PRIORITY_LABELS,
+  isTrialActive,
   pullBusinessFromSupabase,
+  trialDaysLeft,
   saveBusiness,
 } from "./paths/business/lib/state";
 import { toast } from "sonner";
@@ -278,7 +281,7 @@ export default function Profile() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
-      if (!token) throw new Error("სესია ვერ მოიძებნა — გამოდი და თავიდან შედი");
+      if (!token) throw new Error("სესია ვერ მოიძებნა, გამოდი და თავიდან შედი");
 
       const { data, error } = await supabase.functions.invoke("delete-account", {
         headers: { Authorization: `Bearer ${token}` },
@@ -290,7 +293,7 @@ export default function Profile() {
       toast.success("ანგარიში წაშლილია");
       navigate("/", { replace: true });
     } catch (e: any) {
-      toast.error(e?.message ?? "წაშლა ვერ მოხერხდა — დაგვიკავშირდი");
+      toast.error(e?.message ?? "წაშლა ვერ მოხერხდა, დაგვიკავშირდი");
       setDeleting(false);
     }
   };
@@ -304,7 +307,7 @@ export default function Profile() {
   }
 
   return (
-    <BusinessShell seo={{ title: "ჩემი პროფილი — SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიონალური ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
+    <BusinessShell seo={{ title: "ჩემი პროფილი, SpeakBusy", description: "ნახე და განაახლე შენი პროფილი, დონე, მიზნები და პროფესიონალური ინტერესები SpeakBusy-ზე.", path: "/profile" }}>
       <header className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
           ანგარიში
@@ -448,7 +451,7 @@ export default function Profile() {
         </div>
         <p className="ka text-xs text-ink-muted mb-3">რომელ ბიზნეს სფეროებთან გაქვს საქმე.</p>
         <div className="flex flex-wrap gap-2">
-          {(Object.keys(FIELD_LABELS) as BusinessField[]).map((f) => {
+          {FIELD_CHOICES.map((f) => {
             const on = fields.includes(f);
             return (
               <button
@@ -511,7 +514,7 @@ export default function Profile() {
             className="ka inline-flex items-center gap-2 text-sm text-wine font-semibold"
           >
             <LifeBuoy size={13} strokeWidth={2.25} />
-            დახმარება — დაგვიკავშირდი
+            დახმარება, დაგვიკავშირდი
           </a>
 
           {/* Feedback is invited explicitly. A user who is already in their
@@ -519,7 +522,7 @@ export default function Profile() {
           <div className="pt-3 mt-1 border-t border-line">
             <p className="ka text-xs text-ink-muted leading-relaxed">
               <MessageCircle size={12} strokeWidth={2.25} className="inline -mt-0.5 mr-1 text-wine" />
-              აპლიკაცია ჯერ ახალია — თუ რამე გაწუხებს ან იდეა გაქვს, აუცილებლად მოგვწერე.
+              აპლიკაცია ჯერ ახალია, თუ რამე გაწუხებს ან იდეა გაქვს, აუცილებლად მოგვწერე.
             </p>
             <div className="flex items-center gap-2 mt-2.5">
               <a
@@ -573,16 +576,22 @@ export default function Profile() {
           const active = sub?.status === "active";
           const cancelledButActive = sub?.status === "cancelled" && stillInPeriod;
 
-          // 1 — nothing to manage
+          // 1 — nothing to manage. A trial is not "nothing": the dashboard
+          // says the user has premium, so saying they have none here read as a
+          // bug. The free week is called "უფასო პრემიუმი", a paid subscription
+          // is "პრემიუმი".
           if (!sub || (!active && !cancelledButActive && !sub.masked_card)) {
+            const onTrial = isTrialActive(s);
             return (
               <>
                 <p className="ka text-xs text-ink-muted mt-1 leading-relaxed">
-                  აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ.
+                  {onTrial
+                    ? `უფასო პრემიუმი აქტიურია, დარჩა ${trialDaysLeft(s)} დღე. გამოწერა ჯერ არ გაქვს.`
+                    : "აქტიური გამოწერა არ გაქვს. უფასო ვერსიით სარგებლობ."}
                 </p>
                 <Link
                   to="/path/business/premium"
-                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-wine text-on-dark text-xs font-bold"
+                  className="ka inline-block mt-3 px-3 py-2 rounded-md bg-wine text-on-dark dark:text-panel-deep text-xs font-bold"
                 >
                   პრემიუმის ნახვა
                 </Link>
@@ -636,7 +645,7 @@ export default function Profile() {
                 {!active && (
                   <Link
                     to="/path/business/premium"
-                    className="ka px-3 py-2 rounded-md bg-wine text-on-dark text-xs font-bold"
+                    className="ka px-3 py-2 rounded-md bg-wine text-on-dark dark:text-panel-deep text-xs font-bold"
                   >
                     გამოწერის განახლება
                   </Link>
@@ -667,8 +676,8 @@ export default function Profile() {
           <h2 className="ka font-bold text-wine text-sm">ჩემი მონაცემების ჩამოტვირთვა</h2>
         </div>
         <p className="ka text-xs text-ink-muted mb-3 leading-relaxed">
-          ჩამოტვირთე ყველა შენი მონაცემი — პროფილი, პროგრესი, სესიები და შენახული
-          დოკუმენტები — JSON ფაილად.
+          ჩამოტვირთე ყველა შენი მონაცემი, პროფილი, პროგრესი, სესიები და შენახული
+          დოკუმენტები, JSON ფაილად.
         </p>
         <button
           onClick={handleExport}

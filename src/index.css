@@ -132,10 +132,17 @@
     --shadow-warm: 0 8px 30px -6px hsl(43 54% 30% / 0.35);
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.45);
 
-    /* Brand palette tokens (dark) */
-    --wine: 216 16% 59%;
-    --wine-deep: 213 14% 49%;
-    --wine-soft: 215 18% 24%;
+    /* Brand palette tokens (dark)
+       The burgundy is LIGHTENED for dark mode rather than swapped for a
+       neutral: #5C1A2E on a near-black card is about 1.3:1 contrast, which is
+       unreadable, but a grey-blue stops looking like SpeakBusy. This is the
+       same hue at a light tint — 5.3:1 as text on the dark card, and still
+       dark enough to carry near-black text when used as a button fill.
+       Buttons that fill with wine must use `dark:text-panel-deep`, since
+       --on-dark is near-white in both themes. */
+    --wine: 343 38% 63%;
+    --wine-deep: 343 38% 57%;
+    --wine-soft: 343 22% 24%;
 
     --gold: 43 62% 62%;
     --gold-soft: 43 55% 80%;

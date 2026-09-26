@@ -92,7 +92,7 @@ export default function TrialEnded() {
           </h1>
 
           <p className="text-on-dark-muted leading-relaxed mb-6">
-            პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა — ყველა ნასწავლი სიტყვა, streak-ი და ლექსიკონი შენთან რჩება.
+            პრემიუმის საცდელი პერიოდი ამოიწურა. შენი პროგრესი არსად წასულა, ყველა ნასწავლი სიტყვა, streak-ი და ლექსიკონი შენთან რჩება.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -128,7 +128,7 @@ export default function TrialEnded() {
             }}
             className="w-full h-12 bg-gold hover:bg-gold-deep text-ink font-bold rounded-full text-base"
           >
-            პრემიუმის ნახვა — 13.99 ლარი/თვე
+            პრემიუმის ნახვა, 13.99 ლარი/თვე
           </Button>
 
           <button

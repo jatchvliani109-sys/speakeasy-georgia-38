@@ -185,7 +185,7 @@ export default function TrialGift() {
             <Check size={38} strokeWidth={2.5} />
           </span>
           <h1 className="ka text-2xl font-bold text-wine mt-5">
-            პრემიუმი გააქტიურებულია
+            უფასო პრემიუმი გააქტიურებულია
           </h1>
           <p className="ka text-sm text-ink-muted mt-2">
             {TRIAL_DAYS} დღე შენია. ისიამოვნე.
@@ -271,7 +271,7 @@ export default function TrialGift() {
             <Perk
               icon={<InfinityIcon size={16} strokeWidth={2.25} />}
               title="ულიმიტო ლექსიკის სესიები"
-              sub="დაინახავ გიღირს თუარა :)"
+              sub="დაინახავ გიღირს თუ არა :)"
             />
             <Perk
               icon={<Bot size={16} strokeWidth={2.25} />}
@@ -314,7 +314,7 @@ export default function TrialGift() {
               <button
                 onClick={accept}
                 disabled={busy}
-                className="ka w-full h-14 rounded-2xl bg-wine text-on-dark text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-wine-deep transition-colors disabled:opacity-60"
+                className="ka w-full h-14 rounded-2xl bg-wine text-on-dark dark:text-panel-deep text-[15px] font-bold inline-flex items-center justify-center gap-2 hover:bg-wine-deep transition-colors disabled:opacity-60"
               >
                 <Gift size={17} strokeWidth={2.25} />
                 {busy ? "ირთვება..." : "მადლობა"}
@@ -339,7 +339,7 @@ export default function TrialGift() {
                 <button
                   onClick={() => setConfirmDecline(false)}
                   disabled={busy}
-                  className="ka flex-1 h-11 rounded-xl bg-wine text-on-dark text-[13px] font-bold"
+                  className="ka flex-1 h-11 rounded-xl bg-wine text-on-dark dark:text-panel-deep text-[13px] font-bold"
                 >
                   დავბრუნდე
                 </button>

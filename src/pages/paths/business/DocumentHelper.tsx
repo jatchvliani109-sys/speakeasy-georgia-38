@@ -26,7 +26,7 @@ import AiLockedCard from "./AiLockedCard";
 // budget (shared with interviews + self-introduction). Edits/deletes/library
 // views are free — only model calls consume.
 const AI_LIMIT_MSG =
-  "ამ კვირის AI სესიები ამოწურულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში — ორშაბათს განახლდება.";
+  "ამ კვირის AI სესიები ამოწურულია. ⭐ პრემიუმი გაძლევს 7-ს კვირაში, ორშაბათს განახლდება.";
 // The weekly cap is enforced SERVER-SIDE inside the business-docs edge function
 // (consume_ai_session / refund_ai_session under the service role). The client
 // no longer decrements the counter itself — it just calls, and re-reads the
@@ -125,7 +125,7 @@ export default function DocumentHelper() {
 
   if (!user || !profile) {
     return (
-      <BusinessShell seo={{ title: "დოკუმენტების ასისტენტი — SpeakBusy", description: "შექმენი და გააუმჯობესე პროფესიონალური დოკუმენტები AI-ის დახმარებით.", path: "/path/business/documents" }}>
+      <BusinessShell seo={{ title: "დოკუმენტების ასისტენტი, SpeakBusy", description: "შექმენი და გააუმჯობესე პროფესიონალური დოკუმენტები AI-ის დახმარებით.", path: "/path/business/documents" }}>
         <div className="ka text-ink-muted">იტვირთება...</div>
       </BusinessShell>
     );
@@ -139,7 +139,7 @@ export default function DocumentHelper() {
         </p>
         <h1 className="ka text-2xl font-bold text-wine mt-1">დოკუმენტების ასისტენტი</h1>
         <p className="ka text-sm text-ink-muted mt-1">
-          რეალური პროფესიონალური დოკუმენტები — შენი მონაცემებით, წამიერად.
+          რეალური პროფესიონალური დოკუმენტები, შენი მონაცემებით, წამიერად.
         </p>
         {!aiLocked(state) && (
           <p className="ka text-[11px] text-ink-muted mt-1">
@@ -189,7 +189,7 @@ export default function DocumentHelper() {
       {aiLocked(state) && (
         <AiLockedCard
           title="დოკუმენტების ასისტენტი"
-          description="რეზიუმე, სამოტივაციო წერილი და ბიო — შენი მონაცემებით, პროფესიონალურ ინგლისურად."
+          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით, პროფესიონალურ ინგლისურად."
           trialAvailable={shouldOfferTrial(state)}
         />
       )}
@@ -257,11 +257,11 @@ function HomeView({
   onOpenDoc: (d: BusinessDocument) => void;
 }) {
   const tools: { id: DocType; title: string; subtitle: string }[] = [
-    { id: "email", title: "პროფესიონალური იმეილი", subtitle: "აღწერე რა გინდა გადასცე — მიიღე გაპრიალებული იმეილი." },
-    { id: "email_fix", title: "გაასწორე ჩემი ელ-ფოსტა", subtitle: "ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია + ახსნა." },
+    { id: "email", title: "პროფესიონალური იმეილი", subtitle: "აღწერე რა გინდა გადასცე, მიიღე გაპრიალებული იმეილი." },
+    { id: "email_fix", title: "გაასწორე ჩემი ელ-ფოსტა", subtitle: "ჩასვი შენი იმეილი, მიიღე გაუმჯობესებული ვერსია + ახსნა." },
     { id: "cover_letter", title: "სამოტივაციო წერილი", subtitle: "შენი რეზიუმე + სამუშაო პოზიცია → მორგებული წერილი." },
-    { id: "resume_improve", title: "რეზიუმეს გაუმჯობესება", subtitle: "კონკრეტული რჩევები — სუსტი ფრაზები, keywords, ტონი." },
-    { id: "bio", title: "პროფესიონალური ბიო", subtitle: "მოკლე, საშუალო, სრული — LinkedIn-ისთვის და სხვა." },
+    { id: "resume_improve", title: "რეზიუმეს გაუმჯობესება", subtitle: "კონკრეტული რჩევები, სუსტი ფრაზები, keywords, ტონი." },
+    { id: "bio", title: "პროფესიონალური ბიო", subtitle: "მოკლე, საშუალო, სრული, LinkedIn-ისთვის და სხვა." },
   ];
 
   return (
@@ -685,7 +685,7 @@ function EmailFixFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d:
     <div>
       <h2 className="ka text-xl font-bold text-wine mb-1">გაასწორე ჩემი ელ-ფოსტა</h2>
       <p className="ka text-xs text-ink-muted mb-4">
-        ჩასვი შენი იმეილი — მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
+        ჩასვი შენი იმეილი, მიიღე გაუმჯობესებული ვერსია და ისწავლე რა გასწორდა.
       </p>
       <BizCard>
         <Label>შენი იმეილი *</Label>
@@ -777,7 +777,7 @@ function CoverLetterFlow({
       });
       const doc = await saveDocument(user.id, {
         doc_type: "cover_letter",
-        title: r.title || `სამოტივაციო — ${jobTitle}`,
+        title: r.title || `სამოტივაციო, ${jobTitle}`,
         content: r.content || "",
         meta: { emphasized: r.emphasized || [] },
         inputs: { jobTitle, jobDescription },
@@ -808,7 +808,7 @@ function CoverLetterFlow({
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
           rows={6}
-          placeholder="ჩასვი ვაკანსიის ტექსტი — წერილი უფრო კარგად მოერგება..."
+          placeholder="ჩასვი ვაკანსიის ტექსტი, წერილი უფრო კარგად მოერგება..."
           className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <div className="flex justify-end mt-4">
@@ -902,7 +902,7 @@ function ResumeImproveFlow({
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
           rows={4}
-          placeholder="ვაკანსიის აღწერა — keywords უფრო ზუსტი იქნება..."
+          placeholder="ვაკანსიის აღწერა, keywords უფრო ზუსტი იქნება..."
           className="w-full mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm focus:outline-none focus:border-wine"
         />
         <div className="flex justify-end mt-4">
@@ -952,7 +952,7 @@ function BioFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Busi
       const formatted = (r.medium || r.short || r.full || "").trim();
       const doc = await saveDocument(user.id, {
         doc_type: "bio",
-        title: r.title || `პროფესიონალური ბიო — ${purpose}`,
+        title: r.title || `პროფესიონალური ბიო, ${purpose}`,
         content: formatted,
         meta: { short: r.short, medium: r.medium, full: r.full, purpose, tone },
         inputs: { purpose, tone },
@@ -1180,7 +1180,7 @@ function DocView({
               experience. They may send this to an employer, so the warning
               belongs next to the text, not buried in the Terms. */}
           <p className="ka text-[11px] text-ink-subtle mt-4 pt-3 border-t border-line leading-relaxed">
-            ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ — გამოყენებამდე წაიკითხე და
+            ⚠️ ტექსტი შექმნილია ხელოვნური ინტელექტის მიერ, გამოყენებამდე წაიკითხე და
             გადაამოწმე, რომ ყველა ფაქტი შენს რეალურ გამოცდილებას შეესაბამება.
           </p>
         </article>
@@ -1203,7 +1203,7 @@ function DocView({
             )}
             <section className="mt-4">
               <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1">
-                შედარება — ორიგინალი / გაუმჯობესებული
+                შედარება, ორიგინალი / გაუმჯობესებული
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-card border border-line rounded-2xl p-4">
@@ -1477,4 +1477,3 @@ function BioVersions({
     </section>
   );
 }
-

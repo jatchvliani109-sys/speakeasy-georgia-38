@@ -500,6 +500,23 @@ export const FIELD_LABELS: Record<BusinessField, string> = {
   logistics: "Logistics",
 };
 
+/**
+ * The fields offered in setup and the profile.
+ *
+ * FIELD_LABELS still lists every value the type allows, because accounts saved
+ * before this change may hold one of the others. Only these six have field
+ * vocabulary behind them, though — picking any of the rest changed nothing
+ * about what the learner was taught, and left the progress bar short.
+ */
+export const FIELD_CHOICES: BusinessField[] = [
+  "management",
+  "marketing",
+  "finance",
+  "hr",
+  "sales",
+  "project_management",
+];
+
 export const LEVEL_LABELS: Record<BusinessLevel, string> = {
   business_beginner: "Business Beginner",
   business_elementary: "Business Elementary",

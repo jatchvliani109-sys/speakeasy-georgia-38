@@ -49,7 +49,6 @@ const BusinessReassessment = lazy(() => import("./pages/paths/business/BusinessR
 const SelfIntroduction = lazy(() => import("./pages/paths/business/SelfIntroduction"));
 const BusinessResumeUpload = lazy(() => import("./pages/paths/business/BusinessResumeUpload"));
 const DocumentHelper = lazy(() => import("./pages/paths/business/DocumentHelper"));
-const Scenarios = lazy(() => import("./pages/paths/business/Scenarios"));
 const BusinessPremium = lazy(() => import("./pages/paths/business/BusinessPremium"));
 const VocabularyModule = lazy(() => import("./pages/paths/business/VocabularyModule"));
 
@@ -107,7 +106,6 @@ const App = () => (
             <Route path="/path/business/dictionary" element={<Navigate to="/path/business/lexicon?tab=phrases" replace />} />
             <Route path="/path/business/vocabulary/notebook" element={<Navigate to="/path/business/lexicon?tab=words" replace />} />
             <Route path="/path/business/documents" element={<RequireAuth><DocumentHelper /></RequireAuth>} />
-            <Route path="/path/business/scenarios" element={<RequireAuth><Scenarios /></RequireAuth>} />
             <Route path="/path/business/premium" element={<RequireAuth><BusinessPremium /></RequireAuth>} />
             <Route path="/path/business/vocabulary" element={<RequireAuth><VocabularyModule /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />

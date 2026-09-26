@@ -498,10 +498,17 @@ export async function loadRecentSessions(
 export type PlanTier = "free" | "paid";
 
 export type PlanOptions = {
-  /** Subscription tier — controls the session word budget. Defaults to "free". */
+  /** Subscription tier. Controls the session length and the new-word ceiling. */
   plan?: PlanTier;
-  /** Completed vocab sessions today — paid budgets shrink with each one. */
+  /** Completed vocab sessions today. Kept for callers; pacing no longer uses it. */
   sessionsToday?: number;
+  /**
+   * The learner's last few completed sessions, newest first, as
+   * loadRecentSessions() returns them. This is what decides how many new words
+   * they get: someone who keeps scoring well is never held back, someone who is
+   * struggling gets review instead of more material.
+   */
+  recentScores?: { score: number; total: number }[];
 };
 
 export type SessionPlan = {
@@ -511,7 +518,7 @@ export type SessionPlan = {
 };
 
 // ---- Word budgets ----------------------------------------------------------
-const FREE_NEW_TARGET = 6;      // free users: 6 new words per session
+const FREE_NEW_TARGET = 5;      // free users: at most 5 new words per session
 const FREE_REVIEW_TARGET = 8;   // free users: up to 8 review words per session
 
 // Premium sessions keep a CONSISTENT length; what changes across the day is the
@@ -526,11 +533,8 @@ const FREE_REVIEW_TARGET = 8;   // free users: up to 8 review words per session
 const QUESTIONS_PER_NEW = 2;
 const MISTAKE_ALLOWANCE = 2;    // buildQuiz adds 1-2 "common mistake" items
 const PAID_QUESTION_TARGET = 24;
-const PAID_BUDGET_STEP = 2;     // ...easing down slightly from the 3rd session on
-const PAID_MIN_QUESTIONS = 18;
-const PAID_NEW_FIRST = 8;       // new words in the day's first session
-const FREE_QUESTION_TARGET = 20;
-const PAID_MAX_NEW = 12;        // hard cap on NEW words — retention drops past ~10-12,
+const FREE_QUESTION_TARGET = 18;
+const PAID_MAX_NEW = 8;         // hard cap on NEW words — retention drops past ~10-12,
                                 // so bigger budgets buy more review, not more new words
 
 // ---- Tier classification --------------------------------------------------
@@ -583,26 +587,41 @@ export function planSession(
   opts: PlanOptions = {},
 ): SessionPlan {
   const plan: PlanTier = opts.plan ?? "free";
-  const sessionsToday = Math.max(0, opts.sessionsToday ?? 0);
 
   // ---- Budgets per tier + session number ----
   let newTarget: number;
   let reviewTarget: number;
   let sessionTarget: number;   // total words we aim to serve this session
   let newCeiling: number;      // hard cap on new words (governor-limited)
+  // MECHANIC 2 — PERFORMANCE PACING. How many new words someone gets is decided
+  // by how well they are actually learning, not by which session of the day it
+  // is. A learner who keeps scoring well can take session after session at full
+  // speed; a learner who is struggling gets review until they catch up.
+  //
+  // This replaced a fixed 8/4/3 taper that never ran: planSession was called
+  // without options, so EVERY user — paid, trial or free — silently got the
+  // free budget of 6 new words, in every session.
+  const recent = (opts.recentScores ?? []).filter((r) => r && r.total > 0).slice(0, 3);
+  const answered = recent.reduce((a, r) => a + r.total, 0);
+  const correct = recent.reduce((a, r) => a + r.score, 0);
+  // No history yet (first ever session) starts in the middle rather than at the
+  // top: nobody has earned 8 words before answering a single question.
+  const accuracy = answered > 0 ? correct / answered : 0.75;
+  const earnedNew =
+    accuracy >= 0.85 ? 8 :
+    accuracy >= 0.70 ? 6 :
+    accuracy >= 0.50 ? 4 : 3;
+
   if (plan === "paid") {
-    sessionTarget = Math.max(
-      PAID_MIN_QUESTIONS,
-      PAID_QUESTION_TARGET - PAID_BUDGET_STEP * Math.max(0, sessionsToday - 1),
-    );
+    sessionTarget = PAID_QUESTION_TARGET;
     newCeiling = PAID_MAX_NEW;
-    // MECHANIC 2 — same-day taper: later sessions shift toward consolidation.
-    // Freed new-word slots become review, so the QUESTION COUNT stays steady.
-    newTarget = sessionsToday === 0 ? PAID_NEW_FIRST : sessionsToday === 1 ? 4 : 3;
+    newTarget = earnedNew;
   } else {
+    // Free sessions are shorter and top out lower. The free tier has to be
+    // genuinely useful and still leave a reason to subscribe.
     sessionTarget = FREE_QUESTION_TARGET;
     newCeiling = FREE_NEW_TARGET;
-    newTarget = FREE_NEW_TARGET;
+    newTarget = Math.min(earnedNew, FREE_NEW_TARGET);
   }
   newTarget = Math.min(newTarget, newCeiling);
   reviewTarget = Math.max(0, sessionTarget - MISTAKE_ALLOWANCE - QUESTIONS_PER_NEW * newTarget);
@@ -1392,6 +1411,19 @@ const CONFIDENCE_WEIGHT: Record<number, number> = {
 
 export const TOTAL_VOCAB_WORDS = ALL_WORDS.length;
 
+/**
+ * How many words THIS learner can actually be served: the core curriculum plus
+ * the field words for the professions they chose.
+ *
+ * The percentage used to divide by all 980, but a learner only ever meets the
+ * core 806 plus their own field (20-31 words each). With one field the bar
+ * topped out around 85%, so the last letters of "ბიზნესმენი" could never
+ * appear — the milestone was unreachable by design.
+ */
+export function vocabTotalFor(fields: string[] = [], goals: string[] = []): number {
+  return ALL_CORE_WORDS.length + fieldWordsFor(fields, goals).length;
+}
+
 export type VocabProgressSummary = {
   /** 0-100, one decimal. The headline number. */
   percent: number;
@@ -1408,8 +1440,12 @@ export type VocabProgressSummary = {
   total: number;
 };
 
-export function summarizeVocabProgress(rows: ProgressRow[]): VocabProgressSummary {
-  const total = TOTAL_VOCAB_WORDS;
+export function summarizeVocabProgress(
+  rows: ProgressRow[],
+  fields: string[] = [],
+  goals: string[] = [],
+): VocabProgressSummary {
+  const total = vocabTotalFor(fields, goals);
   let known = 0, learning = 0, fresh = 0;
 
   for (const r of rows) {
