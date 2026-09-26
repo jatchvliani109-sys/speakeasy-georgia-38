@@ -18,6 +18,7 @@ import {
   saveBusiness,
 } from "./paths/business/lib/state";
 import { toast } from "sonner";
+import { formatDateKa, formatCardMask } from "@/lib/formatDate";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -606,12 +607,12 @@ export default function Profile() {
                 {active ? (
                   <>
                     პრემიუმი აქტიურია.
-                    {periodEnd && ` შემდეგი გადახდა: ${periodEnd.toLocaleDateString("ka-GE")}.`}
+                    {periodEnd && ` შემდეგი გადახდა: ${formatDateKa(periodEnd)}.`}
                   </>
                 ) : (
                   <>
                     გამოწერა გაუქმებულია, ავტომატური გადახდა აღარ მოხდება.
-                    {periodEnd && ` პრემიუმი აქტიურია ${periodEnd.toLocaleDateString("ka-GE")}-მდე.`}
+                    {periodEnd && ` პრემიუმი აქტიურია ${formatDateKa(periodEnd)}-მდე.`}
                   </>
                 )}
               </p>
@@ -621,7 +622,7 @@ export default function Profile() {
                   <CreditCard size={16} strokeWidth={2} className="text-wine shrink-0" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-ink tabular-nums truncate">
-                      {sub.masked_card}
+                      {formatCardMask(sub.masked_card)}
                     </p>
                     <p className="ka text-[10px] text-ink-subtle">
                       {active

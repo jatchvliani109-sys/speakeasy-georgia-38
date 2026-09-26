@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatDateShortKa } from "@/lib/formatDate";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import {
@@ -26,6 +27,7 @@ import {
   trialUnlockProgress,
   TRIAL_AI_UNLOCK_WORDS,
   isTrialActive,
+  LEVEL_LABELS,
 } from "./lib/state";
 import AiLockedCard from "./AiLockedCard";
 
@@ -72,7 +74,7 @@ const EXAMPLES: Record<string, Record<LevelTier, Example>> = {
   },
   interview: {
     beginner: { en: "My name is Nino. I have one year of customer service experience. I want to work in your team.", ka: "მე მქვია ნინო. მაქვს ერთი წლის გამოცდილება customer service-ში. მინდა ვიმუშაო თქვენს გუნდში." },
-    elementary: { en: "I'm Nino. I have one year of customer service experience and good communication skills. I'd like to grow in a professional team.", ka: "ნინო ვარ. მაქვს 1 წლის გამოცდილება customer service-ში და კარგი კომუნიკაცია. მინდა გავიზარდო პროფესიულ გუნდში." },
+    elementary: { en: "I'm Nino. I have one year of customer service experience and good communication skills. I'd like to grow in a professional team.", ka: "ნინო ვარ. მაქვს 1 წლის გამოცდილება customer service-ში და კარგი კომუნიკაცია. მინდა გავიზარდო პროფესიონალურ გუნდში." },
     intermediate: { en: "I'm Nino. For the past year I've worked in customer service, where I learned how to handle clients calmly and clearly. I'm looking for a role where I can grow.", ka: "ნინო ვარ. ბოლო ერთი წელია ვმუშაობ customer service-ში, ვისწავლე კლიენტებთან მუშაობა მშვიდად და ნათლად." },
     advanced: { en: "I'm Nino. Over the past year in customer service I learned how to stay calm under pressure and turn difficult conversations into solutions. I'm now looking for a role where I can take more ownership.", ka: "ნინო ვარ. ერთი წლის განმავლობაში customer service-ში ვისწავლე როგორ მოვაგვარო რთული საუბრები.", note: "Tone: calm, ownership-focused." },
   },
@@ -97,7 +99,7 @@ const EXAMPLES: Record<string, Record<LevelTier, Example>> = {
   general: {
     beginner: { en: "Hi, I'm Nino. I work in marketing. I want to learn more English for my job.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში. მინდა ვისწავლო მეტი ინგლისური სამსახურისთვის." },
     elementary: { en: "Hi, I'm Nino. I work in marketing and I'm improving my English to communicate better at work.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვიუმჯობესებ ინგლისურს სამსახურისთვის." },
-    intermediate: { en: "Hi, I'm Nino. I work in marketing and I'm focused on building stronger professional English for daily work and emails.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვაუმჯობესებ პროფესიულ ინგლისურს ყოველდღიური სამუშაოსთვის." },
+    intermediate: { en: "Hi, I'm Nino. I work in marketing and I'm focused on building stronger professional English for daily work and emails.", ka: "გამარჯობა, ნინო ვარ. ვმუშაობ მარკეტინგში და ვაუმჯობესებ პროფესიონალურ ინგლისურს ყოველდღიური სამუშაოსთვის." },
     advanced: { en: "Hi, I'm Nino, I work in marketing and I'm sharpening my professional English to communicate more clearly in meetings and writing.", ka: "გამარჯობა, ნინო ვარ, ვმუშაობ მარკეტინგში და ვაუმჯობესებ ინგლისურს შეხვედრებსა და წერაში.", note: "Tone: concise, professional." },
   },
 };
@@ -323,7 +325,7 @@ export default function SelfIntroduction() {
         <h1 className="ka text-2xl font-bold text-wine mt-1">შენი პროფესიონალური წარდგენა</h1>
         <p className="ka text-xs text-ink-muted mt-1">
           ნაბიჯ-ნაბიჯ ისწავლე როგორ წარადგინო თავი ინგლისურად.
-          {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-wine">{biz.level.replace("business_", "")}</span></span>}
+          {biz?.level && <span className="ml-1">• დონე: <span className="font-semibold text-wine">{LEVEL_LABELS[biz.level] ?? biz.level}</span></span>}
         </p>
       </div>
 
@@ -717,7 +719,7 @@ export default function SelfIntroduction() {
                 <BizCard key={s.id}>
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="ka text-[11px] text-ink-muted">{new Date(s.createdAt).toLocaleDateString()} · {s.selected}</p>
+                      <p className="ka text-[11px] text-ink-muted">{formatDateShortKa(s.createdAt)} · {s.selected}</p>
                       <p className="ka text-xs text-wine mt-0.5 font-semibold">
                         {SELF_INTRO_PURPOSES.find((p) => p.id === s.inputs.purpose)?.label || "—"}
                       </p>
@@ -733,7 +735,7 @@ export default function SelfIntroduction() {
                     <button onClick={() => markPracticed(s.id)} className="text-xs px-3 py-1.5 rounded-lg border border-line">I practiced</button>
                   </div>
                   {s.practicedAt && (
-                    <p className="ka text-[10px] text-ink-muted mt-2">ბოლო ვარჯიში: {new Date(s.practicedAt).toLocaleDateString()}</p>
+                    <p className="ka text-[10px] text-ink-muted mt-2">ბოლო ვარჯიში: {formatDateShortKa(s.practicedAt)}</p>
                   )}
                 </BizCard>
               );

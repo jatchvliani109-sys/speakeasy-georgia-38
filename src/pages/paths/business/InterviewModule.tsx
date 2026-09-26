@@ -509,6 +509,15 @@ export default function InterviewModule() {
       });
       if (error) throw error;
       const r = data as ReplyData;
+
+      // The weekly session is charged SERVER-SIDE on the first reply of an
+      // interview, so the header ("N/7 AI სესია") was a reply behind: it still
+      // read 6/7 while the database had already moved to 5 left. Re-read once,
+      // on the turn that does the charging.
+      if (turnInStage === 1 && stageIdx === 0 && user) {
+        pullBusinessFromSupabase(user.id).then(setBiz).catch(() => { /* display only */ });
+      }
+
       const nextScore = score + (r.scoreDelta || 0);
       setScore(nextScore);
       const nextHighlights = r.phraseHighlight ? [...highlights, r.phraseHighlight] : highlights;

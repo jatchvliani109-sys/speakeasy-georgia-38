@@ -87,14 +87,32 @@ Deno.serve(async (req) => {
     if (_auth.error) return _auth.error;
     _userId = _auth.user.id;
 
-    // Claim a weekly AI session BEFORE generating. Enforced server-side because
-    // the browser check can be skipped by calling this function directly.
-    const quota = await consumeAiSession(_auth.user.id);
-    if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
-    _claimedWeek = quota.week;
-
     const body = (await req.json()) as Body;
-    const isRewrite = body.variant && body.variant !== "all" && body.baseText;
+    const isRewrite = !!(body.variant && body.variant !== "all" && body.baseText);
+
+    // A rewrite refines the introduction this session ALREADY paid for. The
+    // four buttons under a generated intro (გაუმჯობესება, გამარტივება,
+    // პროფესიონალურად, შემოკლება) are presented as refinements, and the app
+    // says as much — but each one landed here and claimed another weekly
+    // session, so one introduction could eat four of a premium user's seven.
+    //
+    // Only a fresh generation is charged. Rewrites are bounded instead: the
+    // text being refined is one introduction, so anything longer than that is
+    // not a rewrite and is refused rather than sent to the model.
+    if (isRewrite) {
+      if (String(body.baseText).length > 2000) {
+        return new Response(JSON.stringify({ error: "baseText too long" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      // Claim a weekly AI session BEFORE generating. Enforced server-side
+      // because the browser check can be skipped by calling this directly.
+      const quota = await consumeAiSession(_auth.user.id);
+      if (!quota.ok) return quotaExceededResponse(quota, corsHeaders);
+      _claimedWeek = quota.week;
+    }
     const userPrompt = isRewrite ? rewritePrompt(body) : buildPrompt(body);
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {

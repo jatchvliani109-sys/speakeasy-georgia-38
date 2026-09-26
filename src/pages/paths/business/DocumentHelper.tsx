@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { toast } from "@/components/ui/use-toast";
+import { formatDateShortKa, formatDateTimeKa } from "@/lib/formatDate";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
   BusinessDocument,
@@ -41,7 +42,15 @@ async function callDocsWithBudget(userId: string, body: Parameters<typeof callDo
     }
     throw e;
   } finally {
-    try { await pullBusinessFromSupabase(userId); } catch (_e) { /* best effort */ }
+    try {
+      const fresh = await pullBusinessFromSupabase(userId);
+      // The "N/7 AI სესია" counter is rendered by the page, but every
+      // generation happens inside one of six child tool components. Re-reading
+      // the state here updated the cache and nothing on screen, so the header
+      // still read 7/7 straight after a generation that had just spent one.
+      // Announce the fresh state instead of threading a setter through all six.
+      window.dispatchEvent(new CustomEvent("speakbusy:ai-budget", { detail: fresh }));
+    } catch (_e) { /* best effort */ }
   }
 }
 
@@ -59,6 +68,17 @@ export default function DocumentHelper() {
   const [state, setState] = useState<BusinessState | null>(null);
   // Trial users unlock AI by learning 20 words.
   const [unlockWords, setUnlockWords] = useState<number | null>(null);
+  // Keep the remaining-sessions counter honest after a generation (see the
+  // dispatch in callDocsWithBudget).
+  useEffect(() => {
+    const onBudget = (e: Event) => {
+      const fresh = (e as CustomEvent).detail as BusinessState | null;
+      if (fresh) setState(fresh);
+    };
+    window.addEventListener("speakbusy:ai-budget", onBudget);
+    return () => window.removeEventListener("speakbusy:ai-budget", onBudget);
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -327,7 +347,7 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
       <div className="flex-1 min-w-0">
         <p className="ka text-sm font-semibold text-wine break-words line-clamp-2">{doc.title}</p>
         <p className="ka text-[11px] text-ink-muted mt-0.5">
-          {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleDateString("ka-GE")}
+          {DOC_TYPE_LABELS[doc.doc_type]} · {formatDateShortKa(doc.created_at)}
         </p>
       </div>
       <span className="text-ink-muted">→</span>
@@ -621,7 +641,7 @@ function EmailFlow({ profile, onSaved }: { profile: DocsProfile; onSaved: (d: Bu
 
       {step === 3 && (
         <BizCard className="mt-4">
-          <p className="ka text-sm text-wine font-semibold">მზად ხართ?</p>
+          <p className="ka text-sm text-wine font-semibold">მზად ხარ?</p>
           <p className="ka text-xs text-ink-muted mt-1">
             AI გენერირებს იმეილს შენი მონაცემებითა და კონტექსტით.
           </p>
@@ -1075,7 +1095,7 @@ function DocView({
             <h2 className="ka text-lg sm:text-xl font-bold text-wine break-words line-clamp-3 leading-snug">{doc.title}</h2>
           )}
           <p className="ka text-[11px] text-ink-muted mt-1">
-            {DOC_TYPE_LABELS[doc.doc_type]} · {new Date(doc.created_at).toLocaleString("ka-GE")}
+            {DOC_TYPE_LABELS[doc.doc_type]} · {formatDateTimeKa(doc.created_at)}
           </p>
         </div>
         <button

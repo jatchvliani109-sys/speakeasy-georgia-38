@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatDateKa } from "@/lib/formatDate";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import { pullBusinessFromSupabase, saveBusiness } from "./lib/state";
 
@@ -51,12 +52,7 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 function formatDate(iso: string): string {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("ka-GE", { day: "numeric", month: "long", year: "numeric" });
-  } catch {
-    return iso;
-  }
+  return formatDateKa(iso) || iso;
 }
 
 type ExistingResume = {
@@ -256,7 +252,7 @@ export default function BusinessResumeUpload() {
         </p>
         <h1 className="ka text-2xl font-bold text-wine mt-1">ატვირთე შენი რეზიუმე</h1>
         <p className="ka text-sm text-ink-muted mt-2 leading-relaxed">
-          ატვირთე შენი რეზიუმე და ჩვენ მოვარგებთ ყველა გაკვეთილს შენს პროფესიულ
+          ატვირთე შენი რეზიუმე და ჩვენ მოვარგებთ ყველა გაკვეთილს შენს პროფესიონალურ
           გამოცდილებას. ასევე გამოგადგება Cover Letter-ების და ელ-ფოსტების დასაწერად.
         </p>
         {/* Uploading a CV sends personal data to a third-party AI provider

@@ -1835,7 +1835,7 @@ function Results({
   return (
     <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
       {streakCelebration && streakCelebration.to > 0 && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-panel via-wine to-gold text-on-dark p-4 text-center shadow-lg animate-[bizFade_.5s_ease-out_both]">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-panel via-wine-deep to-panel text-on-dark ring-1 ring-gold/50 p-4 text-center shadow-lg animate-[bizFade_.5s_ease-out_both]">
           <div className="relative flex items-center justify-center gap-3">
             <span className={`text-4xl ${streakGrew ? "biz-flame" : ""}`}>🔥</span>
             <div className="text-left">

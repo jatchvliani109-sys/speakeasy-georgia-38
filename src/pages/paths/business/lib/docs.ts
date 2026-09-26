@@ -6,10 +6,10 @@ import type { BusinessState } from "./state";
 export type DocType = "email" | "cover_letter" | "resume_improve" | "bio" | "email_fix";
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
-  email: "პროფესიული იმეილი",
+  email: "პროფესიონალური იმეილი",
   cover_letter: "სამოტივაციო წერილი",
   resume_improve: "რეზიუმეს გაუმჯობესება",
-  bio: "პროფესიული ბიო",
+  bio: "პროფესიონალური ბიო",
   email_fix: "გასწორებული იმეილი",
 };
 

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Star } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateKa, formatCardMask } from "@/lib/formatDate";
 import { useAuth } from "@/lib/auth";
 import { suggestEmail } from "@/lib/emailTypo";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -250,14 +251,14 @@ export default function BusinessPremium() {
           <p className="ka text-[12px] text-ink-muted mt-1.5 leading-relaxed">
             {sub.status === "active" ? (
               <>
-                {sub.masked_card ? `ბარათი ${sub.masked_card} · ` : ""}
+                {sub.masked_card ? `ბარათი ${formatCardMask(sub.masked_card)} · ` : ""}
                 შემდეგი გადახდა{" "}
-                {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}
+                {formatDateKa(sub.current_period_end)}
               </>
             ) : (
               <>
                 ავტომატური გადახდა აღარ მოხდება. პრემიუმი აქტიურია{" "}
-                {new Date(sub.current_period_end).toLocaleDateString("ka-GE")}-მდე.
+                {formatDateKa(sub.current_period_end)}-მდე.
               </>
             )}
           </p>

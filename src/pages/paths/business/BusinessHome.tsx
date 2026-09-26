@@ -24,6 +24,7 @@ import { track } from "@/lib/track";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { formatDateKa } from "@/lib/formatDate";
 
 import {
   BusinessIntensity,
@@ -496,7 +497,7 @@ export default function BusinessHome() {
   const allFourMilestone = vocabSessionsCount >= 7;
   const showMilestone = !!plan && allFourMilestone && !s.firstMilestoneAcknowledged;
   const lastReassessmentLabel = lastReassessmentAt
-    ? new Date(lastReassessmentAt).toLocaleDateString("ka-GE", { year: "numeric", month: "short", day: "numeric" })
+    ? formatDateKa(lastReassessmentAt)
     : "ჯერ არ გაგივლია";
 
   return (
