@@ -128,7 +128,7 @@ export default function DemoSession() {
         <Link
           to="/auth?mode=signup"
           onClick={() => track("demo_signup_clicked", { score })}
-          className="ka mt-6 w-full inline-flex items-center justify-center gap-2 h-14 rounded-xl bg-wine text-on-dark text-base font-bold hover:bg-wine-deep transition-colors"
+          className="ka mt-6 w-full inline-flex items-center justify-center gap-2 h-14 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-base font-bold hover:bg-wine-deep transition-colors"
         >
           გააგრძელე სწავლა უფასოდ
           <ArrowRight className="w-5 h-5" />

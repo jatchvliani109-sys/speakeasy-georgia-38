@@ -90,7 +90,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
     key: "situational",
     titleKa: "სიტუაციური კითხვები",
     shortKa: "Situational",
-    focusKa: "'Tell me about a time when…', STAR struktura, კონკრეტული მაგალითები.",
+    focusKa: "'Tell me about a time when…', STAR სტრუქტურა, კონკრეტული მაგალითები.",
     guidanceEn:
       "SITUATIONAL questions, 'Tell me about a time when…'. Heavy situational stage, push for STAR-style answers (Situation, Task, Action, Result).",
   },

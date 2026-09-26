@@ -22,6 +22,36 @@ const MAX_ATTEMPTS = 3;
 const RETRY_DAYS = 2;
 const TRIAL_DAYS = 7;
 
+// The learner's "% covered" in these emails has to be the SAME number the app
+// shows them, or the email quietly contradicts the dashboard. The app divides
+// by core words + the words of the fields that learner chose (vocabTotalFor in
+// lib/vocabEngine.ts), not by the whole 980-word bank.
+//
+// These counts mirror lib/vocabBank.ts. An edge function cannot import the
+// front-end bank, so if words are added there, update these.
+const CORE_WORD_COUNT = 806;
+const FIELD_WORD_COUNTS: Record<string, number> = {
+  management: 24,
+  marketing: 31,
+  finance: 27,
+  hr: 22,
+  sales: 21,
+  project_management: 20,
+  remote_work: 29,
+};
+
+/** Mirrors fieldKeysFor + vocabTotalFor in the front end. */
+function vocabTotalFor(fields: unknown, goals: unknown): number {
+  const f = Array.isArray(fields) ? (fields as string[]) : [];
+  const g = Array.isArray(goals) ? (goals as string[]) : [];
+  const keys = new Set<string>(f);
+  if (g.includes("remote_work")) keys.add("remote_work");
+  if (g.includes("emails_writing")) keys.add("remote_work");
+  let total = CORE_WORD_COUNT;
+  for (const k of keys) total += FIELD_WORD_COUNTS[k] ?? 0;
+  return total;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -55,17 +85,21 @@ Deno.serve(async (req) => {
       if (!started || isNaN(started.getTime())) continue;
 
       const dayNum = Math.floor((now - started.getTime()) / 86400000);
-      // Which reminder is due today, if any?
-      const template =
-        dayNum === 2 ? "trial-day-2" :
-        dayNum === 5 ? "trial-day-5" :
-        dayNum === TRIAL_DAYS ? "trial-ended" : null;
-      if (!template) continue;
 
-      // Send each reminder at most once, tracked in the state blob so a
-      // re-run of the job cannot double-send.
+      // Send each reminder at most once, tracked in the state blob so a re-run
+      // of the job cannot double-send.
       const sent = Array.isArray(st.trialEmailsSent) ? (st.trialEmailsSent as string[]) : [];
-      if (sent.includes(template)) continue;
+
+      // Which reminder is owed. Deliberately ">=" and not "===": with an exact
+      // day match, one missed run (a deploy, an outage, a cron that did not
+      // fire) dropped that reminder for good. The sent-list is what prevents
+      // duplicates, so catching up a day late is safe. Latest first, so a trial
+      // that ended while the job was down gets the ending email, not day 2.
+      const template =
+        dayNum >= TRIAL_DAYS && !sent.includes("trial-ended") ? "trial-ended" :
+        dayNum >= 5 && !sent.includes("trial-day-5") ? "trial-day-5" :
+        dayNum >= 2 && !sent.includes("trial-day-2") ? "trial-day-2" : null;
+      if (!template) continue;
 
       const email = await getUserEmail(admin, row.user_id);
       if (!email) continue;
@@ -74,18 +108,22 @@ Deno.serve(async (req) => {
       // worse than no reminder, so skip if nothing has been started.
       const { data: prog } = await admin
         .from("business_vocab_progress")
-        .select("confidence, manual_label")
+        .select("confidence")
         .eq("user_id", row.user_id);
       const rows = prog ?? [];
       if (!rows.length && template !== "trial-ended") continue;
 
+      // Same weights, same denominator and the same cap as
+      // summarizeVocabProgress in the app. "ადვილი" is a scheduling label now
+      // and no longer counts as a known word, so it is not shortcut here
+      // either — otherwise the email would report progress the app does not.
       let weighted = 0;
       const W: Record<number, number> = { 0: 0.15, 1: 0.30, 2: 0.50, 3: 0.75, 4: 1, 5: 1 };
       for (const r of rows) {
-        if (r.manual_label === "easy") { weighted += 1; continue; }
         weighted += W[Math.max(0, Math.min(5, Math.round(r.confidence ?? 0)))] ?? 0;
       }
-      const percent = Math.round((weighted / 980) * 1000) / 10;
+      const total = vocabTotalFor(st.field, st.mainPriority);
+      const percent = Math.min(100, Math.round((weighted / total) * 1000) / 10);
 
       await sendAppEmail({
         templateName: template,
@@ -114,12 +152,21 @@ Deno.serve(async (req) => {
 
   // ── 2. RENEWAL CHARGES ────────────────────────────────────────────────────
   try {
+    // Due = the paid period ends at any time TODAY (Tbilisi) or earlier.
+    // The customer was promised a charge on a specific day of the month, and
+    // the job runs once a day, so waiting for the exact hour would push every
+    // renewal to the following day.
+    const TBILISI_MS = 4 * 60 * 60 * 1000;
+    const tb = new Date(Date.now() + TBILISI_MS);
+    tb.setUTCHours(24, 0, 0, 0);                        // next Tbilisi midnight
+    const endOfTodayTbilisi = new Date(tb.getTime() - TBILISI_MS);
+
     const { data: due } = await admin
       .from("subscriptions")
       .select("*")
       .in("status", ["active", "past_due"])
       .not("rectoken", "is", null)
-      .lte("current_period_end", new Date().toISOString())
+      .lt("current_period_end", endOfTodayTbilisi.toISOString())
       .limit(100);
 
     for (const sub of due ?? []) {
