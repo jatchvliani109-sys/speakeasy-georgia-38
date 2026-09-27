@@ -89,14 +89,19 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     exampleKa: "პარასკევისთვის ვადა უნდა დავიცვათ.",
   },
   // 2 — first gap question, still easy.
+  //
+  // The sentence has to RULE OUT the distractors. It used to be "I'll send the
+  // ______ at the end of the month", where a budget, an agenda and feedback are
+  // all things you can send at the end of the month — four correct answers.
+  // "Pay the ___" admits only the invoice.
   {
     type: "gap",
     key: "invoice",
-    sentence: "I'll send the ______ at the end of the month.",
-    choices: ["Budget", "Invoice", "Agenda", "Feedback"],
+    sentence: "Please pay the ______ within 14 days.",
+    choices: ["Budget", "Invoice", "Receipt", "Agenda"],
     correct: "Invoice",
     explanationKa: "დოკუმენტი, რომელშიც ჩაწერილია გადასახდელი თანხა მომსახურებისთვის.",
-    exampleKa: "ანგარიშფაქტურას თვის ბოლოს გამოვაგზავნი.",
+    exampleKa: "გთხოვთ, ანგარიშფაქტურა 14 დღეში გადაიხადოთ.",
   },
   // 3 — reverse direction: Georgian to English is harder than recognising.
   {
@@ -139,7 +144,7 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     choices: ["საზომი ნიშნული", "შეფერხების წერტილი", "მოკლე სია", "ზეგანაკვეთური"],
     correct: "შეფერხების წერტილი",
     explanationKa: "ადგილი, სადაც პროცესი ნელდება.",
-    exampleEn: "We identified the bottleneck in the process.",
+    exampleEn: "Identify the bottleneck.",
     exampleKa: "შეფერხების წერტილი იპოვე.",
   },
   // 7 — a false pair. Two options, so it feels like a breather, but it tests
@@ -152,7 +157,7 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     isCorrect: false,
     realKa: "თანამშრომელთა რაოდენობა",
     explanationKa: "კომპანიაში დასაქმებულთა საერთო რაოდენობა.",
-    exampleEn: "We're increasing headcount next quarter.",
+    exampleEn: "Our headcount grew.",
     exampleKa: "თანამშრომელთა რაოდენობა გაიზარდა.",
   },
   // 8 — Georgian to English again, a word most learners have met at work.
@@ -174,7 +179,7 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     choices: ["Scope creep", "Cash flow", "Due diligence", "Churn"],
     correct: "Scope creep",
     explanationKa: "სამუშაოს თანდათანობითი ზრდა დამატებითი გადახდის გარეშე.",
-    exampleKa: "სამუშაოს ზრდას უფრთხილდი.",
+    exampleKa: "სამუშაოს ფარგლების უკონტროლო ზრდის გამო იმ პროექტზე მოგება დავკარგეთ.",
   },
   // 10 — hard meaning, week 8.
   {
@@ -184,7 +189,7 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     choices: ["მოკლე სია", "საფუძვლიანი შემოწმება", "დღის წესრიგი", "აუთსორსინგი"],
     correct: "საფუძვლიანი შემოწმება",
     explanationKa: "ფრთხილი შემოწმება გადაწყვეტილებამდე.",
-    exampleEn: "We did due diligence before buying.",
+    exampleEn: "Do your due diligence.",
     exampleKa: "საფუძვლიანი შემოწმება გააკეთე.",
   },
   // 11 — audio again, this time a word with two senses.
@@ -218,7 +223,7 @@ export function demoVerdict(score: number): { titleKa: string; bodyKa: string } 
   if (score === DEMO_TOTAL)
     return {
       titleKa: "სრული ქულა.",
-      bodyKa: "ბაზისი უკვე გაქვს. სერიოზული ბიზნეს ლექსიკა შემდეგ იწყება.",
+      bodyKa: "საბაზისო დონე უკვე გაქვს, სერიოზული ბიზნეს სწავლება რეგისტრაციის შემდეგ იწყება.",
     };
   if (score >= 9)
     return {

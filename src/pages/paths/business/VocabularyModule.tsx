@@ -1542,7 +1542,8 @@ function QuestionCard({
     </div>
   );
 
-  switch (q.type) {
+  const body = ((): JSX.Element => {
+    switch (q.type) {
     case "mc_meaning":
       return (
         <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
@@ -1711,7 +1712,99 @@ function QuestionCard({
           {renderChoices(q.choices, q.correct)}
         </div>
       );
-  }
+    }
+  })();
+
+  return (
+    <>
+      {body}
+      {revealed && <AnswerReveal q={q} selected={selected} />}
+    </>
+  );
+}
+
+/**
+ * What the landing-page demo shows after every answer, brought inside the app.
+ *
+ * The in-app quiz only ever said "სწორია ✓" or named the right answer. The
+ * demo — the advert for the app — did more: it gave the meaning and a real
+ * sentence. That is the moment a learner is most willing to read, because they
+ * have just committed to a guess. Olegi noticed the demo was teaching better
+ * than the product and asked for it here.
+ *
+ * Everything comes from the vocabulary bank via the question's wordKey, so
+ * there is no new content to review and nothing can drift out of sync.
+ */
+function AnswerReveal({
+  q,
+  selected,
+}: {
+  q: QuizQuestion;
+  selected: string | number | null;
+}) {
+  const word = "wordKey" in q ? findWord(q.wordKey) : null;
+  const ok = selected !== null && checkAnswer(q, selected);
+
+  // How the right answer should READ, which differs by question type.
+  const answerLabel: string | null = (() => {
+    switch (q.type) {
+      case "mc_meaning":
+      case "listening":
+        return q.correctKa;
+      case "true_false":
+        return q.isCorrect ? "სწორი" : "არასწორი";
+      case "sentence_correct":
+      case "georgian_mistake":
+        return q.choices[q.correctIndex] ?? null;
+      // odd_one_out is unreachable (generator removed) and its options are
+      // objects, not strings — nothing sensible to print.
+      case "odd_one_out":
+        return null;
+      default:
+        return (q as { correct?: string }).correct ?? null;
+    }
+  })();
+
+  // A georgian_mistake carries its own explanation and has no bank word.
+  const explanation =
+    q.type === "georgian_mistake" ? q.explanationKa : word?.explanationKa || "";
+
+  const exampleEn = word?.exampleEn || "";
+  const exampleKa = word?.exampleKa || "";
+
+  return (
+    <div
+      className={`mt-3 rounded-2xl border p-4 animate-[bizFade_.3s_ease-out_both] ${
+        ok ? "border-sage-line bg-sage-soft" : "border-danger-line bg-danger-soft"
+      }`}
+    >
+      <p className={`ka text-sm font-bold ${ok ? "text-sage-deep" : "text-danger-deep"}`}>
+        {ok ? "სწორია ✓" : "სწორი პასუხი:"}{" "}
+        {!ok && answerLabel && (
+          <span className={/[\u10A0-\u10FF]/.test(answerLabel) ? "ka text-ink" : "text-ink"}>
+            {answerLabel}
+          </span>
+        )}
+      </p>
+
+      {word && (
+        <p className="text-sm font-semibold text-wine mt-2">
+          {word.en} <span className="ka text-ink-muted font-normal">, {word.ka}</span>
+        </p>
+      )}
+
+      {explanation && (
+        <p className="ka text-[13px] text-ink-muted mt-1.5 leading-relaxed">{explanation}</p>
+      )}
+
+      {exampleEn && (
+        <div className="mt-3 pt-3 border-t border-line">
+          <p className="text-sm text-ink leading-relaxed">{exampleEn}</p>
+          {exampleKa && <p className="ka text-xs text-ink-muted mt-1">{exampleKa}</p>}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function TypeWordCard({
@@ -1766,15 +1859,8 @@ function TypeWordCard({
         )}
       </div>
 
-      {revealed && (
-        <div className={`mt-3 p-3 rounded-xl border animate-[bizFade_.3s_ease-out_both] ${isCorrect ? "border-sage-line bg-sage-soft" : "border-danger-line bg-danger-soft"}`}>
-          {isCorrect ? (
-            <p className="ka text-sm text-sage-deep font-semibold">სწორია! ✓ {q.correct}</p>
-          ) : (
-            <p className="ka text-sm text-danger-deep">სწორი პასუხი: <span className="font-bold">{q.correct}</span></p>
-          )}
-        </div>
-      )}
+      {/* The verdict box that used to live here is now AnswerReveal, rendered
+          once for every question type by QuestionCard. */}
     </div>
   );
 }
