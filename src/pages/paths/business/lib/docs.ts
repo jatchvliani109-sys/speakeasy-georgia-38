@@ -21,7 +21,13 @@ export const DOC_TYPE_ICONS: Record<DocType, LucideIcon> = {
   email_fix: Wrench,
 };
 
-export type Highlight = { phrase: string; whyKa: string };
+/**
+ * whyKa is now a LABEL the model picks from a fixed Georgian list (see
+ * WHY_TAGS in supabase/functions/business-docs), and `why` carries the
+ * specific reasoning in English. Documents saved before that change still
+ * hold a Georgian sentence in whyKa and render unchanged.
+ */
+export type Highlight = { phrase: string; whyKa: string; why?: string };
 
 export type BusinessDocument = {
   id: string;

@@ -24,7 +24,7 @@ type Briefing = {
   focusAreasEn?: string[];
 };
 
-type WarmUpOption = { label: string; text: string; isBetter: boolean; whyKa: string };
+type WarmUpOption = { label: string; text: string; isBetter: boolean; whyKa: string; why?: string };
 type WarmUpItem = { promptKa: string; contextEn: string; options: WarmUpOption[] };
 
 type SessionData = {
@@ -43,7 +43,7 @@ type Turn = { role: "interviewer" | "candidate"; text: string };
 type PhraseHighlight = { phraseEn: string; praiseKa: string; ka: string };
 type MiniQuiz = {
   promptKa: string;
-  options: { label: string; text: string; isBetter: boolean; whyKa: string }[];
+  options: { label: string; text: string; isBetter: boolean; whyKa: string; why?: string }[];
 };
 
 type ReplyData = {
@@ -57,11 +57,11 @@ type Verdict = { verdict: "strong" | "average" | "weak"; messageEn: string; head
 
 type DebriefData = {
   summaryKa: string;
-  wentWell: { momentKa: string; phraseEn: string; whyKa: string }[];
-  hurtChances: { momentKa: string; phraseEn: string; whyKa: string }[];
+  wentWell: { momentKa: string; phraseEn: string; whyKa: string; why?: string }[];
+  hurtChances: { momentKa: string; phraseEn: string; whyKa: string; why?: string }[];
   keyPhrases: { en: string; ka: string; whenKa: string }[];
   practiceNextKa: string;
-  modelAnswers?: { questionEn: string; theirAnswerKa: string; modelAnswerEn: string; whyStrongerKa: string }[];
+  modelAnswers?: { questionEn: string; theirAnswerKa: string; modelAnswerEn: string; whyStrongerKa: string; whyStronger?: string }[];
   vocabulary: { en: string; ka: string; exampleEn: string; exampleKa: string }[];
 };
 
@@ -158,6 +158,11 @@ export default function InterviewModule() {
   const [hasResume, setHasResume] = useState(false);
   const [resume, setResume] = useState<any | null>(null);
   const [resumable, setResumable] = useState<ResumableRow | null>(null);
+  // Leaving mid-interview used to mean navigating away and hoping: there was no
+  // exit control at all. The transcript is checkpointed after every answer and
+  // the weekly session is charged once per interview row, so walking out and
+  // coming back costs nothing — the user just had no way to know that.
+  const [confirmExit, setConfirmExit] = useState(false);
   const [jobPosting, setJobPosting] = useState("");
   const [matchedPostingText, setMatchedPostingText] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -713,6 +718,8 @@ export default function InterviewModule() {
   }
 
   const b = session?.briefing as any;
+  // Answers given so far — decides whether leaving loses the weekly session.
+  const answeredCount = history.filter((h) => h.role === "candidate").length;
 
   // ---- Resume offer ----
   if (step === "resumeOffer" && resumable) {
@@ -973,7 +980,12 @@ export default function InterviewModule() {
                 >
                   <p className="text-xs font-semibold text-ink-muted">Option {o.label}</p>
                   <p className="text-sm text-wine mt-1">{o.text}</p>
-                  {reveal && <p className="ka text-[11px] text-ink-muted mt-2">💡 {o.whyKa}</p>}
+                  {reveal && (
+                      <>
+                        <p className="ka text-[11px] font-semibold text-ink mt-2">💡 {o.whyKa}</p>
+                        {o.why && <p className="text-[11px] text-ink-muted mt-0.5">{o.why}</p>}
+                      </>
+                    )}
                 </button>
               );
             })}
@@ -1011,13 +1023,48 @@ export default function InterviewModule() {
                   {b.interviewerTitle} · {b.companyName}
                 </p>
               </div>
-              <div className="ml-auto ka text-[10px] uppercase tracking-wider text-gold-soft">
-                {currentStage && session.stageLabelsKa[currentStage]
-                  ? session.stageLabelsKa[currentStage]
-                  : "ინტერვიუ"}
+              <div className="ml-auto flex items-center gap-2">
+                <span className="ka text-[10px] uppercase tracking-wider text-gold-soft">
+                  {currentStage && session.stageLabelsKa[currentStage]
+                    ? session.stageLabelsKa[currentStage]
+                    : "ინტერვიუ"}
+                </span>
+                {step === "interview" && (
+                  <button
+                    onClick={() => setConfirmExit(true)}
+                    className="ka text-[10px] font-semibold text-on-dark/80 hover:text-on-dark border border-on-dark/30 rounded-md px-2 py-1 shrink-0"
+                  >
+                    გასვლა
+                  </button>
+                )}
               </div>
             </div>
           </div>
+
+          {confirmExit && (
+            <BizCard className="border-l-4 border-l-wine">
+              <p className="ka text-sm font-bold text-wine">გასაუბრებიდან გასვლა?</p>
+              <p className="ka text-xs text-ink-muted mt-2 leading-relaxed">
+                {answeredCount > 0
+                  ? "პასუხები შენახულია. როცა დაბრუნდები, იქიდან გააგრძელებ, სადაც გაჩერდი და ახალი AI სესია არ დაგეხარჯება."
+                  : "ჯერ არცერთი პასუხი არ გაგიცია, ამიტომ AI სესია არ დაგხარჯვია. დაბრუნებისას გასაუბრება თავიდან დაიწყება."}
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => setConfirmExit(false)}
+                  className="ka flex-1 h-10 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-semibold"
+                >
+                  გავაგრძელო
+                </button>
+                <button
+                  onClick={() => navigate("/path/business/home")}
+                  className="ka flex-1 h-10 rounded-xl border border-line text-wine text-sm font-semibold"
+                >
+                  გასვლა
+                </button>
+              </div>
+            </BizCard>
+          )}
 
           {/* Conversation */}
           <div
@@ -1084,7 +1131,12 @@ export default function InterviewModule() {
                     >
                       <p className="text-xs font-semibold text-ink-muted">Option {o.label}</p>
                       <p className="text-sm text-wine mt-1">{o.text}</p>
-                      {reveal && <p className="ka text-[11px] text-ink-muted mt-2">💡 {o.whyKa}</p>}
+                      {reveal && (
+                      <>
+                        <p className="ka text-[11px] font-semibold text-ink mt-2">💡 {o.whyKa}</p>
+                        {o.why && <p className="text-[11px] text-ink-muted mt-0.5">{o.why}</p>}
+                      </>
+                    )}
                     </button>
                   );
                 })}
@@ -1154,7 +1206,7 @@ export default function InterviewModule() {
             <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
               Debrief · მწვრთნელის შეფასება
             </p>
-            <p className="ka text-sm text-wine mt-2 leading-relaxed">{debrief.summaryKa}</p>
+            <p className="text-sm text-wine mt-2 leading-relaxed">{debrief.summaryKa}</p>
           </BizCard>
 
           {debrief.wentWell?.length > 0 && (
@@ -1163,9 +1215,9 @@ export default function InterviewModule() {
               <div className="mt-2 space-y-2">
                 {debrief.wentWell.map((w, i) => (
                   <div key={i} className="p-3 rounded-lg bg-sage-soft border border-sage-line">
-                    <p className="ka text-sm font-semibold text-sage-deep">{w.momentKa}</p>
+                    <p className="ka text-sm font-semibold text-sage-deep">{w.whyKa}</p>
                     <p className="text-xs text-wine mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-ink-muted mt-1">{w.whyKa}</p>
+                    <p className="text-[11px] text-ink-muted mt-1">{w.why || w.momentKa}</p>
                   </div>
                 ))}
               </div>
@@ -1178,9 +1230,9 @@ export default function InterviewModule() {
               <div className="mt-2 space-y-2">
                 {debrief.hurtChances.map((w, i) => (
                   <div key={i} className="p-3 rounded-lg bg-cream border border-danger-line">
-                    <p className="ka text-sm font-semibold text-danger-deep">{w.momentKa}</p>
+                    <p className="ka text-sm font-semibold text-danger-deep">{w.whyKa}</p>
                     <p className="text-xs text-wine mt-1 italic">"{w.phraseEn}"</p>
-                    <p className="ka text-[11px] text-ink-muted mt-1">{w.whyKa}</p>
+                    <p className="text-[11px] text-ink-muted mt-1">{w.why || w.momentKa}</p>
                   </div>
                 ))}
               </div>
@@ -1195,7 +1247,7 @@ export default function InterviewModule() {
                   <div key={i} className="p-3 rounded-lg bg-cream border border-line">
                     <p className="text-sm font-bold text-wine">{p.en}</p>
                     <p className="ka text-xs text-ink-muted">{p.ka}</p>
-                    <p className="ka text-[11px] text-ink mt-1">📍 {p.whenKa}</p>
+                    <p className="text-[11px] text-ink mt-1">📍 {p.whenKa}</p>
                   </div>
                 ))}
               </div>
@@ -1209,11 +1261,12 @@ export default function InterviewModule() {
                 {debrief.modelAnswers.map((m, i) => (
                   <div key={i} className="p-3 rounded-lg bg-cream border border-line">
                     <p className="text-sm font-semibold text-ink">{m.questionEn}</p>
-                    <p className="ka text-[11px] text-danger mt-1">{m.theirAnswerKa}</p>
+                    <p className="text-[11px] text-danger mt-1">{m.theirAnswerKa}</p>
                     <div className="mt-2 p-2 rounded-lg bg-card border border-line">
                       <p className="text-sm text-ink">{m.modelAnswerEn}</p>
                     </div>
-                    <p className="ka text-[11px] text-sage mt-1.5">✓ {m.whyStrongerKa}</p>
+                    <p className="ka text-[11px] font-semibold text-sage-deep mt-1.5">✓ {m.whyStrongerKa}</p>
+                    {m.whyStronger && <p className="text-[11px] text-ink-muted mt-0.5">{m.whyStronger}</p>}
                   </div>
                 ))}
               </div>
@@ -1222,7 +1275,7 @@ export default function InterviewModule() {
 
           <BizCard className="bg-cream border-gold-soft">
             <p className="ka text-xs font-semibold text-ink">🎯 ერთი რამ, რაც უნდა ივარჯიშო</p>
-            <p className="ka text-sm text-wine mt-1">{debrief.practiceNextKa}</p>
+            <p className="text-sm text-wine mt-1">{debrief.practiceNextKa}</p>
           </BizCard>
 
           <div className="text-right">

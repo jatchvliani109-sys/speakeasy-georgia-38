@@ -1121,13 +1121,13 @@ function DocView({
           {resumeMeta.summaryKa && (
             <BizCard className="bg-sage-soft border-sage-line">
               <p className="ka text-[11px] uppercase tracking-wider text-sage font-semibold mb-1">შეჯამება</p>
-              <p className="ka text-xs text-wine leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
+              <p className="text-xs text-wine leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
             </BizCard>
           )}
           {resumeMeta.toneAssessmentKa && (
             <BizCard>
               <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-1">ტონი</p>
-              <p className="ka text-xs text-wine leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
+              <p className="text-xs text-wine leading-relaxed">{resumeMeta.toneAssessmentKa}</p>
             </BizCard>
           )}
           {Array.isArray(resumeMeta.missingKeywords) && resumeMeta.missingKeywords.length > 0 && (
@@ -1148,8 +1148,8 @@ function DocView({
               <ul className="space-y-3">
                 {resumeMeta.suggestions.map((s: any, i: number) => (
                   <li key={i} className="border-t border-line first:border-t-0 pt-3 first:pt-0">
-                    {s.sectionKa && <p className="ka text-xs font-semibold text-wine">{s.sectionKa}</p>}
-                    {s.issueKa && <p className="ka text-[11px] text-ink-muted mt-1">{s.issueKa}</p>}
+                    {s.sectionKa && <p className="text-xs font-semibold text-wine">{s.sectionKa}</p>}
+                    {s.issueKa && <p className="text-[11px] text-ink-muted mt-1">{s.issueKa}</p>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                       {s.before && (
                         <div className="bg-danger-soft rounded-md px-2 py-1.5 text-[11px]">
@@ -1164,7 +1164,10 @@ function DocView({
                         </div>
                       )}
                     </div>
-                    {s.whyKa && <p className="ka text-[11px] text-ink-muted mt-2">↳ {s.whyKa}</p>}
+                    {s.whyKa && (
+                      <p className="ka text-[11px] font-semibold text-ink mt-2">↳ {s.whyKa}</p>
+                    )}
+                    {s.why && <p className="text-[11px] text-ink-muted mt-0.5">{s.why}</p>}
                   </li>
                 ))}
               </ul>
@@ -1212,13 +1215,13 @@ function DocView({
       {doc.doc_type === "email_fix" && !editing && (() => {
         const meta = (doc.meta as any) || {};
         const original: string = meta.original || "";
-        const changes: { before: string; after: string; whyKa: string }[] = Array.isArray(meta.changes) ? meta.changes : [];
+        const changes: { before: string; after: string; whyKa: string; why?: string }[] = Array.isArray(meta.changes) ? meta.changes : [];
         return (
           <>
             {meta.summaryKa && (
               <BizCard className="mt-4 bg-sage-soft border-sage-line">
                 <p className="ka text-[11px] uppercase tracking-wider text-sage font-semibold mb-1">შეჯამება</p>
-                <p className="ka text-xs text-wine leading-relaxed">{meta.summaryKa}</p>
+                <p className="text-xs text-wine leading-relaxed">{meta.summaryKa}</p>
               </BizCard>
             )}
             <section className="mt-4">
@@ -1255,8 +1258,9 @@ function DocView({
                         </div>
                       </div>
                       {c.whyKa && (
-                        <p className="ka text-[11px] text-ink-muted mt-2">↳ {c.whyKa}</p>
+                        <p className="ka text-[11px] font-semibold text-ink mt-2">↳ {c.whyKa}</p>
                       )}
+                      {c.why && <p className="text-[11px] text-ink-muted mt-0.5">{c.why}</p>}
                     </li>
                   ))}
                 </ul>
@@ -1284,6 +1288,7 @@ function DocView({
               <li key={i} className="text-xs">
                 <span className="font-semibold text-wine">"{h.phrase}"</span>
                 <span className="ka text-ink-muted">, {h.whyKa}</span>
+                {h.why && <p className="text-[11px] text-ink-muted mt-0.5">{h.why}</p>}
               </li>
             ))}
           </ul>

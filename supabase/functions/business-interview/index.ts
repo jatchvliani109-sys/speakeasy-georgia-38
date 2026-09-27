@@ -112,6 +112,69 @@ type DebriefBody = {
   verdict: string;
 };
 
+// WHY THE SHORT GEORGIAN VERDICTS ARE A FIXED LIST.
+//
+// Asked to write its own Georgian criticism the model produced awkward and
+// sometimes ungrammatical sentences, and mixed untranslated English into them
+// ("პასუხი მენეჯერის compliance მოთხოვნაზე გადავიდა"). Nobody can review every
+// sentence a model will ever write, so the split is: the model REASONS in
+// English, where it is reliable, and the Georgian is a label it CHOOSES from
+// a list we wrote. Anything off-list is replaced before it is sent.
+const PRAISE_TAGS = [
+  "ასე ჯობია",
+  "ასე უფრო პროფესიონალურია",
+  "კონკრეტული პასუხია",
+  "თავდაჯერებულად ჟღერს",
+  "ბუნებრივი ინგლისურია",
+  "კარგი მაგალითი მოიყვანე",
+  "სტრუქტურირებული პასუხია",
+  "თავაზიანი ფორმულირებაა",
+] as const;
+
+const ISSUE_TAGS = [
+  "პასუხი კითხვას ასცდა",
+  "ძალიან ზოგადია",
+  "კონკრეტული მაგალითი აკლია",
+  "ძალიან გრძელია",
+  "ძალიან მოკლეა",
+  "ტონი ზედმეტად არაფორმალურია",
+  "თავდაჯერებულობა აკლია",
+  "გრამატიკული შეცდომებია",
+] as const;
+
+const PRAISE_LIST = PRAISE_TAGS.map((s) => `"${s}"`).join(", ");
+const ISSUE_LIST = ISSUE_TAGS.map((s) => `"${s}"`).join(", ");
+
+const PRAISE_SET = new Set<string>(PRAISE_TAGS as readonly string[]);
+const ISSUE_SET = new Set<string>(ISSUE_TAGS as readonly string[]);
+
+/**
+ * Clamps every short Georgian verdict to a label we control. Positive fields
+ * fall back to the first praise label, negative ones to the first issue label,
+ * so a hallucinated string can never reach the screen.
+ */
+function clampTags(value: unknown, negative = false): unknown {
+  if (Array.isArray(value)) return value.map((v) => clampTags(v, negative));
+  if (value && typeof value === "object") {
+    const o = value as Record<string, unknown>;
+    for (const k of Object.keys(o)) {
+      const neg = negative || k === "hurtChances" || k === "issueKa";
+      if (k === "praiseKa" || k === "whyKa" || k === "whyStrongerKa") {
+        const set = neg ? ISSUE_SET : PRAISE_SET;
+        const fallback = neg ? ISSUE_TAGS[0] : PRAISE_TAGS[0];
+        const cur = typeof o[k] === "string" ? (o[k] as string).trim() : "";
+        // whyKa on a mini-quiz option describes either a good or a bad answer,
+        // so accept a label from either list there.
+        if (!set.has(cur) && !(PRAISE_SET.has(cur) || ISSUE_SET.has(cur))) o[k] = fallback;
+      } else {
+        o[k] = clampTags(o[k], neg);
+      }
+    }
+    return o;
+  }
+  return value;
+}
+
 const SYSTEM_SESSION = `You design realistic job-interview practice sessions for Georgian learners of Business English.
 Output STRICT JSON only — no markdown.
 
@@ -163,14 +226,14 @@ Output STRICT JSON only:
   "scoreDelta": -2 | -1 | 0 | 1 | 2,  // -2 very weak ... 2 excellent
   "phraseHighlight": null | {
     "phraseEn": "exact strong phrase the candidate just used",
-    "praiseKa": "1 short Georgian sentence praising the move",
+    "praiseKa": "ONE label copied EXACTLY from [${PRAISE_LIST}] — never reworded or invented",
     "ka": "Georgian translation of the phrase"
   },
   "miniQuiz": null | {
     "promptKa": "Quick Georgian question — e.g. 'რომელი პასუხი იქნებოდა უფრო ძლიერი ამ კითხვაზე?'",
     "options": [
-      { "label": "A", "text": "english option", "isBetter": true, "whyKa": "1-line Georgian reason" },
-      { "label": "B", "text": "english option", "isBetter": false, "whyKa": "1-line Georgian reason" }
+      { "label": "A", "text": "english option", "isBetter": true, "whyKa": "ONE label copied EXACTLY from [${PRAISE_LIST}]", "why": "1 short English sentence" },
+      { "label": "B", "text": "english option", "isBetter": false, "whyKa": "ONE label copied EXACTLY from [${ISSUE_LIST}]", "why": "1 short English sentence" }
     ]
   }
 }
@@ -189,28 +252,36 @@ Output STRICT JSON only:
   "headlineKa": "Short Georgian headline reflecting the result (e.g. 'თქვენ მიიღეთ მეორე ინტერვიუ')"
 }`;
 
-const SYSTEM_DEBRIEF = `You are now a warm Business English coach (NOT the interviewer). Break character fully and give structured Georgian feedback on the candidate's interview performance.
+const SYSTEM_DEBRIEF = `You are now a warm Business English coach (NOT the interviewer). Break character fully and give structured feedback on the candidate's interview performance.
+
+LANGUAGE RULE — read this twice:
+Write every explanation, note and summary in ENGLISH. The ONLY Georgian you
+produce is (a) the "ka" translation fields, and (b) short verdict labels, which
+you COPY EXACTLY from the lists given below. Never write your own Georgian
+sentence. Never mix an English word into a Georgian one.
+
 Output STRICT JSON only:
 {
-  "summaryKa": "1-2 sentence warm Georgian summary of the result",
+  "summaryKa": "1-2 sentence warm ENGLISH summary of the result",
   "wentWell": [
-    { "momentKa": "what specifically worked", "phraseEn": "exact phrase or paraphrase they used", "whyKa": "why it worked" }
+    { "momentKa": "what specifically worked, in English", "phraseEn": "exact phrase or paraphrase they used", "whyKa": "ONE label copied EXACTLY from [${PRAISE_LIST}]", "why": "1 short English sentence on why it worked" }
   ],
   "hurtChances": [
-    { "momentKa": "what hurt them", "phraseEn": "exact weak answer or paraphrase", "whyKa": "why it was weak" }
+    { "momentKa": "what hurt them, in English", "phraseEn": "exact weak answer or paraphrase", "whyKa": "ONE label copied EXACTLY from [${ISSUE_LIST}]", "why": "1 short English sentence on why it was weak" }
   ],
   "keyPhrases": [
-    { "en": "phrase to use next time", "ka": "Georgian translation", "whenKa": "when to use it" }
+    { "en": "phrase to use next time", "ka": "Georgian translation", "whenKa": "when to use it, in English" }
   ],
   "modelAnswers": [
     {
       "questionEn": "the interviewer question they answered weakest",
-      "theirAnswerKa": "1 short Georgian note on what was weak about their actual answer",
+      "theirAnswerKa": "1 short ENGLISH note on what was weak about their actual answer",
       "modelAnswerEn": "a strong model answer they could have given (3-5 sentences, natural spoken English)",
-      "whyStrongerKa": "1 Georgian sentence on why this version is stronger"
+      "whyStrongerKa": "ONE label copied EXACTLY from [${PRAISE_LIST}]",
+      "whyStronger": "1 short English sentence on why this version is stronger"
     }
   ],
-  "practiceNextKa": "1 short Georgian sentence — one specific thing to practice before next interview",
+  "practiceNextKa": "1 short ENGLISH sentence — one specific thing to practice before next interview",
   "vocabulary": [
     { "en": "phrase", "ka": "Georgian", "exampleEn": "1-sentence usage", "exampleKa": "Georgian translation" }
   ]
@@ -507,7 +578,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify(r.parsed), {
+    // Last line of defence: no Georgian the model wrote itself gets through
+    // in a verdict field (see PRAISE_TAGS / ISSUE_TAGS above).
+    const safe = clampTags(r.parsed);
+
+    return new Response(JSON.stringify(safe), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

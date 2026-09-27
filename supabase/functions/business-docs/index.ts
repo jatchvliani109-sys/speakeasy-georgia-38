@@ -26,11 +26,67 @@ type Profile = {
   goals?: string[];
 };
 
+// WHY THE GEORGIAN HERE IS A FIXED LIST.
+//
+// The model used to write its own one-line Georgian explanations. Asked for
+// Georgian prose it produced things like "ეს ფრაზა ნეიტრალურად ახსნა
+// გადავადების მიზეზი, რომელიც არ მომხდარა კონტროლირებადი" — grammatically
+// broken, and impossible to fix from here because nobody can review every
+// sentence a model will ever generate.
+//
+// So the split is: the REASONING is in English, where the model is reliable,
+// and the Georgian is a label the model CHOOSES rather than writes. Anything
+// it returns that is not on this list is replaced below, so a hallucinated
+// label can never reach a user.
+const WHY_TAGS = [
+  "ასე უფრო პროფესიონალურია",
+  "ასე უფრო ნათელია",
+  "ასე უფრო მოკლეა",
+  "თავაზიანი ფორმულირებაა",
+  "ბუნებრივი ინგლისურია",
+  "თავდაჯერებულად ჟღერს",
+  "რბილად გადმოსცემს უსიამოვნოს",
+  "კონკრეტიკას ამატებს",
+  "ბიზნესში ხშირად გამოიყენება",
+  "მკაფიოდ ითხოვს მოქმედებას",
+  "გრამატიკულად სწორია",
+  "ტონი შეესაბამება ადრესატს",
+] as const;
+
+const WHY_TAG_LIST = WHY_TAGS.map((s) => `"${s}"`).join(", ");
+const WHY_TAG_RULE =
+  `"whyKa" MUST be copied EXACTLY from this list, character for character — ` +
+  `never translated, reworded or invented: [${WHY_TAG_LIST}]. ` +
+  `Put the specific reasoning in "why", in English, one short sentence.`;
+
+const WHY_SET = new Set<string>(WHY_TAGS as readonly string[]);
+
+/** Replaces any whyKa the model invented with a label we control. */
+function clampWhyTags(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(clampWhyTags);
+  if (value && typeof value === "object") {
+    const o = value as Record<string, unknown>;
+    for (const k of Object.keys(o)) {
+      if (k === "whyKa") {
+        if (typeof o[k] !== "string" || !WHY_SET.has((o[k] as string).trim())) {
+          o[k] = WHY_TAGS[0];
+        }
+      } else {
+        o[k] = clampWhyTags(o[k]);
+      }
+    }
+    return o;
+  }
+  return value;
+}
+
 const SYSTEM_BASE = `You are a senior professional writer helping Georgian users produce real English business documents they can actually use.
 Output STRICT JSON only — no markdown, no commentary outside JSON.
 Rules:
 - Output the polished English document.
-- Add 3-6 "highlights": short phrases from the document with a 1-line Georgian explanation of WHY they work. These are subtle learning moments.
+- Add 3-6 "highlights": short phrases from the document, each with a Georgian label and a one-sentence English reason. These are subtle learning moments.
+- ${WHY_TAG_RULE}
+- Every other explanation, summary or note you write is in ENGLISH. The only Georgian you produce is the "title" field and the fixed labels above.
 - Tone: professional, natural, modern (not stiff, not corporate-cliche).
 - Use the user's profile/resume context to personalize specifics (industry, role, skills).
 - Never invent fake credentials or specific employer names not in the profile.`;
@@ -69,7 +125,7 @@ Return JSON:
   "subject": "English subject line",
   "content": "Full email body in English with greeting, body paragraphs separated by \\n\\n, and sign-off",
   "highlights": [
-    { "phrase": "exact phrase from email", "whyKa": "1-line Georgian explanation" }
+    { "phrase": "exact phrase from email", "whyKa": "one label from the allowed list", "why": "1 short English sentence" }
   ]
 }`;
 }
@@ -86,9 +142,9 @@ Return JSON:
 {
   "title": "short Georgian title (e.g. 'სამოტივაციო წერილი — Product Manager')",
   "content": "Full English cover letter — header, greeting, 3 body paragraphs, closing. Use \\n\\n between paragraphs",
-  "emphasized": ["1-3 short Georgian bullets describing which parts of their experience were emphasized and why"],
+  "emphasized": ["1-3 short ENGLISH bullets describing which parts of their experience were emphasized and why"],
   "highlights": [
-    { "phrase": "exact phrase from letter", "whyKa": "1-line Georgian explanation" }
+    { "phrase": "exact phrase from letter", "whyKa": "one label from the allowed list", "why": "1 short English sentence" }
   ]
 }`;
 }
@@ -106,16 +162,17 @@ ${b.jobDescription ? `Target role / job description:\n"""${b.jobDescription.slic
 Return JSON:
 {
   "title": "Georgian title (e.g. 'რეზიუმეს გაუმჯობესება')",
-  "content": "Short Georgian executive summary (3-5 sentences) of the resume's strengths and main areas to improve",
-  "toneAssessmentKa": "1-2 Georgian sentences about overall professional tone",
+  "content": "Short ENGLISH executive summary (3-5 sentences) of the resume's strengths and main areas to improve",
+  "toneAssessmentKa": "1-2 ENGLISH sentences about overall professional tone",
   "missingKeywords": ["English keywords missing for the target role (5-10)"],
   "suggestions": [
     {
-      "sectionKa": "Georgian label of the section (e.g. 'სამუშაო გამოცდილება — Project X')",
-      "issueKa": "1-line Georgian explanation of what's weak",
+      "sectionKa": "section name as it appears in the resume, in English (e.g. 'Work experience — Project X')",
+      "issueKa": "1-line ENGLISH explanation of what's weak",
       "before": "exact weak phrase from the resume (English)",
       "after": "stronger English rewrite",
-      "whyKa": "1-line Georgian explanation of why the rewrite is stronger"
+      "whyKa": "one label from the allowed list",
+      "why": "1 short English sentence on why the rewrite is stronger"
     }
   ],
   "rewrittenResume": "FULL rewritten resume in clean plain text English. STRICT RULES: (1) Keep EXACTLY the same sections and same order as the user's original (e.g. header/name, summary, experience, education, skills, etc. — only those that exist). (2) Keep ALL same factual information (companies, dates, roles, schools, skills). Do NOT invent or remove facts. (3) Rewrite phrasing with stronger professional language and action verbs; apply all suggestions above. (4) Use clear section headers in UPPERCASE on their own line, blank line between sections. (5) For experience entries: line 1 = Role — Company — Dates; following lines = '- ' bullets. (6) Plain text only, no markdown, real line breaks.",
@@ -140,7 +197,7 @@ Return JSON:
   "full": "2-3 paragraph English bio with line breaks (\\n\\n)",
   "content": "use the medium version as the default content",
   "highlights": [
-    { "phrase": "exact phrase from bio", "whyKa": "1-line Georgian explanation" }
+    { "phrase": "exact phrase from bio", "whyKa": "one label from the allowed list", "why": "1 short English sentence" }
   ]
 }`;
 }
@@ -161,7 +218,7 @@ Rules:
 - Keep the user's intent and core content. Do not invent facts.
 - Fix grammar, clarity, structure, tone, professionalism.
 - Improve subject line if there was one (or propose one).
-- Identify 3-8 SPECIFIC changes with concrete before/after snippets and a short Georgian explanation of WHY each change is better.
+- Identify 3-8 SPECIFIC changes with concrete before/after snippets, a Georgian label and a short ENGLISH sentence on why each change is better.
 
 Return JSON:
 {
@@ -172,12 +229,13 @@ Return JSON:
     {
       "before": "exact snippet from the original (English)",
       "after": "improved snippet (English)",
-      "whyKa": "1-line Georgian explanation of why this is better"
+      "whyKa": "one label from the allowed list",
+      "why": "1 short English sentence on why this is better"
     }
   ],
-  "summaryKa": "2-3 sentence Georgian summary of what was improved overall",
+  "summaryKa": "2-3 sentence ENGLISH summary of what was improved overall",
   "highlights": [
-    { "phrase": "exact phrase from improved email", "whyKa": "1-line Georgian explanation" }
+    { "phrase": "exact phrase from improved email", "whyKa": "one label from the allowed list", "why": "1 short English sentence" }
   ]
 }`;
 }
@@ -194,7 +252,7 @@ Adjustment: ${b.adjustment}
 Return JSON:
 {
   "content": "the rewritten English document",
-  "highlights": [ { "phrase": "...", "whyKa": "..." } ]
+  "highlights": [ { "phrase": "...", "whyKa": "one label from the allowed list", "why": "1 short English sentence" } ]
 }`;
 }
 
@@ -276,7 +334,11 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    return new Response(JSON.stringify({ ...r.parsed, aiRemaining: quota.remaining }), {
+    // Last line of defence: a label the model invented instead of choosing
+    // never reaches a Georgian user (see WHY_TAGS above).
+    const safe = clampWhyTags(r.parsed) as Record<string, unknown>;
+
+    return new Response(JSON.stringify({ ...safe, aiRemaining: quota.remaining }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
