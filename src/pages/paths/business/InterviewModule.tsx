@@ -1012,7 +1012,7 @@ export default function InterviewModule() {
       {(step === "interview" || step === "verdict") && (
         <div className="space-y-3">
           {/* Interview "set" card */}
-          <div className="rounded-2xl bg-gradient-to-br from-panel-soft via-wine to-panel-deep text-on-dark p-4 shadow-[0_12px_30px_-15px_rgba(92,26,46,0.5)]">
+          <div className="rounded-2xl bg-gradient-to-br from-panel-soft via-wine dark:via-wine-soft to-panel-deep text-on-dark p-4 shadow-[0_12px_30px_-15px_rgba(92,26,46,0.5)]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-panel text-gold grid place-items-center font-bold text-sm">
                 {initials(b.interviewerName)}
@@ -1211,7 +1211,7 @@ export default function InterviewModule() {
 
           {debrief.wentWell?.length > 0 && (
             <BizCard>
-              <p className="ka text-xs font-semibold text-sage">✓ რა გამოგივიდა</p>
+              <p className="ka text-xs font-semibold text-sage-deep">✓ რა გამოგივიდა</p>
               <div className="mt-2 space-y-2">
                 {debrief.wentWell.map((w, i) => (
                   <div key={i} className="p-3 rounded-lg bg-sage-soft border border-sage-line">
@@ -1286,7 +1286,7 @@ export default function InterviewModule() {
 
       {step === "done" && (
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft via-wine to-panel-deep text-on-dark p-7 shadow-[0_20px_50px_-20px_rgba(92,26,46,0.6)]">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft via-wine dark:via-wine-soft to-panel-deep text-on-dark p-7 shadow-[0_20px_50px_-20px_rgba(92,26,46,0.6)]">
             <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-panel/20 blur-3xl pointer-events-none animate-[glow_3s_ease-in-out_infinite_alternate]" />
             <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-sage/15 blur-3xl pointer-events-none" />
             <div className="relative text-center">
@@ -1479,7 +1479,7 @@ function SumRow({ ok, label }: { ok: boolean; label: string }) {
     <li className="flex items-start gap-2">
       <span
         className={`mt-0.5 shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] ${
-          ok ? "bg-sage text-on-dark" : "bg-line text-ink-muted"
+          ok ? "bg-sage-deep text-on-dark dark:text-panel-deep" : "bg-line text-ink-muted"
         }`}
       >
         {ok ? "✓" : "—"}

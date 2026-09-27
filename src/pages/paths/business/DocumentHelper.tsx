@@ -1120,7 +1120,7 @@ function DocView({
           </p>
           {resumeMeta.summaryKa && (
             <BizCard className="bg-sage-soft border-sage-line">
-              <p className="ka text-[11px] uppercase tracking-wider text-sage font-semibold mb-1">შეჯამება</p>
+              <p className="ka text-[11px] uppercase tracking-wider text-sage-deep font-semibold mb-1">შეჯამება</p>
               <p className="text-xs text-wine leading-relaxed whitespace-pre-wrap">{resumeMeta.summaryKa}</p>
             </BizCard>
           )}
@@ -1159,7 +1159,7 @@ function DocView({
                       )}
                       {s.after && (
                         <div className="bg-sage-soft rounded-md px-2 py-1.5 text-[11px]">
-                          <span className="ka font-semibold text-sage">After: </span>
+                          <span className="ka font-semibold text-sage-deep">After: </span>
                           <span className="text-wine">{s.after}</span>
                         </div>
                       )}
@@ -1220,7 +1220,7 @@ function DocView({
           <>
             {meta.summaryKa && (
               <BizCard className="mt-4 bg-sage-soft border-sage-line">
-                <p className="ka text-[11px] uppercase tracking-wider text-sage font-semibold mb-1">შეჯამება</p>
+                <p className="ka text-[11px] uppercase tracking-wider text-sage-deep font-semibold mb-1">შეჯამება</p>
                 <p className="text-xs text-wine leading-relaxed">{meta.summaryKa}</p>
               </BizCard>
             )}
@@ -1234,7 +1234,7 @@ function DocView({
                   <p className="text-xs whitespace-pre-wrap font-serif text-wine leading-relaxed">{original}</p>
                 </div>
                 <div className="bg-card border border-sage-line rounded-2xl p-4">
-                  <p className="ka text-[10px] uppercase tracking-wider text-sage font-semibold mb-2">გაუმჯობესებული</p>
+                  <p className="ka text-[10px] uppercase tracking-wider text-sage-deep font-semibold mb-2">გაუმჯობესებული</p>
                   <p className="text-xs whitespace-pre-wrap font-serif text-wine leading-relaxed">{doc.content}</p>
                 </div>
               </div>
@@ -1253,7 +1253,7 @@ function DocView({
                           <span className="text-wine">{c.before}</span>
                         </div>
                         <div className="bg-sage-soft rounded-md px-2 py-1.5">
-                          <span className="ka font-semibold text-sage">After: </span>
+                          <span className="ka font-semibold text-sage-deep">After: </span>
                           <span className="text-wine">{c.after}</span>
                         </div>
                       </div>

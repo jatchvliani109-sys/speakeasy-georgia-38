@@ -168,7 +168,7 @@ export function highlightText(content: string, highlights: Highlight[]): string 
     const re = new RegExp(safe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     html = html.replace(
       re,
-      `<mark class="bg-gold-soft text-wine rounded px-0.5 cursor-help" title="${escapeHtml(h.whyKa)}" data-hl="${idx}">${safe}</mark>`,
+      `<mark class="bg-gold-soft text-wine dark:text-panel-deep rounded px-0.5 cursor-help" title="${escapeHtml(h.whyKa)}" data-hl="${idx}">${safe}</mark>`,
     );
   });
   return html.replace(/\n/g, "<br/>");

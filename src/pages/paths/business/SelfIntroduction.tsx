@@ -856,7 +856,7 @@ function ExerciseItem({ ex, idx }: { ex: Exercise; idx: number }) {
       <div className="mt-2 flex items-center gap-2">
         <button onClick={check}
           className="text-[11px] px-3 py-1.5 rounded-lg border border-wine text-wine">შემოწმება</button>
-        {checked === true && <span className="ka text-[11px] text-sage">სწორია</span>}
+        {checked === true && <span className="ka text-[11px] text-sage-deep">სწორია</span>}
         {checked === false && (
           <span className="ka text-[11px] text-danger">
             სცადე ისევ{("hintKa" in ex && ex.hintKa) ? `, ${ex.hintKa}` : ""}
