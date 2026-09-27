@@ -92,9 +92,8 @@ export default function VocabularyModule() {
   const [qIdx, setQIdx] = useState(0);
   // READ-ONLY review of an already-answered question.
   //
-  // Correct answers auto-advance after 1.5s, which is not always long enough to
-  // take in the word. This lets the user page back and look again — but NOT
-  // re-answer: the answer is already recorded, has already fed the spaced
+  // Lets the user page back to an earlier question and look at it again — but
+  // NOT re-answer: the answer is already recorded, has already fed the spaced
   // repetition schedule, and may have requeued the question. Allowing a second
   // attempt would corrupt that, and a word you got wrong and then "fixed" is
   // not a word you know.
@@ -137,7 +136,6 @@ export default function VocabularyModule() {
   const [resumed, setResumed] = useState(false);
   const [screenFlash, setScreenFlash] = useState<null | "gold" | "mega">(null);
   const masteredBaselineRef = useRef<number>(0);
-  const autoAdvanceRef = useRef<number | null>(null);
 
   // Words due for review today — shown on the intro screen so the learner
   // sees exactly what today's session will strengthen.
@@ -393,25 +391,18 @@ export default function VocabularyModule() {
   };
 
   const enterReview = () => {
-    if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     setReviewIdx(qIdx > 0 ? qIdx - 1 : 0);
   };
   /**
    * Leave review and resume the normal flow.
    *
-   * Entering review cancels the pending auto-advance. If the live question was
-   * answered CORRECTLY, that timer was the only thing moving the session on —
-   * so without restarting it the user is stranded on an answered question.
-   * (The manual "შემდეგი" button is also shown as a fallback.)
+   * This used to restart the auto-advance timer, because that timer was the
+   * only thing moving a correctly-answered question on. Nothing advances on a
+   * timer any more, so returning to the live question and leaving "შემდეგი" to
+   * the user is the whole job.
    */
   const exitReview = () => {
     setReviewIdx(null);
-    const answeredCorrectly =
-      revealed && selected !== null && liveQ && checkAnswer(liveQ, selected);
-    if (answeredCorrectly) {
-      if (autoAdvanceRef.current) window.clearTimeout(autoAdvanceRef.current);
-      autoAdvanceRef.current = window.setTimeout(() => goNextRef.current(), 1200);
-    }
   };
 
   // Duolingo-style mistake requeue: a missed question is appended to the END of
@@ -470,10 +461,14 @@ export default function VocabularyModule() {
       } else {
         playCorrect();
       }
-      // Auto-advance on correct after 1.5s (longer if streak overlay is showing)
-      const delay = (nextCombo === 10 || (nextCombo > 10 && nextCombo % 10 === 0)) ? 2700 : (nextCombo === 5 || (nextCombo > 5 && nextCombo % 5 === 0)) ? 1700 : 1500;
-      if (autoAdvanceRef.current) window.clearTimeout(autoAdvanceRef.current);
-      autoAdvanceRef.current = window.setTimeout(() => goNext(nextAnswers), delay);
+      // NO auto-advance, on correct answers either.
+      //
+      // A right answer used to move on by itself after 1.5-2.7s, which was fine
+      // while the feedback was a single line. AnswerReveal now shows the
+      // meaning, the explanation and an example sentence — the actual teaching —
+      // and a timer that pulls it away mid-sentence is worse than not showing it
+      // at all. Both paths now wait for "შემდეგი", which was already on screen
+      // for wrong answers and is now shown for every answer.
     } else {
       setCombo(0);
       playWrong();
@@ -486,12 +481,8 @@ export default function VocabularyModule() {
     }
   };
 
-  // Ref so exitReview (declared earlier) can call goNext without a forward
-  // reference. Kept in sync on every render.
-  const goNextRef = useRef<() => void>(() => {});
 
   const goNext = (ans: { wordKey: string; correct: boolean; production: boolean }[]) => {
-    if (autoAdvanceRef.current) { window.clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
     // Never advance while the user is looking back at an earlier question.
     if (reviewIdx !== null) return;
     if (resumed) setResumed(false);
@@ -504,9 +495,6 @@ export default function VocabularyModule() {
     }
   };
 
-  // Keep the ref pointing at the current closure so exitReview's timer calls
-  // the live version with the latest answers.
-  goNextRef.current = () => goNext(answers);
 
 
   const finishSession = async (finalAnswers: { wordKey: string; correct: boolean; production: boolean }[]) => {
