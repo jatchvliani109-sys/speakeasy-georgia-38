@@ -131,7 +131,7 @@ export default function TrialEnded() {
 
           <button
             onClick={() => navigate("/path/business/home", { replace: true })}
-            className="w-full mt-4 text-sm text-on-dark-muted/70 hover:text-on-dark transition-colors"
+            className="ka w-full mt-4 text-sm text-on-dark-muted hover:text-on-dark transition-colors"
           >
             უფასო ვერსიით გაგრძელება
           </button>

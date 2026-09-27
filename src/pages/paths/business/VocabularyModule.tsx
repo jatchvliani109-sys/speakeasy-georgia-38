@@ -746,7 +746,7 @@ export default function VocabularyModule() {
         <h1 className="ka text-2xl font-bold text-wine mt-1">
           {stage === "results"
             ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
-            : stage === "reviewIntro"
+            : reviewMode
             ? "გამეორების სესია"
             : "ახალი სიტყვები"}
         </h1>
@@ -819,6 +819,16 @@ export default function VocabularyModule() {
               className="ka inline-block mt-5 px-6 py-3 rounded-full bg-gold text-panel-deep text-sm font-bold"
             >
               მთავარზე დაბრუნება
+            </Link>
+            {/* A review session costs nothing and is never capped, but this
+                screen only offered "come back tomorrow" and an upsell — so a
+                free learner who opened the app again the same day hit a dead
+                end next to something they were allowed to do all along. */}
+            <Link
+              to="/path/business/vocabulary?mode=review"
+              className="ka block mt-3 text-[12px] font-semibold text-on-dark underline underline-offset-4"
+            >
+              გამეორება, ნასწავლი სიტყვები
             </Link>
             <Link
               to="/path/business/premium"

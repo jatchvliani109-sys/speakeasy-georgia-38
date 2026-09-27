@@ -101,7 +101,7 @@ export default function AiLockedCard({
             "ულიმიტო ლექსიკის სესიები",
           ].map((t) => (
             <li key={t} className="ka text-[13px] text-ink flex items-start gap-2">
-              <span className="text-gold mt-0.5">•</span>
+              <span className="text-gold-deep dark:text-gold mt-0.5">•</span>
               {t}
             </li>
           ))}
