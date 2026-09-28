@@ -474,10 +474,10 @@ export const PRIORITY_LABELS: Record<BusinessPriority, string> = {
 };
 
 export const INTENSITY_LABELS: Record<BusinessIntensity, string> = {
-  light: "მსუბუქი რეჟიმი - 10 წუთი დღეში",
-  standard: "სტანდარტული - 20 წუთი დღეში",
-  intensive: "ინტენსიური - 30–40 წუთი დღეში",
-  deadline: "სწრაფი მიზანი - მაქვს კონკრეტული ვადა",
+  light: "მსუბუქი რეჟიმი — 10 წუთი დღეში",
+  standard: "სტანდარტული — 20 წუთი დღეში",
+  intensive: "ინტენსიური — 30–40 წუთი დღეში",
+  deadline: "სწრაფი მიზანი — მაქვს კონკრეტული ვადა",
 };
 
 export const DEADLINE_LABELS: Record<Exclude<BusinessDeadline, null>, string> = {
@@ -720,6 +720,45 @@ export function saveSelfIntro(uid: string, item: SavedSelfIntro) {
   localStorage.setItem(SI_KEY(uid), JSON.stringify(list));
   pushSelfIntrosRemote(uid, list).catch(() => {});
   return list;
+}
+
+/**
+ * An unsaved generation, kept so a spent AI session survives a navigation.
+ *
+ * The flow only wrote to SI_KEY at step 6 ("შენახვა"). Generation happens at
+ * step 4 and costs one of the seven weekly AI sessions, so anyone who tabbed
+ * away, opened the dashboard or hit back before pressing "ამის გამოყენება"
+ * lost both the text and the session, with nothing on screen to warn them.
+ */
+const SI_DRAFT_KEY = (uid: string) => `business_self_intro_draft_${uid}`;
+
+export type SelfIntroDraft = {
+  createdAt: string;
+  inputs: SelfIntroInputs;
+  short: SelfIntroVersion;
+  standard: SelfIntroVersion;
+  polished: SelfIntroVersion;
+  phrases: SelfIntroPhrase[];
+  selected: "short" | "standard" | "polished";
+};
+
+export function loadSelfIntroDraft(uid: string): SelfIntroDraft | null {
+  try {
+    const raw = localStorage.getItem(SI_DRAFT_KEY(uid));
+    if (!raw) return null;
+    const d = JSON.parse(raw) as SelfIntroDraft;
+    // A draft older than a week is stale; the weekly pool has reset by then.
+    if (Date.now() - new Date(d.createdAt).getTime() > 7 * 86400000) return null;
+    return d?.short && d?.standard && d?.polished ? d : null;
+  } catch { return null; }
+}
+
+export function saveSelfIntroDraft(uid: string, draft: SelfIntroDraft) {
+  try { localStorage.setItem(SI_DRAFT_KEY(uid), JSON.stringify(draft)); } catch { /* quota */ }
+}
+
+export function clearSelfIntroDraft(uid: string) {
+  try { localStorage.removeItem(SI_DRAFT_KEY(uid)); } catch { /* ignore */ }
 }
 
 export function deleteSelfIntro(uid: string, id: string) {

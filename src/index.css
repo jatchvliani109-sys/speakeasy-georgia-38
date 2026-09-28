@@ -73,7 +73,7 @@
     --gold-deep: 43 49% 34%;   /* 4.85:1 on cream — 36% fell just under AA */
     --ink: 240 3% 12%;
     --ink-muted: 0 0% 29%;
-    --ink-muted-2: 0 0% 42%;
+    --ink-muted-2: 0 0% 41%;   /* 42% was 4.48:1 on the auth card — a hair under AA */
     --ink-subtle: 0 0% 44%;   /* 54% gave 3.5:1 on white, 3.2:1 on cream — both under AA */
     --on-dark: 36 36% 96%;
     --on-dark-muted: 30 19% 84%;

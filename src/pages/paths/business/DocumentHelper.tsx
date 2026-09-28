@@ -151,8 +151,67 @@ export default function DocumentHelper() {
     );
   }
 
+  // Trial user who has not yet earned AI access.
+  if (!aiLocked(state) && isTrialActive(state) && unlockWords !== null &&
+      unlockWords < TRIAL_AI_UNLOCK_WORDS) {
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="დოკუმენტების ასისტენტი"
+          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით."
+          unlockProgress={unlockWords}
+          unlockTarget={TRIAL_AI_UNLOCK_WORDS}
+        />
+      </BusinessShell>
+    );
+  }
+
+  if (aiLocked(state)) {
+    // Generating is locked, but the documents already generated belong to the
+    // user and were paid for. Locking the whole page hid them, so a lapsed
+    // subscriber lost access to their own CV and cover letters. The library
+    // and the reader stay open; only the AI controls are gone.
+    return (
+      <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
+        <AiLockedCard
+          title="დოკუმენტების ასისტენტი"
+          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით, პროფესიონალურ ინგლისურად."
+          trialAvailable={shouldOfferTrial(state)}
+        />
+
+        {docs.length > 0 && view.kind !== "doc" && (
+          <div className="mt-4">
+            <LibraryView
+              docs={docs}
+              onBack={() => setView({ kind: "home" })}
+              onOpen={(d) => setView({ kind: "doc", doc: d })}
+              onDelete={async (id) => {
+                await deleteDocument(id);
+                await refreshDocs();
+              }}
+            />
+          </div>
+        )}
+
+        {view.kind === "doc" && (
+          <div className="mt-4">
+            <DocView
+              doc={view.doc}
+              readOnly
+              onBack={() => setView({ kind: "library" })}
+              onUpdated={async (updated) => {
+                await refreshDocs();
+                setView({ kind: "doc", doc: updated });
+              }}
+            />
+          </div>
+        )}
+      </BusinessShell>
+    );
+  }
+
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "უკან Business-ზე" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <header className="mb-5">
         <p className="text-[11px] uppercase tracking-wider text-ink font-bold">
           SpeakBusy
@@ -193,25 +252,6 @@ export default function DocumentHelper() {
             </Link>
           </div>
         </BizCard>
-      )}
-
-      {/* Trial user who has not yet earned AI access. */}
-      {!aiLocked(state) && isTrialActive(state) && unlockWords !== null &&
-        unlockWords < TRIAL_AI_UNLOCK_WORDS && (
-        <AiLockedCard
-          title="დოკუმენტების ასისტენტი"
-          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით."
-          unlockProgress={unlockWords}
-          unlockTarget={TRIAL_AI_UNLOCK_WORDS}
-        />
-      )}
-
-      {aiLocked(state) && (
-        <AiLockedCard
-          title="დოკუმენტების ასისტენტი"
-          description="რეზიუმე, სამოტივაციო წერილი და ბიო, შენი მონაცემებით, პროფესიონალურ ინგლისურად."
-          trialAvailable={shouldOfferTrial(state)}
-        />
       )}
 
       {!aiLocked(state) && aiSessionsRemaining(state) > 0 && !(isTrialActive(state) && unlockWords !== null && unlockWords < TRIAL_AI_UNLOCK_WORDS) && view.kind === "home" && (
@@ -1028,10 +1068,14 @@ function DocView({
   doc,
   onBack,
   onUpdated,
+  readOnly = false,
 }: {
   doc: BusinessDocument;
   onBack: () => void;
   onUpdated: (d: BusinessDocument) => void;
+  /** No AI access: reading, copying and editing by hand stay; the AI
+      adjustment buttons would only fail at the server quota check. */
+  readOnly?: boolean;
 }) {
   const { user } = useAuth();
   const [adjusting, setAdjusting] = useState(false);
@@ -1296,7 +1340,7 @@ function DocView({
       )}
 
       {/* Adjustments */}
-      {!editing && (
+      {!editing && !readOnly && (
         <section className="mt-5">
           <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1">
             შესწორებები

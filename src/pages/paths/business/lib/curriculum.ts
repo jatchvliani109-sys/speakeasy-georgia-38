@@ -73,7 +73,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "background",
     titleKa: "გამოცდილების მიმოხილვა",
-    shortKa: "Background",
+    shortKa: "გამოცდილება",
     focusKa: "Tell me about yourself, experience overview, მკაფიო structure.",
     guidanceEn:
       "BACKGROUND questions, 'Tell me about yourself', experience overview. Heavy weight on small_talk + background stages. Foundation.",
@@ -81,7 +81,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "motivation",
     titleKa: "მოტივაცია",
-    shortKa: "Motivation",
+    shortKa: "მოტივაცია",
     focusKa: "რატომ ეს კომპანია, რატომ ეს როლი, specific + authentic პასუხები.",
     guidanceEn:
       "MOTIVATION questions, 'Why this company?', 'Why this role?'. Push for specifics about company, not generic answers. Build on intro skills.",
@@ -89,7 +89,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "situational",
     titleKa: "სიტუაციური კითხვები",
-    shortKa: "Situational",
+    shortKa: "სიტუაციები",
     focusKa: "'Tell me about a time when…', STAR სტრუქტურა, კონკრეტული მაგალითები.",
     guidanceEn:
       "SITUATIONAL questions, 'Tell me about a time when…'. Heavy situational stage, push for STAR-style answers (Situation, Task, Action, Result).",
@@ -97,7 +97,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "competency",
     titleKa: "უნარების დემონსტრირება",
-    shortKa: "Skills",
+    shortKa: "უნარები",
     focusKa: "Skill-based კითხვები, კონკრეტული უნარების მაგალითები.",
     guidanceEn:
       "SKILL AND COMPETENCY questions, demonstrate specific abilities, technical/role skills. Probe for evidence + outcomes. Builds on STAR from situational.",
@@ -105,7 +105,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "pressure",
     titleKa: "ზეწოლა და pushback",
-    shortKa: "Pressure",
+    shortKa: "ზეწოლა",
     focusKa: "რთული follow-up-ების მართვა, თავდაცვა პროფესიონალურად.",
     guidanceEn:
       "PRESSURE AND PUSHBACK, interviewer pushes back hard on every answer, plays skeptical, asks 'why should I believe you?'. Heavy curveball stage.",
@@ -113,7 +113,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "salary",
     titleKa: "ხელფასი და მოლაპარაკება",
-    shortKa: "Salary",
+    shortKa: "ხელფასი",
     focusKa: "სენსიტიური თემების მართვა, ხელფასი, ბენეფიტები, ვადები.",
     guidanceEn:
       "SALARY AND NEGOTIATION, professional handling of compensation, benefits, start date. Hedging language, ranges, value justification.",
@@ -121,7 +121,7 @@ export const INTERVIEW_CURRICULUM: CurriculumTopic[] = [
   {
     key: "closing",
     titleKa: "დახურვა და კითხვები",
-    shortKa: "Closing",
+    shortKa: "დახურვა",
     focusKa: "ძლიერი ბოლო შთაბეჭდილება, კარგი კითხვები ინტერვიუერისთვის.",
     guidanceEn:
       "CLOSING AND QUESTIONS FOR INTERVIEWER, leave a strong final impression, ask thoughtful questions about role/team/company. Heavy closing stage.",

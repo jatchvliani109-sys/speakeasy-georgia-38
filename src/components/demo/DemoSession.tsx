@@ -47,6 +47,19 @@ function correctValue(q: DemoQuestion): string {
   return q.type === "trueFalse" ? String(q.isCorrect) : q.correct;
 }
 
+/**
+ * Drops the answer into the gap for the "here is the full sentence" line.
+ *
+ * The options are capitalised because they are buttons ("Invoice"), so a naive
+ * replace produced "Please pay the Invoice within 14 days." Lower-case it
+ * unless the gap is what starts the sentence.
+ */
+function fillGap(sentence: string, answer: string): string {
+  const atStart = sentence.trimStart().startsWith("______");
+  const word = atStart ? answer : answer.charAt(0).toLowerCase() + answer.slice(1);
+  return sentence.replace("______", word);
+}
+
 export default function DemoSession() {
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -252,7 +265,7 @@ export default function DemoSession() {
           <p className="ka text-sm text-ink-muted mt-1.5 leading-relaxed">{q.explanationKa}</p>
           <div className="mt-3 pt-3 border-t border-line">
             <p className="text-sm text-ink leading-relaxed">
-              {q.type === "gap" ? q.sentence.replace("______", q.correct) : q.exampleEn}
+              {q.type === "gap" ? fillGap(q.sentence, q.correct) : q.exampleEn}
             </p>
             <p className="ka text-xs text-ink-muted mt-1">{q.exampleKa}</p>
           </div>

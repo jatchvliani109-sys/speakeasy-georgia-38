@@ -110,7 +110,7 @@ export const DEMO_QUESTIONS: DemoQuestion[] = [
     ka: "უკუკავშირი",
     choices: ["Minutes", "Agenda", "Feedback", "Follow up"],
     correct: "Feedback",
-    explanationKa: "მოსაზრება ან კომენტარი ვინმეს/რამეს ფონქციონირებაზე.",
+    explanationKa: "მოსაზრება ან კომენტარი ვინმეს/რამეს ფუნქციონირებაზე.",
     exampleEn: "Thanks for the honest feedback on my report.",
     exampleKa: "გმადლობთ ჩემს ანგარიშზე გულახდილი უკუკავშირისთვის.",
   },

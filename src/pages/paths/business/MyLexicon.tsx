@@ -312,7 +312,7 @@ const WORD_FILTERS: { id: WordFilter; label: string }[] = [
   { id: "learned", label: "✓ ვიცი" },
   { id: "learning", label: "ვსწავლობ" },
   { id: "fresh", label: "ახალი" },
-  { id: "difficult", label: "რთული" },
+  { id: "difficult", label: "ვცდები" },
 ];
 
 function WordsTab() {
@@ -433,6 +433,16 @@ function WordsTab() {
 
       <SearchInput value={query} onChange={setQuery} placeholder="ძებნა სიტყვებში..." />
 
+      {/* The three buttons on each card silently reschedule a word, and nothing
+          on screen said so. Nobody taps a control whose effect is invisible. */}
+      {!loading && rows.length > 0 && (
+        <p className="ka text-[11px] text-ink-muted mt-2 mb-1 leading-relaxed">
+          ყოველი სიტყვის ბოლოს არსებული ღილაკები განსაზღვრავს, როდის დაბრუნდება
+          სიტყვა: <b className="text-ink">ადვილი</b> სამი კვირით გადასწევს,
+          <b className="text-ink"> რთული</b> შემდეგ სესიაშივე დააბრუნებს.
+        </p>
+      )}
+
       {loading ? (
         <BizCard><p className="ka text-sm text-ink-muted">იტვირთება...</p></BizCard>
       ) : rows.length === 0 ? (
@@ -500,6 +510,9 @@ function WordsTab() {
                       dots that silently change how a word is scheduled. The word
                       is on the button now. */}
                   <div className="flex gap-1">
+                    {/* Scheduling hints, not a difficulty rating: ადვილი pushes
+                        the word three weeks out, რთული brings it back in the
+                        next session. Said out loud below the first card. */}
                     {LABELS.map((l) => (
                       <button
                         key={l.id}

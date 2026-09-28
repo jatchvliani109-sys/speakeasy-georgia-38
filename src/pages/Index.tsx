@@ -292,7 +292,7 @@ const Index = () => {
         <section className="bg-card py-20 sm:py-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-gold mb-3">
+              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-gold-deep dark:text-gold mb-3">
                 <span className="h-px w-6 bg-gold" />
                 Modules
                 <span className="h-px w-6 bg-gold" />
@@ -333,7 +333,7 @@ const Index = () => {
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
               მზად ხარ პროფესიონალურ ინგლისურს დაეუფლო?
             </h2>
-            <p className="mt-5 text-base sm:text-lg text-wine-soft ka leading-relaxed">
+            <p className="mt-5 text-base sm:text-lg text-on-dark/85 ka leading-relaxed">
               შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
             </p>
             <div className="mt-10">

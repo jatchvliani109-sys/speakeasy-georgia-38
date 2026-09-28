@@ -370,7 +370,10 @@ export default function BusinessHome() {
     const res = computeStreakWithFreezes(streakDates, banked, priorDays);
     const days = new Set(streakDates.map((d) => new Date(d).toDateString()));
     const priorSet = new Set([...priorDays, ...res.freezeDaysUsed]);
-    const KA_DAYS = ["კვ", "ორ", "სა", "ოთ", "ხუ", "პა", "შა"];
+    // Two-letter Georgian abbreviations don't survive 10px: "კვ" reads as "33"
+    // (both კ and ვ are 3-shaped glyphs) and "სა" is ambiguous between
+    // სამშაბათი and შაბათი. These are the standard three-letter forms.
+    const KA_DAYS = ["კვი", "ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ"];
     const week: { label: string; done: boolean; frozen: boolean; isToday: boolean }[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -574,7 +577,7 @@ export default function BusinessHome() {
                         : "bg-card border-line"
               }`}
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className={`leading-none ${
@@ -609,7 +612,7 @@ export default function BusinessHome() {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-1.5 shrink-0">
+                <div className="flex gap-1.5 shrink-0 justify-between sm:justify-end">
                   {last7.map((d, i) => (
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
@@ -777,7 +780,7 @@ export default function BusinessHome() {
                       ? `უფასო პრემიუმს ${trialDaysLeft(s)} დღე დარჩა`
                        : `უფასო პრემიუმი · დარჩა ${trialDaysLeft(s)} დღე`}
                   </p>
-                  <p className="ka text-[11px] text-on-dark/70 truncate">
+                  <p className="ka text-[11px] text-on-dark/70 leading-snug">
                     {trialEndingSoon(s)
                       ? "შეინარჩუნე ულიმიტო წვდომა, ნახე პრემიუმი"
                       : `ულიმიტო სესიები · ${aiSessionsRemaining(s)} AI სესია დარჩა`}
@@ -798,7 +801,7 @@ export default function BusinessHome() {
                 <span className="text-gold shrink-0"><Star size={16} className="fill-gold" /></span>
                 <div className="min-w-0">
                   <p className="ka text-[13px] font-bold text-on-dark truncate">პრემიუმი, ულიმიტო სესიები</p>
-                  <p className="ka text-[11px] text-on-dark/70 truncate">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
+                  <p className="ka text-[11px] text-on-dark/70 leading-snug">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
               <ArrowRight size={15} className="text-gold shrink-0" />
@@ -997,7 +1000,7 @@ export default function BusinessHome() {
               <MoreRow
                 icon={<FileText size={15} strokeWidth={2} />}
                 title="დოკუმენტების ასისტენტი"
-                sub="იმეილი, რეზიუმე, სამოტივაციო - შენი მონაცემებით"
+                sub="იმეილი, რეზიუმე, სამოტივაციო — შენი მონაცემებით"
                 onClick={() => navigate("/path/business/documents")}
               />
               <MoreRow
@@ -1018,10 +1021,13 @@ export default function BusinessHome() {
                 sub="შენი მიზნები, ინტენსივობა და სფეროები"
                 onClick={() => navigate("/path/business/plan")}
               />
+              {/* A paying subscriber was still being sold premium in their own
+                  menu ("ულიმიტო სესიები და რეალური გასაუბრებები"). For them the
+                  same row should lead to their subscription, not to the pitch. */}
               <MoreRow
                 icon={<Star size={15} strokeWidth={2} />}
                 title="⭐ პრემიუმი"
-                sub="ულიმიტო სესიები და რეალური გასაუბრებები"
+                sub={s?.mockPro === true ? "შენი გამოწერა და სტატუსი" : "ულიმიტო სესიები და რეალური გასაუბრებები"}
                 onClick={() => navigate("/path/business/premium")}
               />
             </div>
@@ -1134,7 +1140,10 @@ function MoreRow({
       </span>
       <span className="flex-1 min-w-0">
         <span className="ka block text-sm font-semibold text-wine">{title}</span>
-        <span className="ka block text-[11px] text-ink-muted mt-0.5 truncate">{sub}</span>
+        {/* Was `truncate`: on a 390px phone every one of these Georgian
+            subtitles was cut mid-word with an ellipsis. Wrapping is free —
+            the row just gets a second line. */}
+        <span className="ka block text-[11px] text-ink-muted mt-0.5 leading-snug">{sub}</span>
       </span>
       <ArrowRight size={14} strokeWidth={2.25} className="text-ink-muted shrink-0" />
     </button>

@@ -13,6 +13,9 @@ import {
   loadSelfIntros,
   saveSelfIntro,
   deleteSelfIntro,
+  loadSelfIntroDraft,
+  saveSelfIntroDraft,
+  clearSelfIntroDraft,
   pullBusinessFromSupabase,
   SavedSelfIntro,
   SelfIntroInputs,
@@ -166,6 +169,17 @@ export default function SelfIntroduction() {
       if (!cancelled) {
         setBiz(bizState);
         setSaved(loadSelfIntros(user.id));
+        // A generation that was never saved still cost an AI session. Put the
+        // user back on it rather than on the empty first step.
+        const draft = loadSelfIntroDraft(user.id);
+        if (draft) {
+          setInputs(draft.inputs);
+          setResult({ short: draft.short, standard: draft.standard,
+            polished: draft.polished, phrases: draft.phrases });
+          setSelected(draft.selected);
+          setStep(4);
+          return;
+        }
       }
       // Pre-fill from latest resume if user hasn't started typing yet
       const { data: resume } = await supabase
@@ -221,9 +235,15 @@ export default function SelfIntroduction() {
       });
       if (error) throw error;
       if (!data?.short || !data?.standard || !data?.polished) throw new Error("AI-მ ვერ დააბრუნა სრული პასუხი. სცადე ისევ.");
-      setResult({ short: data.short, standard: data.standard, polished: data.polished,
-        phrases: Array.isArray(data.phrases) ? data.phrases : [] });
-      setSelected(isBeginner ? "short" : isAdvanced ? "polished" : "standard");
+      const gen = { short: data.short, standard: data.standard, polished: data.polished,
+        phrases: Array.isArray(data.phrases) ? data.phrases : [] };
+      const pick = isBeginner ? "short" : isAdvanced ? "polished" : "standard";
+      setResult(gen);
+      setSelected(pick as "short" | "standard" | "polished");
+      saveSelfIntroDraft(user.id, {
+        createdAt: new Date().toISOString(), inputs, ...gen,
+        selected: pick as "short" | "standard" | "polished",
+      });
       setStep(4);
     } catch (e: any) { toast.error(e?.message || "გენერაცია ვერ მოხერხდა"); }
     finally { setLoading(false); }
@@ -240,7 +260,9 @@ export default function SelfIntroduction() {
       });
       if (error) throw error;
       if (!data?.en) throw new Error("AI-მ ვერ დააბრუნა პასუხი");
-      setResult({ ...result, [which]: { en: data.en, ka: data.ka || "" } });
+      const next = { ...result, [which]: { en: data.en, ka: data.ka || "" } };
+      setResult(next);
+      if (user) saveSelfIntroDraft(user.id, { createdAt: new Date().toISOString(), inputs, ...next, selected });
     } catch (e: any) { toast.error(e?.message || "ვერ მოხერხდა"); }
     finally { setRewriting(null); }
   };
@@ -254,6 +276,7 @@ export default function SelfIntroduction() {
     };
     const list = saveSelfIntro(user.id, item);
     setSaved(list);
+    clearSelfIntroDraft(user.id);
     saveBusiness(user.id, { businessSelfIntroductionCompleted: true });
     toast.success("შენახულია");
     setStep(7);
@@ -319,7 +342,7 @@ export default function SelfIntroduction() {
   }
 
   return (
-    <BusinessShell back={{ to: "/path/business/home", label: "Business Dashboard" }}>
+    <BusinessShell back={{ to: "/path/business/home", label: "SpeakBusy" }}>
       <div className="mb-4">
         <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">{"\n"}</p>
         <h1 className="ka text-2xl font-bold text-wine mt-1">შენი პროფესიონალური წარდგენა</h1>

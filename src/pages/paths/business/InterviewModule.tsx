@@ -773,7 +773,7 @@ export default function InterviewModule() {
           <ModeCard
             titleKa="რეალური ვაკანსია"
             badgeKa="⭐ პრემიუმ"
-            descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოერგება - სუსტ წერტილებზეც."
+            descKa="ატვირთე რეალური ვაკანსია, რომელზეც აპლიცირებ. კითხვები შენს რეზიუმესა და ვაკანსიას მოერგება — სუსტ წერტილებზეც."
             emoji="🎯"
             locked={!hasResume || (PAYMENTS_LIVE && !isPaidUser) || aiEmpty}
             lockedHintKa={
@@ -803,7 +803,7 @@ export default function InterviewModule() {
           />
           <ModeCard
             titleKa="შემთხვევითი გასაუბრება"
-            descKa="მზა როლი - გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
+            descKa="მზა როლი — გაყიდვები, ბუღალტერია, მარკეტინგი და სხვა. რეზიუმე არ სჭირდება. სწრაფი ვარჯიში."
             emoji="🎲"
             locked={aiEmpty}
             lockedHintKa={aiLockedHint}
@@ -917,7 +917,11 @@ export default function InterviewModule() {
           <BizCard className="border-l-4 border-l-ink">
             {curriculum && (
               <p className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
-                ეტაპი {curriculum.step} / {curriculum.total}
+                {/* "ეტაპი" is already the word used for the five stages
+                    INSIDE one interview ("ეტაპი 1 / 5" at the bottom of the
+                    chat). Using it here too meant one session showed
+                    "ეტაპი 1 / 7" and "ეტაპი 1 / 5" at the same time. */}
+                თემა {curriculum.step} / {curriculum.total}
                 {curriculum.cycle > 1 ? ` · გავლა #${curriculum.cycle}` : ""} · {curriculum.titleKa}
               </p>
             )}
@@ -1056,11 +1060,14 @@ export default function InterviewModule() {
                 >
                   გავაგრძელო
                 </button>
+                {/* Not "გასვლა": the header button that opens this dialog is
+                    already labelled that, so the confirm step showed two
+                    identical buttons at once. */}
                 <button
                   onClick={() => navigate("/path/business/home")}
                   className="ka flex-1 h-10 rounded-xl border border-line text-wine text-sm font-semibold"
                 >
-                  გასვლა
+                  დადასტურება
                 </button>
               </div>
             </BizCard>

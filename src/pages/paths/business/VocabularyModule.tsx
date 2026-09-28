@@ -1029,7 +1029,8 @@ export default function VocabularyModule() {
           masteredMilestone={masteredMilestone}
           answers={lastResults.answers}
           newWords={lastResults.newWords}
-          reviewCount={reviewKeys.length}
+          reviewMode={reviewMode}
+          reviewCount={reviewMode ? 0 : reviewKeys.length}
           totalVocab={totalVocab}
           streakCelebration={streakCelebration}
           canPracticeMore={!dailyLimitReached && (lastResults.answers.some((a) => !a.correct) || progress.length > 0)}
@@ -1105,7 +1106,7 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-on-dark/10 rounded-lg px-3 py-2">
-      <p className="ka text-[10px] text-on-dark/70 uppercase tracking-wider">{label}</p>
+      <p className="ka text-[10px] text-on-dark/70 leading-tight break-words">{label}</p>
       <p className="text-base font-bold text-on-dark mt-0.5">{value}</p>
     </div>
   );
@@ -1353,7 +1354,7 @@ const MSG_EXCELLENT = [
   "Board-ი ფეხზე დამდგარა 👏",
 ];
 const MSG_GOOD = [
-  "კარგი Deal დადე - ხელს გართმევ! 🤝",
+  "კარგი Deal დადე — ხელს გართმევ! 🤝",
   "სტაბილური ზრდაა, ინვესტორები კმაყოფილი იქნებოდნენ 📊",
   "მოლაპარაკება მოიგე, ოღონდ მცირე დათმობით 😉",
   "KPI შესრულებულია, ყოჩაღ!",
@@ -1777,7 +1778,8 @@ function AnswerReveal({
 
       {word && (
         <p className="text-sm font-semibold text-wine mt-2">
-          {word.en} <span className="ka text-ink-muted font-normal">, {word.ka}</span>
+          {word.en}
+          <span className="ka text-ink-muted font-normal">, {word.ka}</span>
         </p>
       )}
 
@@ -1856,6 +1858,7 @@ function TypeWordCard({
 function Results({
   answers,
   newWords,
+  reviewMode,
   reviewCount,
   totalVocab,
   streakCelebration,
@@ -1867,6 +1870,7 @@ function Results({
   masteredTotal,
   masteredMilestone,
 }: {
+  reviewMode: boolean;
   sessionDelta: number | null;
   newlyMastered: VocabWord[];
   masteredTotal: number;
@@ -1906,6 +1910,10 @@ function Results({
 
   const learnedToday = mastered.length;
   const addedToReview = needsReview.length + reviewCount;
+  // A review session teaches nothing new, so `mastered` is almost always 0 and
+  // the first tile read "ნასწავლი 0" right after revising twenty words. In
+  // review mode the honest number is how many distinct words were practised.
+  const revisedCount = perWord.size;
 
   // useMemo keeps the line stable while the score counters animate; without it
   // every re-render would draw a different message.
@@ -1963,7 +1971,10 @@ function Results({
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <SummaryStat label="ნასწავლი" value={learnedToday} />
+        <SummaryStat
+          label={reviewMode ? "გამეორებული" : "ნასწავლი"}
+          value={reviewMode ? revisedCount : learnedToday}
+        />
         <SummaryStat label="გასამეორებელი" value={addedToReview} />
         <SummaryStat label="სულ ლექსიკაში" value={totalVocab} />
       </div>
@@ -2072,7 +2083,7 @@ function SummaryStat({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-card border border-line rounded-xl p-3 text-center">
       <p className="text-xl font-bold text-wine">{value}</p>
-      <p className="ka text-[10px] text-ink-muted uppercase tracking-wider mt-0.5">{label}</p>
+      <p className="ka text-[10px] text-ink-muted leading-tight break-words mt-0.5">{label}</p>
     </div>
   );
 }

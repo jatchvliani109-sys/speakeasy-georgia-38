@@ -177,6 +177,24 @@ Deno.serve(async (req) => {
           .update({ status: "expired", updated_at: new Date().toISOString() })
           .eq("user_id", sub.user_id);
         await revokePremium(admin, sub.user_id);
+
+        // Premium used to just stop, with no email at any point in the six
+        // days of retries. Tell them it ended and how to come back.
+        const goneEmail = await getUserEmail(admin, sub.user_id);
+        if (goneEmail) {
+          await sendAppEmail({
+            templateName: "payment-failed",
+            recipientEmail: goneEmail,
+            idempotencyKey: `payfail_final_${sub.user_id}_${sub.current_period_end ?? "na"}`,
+            templateData: {
+              amount: (PRICE_TETRI / 100).toFixed(2),
+              attempts_total: String(MAX_ATTEMPTS),
+              is_final: "1",
+              profile_url: "https://speakbusy.com/profile",
+              premium_url: "https://speakbusy.com/path/business/premium",
+            },
+          });
+        }
         summary.charges.push({ user: sub.user_id, action: "expired_after_retries" });
         continue;
       }
@@ -190,7 +208,13 @@ Deno.serve(async (req) => {
         }
       }
 
-      const orderId = `sb_rec_${String(sub.user_id).slice(0, 8)}_${Date.now()}`;
+      // Keyed to the period and attempt rather than the clock. Two overlapping
+      // runs of this job would otherwise mint two different order ids for the
+      // same renewal and charge the customer twice; with this, the second one
+      // is a duplicate order that Flitt rejects. A genuine retry has a higher
+      // attempt number, so it still goes through.
+      const periodKey = String(sub.current_period_end ?? "na").slice(0, 10).replace(/-/g, "");
+      const orderId = `sb_rec_${String(sub.user_id).slice(0, 8)}_${periodKey}_a${attempts + 1}`;
       const request: Record<string, unknown> = {
         order_id: orderId,
         order_desc: "SpeakBusy Premium",
@@ -265,6 +289,28 @@ Deno.serve(async (req) => {
           last_charge_attempt: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq("user_id", sub.user_id);
+
+        // A declined card is the one moment the customer can actually fix
+        // things, and it was the one moment we said nothing.
+        const failEmail = await getUserEmail(admin, sub.user_id);
+        if (failEmail) {
+          const retryAt = new Date();
+          retryAt.setDate(retryAt.getDate() + RETRY_DAYS);
+          await sendAppEmail({
+            templateName: "payment-failed",
+            recipientEmail: failEmail,
+            idempotencyKey: `payfail_${orderId}`,
+            templateData: {
+              amount: (PRICE_TETRI / 100).toFixed(2),
+              retry_date: formatGeorgianDate(retryAt),
+              attempt: String(attempts + 1),
+              attempts_total: String(MAX_ATTEMPTS),
+              is_final: "",
+              profile_url: "https://speakbusy.com/profile",
+              premium_url: "https://speakbusy.com/path/business/premium",
+            },
+          });
+        }
         summary.charges.push({ user: sub.user_id, action: "failed", attempt: attempts + 1, message });
       }
     }
