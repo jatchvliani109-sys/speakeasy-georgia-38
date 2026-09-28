@@ -312,7 +312,7 @@ const WORD_FILTERS: { id: WordFilter; label: string }[] = [
   { id: "learned", label: "✓ ვიცი" },
   { id: "learning", label: "ვსწავლობ" },
   { id: "fresh", label: "ახალი" },
-  { id: "difficult", label: "ვცდები" },
+  { id: "difficult", label: "მეშლება" },
 ];
 
 function WordsTab() {
