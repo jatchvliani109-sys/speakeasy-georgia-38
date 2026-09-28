@@ -393,6 +393,25 @@ export default function Auth() {
           Google-ით გაგრძელება
         </button>
 
+        {/* "Sign in with Google" also SIGNS YOU UP when no account exists, so
+            in login mode — where the terms checkbox is not rendered and
+            blockedByTerms() short-circuits to false — a brand new account
+            could be created without the terms ever being shown. The checkbox
+            still gates signup mode; this covers the other door. */}
+        {mode === "login" && (
+          <p className="ka text-[11px] text-ink-muted-2 leading-relaxed text-center mt-3">
+            Google-ით გაგრძელებით ეთანხმები{" "}
+            <Link to="/terms" className="underline hover:text-wine transition-colors">
+              წესებს და პირობებს
+            </Link>
+            , ასევე{" "}
+            <Link to="/privacy" className="underline hover:text-wine transition-colors">
+              კონფიდენციალობის პოლიტიკას
+            </Link>
+            .
+          </p>
+        )}
+
 
         <button
           onClick={() => setMode(mode === "signup" ? "login" : "signup")}
