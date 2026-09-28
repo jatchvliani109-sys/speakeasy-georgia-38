@@ -8,7 +8,7 @@
 // callback now, and cancellation lives in Profile so it reaches Flitt too.
 // -----------------------------------------------------------------------------
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Check, Star } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateKa, formatCardMask } from "@/lib/formatDate";
@@ -59,6 +59,10 @@ export default function BusinessPremium() {
   // the subscription process and terms and obtain a ONE-TIME confirmation from
   // the customer. The subscribe button stays disabled until this is ticked.
   const [cardConsent, setCardConsent] = useState(false);
+  // Separate from cardConsent on purpose: bundling "my address is right" into
+  // the card-storage tick makes both weaker, and this one is the whole reason
+  // the signup no longer asks for a confirmation click.
+  const [emailConfirmed, setEmailConfirmed] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -188,35 +192,59 @@ export default function BusinessPremium() {
               </label>
             </div>
 
-            {/* Last chance to catch a mistyped address. Registration no longer
-                waits for a confirmation email, so this is the first moment the
-                address is actually needed: the receipt and every charge notice
-                go here, and a wrong one means a customer who paid and heard
-                nothing. */}
+            {/* Registration no longer waits for a confirmation click, so this
+                is the FIRST time the address is actually verified by anyone —
+                and it is the moment it starts to matter, because the receipt
+                and every future charge notice go here. A wrong address means a
+                customer who paid and then heard nothing from us.
+
+                Deliberately an active tick rather than a line of small print:
+                the user is being asked to take responsibility for it. */}
             {user?.email && (
-              <div className="mt-4 rounded-xl bg-on-dark/5 border border-on-dark/10 p-3">
-                <p className="ka text-[11px] text-on-dark/70 leading-relaxed">
-                  ქვითარი და გადახდის შეტყობინებები გამოგეგზავნება აქ:
+              <div className="rounded-xl bg-on-dark/5 border border-on-dark/10 p-4 mb-4 text-left">
+                <p className="ka text-[12px] font-bold text-on-dark mb-2">
+                  შეამოწმე ელ-ფოსტა
                 </p>
-                <p className="text-[13px] font-semibold text-on-dark mt-1 break-all">
+                <p className="ka text-[11px] text-on-dark/70 leading-relaxed">
+                  ქვითარი, გადახდის დადასტურება და ყოველი მომავალი ჩამოჭრის
+                  შეტყობინება გამოგეგზავნება აქ:
+                </p>
+                <p className="text-[15px] font-bold text-gold mt-1.5 break-all">
                   {user.email}
                 </p>
-                {suggestEmail(user.email) ? (
+
+                {suggestEmail(user.email) && (
                   <p className="ka text-[11px] text-gold mt-1.5 leading-relaxed">
-                    დარწმუნდი, რომ სწორია. იქნებ {suggestEmail(user.email)}? შეცვლა
-                    პროფილის გვერდიდან შეგიძლია.
-                  </p>
-                ) : (
-                  <p className="ka text-[11px] text-on-dark/50 mt-1.5 leading-relaxed">
-                    არასწორია? შეცვალე პროფილის გვერდიდან გამოწერამდე.
+                    იქნებ {suggestEmail(user.email)}?
                   </p>
                 )}
+
+                <p className="ka text-[11px] text-on-dark/50 mt-1.5 leading-relaxed">
+                  არასწორია?{" "}
+                  <Link to="/profile" className="text-on-dark underline underline-offset-2">
+                    შეცვალე პროფილის გვერდიდან
+                  </Link>{" "}
+                  გამოწერამდე.
+                </p>
+
+                <label className="flex items-start gap-2.5 cursor-pointer mt-3 pt-3 border-t border-on-dark/10">
+                  <input
+                    type="checkbox"
+                    checked={emailConfirmed}
+                    onChange={(e) => setEmailConfirmed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 shrink-0 accent-gold cursor-pointer"
+                  />
+                  <span className="ka text-[12px] text-on-dark leading-relaxed">
+                    ვადასტურებ, რომ ეს ჩემი სწორი ელ-ფოსტაა და ვიცი, რომ
+                    ქვითრები და შეტყობინებები ამ მისამართზე მოვა.
+                  </span>
+                </label>
               </div>
             )}
 
             <button
               onClick={subscribe}
-              disabled={busy || !cardConsent || (sub?.status === "active")}
+              disabled={busy || !cardConsent || (!!user?.email && !emailConfirmed) || (sub?.status === "active")}
               className="ka w-full mt-4 py-3.5 rounded-xl bg-gold text-ink dark:text-panel-deep text-[15px] font-bold hover:bg-gold-2 transition-colors disabled:opacity-60"
             >
               {busy ? "იხსნება..." : `გამოწერა · ${PRICE_GEL} ₾ / თვეში`}

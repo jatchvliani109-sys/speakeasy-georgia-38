@@ -1,14 +1,8 @@
 import { Navigate } from "react-router-dom";
-import { useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
-import Layout from "@/components/Layout";
-import { Mail } from "lucide-react";
-import { toast } from "sonner";
 
 export default function RequireAuth({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
-  const [resending, setResending] = useState(false);
 
   if (loading) {
     return (
@@ -19,67 +13,24 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
   }
   if (!user) return <Navigate to="/auth" replace />;
 
-  // Block unverified users — Supabase only sets email_confirmed_at after the
-  // user clicks the link in their inbox.
-  if (!user.email_confirmed_at) {
-    const resend = async () => {
-      if (!user.email) return;
-      setResending(true);
-      try {
-        const { error } = await supabase.auth.resend({
-          type: "signup",
-          email: user.email,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-        });
-        if (error) throw error;
-        toast.success("ბმული თავიდან გაიგზავნა");
-      } catch (err: any) {
-        toast.error(err.message ?? "ვერ მოხერხდა გაგზავნა");
-      } finally {
-        setResending(false);
-      }
-    };
-
-    return (
-      <Layout showLogout={false}>
-        <div className="max-w-sm mx-auto py-10 text-center">
-          <span className="inline-flex w-14 h-14 rounded-full bg-panel-deep text-on-dark items-center justify-center">
-            <Mail className="w-6 h-6" />
-          </span>
-          <h1 className="text-2xl font-extrabold ka text-wine mt-4 tracking-tight">
-            დაადასტურეთ თქვენი ელ-ფოსტა
-          </h1>
-          <p className="text-sm text-ink-muted mt-3 ka leading-relaxed">
-            დაშბორდზე წვდომისთვის ჯერ უნდა დაადასტუროთ ელ-ფოსტა. გადახედეთ თქვენს
-            inbox-ს და დააჭირეთ დადასტურების ბმულს.
-          </p>
-          {user.email && (
-            <p className="text-xs text-ink-muted-2 mt-2 ka">
-              გავაგზავნეთ: <span className="font-semibold text-wine">{user.email}</span>
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={resend}
-            disabled={resending}
-            className="mt-6 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-wine-deep/30 text-sm font-semibold text-wine hover:bg-panel-deep/5 transition-colors disabled:opacity-60 ka"
-          >
-            {resending ? "იგზავნება..." : "ხელახლა გაგზავნა"}
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/auth";
-            }}
-            className="mt-3 w-full text-center text-xs text-ink-muted-2 hover:text-wine ka"
-          >
-            გასვლა
-          </button>
-        </div>
-      </Layout>
-    );
-  }
-
+  // NO EMAIL-VERIFICATION WALL.
+  //
+  // This used to block anyone whose `email_confirmed_at` was null behind a
+  // "check your inbox" screen. Two reasons it is gone:
+  //
+  //  1. Paid traffic arrives from the Instagram in-app browser. A mandatory
+  //     mail round-trip there means leaving the webview, opening a mail app,
+  //     and landing back in a DIFFERENT browser — the session they signed up
+  //     in is orphaned. Most of that traffic never comes back.
+  //
+  //  2. It made the whole app hostage to one Supabase toggle. With
+  //     "Confirm email" switched off, GoTrue is expected to stamp
+  //     `email_confirmed_at` at signup — but if that ever changed, or the
+  //     toggle got flipped back, every new account would hit this wall with
+  //     no confirmation mail on the way to release them.
+  //
+  // The address still matters, so it is checked where it actually costs money:
+  // BusinessPremium makes the user confirm it in writing before a card is
+  // stored, since that is where receipts and charge notices are sent.
   return children;
 }
