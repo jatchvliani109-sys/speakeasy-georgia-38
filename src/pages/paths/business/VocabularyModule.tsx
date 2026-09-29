@@ -35,7 +35,7 @@ import {
   progressDelta,
 } from "./lib/vocabEngine";
 import { pullBusinessFromSupabase, type BusinessState,
-  hasUnlimitedVocab,
+  hasUnlimitedVocab, saveBusiness,
 } from "./lib/state";
 import { findWord, type VocabWord } from "./lib/vocabBank";
 import { clusterById, getContext, type SituationCluster } from "./lib/vocabContext";
@@ -1024,6 +1024,11 @@ export default function VocabularyModule() {
       {stage === "results" && lastResults && (
         <Results
           sessionDelta={sessionDelta}
+          askForName={!displayName && !state?.nameAskSettled}
+          onNameSettled={() => {
+            setState((s) => (s ? { ...s, nameAskSettled: true } : s));
+            if (user) saveBusiness(user.id, { nameAskSettled: true });
+          }}
           newlyMastered={newlyMastered}
           masteredTotal={masteredTotal}
           masteredMilestone={masteredMilestone}
@@ -1858,6 +1863,8 @@ function TypeWordCard({
 function Results({
   answers,
   newWords,
+  askForName,
+  onNameSettled,
   reviewMode,
   reviewCount,
   totalVocab,
@@ -1870,6 +1877,8 @@ function Results({
   masteredTotal,
   masteredMilestone,
 }: {
+  askForName: boolean;
+  onNameSettled: () => void;
   reviewMode: boolean;
   sessionDelta: number | null;
   newlyMastered: VocabWord[];
@@ -1969,6 +1978,8 @@ function Results({
           )}
         </div>
       </div>
+
+      {askForName && <NameAsk onSettled={onNameSettled} />}
 
       <div className="grid grid-cols-3 gap-2">
         <SummaryStat
@@ -2076,6 +2087,70 @@ function Results({
         </Link>
       </div>
     </div>
+  );
+}
+
+/**
+ * Asked HERE, not during onboarding.
+ *
+ * This used to be the first screen after signup: a mandatory text box, before
+ * the product had shown the user anything. Our first real registration quit on
+ * it. Now it comes after a finished session, when there is something to attach
+ * the name to — and it is genuinely optional: dismissing it is recorded the
+ * same as answering, so nobody is asked twice.
+ */
+function NameAsk({ onSettled }: { onSettled: () => void }) {
+  const { save } = useDisplayName();
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    const clean = value.trim();
+    if (!clean) return;
+    setBusy(true);
+    const res = await save(clean);
+    setBusy(false);
+    if (!res.ok) {
+      toast.error("სახელის შენახვა ვერ მოხერხდა");
+      return;   // leave the card up so the attempt is not silently lost
+    }
+    toast.success("სასიამოვნოა გაცნობა 👋");
+    onSettled();
+  };
+
+  return (
+    <BizCard className="border-gold/50">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="ka text-sm font-bold text-wine">როგორ მოგმართოთ?</p>
+          <p className="ka text-[11px] text-ink-muted mt-1 leading-relaxed">
+            შენი სახელი მხოლოდ მისალმებისთვის გვჭირდება.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onSettled}
+          aria-label="დახურვა"
+          className="ka text-[11px] text-ink-muted hover:text-wine shrink-0"
+        >
+          ახლა არა
+        </button>
+      </div>
+      <div className="flex gap-2 mt-3">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+          maxLength={60}
+          placeholder="მაგ. ნინო"
+          className="ka flex-1 min-w-0 px-3 py-2 rounded-xl border border-line focus:border-wine focus:outline-none bg-card text-ink placeholder:text-ink-subtle text-base"
+        />
+        <BizButton onClick={submit} disabled={busy || !value.trim()}>
+          {busy ? "ინახება..." : "შენახვა"}
+        </BizButton>
+      </div>
+    </BizCard>
   );
 }
 

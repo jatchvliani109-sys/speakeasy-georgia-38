@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
-import { toast } from "sonner";
 import { track } from "@/lib/track";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
 import {
@@ -31,20 +30,20 @@ const FIELD_KEYS = FIELD_CHOICES;
 export default function BusinessSetup() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { displayName, loaded: nameLoaded, save: saveName } = useDisplayName();
+  // Read-only here now. THE NAME IS NO LONGER ASKED DURING SETUP: it was the
+  // first screen a new account saw — a mandatory text box, shown before the
+  // product had given them anything — and our first real signup quit on it.
+  // The question moved to the end of the first vocabulary session, where the
+  // user has something to show for the effort. Setup keeps the name only to
+  // greet someone who already has one.
+  const { displayName } = useDisplayName();
 
-  const [nameInput, setNameInput] = useState<string>("");
-  const [savingName, setSavingName] = useState(false);
   const [step, setStep] = useState<Step>(0);
 
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
   const [deadline, setDeadline] = useState<BusinessDeadline>(null);
   const [field, setField] = useState<BusinessField[]>([]);
-
-  useEffect(() => {
-    if (nameLoaded && displayName) setNameInput(displayName);
-  }, [nameLoaded, displayName]);
 
   useEffect(() => {
     track("setup_started");
@@ -151,68 +150,24 @@ export default function BusinessSetup() {
   };
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);
 
-  const needsName = nameLoaded && !displayName;
+  // One event per screen. "setup_started" alone cannot tell you which question
+  // lost someone who signed up and never came back.
+  useEffect(() => {
+    track("setup_step_viewed", {
+      step: step === 0 ? "goals" : step === 1 ? "intensity" : "field",
+    });
+  }, [step]);
 
-  const submitName = async () => {
-    const clean = nameInput.trim();
-    if (!clean) {
-      toast.error("გთხოვ, შეიყვანე შენი სახელი");
-      return;
-    }
-    setSavingName(true);
-    const res = await saveName(clean);
-    setSavingName(false);
-    if (!res.ok) toast.error("სახელის შენახვა ვერ მოხერხდა");
-  };
-
-  if (needsName) {
-    return (
-      <BusinessShell>
-        <div className="mb-6">
-          <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
-            ნაბიჯი 1 / 4
-          </p>
-          <h1 className="ka text-2xl font-bold text-wine mt-1">როგორ მოგმართოთ?</h1>
-          <p className="ka text-sm text-ink-muted mt-1">
-            შეიყვანე შენი სახელი
-          </p>
-        </div>
-        <BizCard>
-          <label className="ka text-xs text-ink-muted font-semibold" htmlFor="name-input">
-            შენი სახელი
-          </label>
-          <input
-            id="name-input"
-            type="text"
-            autoFocus
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") submitName();
-            }}
-            maxLength={60}
-            placeholder="მაგ. ნინო"
-            className="ka mt-2 w-full px-4 py-3 rounded-xl border border-line focus:border-wine focus:outline-none bg-card text-ink placeholder:text-ink-subtle text-base"
-          />
-          <div className="flex justify-end mt-6">
-            <BizButton onClick={submitName} disabled={savingName || !nameInput.trim()}>
-              {savingName ? "ინახება..." : "შემდეგი"}
-            </BizButton>
-          </div>
-        </BizCard>
-      </BusinessShell>
-    );
-  }
 
   return (
     <BusinessShell>
       <div className="mb-6">
         <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
-          ნაბიჯი {step + 2} / 4
+          ნაბიჯი {step + 1} / 3
         </p>
         <h1 className="ka text-2xl font-bold text-wine mt-1">პერსონალიზაცია</h1>
         <p className="ka text-sm text-ink-muted mt-1">
-          niniebi, გვითხარი&nbsp;რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
+          {displayName ? `${displayName}, ` : ""}გვითხარი&nbsp;რისთვის გჭირდება ბიზნეს ინგლისური და შენთვის შესაბამის გეგმას შევქმნით.
         </p>
       </div>
 

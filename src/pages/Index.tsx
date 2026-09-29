@@ -181,7 +181,10 @@ const Index = () => {
           <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
           <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-gold opacity-40" aria-hidden />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20 sm:pt-24 sm:pb-28 relative z-10">
+          {/* Padding halved (was pt-14 pb-20 sm:pt-24 sm:pb-28) to pull the
+              demo up into the first screenful on a phone. The demo is the
+              advert; the hero only has to say who this is for. */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 pb-10 sm:pt-12 sm:pb-14 relative z-10">
             <div className="flex items-center gap-3 mb-8">
               <span className="h-px w-8 bg-gold" />
               <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold ka">
@@ -192,16 +195,14 @@ const Index = () => {
             {/* The headline is the line that made people click the ad. A
                 visitor who arrives on a different thought than the one they
                 clicked has to be re-convinced, and they will not wait. */}
-            <h1 className="text-[2.2rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight ka max-w-3xl">
-              ბიზნეს ინგლისურს{"\n"}
-              <span className="block mt-2">არსად გასწავლიან</span>
-              <span className="block mt-2 text-gold">ნორმალურად.</span>
+            <h1 className="text-[1.9rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight ka max-w-3xl">
+              ბიზნეს ინგლისური{" "}
+              {/* Allowed to wrap on its own rather than forced onto fixed
+                  lines: "პროფესიონალებისთვის." is 20 characters with no break
+                  opportunity, so a hard line at phone width would run off the
+                  screen. */}
+              <span className="text-gold">ქართველი პროფესიონალებისთვის.</span>
             </h1>
-
-            <p className="mt-6 text-base sm:text-lg text-on-dark-subtle leading-relaxed max-w-xl ka">
-              980 სიტყვა და ფრაზა, რომლებიც სამსახურში ყოველდღე ხმარებაშია.
-              ქართული ახსნებით, აუდიოთი და რეალური მაგალითებით.
-            </p>
 
             {/* The button no longer asks for an account. It scrolls to the
                 demo below, because nobody registers to find out what a product
@@ -251,6 +252,14 @@ const Index = () => {
             </div>
 
             <DemoSession />
+
+            {/* Moved down from the hero. NOTE THE COLOUR: it was
+                text-on-dark-subtle, which is for the dark hero — on this cream
+                section that would have been near-invisible. */}
+            <p className="mt-8 text-center text-base sm:text-lg text-ink-muted leading-relaxed ka">
+              980 სიტყვა და ფრაზა, რომლებიც სამსახურში ყოველდღე ხმარებაშია.
+              ქართული ახსნებით, აუდიოთი და რეალური მაგალითებით.
+            </p>
           </div>
         </section>
 

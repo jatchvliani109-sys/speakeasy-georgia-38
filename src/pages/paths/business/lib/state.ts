@@ -93,6 +93,12 @@ export type BusinessState = {
    * reappear on every visit.
    */
   lastVocabMilestone?: number;
+  /**
+   * The "what should we call you?" card has been answered or waved away.
+   * The name used to be a mandatory screen shown before the product; it is
+   * now asked once, after the first session, and never again either way.
+   */
+  nameAskSettled?: boolean;
 };
 
 

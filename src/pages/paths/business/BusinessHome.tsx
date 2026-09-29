@@ -221,10 +221,17 @@ export default function BusinessHome() {
   // Raw completed_at timestamps (vocab + interview) powering the daily streak.
   const [streakDates, setStreakDates] = useState<string[]>([]);
 
-  // Existing users with no saved name: prompt once.
-  useEffect(() => {
-    if (nameLoaded && !profileName) setNameDialogOpen(true);
-  }, [nameLoaded, profileName]);
+  // NO AUTO-OPENING NAME DIALOG.
+  //
+  // This used to force the dialog open for anyone without a name, and
+  // onOpenChange refused to close it while the name was still empty — an
+  // un-dismissable modal on the first screen of the app. With the setup-time
+  // name screen removed it would have become the new trap.
+  //
+  // The name is now asked once at the end of the first vocabulary session, and
+  // can be changed any time from the profile page. Nothing opens this dialog
+  // any more; the markup below is left in place rather than unpicked from a
+  // live file, and can be deleted in a tidy-up.
 
   // The goodbye screen used to be reachable only through /path/business, so
   // anyone opening the dashboard directly (home-screen shortcut, bookmark,
@@ -505,7 +512,7 @@ export default function BusinessHome() {
 
   return (
     <BusinessShell seo={{ title: "ჩემი სწავლება, SpeakBusy", description: "შენი პერსონალური ბიზნეს ინგლისურის სასწავლო გეგმა, დღევანდელი ფოკუსი და პროგრესი.", path: "/path/business/home" }}>
-      <Dialog open={nameDialogOpen} onOpenChange={(v) => { if (!v && !profileName) return; setNameDialogOpen(v); }}>
+      <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
         <DialogContent className="bg-cream border-line">
           <DialogHeader>
             <DialogTitle className="ka text-wine">როგორ დაგიძახოთ?</DialogTitle>

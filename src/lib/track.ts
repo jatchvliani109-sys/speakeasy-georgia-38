@@ -31,6 +31,11 @@ export type TrackEvent =
   | "login_started"
   | "signup_completed"
   | "setup_started"
+  // Which setup screen a person is looking at. Without this, a user who
+  // signs up and quits during onboarding produces exactly one event
+  // ("setup_started") and no row anywhere, so there is no way to tell which
+  // question lost them. props: { step: "name" | "goals" | "intensity" | "field" }
+  | "setup_step_viewed"
   | "setup_step_skipped"
   | "setup_completed"
   | "placement_test_started"
