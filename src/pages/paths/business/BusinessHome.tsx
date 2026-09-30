@@ -329,9 +329,12 @@ export default function BusinessHome() {
           const plan = planSession(vp, cur.field || [], cur.mainPriority || [], {
             plan: hasUnlimitedVocab(cur) ? "paid" : "free",
             recentScores: recentForPlan,
-            // Must match VocabularyModule's call or the dashboard would preview
-            // a different word count than the session actually serves.
-            level: cur.level,
+            // MEASURED level only — must match VocabularyModule's call exactly,
+            // or the dashboard previews a different session than the one the
+            // learner gets. See the note there: cur.level is seeded to
+            // business_elementary for people who skipped the test, so
+            // testCompleted is what actually says the level was measured.
+            level: cur.testCompleted ? cur.level : null,
           });
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);

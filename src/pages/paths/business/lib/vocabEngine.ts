@@ -580,12 +580,19 @@ export type PlanOptions = {
    */
   recentScores?: { score: number; total: number }[];
   /**
-   * The placement-test result ("business_beginner" … "business_advanced"), or
-   * null/undefined when the learner skipped the test. This does NOT unlock
-   * tiers — it only changes the MIX of new words while the learner is still in
-   * Tier 1, so someone who tested advanced is not spending their first month on
-   * "Deadline" and "Client". See LEVEL_MIX below. Unknown level = beginner mix
-   * = exactly the behaviour that shipped before this option existed.
+   * The MEASURED level ("business_beginner" … "business_advanced"), or null
+   * when the learner has not taken the placement test or a reassessment.
+   *
+   * Callers must pass `state.testCompleted ? state.level : null`, NOT
+   * `state.level`. BusinessHome seeds state.level to business_elementary for
+   * anyone who skipped the test — that field is populated for almost everyone
+   * and is a guess, not a result. Only testCompleted distinguishes the two.
+   *
+   * This does NOT unlock tiers — it only changes the MIX of new words while
+   * the learner is still in Tier 1, so someone who tested advanced is not
+   * spending their first month on "Deadline" and "Client". See LEVEL_MIX
+   * below. null = beginner mix = exactly the behaviour that shipped before
+   * this option existed.
    */
   level?: string | null;
 };
@@ -1389,6 +1396,11 @@ function topUpQuestions(
     const k = (q as any).wordKey;
     if (k) perWord.set(k, (perWord.get(k) ?? 0) + 1);
   }
+  // Top-ups used to be capped by COUNT only, so they could re-add a question
+  // the quiz already contained — same format, same word, verbatim. Track what
+  // is already in the quiz by format+word and never produce a second copy.
+  const sig = (q: QuizQuestion) => `${q.type}:${(q as any).wordKey ?? (q as any).key ?? ""}`;
+  const present = new Set(questions.map(sig));
   let gi = 0;
   let guard = 0;
   while (questions.length < target && guard++ < 300) {
@@ -1399,6 +1411,8 @@ function topUpQuestions(
       const gen = generators[gi++ % generators.length];
       const q = gen(w, pool);
       if (!q) continue;
+      if (present.has(sig(q))) continue;
+      present.add(sig(q));
       questions.push(q);
       perWord.set(w.key, (perWord.get(w.key) ?? 0) + 1);
       added = true;
@@ -1429,14 +1443,19 @@ export function buildQuiz(
 
   const questions: QuizQuestion[] = [];
 
+  // Which generator pass 1 used for each new word, so pass 2 can avoid it.
+  const firstGenFor: (Generator | null)[] = [];
+
   // Pass 1: encode — one question per new word. Words the learner claimed to
   // already know get a single typed PROOF question instead of the usual pair.
   newWords.forEach((w, i) => {
     if (claimedSet.has(w.key)) {
+      firstGenFor[i] = null;
       questions.push(makeTypeWord(w) || makeTrKaToEn(w, pool));
       return;
     }
     const gen = newGens[(i + genOffset) % newGens.length];
+    firstGenFor[i] = gen;
     const q = gen(w, pool);
     if (q) questions.push(q);
     else questions.push(makeMcMeaning(w, pool));
@@ -1444,12 +1463,51 @@ export function buildQuiz(
 
   // Pass 2: retrieve — a second, different-format question per new word.
   // Claimed words skip this: one proof is enough.
+  //
+  // "Different-format" was the intent but never the behaviour. Pass 1 indexed a
+  // pool of N generators and pass 2 a pool of M, and the two pools OVERLAP
+  // (tier 1 shares listening, tr_en_to_ka and synonym_match), so whenever the
+  // two modular indexes landed on the same generator a word got the identical
+  // question type twice — recognition twice, no retrieval, which is the entire
+  // point of the pair. Measured across all 97 offsets: tier 1 hit it in ~40% of
+  // 6-word sessions, and tier 2 with 8 new words in 100% of them, averaging 2
+  // words per session. Seen live: "Client" served two listening questions and
+  // "Feedback" two synonym-match questions in the same quiz.
+  //
+  // It also drove a false label. VocabularyModule marks a question "🔁 you
+  // missed this earlier" when an identical type+word appeared earlier in the
+  // quiz — true for a requeued wrong answer, but these collisions tripped it
+  // too, telling learners they had failed a question they had just answered
+  // correctly, and suppressing the real requeue if they then got it wrong.
+  const sigOf = (q: QuizQuestion) => `${q.type}:${(q as any).wordKey ?? (q as any).key ?? ""}`;
+  const alreadyAsked = new Set(questions.map(sigOf));
+
   newWords.forEach((w, i) => {
     if (claimedSet.has(w.key)) return;
-    const gen = secondGens[(i + genOffset + 1) % secondGens.length];
-    const q = gen(w, pool);
-    if (q) questions.push(q);
-    else questions.push(makeTrEnToKa(w, pool));
+    // Preferred order: the rotation's pick first, then the rest of the pool,
+    // then the first-pass pool, then the old hardcoded fallback. Take the first
+    // candidate that is neither pass 1's generator nor a question this quiz
+    // already contains — a generator can also return null (no collocation for
+    // this word, say), and the blind fallback was itself a duplicate source.
+    const ordered: Generator[] = [
+      ...Array.from({ length: secondGens.length }, (_, k) =>
+        secondGens[(i + genOffset + 1 + k) % secondGens.length]),
+      ...newGens,
+      makeTrEnToKa,
+    ];
+    let pushed = false;
+    for (const cand of ordered) {
+      if (cand === firstGenFor[i]) continue;
+      const q = cand(w, pool);
+      if (!q || alreadyAsked.has(sigOf(q))) continue;
+      alreadyAsked.add(sigOf(q));
+      questions.push(q);
+      pushed = true;
+      break;
+    }
+    // Every format for this word is exhausted or unavailable — better one
+    // solid question than a verbatim repeat, so the word simply gets one.
+    if (!pushed) { /* intentionally no second question */ }
   });
 
   // Review words: one question each.

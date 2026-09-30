@@ -126,6 +126,9 @@ export default function VocabularyModule() {
   const [reviewMode, setReviewMode] = useState(false);
   /** How many missed questions have been appended to THIS session so far. */
   const requeuedRef = useRef(0);
+  /** qid()s this session requeued because the learner missed them. The only
+   *  honest source for "this is a retry" — see isRetry below. */
+  const requeuedIdsRef = useRef<Set<string>>(new Set());
   /** True once this session's results are being saved, so it cannot save twice. */
   const finishingRef = useRef(false);
   const [combo, setCombo] = useState(0);
@@ -187,10 +190,15 @@ export default function VocabularyModule() {
         plan: hasUnlimitedVocab(s) ? "paid" : "free",
         sessionsToday: doneToday,
         recentScores: recent,
-        // Placement result. Does not unlock tiers — only blends harder words
-        // into the new-word mix so people who tested high are not stuck on
-        // "Deadline" for a month. Undefined (test skipped) = beginner mix.
-        level: s.level,
+        // MEASURED level only. `s.level` is NOT a safe proxy for "took the
+        // test": BusinessHome seeds a level of business_elementary for anyone
+        // who skipped it (so buildPlan has something to work with) and saves it
+        // with levelEstimated: true. Passing that straight through handed every
+        // test-skipper a 15% Tier 2 mix on the strength of a guess the app made
+        // for them — confirmed live, a brand-new untested account was served
+        // "Leverage" as its 4th ever word. testCompleted is the honest gate:
+        // both real measurement paths (placement test, reassessment) set it.
+        level: s.testCompleted ? s.level : null,
       });
       const totalDone = await countCompletedSessions(user.id);
       if (cancelled) return;
@@ -248,7 +256,7 @@ export default function VocabularyModule() {
       // The placement floor raises the CENTRE of the adaptive band, not the
       // result — computeFormatTier still adds +1 for strong recent accuracy on
       // top of it, and still eases back down when accuracy drops.
-      const floor = formatFloorForLevel(s.level);
+      const floor = formatFloorForLevel(s.testCompleted ? s.level : null);
       setFormatFloor(floor);
       const baseTier = Math.max(plan.tierLevel, floor) as 1 | 2 | 3;
       setFormatTier(computeFormatTier(baseTier, recent));
@@ -266,6 +274,10 @@ export default function VocabularyModule() {
         setFormatTier(saved.formatTier);
         setReviewMode(saved.reviewMode);
         setBestCombo(saved.bestCombo);
+        // Without this, resuming lost the record of what had been requeued, so
+        // a missed question could be appended a second time.
+        requeuedIdsRef.current = new Set(saved.requeuedIds ?? []);
+        requeuedRef.current = saved.requeuedIds?.length ?? 0;
         setSelected(null);
         setRevealed(false);
         setResumed(true);
@@ -310,6 +322,7 @@ export default function VocabularyModule() {
       formatTier,
       reviewMode,
       bestCombo,
+      requeuedIds: [...requeuedIdsRef.current],
     });
   }, [stage, quiz, qIdx, answers, user, newWords, formatTier, reviewMode, bestCombo]);
 
@@ -322,6 +335,7 @@ export default function VocabularyModule() {
   const startSession = () => {
     if (dailyLimitReached) return;
     requeuedRef.current = 0;
+    requeuedIdsRef.current = new Set();
     finishingRef.current = false;
     clearSessionSnapshot();   // starting fresh on purpose
     setResumed(false);
@@ -432,7 +446,17 @@ export default function VocabularyModule() {
   // already due immediately, so the rest come back in the next session anyway.
   const MAX_REQUEUED = 5;
   const qid = (q: QuizQuestion) => `${q.type}:${"wordKey" in q ? q.wordKey : (q as any).key}`;
-  const isRetry = !isReviewing && !!liveQ && quiz.slice(0, qIdx).some((q) => qid(q) === qid(liveQ));
+  // A retry is a question THIS SESSION PUT BACK because the learner missed it,
+  // which is a fact we record when we requeue it — not something to infer from
+  // the shape of the queue. Inferring it ("has this type+word appeared before?")
+  // silently mislabelled any legitimate repeat: a generator collision in
+  // buildQuiz, or a top-up question, made the app tell learners they had failed
+  // something they had just answered correctly, and then suppressed the real
+  // requeue when they genuinely missed it. Both sources are fixed in
+  // vocabEngine, but the inference stays wrong in principle, so it is gone.
+  const isRetry =
+    !isReviewing && !!liveQ && requeuedIdsRef.current.has(qid(liveQ)) &&
+    quiz.slice(0, qIdx).some((q) => qid(q) === qid(liveQ));
 
   const triggerStreak = (n: number) => {
     setStreakN(n);
@@ -490,6 +514,7 @@ export default function VocabularyModule() {
       // Requeue the missed question once, at the end of this session.
       if (!isRetry && requeuedRef.current < MAX_REQUEUED) {
         requeuedRef.current += 1;
+        requeuedIdsRef.current.add(qid(liveQ));
         setQuiz((qs) => [...qs, liveQ]);
       }
       // Wrong: do not auto-advance — let user review and click next.
@@ -1449,6 +1474,9 @@ type SavedSession = {
   formatTier: 1 | 2 | 3;
   reviewMode: boolean;
   bestCombo: number;
+  /** qid()s requeued after a miss. Optional so snapshots written before this
+   *  existed still load — they simply resume with no retries recorded. */
+  requeuedIds?: string[];
 };
 
 function saveSessionSnapshot(s: SavedSession) {
