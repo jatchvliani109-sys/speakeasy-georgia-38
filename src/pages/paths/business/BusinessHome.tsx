@@ -329,6 +329,9 @@ export default function BusinessHome() {
           const plan = planSession(vp, cur.field || [], cur.mainPriority || [], {
             plan: hasUnlimitedVocab(cur) ? "paid" : "free",
             recentScores: recentForPlan,
+            // Must match VocabularyModule's call or the dashboard would preview
+            // a different word count than the session actually serves.
+            level: cur.level,
           });
           setVocabNewToday(plan.newWords.length);
           setVocabReviewToday(plan.reviewKeys.length);

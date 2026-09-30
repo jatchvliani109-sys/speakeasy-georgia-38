@@ -322,6 +322,32 @@ const FORMAT_BOOST_ACCURACY = 0.9; // ≥90% over recent sessions → harder for
 const FORMAT_EASE_ACCURACY = 0.6;  // <60% → gentler formats
 const FORMAT_MIN_SESSIONS = 2;     // need at least 2 recent sessions to judge
 
+// The placement test also raises the FLOOR of the format tier, not just the
+// word mix. Without this, someone who tested advanced spends their first month
+// on Tier 1 question types — multiple choice, true/false, listening — because
+// the format tier is driven by the curriculum tier, which stays at 1 until they
+// have mastered 80% of the foundation.
+//
+// Floors stop at 2, deliberately, for both intermediate and advanced. Tier 3
+// formats drop multiple choice entirely and lean on typing English from
+// Georgian; handing that to someone on their FIRST session, on the strength of
+// one placement test, is a bad trade. If they are misplaced the app cannot find
+// out until two sessions have been scored (FORMAT_MIN_SESSIONS) — two brutal
+// sessions is enough to lose a new user, whereas two slightly-easy ones costs
+// nothing. The floor is a CENTRE, not a ceiling: computeFormatTier still adds
+// +1 at ≥90% accuracy, so a genuine advanced learner reaches Tier 3 formats
+// within two sessions on evidence rather than on a guess — and still eases back
+// to Tier 1 if the placement turns out to have been wrong.
+export function formatFloorForLevel(level?: string | null): 1 | 2 | 3 {
+  switch (level) {
+    case "business_intermediate":
+    case "business_advanced":
+      return 2;
+    default:
+      return 1; // beginner, elementary, or no placement test taken
+  }
+}
+
 export function computeFormatTier(
   curriculumTier: 1 | 2 | 3,
   recentSessions: { score: number; total: number }[],
@@ -553,6 +579,15 @@ export type PlanOptions = {
    * struggling gets review instead of more material.
    */
   recentScores?: { score: number; total: number }[];
+  /**
+   * The placement-test result ("business_beginner" … "business_advanced"), or
+   * null/undefined when the learner skipped the test. This does NOT unlock
+   * tiers — it only changes the MIX of new words while the learner is still in
+   * Tier 1, so someone who tested advanced is not spending their first month on
+   * "Deadline" and "Client". See LEVEL_MIX below. Unknown level = beginner mix
+   * = exactly the behaviour that shipped before this option existed.
+   */
+  level?: string | null;
 };
 
 export type SessionPlan = {
@@ -611,6 +646,81 @@ function wordsByTier() {
 const TIER2_UNLOCK_PCT = 0.8;  // 80% of Tier 1 mastered → Tier 2 unlocks
 const TIER3_UNLOCK_PCT = 0.7;  // 70% of Tier 2 mastered → Tier 3 unlocks
 const TIER4_UNLOCK_PCT = 0.5;  // 50% of Tier 1 mastered → field words allowed
+
+// ---- Placement level → new-word mix ---------------------------------------
+// The thresholds above are a PROGRESSION mechanism and stay exactly as they
+// are: nobody skips the foundation. What the placement test changes is the
+// blend of each session's NEW words while the learner is still working through
+// Tier 1. Someone who tested advanced still gets Tier 1 words — just fewer of
+// them per session, with Tier 2 and Tier 3 words mixed in so the session is
+// actually worth their time.
+//
+// Numbers are the SHARE OF EACH SESSION'S NEW WORDS, not the share of a tier
+// unlocked. At 8 new words, advanced works out to roughly 4 / 3 / 1.
+//
+// No placement test = beginner mix = 100% Tier 1 = byte-for-byte the behaviour
+// that shipped before this table existed. Skipping the test can never make the
+// app behave worse than it did.
+type TierMix = readonly [number, number, number];
+
+const LEVEL_MIX: Record<string, TierMix> = {
+  business_beginner:     [1.00, 0.00, 0.00],
+  business_elementary:   [0.85, 0.15, 0.00],
+  business_intermediate: [0.70, 0.20, 0.10],
+  business_advanced:     [0.45, 0.35, 0.20],
+};
+const BEGINNER_MIX: TierMix = [1, 0, 0];
+
+function mixFor(level?: string | null): TierMix {
+  return (level && LEVEL_MIX[level]) || BEGINNER_MIX;
+}
+
+/**
+ * Build this session's core new-word list from the three tier pools according
+ * to the learner's mix.
+ *
+ * Allocation is done against LIFETIME counts, not per-session ones. Rounding a
+ * 20% share inside a single 6-word session always loses the same fraction in
+ * the same direction — intermediate would have got 1 Tier 2 word per session
+ * forever, i.e. 12%, not 20%. Scoring each slot against how far that tier has
+ * fallen behind its quota over ALL the words the learner has ever seen makes
+ * the ratios converge exactly, and it self-corrects: a learner who takes the
+ * placement test late has their Tier 2/3 quota caught up over the next few
+ * sessions instead of being written off.
+ *
+ * A tier whose unseen pool has run dry is skipped and its slot goes to
+ * whichever tier is next furthest behind, so the session is never short.
+ */
+function mixedCorePool(
+  pools: readonly [VocabWord[], VocabWord[], VocabWord[]],
+  seenCounts: readonly [number, number, number],
+  mix: TierMix,
+  slots: number,
+): VocabWord[] {
+  const out: VocabWord[] = [];
+  const cursor: [number, number, number] = [0, 0, 0];
+  const taken: [number, number, number] = [seenCounts[0], seenCounts[1], seenCounts[2]];
+  let total = seenCounts[0] + seenCounts[1] + seenCounts[2];
+
+  while (out.length < slots) {
+    let best = -1;
+    let bestScore = -Infinity;
+    for (let t = 0; t < 3; t++) {
+      if (mix[t] <= 0) continue;                 // tier not open to this level
+      if (cursor[t] >= pools[t].length) continue; // pool exhausted
+      const deficit = mix[t] * (total + 1) - taken[t];
+      if (deficit > bestScore + 1e-9) {
+        bestScore = deficit;
+        best = t;
+      }
+    }
+    if (best < 0) break; // nothing left anywhere
+    out.push(pools[best][cursor[best]++]);
+    taken[best]++;
+    total++;
+  }
+  return out;
+}
 
 /**
  * Pick today's words with progressive tier gating + layered review selection.
@@ -767,7 +877,26 @@ export function planSession(
   // Field words capped at 2 so the core curriculum still dominates.
   const fieldCap = tier4Unlocked ? Math.min(2, newTarget) : 0;
 
-  const primary = currentTier === 3 ? t3Unseen : currentTier === 2 ? t2Unseen : t1Unseen;
+  // While the learner is still in Tier 1, the placement level decides the blend
+  // (see LEVEL_MIX). Once Tier 2 has actually been UNLOCKED by mastery, the
+  // normal machinery takes over unchanged — at that point "primary" is already
+  // the harder pool, and mixing Tier 1 back in would be pulling them backwards.
+  const mix = mixFor(opts.level);
+  const useMix = currentTier === 1 && (mix[1] > 0 || mix[2] > 0);
+
+  const primary: VocabWord[] = useMix
+    ? mixedCorePool(
+        [t1Unseen, t2Unseen, t3Unseen],
+        [
+          t1.length - t1Unseen.length,
+          t2.length - t2Unseen.length,
+          t3.length - t3Unseen.length,
+        ],
+        mix,
+        newTarget,
+      )
+    : currentTier === 3 ? t3Unseen : currentTier === 2 ? t2Unseen : t1Unseen;
+
   for (const w of primary) {
     if (newWords.length >= newTarget - fieldCap) break;
     newWords.push(w);

@@ -13,6 +13,7 @@ import {
   buildQuiz,
   buildReviewQuiz,
   computeFormatTier,
+  formatFloorForLevel,
   computeStreakWithFreezes,
   countCompletedSessions,
   countSessionsToday,
@@ -83,6 +84,10 @@ export default function VocabularyModule() {
   // Question-format difficulty — escalates above tierLevel automatically when
   // recent accuracy is very high, eases back when it drops.
   const [formatTier, setFormatTier] = useState<1 | 2 | 3>(1);
+  // Floor set by the placement test. Kept separately from formatTier so the
+  // hint under the intro card can tell the learner the TRUE reason the
+  // questions are harder — their level test, or their recent scores.
+  const [formatFloor, setFormatFloor] = useState<1 | 2 | 3>(1);
   // Words the learner marked "I already know this" on the card stage.
   const [claimed, setClaimed] = useState<Set<string>>(new Set());
   const [sessionsToday, setSessionsToday] = useState(0);
@@ -182,6 +187,10 @@ export default function VocabularyModule() {
         plan: hasUnlimitedVocab(s) ? "paid" : "free",
         sessionsToday: doneToday,
         recentScores: recent,
+        // Placement result. Does not unlock tiers — only blends harder words
+        // into the new-word mix so people who tested high are not stuck on
+        // "Deadline" for a month. Undefined (test skipped) = beginner mix.
+        level: s.level,
       });
       const totalDone = await countCompletedSessions(user.id);
       if (cancelled) return;
@@ -236,7 +245,13 @@ export default function VocabularyModule() {
       setNewWords(newW);
       setReviewKeys(revK);
       setTierLevel(plan.tierLevel);
-      setFormatTier(computeFormatTier(plan.tierLevel, recent));
+      // The placement floor raises the CENTRE of the adaptive band, not the
+      // result — computeFormatTier still adds +1 for strong recent accuracy on
+      // top of it, and still eases back down when accuracy drops.
+      const floor = formatFloorForLevel(s.level);
+      setFormatFloor(floor);
+      const baseTier = Math.max(plan.tierLevel, floor) as 1 | 2 | 3;
+      setFormatTier(computeFormatTier(baseTier, recent));
 
       // Resume an interrupted session rather than silently starting a new one.
       // Only a snapshot of the SAME kind, though: tapping "გამეორება" used to
@@ -862,11 +877,20 @@ export default function VocabularyModule() {
             reviewCount={reviewKeys.length}
             onStart={startSession}
           />
-          {formatTier > tierLevel && (
+          {/* Two different reasons the questions can be above the curriculum
+              tier, and they must not be confused: the placement test (true
+              from session one, before any score exists) and recent accuracy.
+              Telling a brand-new user their questions got harder "based on
+              recent results" when they have no results yet reads as a bug. */}
+          {formatTier > Math.max(tierLevel, formatFloor) ? (
             <p className="ka text-xs text-ink-muted mt-2 text-center">
               📈 ბოლო შედეგების მიხედვით კითხვები ოდნავ გართულდა
             </p>
-          )}
+          ) : formatFloor > tierLevel && formatTier >= formatFloor ? (
+            <p className="ka text-xs text-ink-muted mt-2 text-center">
+              📊 კითხვების სირთულე შენს დონეს შეესაბამება
+            </p>
+          ) : null}
           {sessionReviewList.length > 0 && (
             <BizCard className="mt-4">
               <div className="flex items-baseline justify-between">
