@@ -39,15 +39,20 @@ export default function BusinessSetup() {
   const { displayName } = useDisplayName();
 
   const [step, setStep] = useState<Step>(0);
+  // False until we know this visit will actually SHOW the questions. After the
+  // placement test the app routes back through /setup, which redirects
+  // straight to the dashboard — but the mount still fired setup_started, so
+  // every user logged it twice and the onboarding funnel read ~2x worse than
+  // reality. Seen in the first real signups: two users, two setup_started
+  // each, the second 0.1-0.3s before reached_dashboard.
+  const [showing, setShowing] = useState(false);
 
   const [goals, setGoals] = useState<BusinessGoal[]>([]);
   const [intensity, setIntensity] = useState<BusinessIntensity | null>(null);
   const [deadline, setDeadline] = useState<BusinessDeadline>(null);
   const [field, setField] = useState<BusinessField[]>([]);
 
-  useEffect(() => {
-    track("setup_started");
-  }, []);
+
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +65,8 @@ export default function BusinessSetup() {
         navigate("/path/business/home", { replace: true });
         return;
       }
+      track("setup_started");
+      setShowing(true);
       setGoals(cur.goals ?? []);
       setIntensity(cur.intensity ?? null);
       setDeadline(cur.deadline ?? null);
@@ -151,12 +158,14 @@ export default function BusinessSetup() {
   const back = () => setStep((s) => Math.max(0, (s - 1) as Step) as Step);
 
   // One event per screen. "setup_started" alone cannot tell you which question
-  // lost someone who signed up and never came back.
+  // lost someone who signed up and never came back. Gated on `showing` for the
+  // same reason as above — no events from a pass that only redirects.
   useEffect(() => {
+    if (!showing) return;
     track("setup_step_viewed", {
       step: step === 0 ? "goals" : step === 1 ? "intensity" : "field",
     });
-  }, [step]);
+  }, [step, showing]);
 
 
   return (
