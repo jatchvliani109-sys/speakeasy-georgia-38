@@ -158,7 +158,8 @@ function clampTags(value: unknown, negative = false): unknown {
   if (value && typeof value === "object") {
     const o = value as Record<string, unknown>;
     for (const k of Object.keys(o)) {
-      const neg = negative || k === "hurtChances" || k === "issueKa";
+      const neg = negative || k === "hurtChances" || k === "issueKa" ||
+        (k === "whyKa" && o.isBetter === false);
       if (k === "praiseKa" || k === "whyKa" || k === "whyStrongerKa") {
         const set = neg ? ISSUE_SET : PRAISE_SET;
         const fallback = neg ? ISSUE_TAGS[0] : PRAISE_TAGS[0];
@@ -392,8 +393,8 @@ Return JSON exactly in this shape:
       "promptKa": "Georgian instruction (e.g. 'რომელი პასუხი იქნება უფრო ძლიერი გასაუბრების დასაწყისში?')",
       "contextEn": "Short English interviewer line that prompts these options",
       "options": [
-        { "label": "A", "text": "candidate answer in English", "isBetter": true, "whyKa": "1-line Georgian explanation" },
-        { "label": "B", "text": "candidate answer in English", "isBetter": false, "whyKa": "1-line Georgian explanation" }
+        { "label": "A", "text": "candidate answer in English", "isBetter": true, "whyKa": "ONE label copied EXACTLY from [${PRAISE_LIST}]", "why": "1 short English sentence" },
+        { "label": "B", "text": "candidate answer in English", "isBetter": false, "whyKa": "ONE label copied EXACTLY from [${ISSUE_LIST}]", "why": "1 short English sentence" }
       ]
     }
   ],
