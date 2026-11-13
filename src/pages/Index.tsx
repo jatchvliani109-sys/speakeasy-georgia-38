@@ -145,7 +145,9 @@ function Landing() {
   // Scroll-driven movement that belongs to the page itself:
   //  - leaving the hero, the text drifts down and fades while the deck rises
   //    faster (depth);
-  //  - the closing card straightens up and grows into place as it arrives.
+  //  - the closing card rises and straightens as it arrives, hinged at its
+  //    bottom-left corner. (It used to grow from its centre too, which pulled
+  //    Tiki, who walks along its bottom edge, backwards for a moment.)
   const ctaTop = useRef(0);
   useScrollFrame(
     {
@@ -168,7 +170,7 @@ function Landing() {
         const card = ctaCardRef.current;
         if (card) {
           const e = easeOutCubic(progress(f.vh - ctaTop.current, 0, f.vh * 0.6));
-          card.style.transform = `scale(${(0.9 + 0.1 * e).toFixed(4)}) rotate(${(-2.5 * (1 - e)).toFixed(2)}deg)`;
+          card.style.transform = `translate3d(0, ${(56 * (1 - e)).toFixed(1)}px, 0) rotate(${(-3 * (1 - e)).toFixed(2)}deg)`;
         }
       },
     },
@@ -398,7 +400,7 @@ function Landing() {
             <div ref={ctaStationRef} data-thread className="max-w-4xl mx-auto">
               <div
                 ref={ctaCardRef}
-                className="paper-card relative overflow-hidden rounded-[32px] px-6 sm:px-14 pt-14 sm:pt-20 pb-4 text-center will-change-transform"
+                className="paper-card relative overflow-hidden rounded-[32px] px-6 sm:px-14 pt-14 sm:pt-20 pb-4 text-center will-change-transform origin-bottom-left"
               >
                 <RevealHeading
                   text="მზად ხარ პროფესიონალურ ინგლისურს დაეუფლო?"
