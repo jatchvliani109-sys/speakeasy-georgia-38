@@ -54,7 +54,14 @@ export default function ScrollTiki({
       const restX = g.width * restAt - w / 2;
       // the whole walk plays while the card rises from the bottom of the
       // screen to a little above the middle
-      const p = reduced ? 1 : progress(f.y + f.vh, g.top + 40, g.top + f.vh * 0.62);
+      // The walk plays from when the card rises into view until it is a little
+      // above the middle of the screen, or until the very bottom of the page
+      // if that comes first (on a wide screen the page can end sooner, and he
+      // must still finish lying down).
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - f.vh);
+      const startY = g.top + 40 - f.vh;
+      const endY = Math.max(startY + 120, Math.min(g.top - f.vh * 0.38, maxScroll - 2));
+      const p = reduced ? 1 : progress(f.y, startY, endY);
       const WALK_END = 0.78;
       let x: number;
       let frame: number;

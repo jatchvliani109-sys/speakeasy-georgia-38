@@ -30,6 +30,7 @@ import { track } from "@/lib/track";
 import {
   easeOutCubic,
   progress,
+  useMagnetic,
   useReducedMotion,
   useRevealClass,
   useScrollFrame,
@@ -134,8 +135,10 @@ function Landing() {
   const tikiTrackRef = useRef<HTMLDivElement>(null);
 
   useScrollProgress(progressRef);
-  // (no magnetic pull on the two sign-up buttons: the cobalt arrow line is
-  // attached to them, so they stay exactly where the line expects them)
+  // the two sign-up buttons lean toward the mouse; the arrow inside them
+  // follows the button (see ArrowThread)
+  useMagnetic(heroCtaRef);
+  useMagnetic(finalCtaRef);
   // the hero writes itself in as soon as the page opens
   useRevealClass(heroTextRef, { immediate: true });
   // Once the hero's buttons have scrolled away, the sign-up button follows

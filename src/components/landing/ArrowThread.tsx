@@ -138,7 +138,11 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
   const pathRefs = useRef<(SVGPathElement | null)[]>([]);
   const headRefs = useRef<(SVGGElement | null)[]>([]);
   const btnClipRefs = useRef<(SVGRectElement | null)[]>([]);
-  const cardClipRef = useRef<SVGRectElement>(null);
+  const btnGroupRefs = useRef<(SVGGElement | null)[]>([]);
+  const cardClipRef = useRef<SVGPathElement>(null);
+  // the two buttons, and their centres in page coordinates, so the white
+  // arrow inside each can lean with its button when the mouse pulls it
+  const btns = useRef<{ el: HTMLElement; cx: number; cy: number }[]>([]);
 
   const geo = useRef({
     ok: false,
@@ -379,7 +383,17 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
     };
     setRect(btnClipRefs.current[0], sb, 16);
     setRect(btnClipRefs.current[1], eb, 16);
-    setRect(cardClipRef.current, cr, 32);
+    // the closing card, minus the bottom button (inside the button only the
+    // white copy shows, and that one moves with the button)
+    const rr = (r: { x: number; y: number; w: number; h: number }, k: number) =>
+      `M${r.x + k} ${r.y}H${r.x + r.w - k}A${k} ${k} 0 0 1 ${r.x + r.w} ${r.y + k}V${r.y + r.h - k}` +
+      `A${k} ${k} 0 0 1 ${r.x + r.w - k} ${r.y + r.h}H${r.x + k}A${k} ${k} 0 0 1 ${r.x} ${r.y + r.h - k}` +
+      `V${r.y + k}A${k} ${k} 0 0 1 ${r.x + k} ${r.y}Z`;
+    cardClipRef.current?.setAttribute("d", rr(cr, 32) + rr(eb, 16));
+    btns.current = [
+      { el: startBtn, cx: sb.x + sb.w / 2, cy: sb.y + sb.h / 2 },
+      { el: endBtn, cx: eb.x + eb.w / 2, cy: eb.y + eb.h / 2 },
+    ];
 
     geo.current = {
       ok: true,
@@ -515,6 +529,46 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
 
   useEffect(() => () => cancelAnimationFrame(chase.current.raf), []);
 
+  // ── the white arrow leans with its button (the mouse pull on the button) ──
+  useEffect(() => {
+    let raf = 0;
+    let until = 0;
+    const sync = () => {
+      raf = 0;
+      btns.current.forEach((b, i) => {
+        const g = btnGroupRefs.current[i];
+        if (!g) return;
+        const t = getComputedStyle(b.el).transform;
+        if (!t || t === "none") {
+          g.removeAttribute("transform");
+          return;
+        }
+        const v = t.slice(t.indexOf("(") + 1, -1).split(",").map(Number);
+        const m = t.startsWith("matrix3d") ? [v[0], v[1], v[4], v[5], v[12], v[13]] : v;
+        g.setAttribute(
+          "transform",
+          `translate(${b.cx} ${b.cy}) matrix(${m.map((n) => n.toFixed(4)).join(" ")}) translate(${-b.cx} ${-b.cy})`,
+        );
+      });
+      if (performance.now() < until) raf = requestAnimationFrame(sync);
+    };
+    // follow for a while after any pointer activity (the button eases back)
+    const poke = () => {
+      until = performance.now() + 700;
+      if (!raf) raf = requestAnimationFrame(sync);
+    };
+    const opts = { passive: true } as const;
+    window.addEventListener("pointermove", poke, opts);
+    window.addEventListener("pointerdown", poke, opts);
+    window.addEventListener("pointerup", poke, opts);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", poke);
+      window.removeEventListener("pointerdown", poke);
+      window.removeEventListener("pointerup", poke);
+    };
+  }, []);
+
   const line = (i: number, cls: string) => (
     <path ref={(el) => (pathRefs.current[i] = el)} className={cls} style={{ strokeDasharray: "0 100000" }} />
   );
@@ -546,11 +600,14 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
         <defs>
           {glow(1)}
           {glow(2)}
+          {glow(3)}
           <clipPath id={`${uid}-card`}>
-            <rect ref={cardClipRef} />
+            <path ref={cardClipRef} clipRule="evenodd" />
           </clipPath>
-          <clipPath id={`${uid}-btn`}>
+          <clipPath id={`${uid}-btn0`}>
             <rect ref={(el) => (btnClipRefs.current[0] = el)} />
+          </clipPath>
+          <clipPath id={`${uid}-btn1`}>
             <rect ref={(el) => (btnClipRefs.current[1] = el)} />
           </clipPath>
         </defs>
@@ -558,9 +615,18 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
           {line(1, "arrow-line arrow-line-paper")}
           {head(1, "arrow-head")}
         </g>
-        <g clipPath={`url(#${uid}-btn)`}>
-          {line(2, "arrow-line arrow-line-white")}
-          {head(2, "arrow-head arrow-head-white")}
+        {/* white inside each button; each group moves with its button */}
+        <g ref={(el) => (btnGroupRefs.current[0] = el)}>
+          <g clipPath={`url(#${uid}-btn0)`}>
+            {line(2, "arrow-line arrow-line-white")}
+            {head(2, "arrow-head arrow-head-white")}
+          </g>
+        </g>
+        <g ref={(el) => (btnGroupRefs.current[1] = el)}>
+          <g clipPath={`url(#${uid}-btn1)`}>
+            {line(3, "arrow-line arrow-line-white")}
+            {head(3, "arrow-head arrow-head-white")}
+          </g>
         </g>
       </svg>
     </>
