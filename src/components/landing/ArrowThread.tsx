@@ -152,6 +152,7 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
     endY: 0,
     startIcon: null as SVGElement | null,
     endIcon: null as SVGElement | null,
+    minL: 0, // the short line inside the top button is always drawn
     last: -1,
   });
 
@@ -198,7 +199,11 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
     const narrow = W < 640;
     const edgeR = narrow ? W * 0.88 : Math.min(W - 9, Math.max(W * 0.86, W - 60));
     const edgeL = narrow ? W * 0.12 : Math.max(9, Math.min(W * 0.14, 60));
-    const pts: P[] = [A, { x: sb.x + sb.w + 22, y: A.y }];
+    // the route starts at the left end of the top arrow's short line, so at
+    // the top of the page our arrow (line + head) IS the button's arrow
+    const S0: P = { x: si.x + si.w * (5 / 24), y: A.y };
+    const shaft = A.x - S0.x;
+    const pts: P[] = [S0, A, { x: sb.x + sb.w + 22, y: A.y }];
 
     // ── out of the hero ──
     const deckBeside = deckSt.x > sb.x + sb.w + 20 && deckSt.y < sb.y + sb.h;
@@ -388,13 +393,15 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
       endY: Z.y,
       startIcon,
       endIcon,
+      minL: shaft,
       last: -1,
     };
   });
 
   // ── drawing at a given length along the route ──
-  const draw = (L: number) => {
+  const draw = (Lin: number) => {
     const g = geo.current;
+    const L = Math.max(g.minL, Lin);
     const n = g.xs.length;
     // sample at length L
     let lo = 0;
@@ -411,7 +418,7 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
     // heading from a little behind the tip, levelled out over the last few
     // pixels so it settles exactly like the button's own arrow
     const back = Math.max(0, lo - 3);
-    let ang = lo === 0 && t === 0 ? 0 : (Math.atan2(y - g.ys[back], x - g.xs[back]) * 180) / Math.PI;
+    let ang = lo === 0 ? 0 : (Math.atan2(y - g.ys[back], x - g.xs[back]) * 180) / Math.PI;
     const toEnd = g.total - L;
     if (toEnd < 30) {
       const k = 1 - toEnd / 30;
@@ -422,16 +429,13 @@ export default function ArrowThread({ rootRef }: { rootRef: RefObject<HTMLElemen
     const off = String(g.total - L);
     pathRefs.current.forEach((p) => p && (p.style.strokeDashoffset = off));
 
-    // at either end the button's own arrow shows; in between, ours flies
-    const atStart = L < 1.5;
-    const atEnd = L > g.total - 1.5;
-    if (g.startIcon) g.startIcon.style.opacity = atStart ? "1" : "0";
-    if (g.endIcon) g.endIcon.style.opacity = atEnd ? "1" : "0";
+    // one arrow, start to finish: the buttons' own icons stay hidden (they
+    // only hold the space and mark where the arrow starts and lands)
     const tf = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${ang.toFixed(1)}deg)`;
     headRefs.current.forEach((h) => {
       if (!h) return;
       h.style.transform = tf;
-      h.style.opacity = atStart || atEnd ? "0" : "1";
+      h.style.opacity = "1";
     });
   };
 

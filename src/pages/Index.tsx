@@ -280,8 +280,9 @@ function Landing() {
                       className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-16 px-8 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
                     >
                       <span>დაიწყე ახლავე უფასოდ</span>
-                      {/* this arrow flies out and becomes the cobalt arrow line */}
-                      <ArrowRight data-arrow="start" className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                      {/* invisible placeholder: holds the space and marks where the
+                          cobalt arrow line starts (ArrowThread draws the arrow) */}
+                      <ArrowRight data-arrow="start" aria-hidden className="w-5 h-5 shrink-0 opacity-0" />
                     </Link>
                     <a
                       href="#demo"
@@ -416,8 +417,8 @@ function Landing() {
                     className="press group inline-flex items-center gap-2.5 h-16 px-7 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
                   >
                     დაიწყე ახლავე უფასოდ
-                    {/* ...and lands back here at the end of the page */}
-                    <ArrowRight data-arrow="end" className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+                    {/* invisible placeholder: where the arrow line lands */}
+                    <ArrowRight data-arrow="end" aria-hidden className="w-5 h-5 shrink-0 opacity-0" />
                   </Link>
                 </div>
                 {/* Tiki walks in along the bottom of the card and naps */}
