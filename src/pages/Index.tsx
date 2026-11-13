@@ -21,6 +21,7 @@ import MatchBoard from "@/components/landing/MatchBoard";
 import ValueDeck from "@/components/landing/ValueDeck";
 import ModuleStack from "@/components/landing/ModuleStack";
 import ScrollTiki from "@/components/landing/ScrollTiki";
+import ArrowThread from "@/components/landing/ArrowThread";
 import { FloatChips, HeroBackdrop } from "@/components/landing/HeroField";
 import { RevealHeading, SplitWords } from "@/components/landing/Reveal";
 import Wordmark from "@/components/Wordmark";
@@ -29,7 +30,6 @@ import { track } from "@/lib/track";
 import {
   easeOutCubic,
   progress,
-  useMagnetic,
   useReducedMotion,
   useRevealClass,
   useScrollFrame,
@@ -134,8 +134,8 @@ function Landing() {
   const tikiTrackRef = useRef<HTMLDivElement>(null);
 
   useScrollProgress(progressRef);
-  useMagnetic(heroCtaRef);
-  useMagnetic(finalCtaRef);
+  // (no magnetic pull on the two sign-up buttons: the cobalt arrow line is
+  // attached to them, so they stay exactly where the line expects them)
   // the hero writes itself in as soon as the page opens
   useRevealClass(heroTextRef, { immediate: true });
   // Once the hero's buttons have scrolled away, the sign-up button follows
@@ -143,8 +143,9 @@ function Landing() {
   const pastHero = useScrolledPast(520);
 
   // Scroll-driven movement that belongs to the page itself:
-  //  - leaving the hero, the text drifts down and fades while the deck rises
-  //    faster (depth);
+  //  - leaving the hero, the deck rises faster than the page (depth). The
+  //    text and buttons stay put: the cobalt arrow line starts from the
+  //    sign-up button, so the button must not drift away from it;
   //  - the closing card rises and straightens as it arrives, hinged at its
   //    bottom-left corner. (It used to grow from its centre too, which pulled
   //    Tiki, who walks along its bottom edge, backwards for a moment.)
@@ -157,19 +158,15 @@ function Landing() {
       },
       write: (f) => {
         if (f.y < f.vh * 1.3) {
-          const text = heroTextRef.current;
           const deck = deckWrapRef.current;
-          if (text) {
-            text.style.transform = `translate3d(0, ${(f.y * 0.16).toFixed(1)}px, 0)`;
-            text.style.opacity = Math.max(0, 1 - f.y / (f.vh * 0.85)).toFixed(3);
-          }
           if (deck) {
             deck.style.transform = `translate3d(0, ${(-f.y * 0.14).toFixed(1)}px, 0) rotate(${(f.y * 0.012).toFixed(2)}deg)`;
           }
         }
         const card = ctaCardRef.current;
         if (card) {
-          const e = easeOutCubic(progress(f.vh - ctaTop.current, 0, f.vh * 0.6));
+          // settles early, before the cobalt arrow line reaches the card
+          const e = easeOutCubic(progress(f.vh - ctaTop.current, 0, f.vh * 0.28));
           card.style.transform = `translate3d(0, ${(56 * (1 - e)).toFixed(1)}px, 0) rotate(${(-3 * (1 - e)).toFixed(2)}deg)`;
         }
       },
@@ -224,6 +221,8 @@ function Landing() {
         {/* Everything inside this wrapper sits on top of the ink thread. */}
         <div ref={rootRef} className="relative">
           <InkThread rootRef={rootRef} />
+          {/* the cobalt arrow: from the top sign-up button to the bottom one */}
+          <ArrowThread rootRef={rootRef} />
 
           {/* ═══════════════ HERO ═══════════════ */}
           <section ref={heroRef} className="relative z-[1] overflow-hidden">
@@ -281,11 +280,12 @@ function Landing() {
                       className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-16 px-8 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
                     >
                       <span>დაიწყე ახლავე უფასოდ</span>
-                      <ArrowRight className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                      {/* this arrow flies out and becomes the cobalt arrow line */}
+                      <ArrowRight data-arrow="start" className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
                     </Link>
                     <a
                       href="#demo"
-                      className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2 h-14 sm:h-16 px-6 rounded-2xl border border-rule/25 text-ink text-base font-semibold hover:bg-rule/5 hover:border-rule/45 transition-colors ka"
+                      className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2 h-14 sm:h-16 px-6 rounded-2xl border border-rule/25 bg-cream text-ink text-base font-semibold hover:bg-cream-2 hover:border-rule/45 transition-colors ka"
                     >
                       <span>გამოსცადე რეგისტრაციის გარეშე</span>
                       <ArrowDown className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-y-0.5" />
@@ -416,7 +416,8 @@ function Landing() {
                     className="press group inline-flex items-center gap-2.5 h-16 px-7 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
                   >
                     დაიწყე ახლავე უფასოდ
-                    <ArrowRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+                    {/* ...and lands back here at the end of the page */}
+                    <ArrowRight data-arrow="end" className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                   </Link>
                 </div>
                 {/* Tiki walks in along the bottom of the card and naps */}

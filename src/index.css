@@ -438,6 +438,26 @@
   stroke-dasharray: 0.1 7;
 }
 
+/* ── the cobalt arrow line (top sign-up button → bottom one) ── */
+/* the trail is dark ink (sand at night), like the other line; the arrowhead
+   is cobalt; both turn white inside the blue buttons */
+.arrow-line {
+  stroke: hsl(var(--rule) / 0.75);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.arrow-head {
+  fill: none;
+  stroke: hsl(var(--cta-line));
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* on the sand closing card the trail stays dark ink in night mode too */
+.arrow-line-paper { stroke: hsl(var(--paper-ink) / 0.75); }
+.arrow-line-white, .arrow-head-white { stroke: #fff; }
+
 /* Tiki's sleep z's on the closing card. */
 @keyframes tikiZ {
   0%   { opacity: 0; transform: translate(0, 0) scale(0.6) rotate(-8deg); }
