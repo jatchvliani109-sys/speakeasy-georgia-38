@@ -342,7 +342,7 @@ export default function Auth() {
             type="submit"
             disabled={loading}
             aria-disabled={mode === "signup" && !termsAccepted}
-            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-panel-deep text-on-dark text-sm font-semibold tracking-wide ka hover:bg-panel-deep transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-cta text-cta-fg text-[15px] font-bold tracking-wide ka hover:bg-cta-hover shadow-[0_12px_26px_-12px_hsl(var(--cta)/0.75)] transition-colors press disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

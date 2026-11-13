@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { BookOpen, Volume2, VolumeX } from "lucide-react";
+import { BookOpen, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { useReducedMotion } from "@/lib/motion";
 import { useAuth } from "@/lib/auth";
 import { useDisplayName } from "@/hooks/useDisplayName";
 import BusinessShell, { BizCard, BizButton } from "./BusinessShell";
@@ -65,6 +66,9 @@ export default function VocabularyModule() {
   const { user } = useAuth();
   const { displayName } = useDisplayName();
   const [stage, setStage] = useState<Stage>("intro");
+  // The current flashcard slides off the deck before the next one is dealt.
+  const [cardLeaving, setCardLeaving] = useState(false);
+  const reducedMotion = useReducedMotion();
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [state, setState] = useState<BusinessState | null>(null);
@@ -771,7 +775,7 @@ export default function VocabularyModule() {
         <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">
           ბიზნეს ლექსიკა
         </p>
-        <h1 className="ka text-2xl font-bold text-wine mt-1">
+        <h1 className="ka text-[1.7rem] font-extrabold tracking-tight text-ink mt-1">
           {stage === "results"
             ? displayName ? `${displayName}, სესია დასრულდა` : "სესია დასრულდა"
             : reviewMode
@@ -836,7 +840,7 @@ export default function VocabularyModule() {
 
       {stage === "intro" && dailyLimitReached && (
         <>
-          <div className="rounded-3xl p-6 text-center text-on-dark bg-gradient-to-br from-panel-soft to-panel shadow-lg">
+          <div className="rise rounded-[26px] p-6 text-center text-on-dark bg-paper-btn border border-on-dark/10 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.6)]">
             <div className="text-4xl">✓</div>
             <h2 className="ka text-xl font-bold mt-2">დღევანდელი ვარჯიში დასრულებულია</h2>
             <p className="ka text-sm text-on-dark/80 mt-2 leading-relaxed">
@@ -844,7 +848,7 @@ export default function VocabularyModule() {
             </p>
             <Link
               to="/path/business/home"
-              className="ka inline-block mt-5 px-6 py-3 rounded-full bg-gold text-panel-deep text-sm font-bold"
+              className="press ka inline-block mt-5 px-6 py-3 rounded-xl bg-cta text-cta-fg hover:bg-cta-hover text-sm font-bold"
             >
               მთავარზე დაბრუნება
             </Link>
@@ -971,9 +975,21 @@ export default function VocabularyModule() {
             word={newWords[cardIdx]}
             claimed={claimed.has(newWords[cardIdx].key)}
             onToggleClaim={() => toggleClaim(newWords[cardIdx].key)}
+            remaining={newWords.length - cardIdx}
+            leaving={cardLeaving}
           />
-          <div className="mt-4 flex justify-end">
-            <BizButton onClick={onNextCard}>
+          <div className="mt-7 flex justify-end">
+            <BizButton
+              onClick={() => {
+                if (cardLeaving) return;
+                if (reducedMotion) return onNextCard();
+                setCardLeaving(true);
+                window.setTimeout(() => {
+                  setCardLeaving(false);
+                  onNextCard();
+                }, 260);
+              }}
+            >
               {cardIdx + 1 < newWords.length ? "შემდეგი →" : "ქვიზის დაწყება →"}
             </BizButton>
           </div>
@@ -1102,10 +1118,9 @@ function IntroCard({
   onStart,
 }: { newWords: VocabWord[]; reviewCount: number; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
-      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-panel/15 blur-2xl pointer-events-none" />
+    <div className="rise relative overflow-hidden rounded-[26px] bg-paper-btn border border-on-dark/10 text-on-dark p-6 sm:p-7 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.6)]">
       <div className="relative">
-        <p className="ka text-[10px] uppercase tracking-wider bg-panel/20 text-gold-soft px-2 py-1 rounded-md font-semibold inline-block">
+        <p className="ka text-[10px] uppercase tracking-wider bg-on-dark/10 text-gold-soft px-2 py-1 rounded-md font-semibold inline-block">
           შემდეგი სესია
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
@@ -1118,7 +1133,7 @@ function IntroCard({
         </div>
         <button
           onClick={onStart}
-          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-gold text-panel-deep hover:bg-gold-2 transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+          className="press ka mt-5 inline-flex items-center justify-center gap-2 h-12 bg-cta text-cta-fg hover:bg-cta-hover shadow-[0_12px_26px_-12px_hsl(var(--cta)/0.8)] transition-colors px-5 rounded-xl font-bold text-[15px] w-full"
         >
           დაწყება →
         </button>
@@ -1129,10 +1144,9 @@ function IntroCard({
 
 function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () => void }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark p-6 shadow-[0_12px_32px_-12px_rgba(92,26,46,0.45)]">
-      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-panel/15 blur-2xl pointer-events-none" />
+    <div className="rise relative overflow-hidden rounded-[26px] bg-paper-btn border border-on-dark/10 text-on-dark p-6 sm:p-7 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.6)]">
       <div className="relative">
-        <p className="ka text-[10px] uppercase tracking-wider bg-panel/20 text-gold-soft px-2 py-1 rounded-md font-semibold inline-block">
+        <p className="ka text-[10px] uppercase tracking-wider bg-on-dark/10 text-gold-soft px-2 py-1 rounded-md font-semibold inline-block">
           გამეორება
         </p>
         <h2 className="ka text-xl font-bold mt-3 leading-snug">
@@ -1148,7 +1162,7 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
         </div>
         <button
           onClick={onStart}
-          className="ka mt-5 inline-flex items-center justify-center gap-2 bg-gold text-panel-deep hover:bg-gold-2 transition-colors px-5 py-3 rounded-xl font-bold text-sm w-full"
+          className="press ka mt-5 inline-flex items-center justify-center gap-2 h-12 bg-cta text-cta-fg hover:bg-cta-hover shadow-[0_12px_26px_-12px_hsl(var(--cta)/0.8)] transition-colors px-5 rounded-xl font-bold text-[15px] w-full"
         >
           გამეორების დაწყება →
         </button>
@@ -1159,7 +1173,7 @@ function ReviewIntroCard({ words, onStart }: { words: VocabWord[]; onStart: () =
 
 function Mini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-on-dark/10 rounded-lg px-3 py-2">
+    <div className="pop-in bg-on-dark/10 rounded-xl px-3 py-2.5">
       <p className="ka text-[10px] text-on-dark/70 leading-tight break-words">{label}</p>
       <p className="text-base font-bold text-on-dark mt-0.5">{value}</p>
     </div>
@@ -1174,10 +1188,10 @@ function ProgressBar({ value, total, label, pulse = 0 }: { value: number; total:
         <p className="ka text-[11px] text-ink-muted font-semibold uppercase tracking-wider">{label}</p>
         <p className="text-[11px] text-ink-muted font-mono">{pct}%</p>
       </div>
-      <div className={`h-2 bg-line rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
+      <div className={`h-2 bg-ink/10 rounded-full overflow-hidden ${pulse ? "biz-progress-pulse" : ""}`}>
         <div
           key={pulse}
-          className="h-full bg-gradient-to-r from-panel-soft to-panel rounded-full"
+          className="h-full bg-gold rounded-full shadow-[0_0_10px_hsl(var(--cta)/0.45)]"
           style={{ width: `${pct}%`, transition: "width 700ms cubic-bezier(0.2,0.8,0.2,1)" }}
         />
       </div>
@@ -1189,85 +1203,178 @@ function WordCard({
   word,
   claimed,
   onToggleClaim,
+  remaining = 1,
+  leaving = false,
 }: {
   word: VocabWord;
   claimed?: boolean;
   onToggleClaim?: () => void;
+  /** Cards left in the deck, this one included: drawn as edges behind it. */
+  remaining?: number;
+  /** Slides the card off the deck before the next one is dealt. */
+  leaving?: boolean;
 }) {
+  // A real flashcard: the English side first, so the learner guesses the
+  // meaning before seeing it, then a tap turns the card over to the Georgian,
+  // the explanation and the examples. The turn is two halves (out to 90°,
+  // swap the face, in from -90°), so each face keeps its natural height
+  // instead of being forced into one fixed box.
   const ctx = getContext(word.key);
+  const reduced = useReducedMotion();
+  const [side, setSide] = useState<"front" | "back">("front");
+  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+
+  const turn = () => {
+    if (phase !== "idle") return;
+    const next = side === "front" ? "back" : "front";
+    playFlip();
+    if (reduced) {
+      setSide(next);
+      return;
+    }
+    setPhase("out");
+    timers.current.push(
+      window.setTimeout(() => {
+        setSide(next);
+        setPhase("in");
+        timers.current.push(window.setTimeout(() => setPhase("idle"), 340));
+      }, 170),
+    );
+  };
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      turn();
+    }
+  };
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+
+  const colls = (word.collocations && word.collocations.length > 0)
+    ? word.collocations
+    : (ctx?.collocations ?? []);
+  // Second example: authored for all 980 words; context file is fallback.
+  const ex2 = (word.example2En && word.example2En.trim())
+    ? { en: word.example2En, ka: word.example2Ka }
+    : (ctx?.examples[0] ?? null);
+
   return (
-    <div key={word.key} className="biz-card-flip bg-card border border-line rounded-3xl p-6 shadow-[0_2px_4px_rgba(92,26,46,0.04),0_12px_32px_-12px_rgba(92,26,46,0.15)]">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-3xl font-bold text-wine tracking-tight">{word.en}</h2>
-          <p className="ka text-base text-ink-muted mt-1">{word.ka}</p>
-        </div>
-        <ReadAloudButton text={word.en} storageKey={word.key} size="md" />
-      </div>
-
-      {onToggleClaim && (
-        <button
-          type="button"
-          onClick={onToggleClaim}
-          className={`ka mt-3 text-[11px] px-3 py-1.5 rounded-full border font-semibold transition-colors
-            ${claimed
-              ? "border-gold bg-gold/15 text-wine"
-              : "border-line bg-card text-ink-muted hover:border-gold hover:text-wine"}
-          `}
-        >
-          {claimed ? "✓ ვიცი, ქვიზში დავადასტურებ" : "ვიცი ეს სიტყვა"}
-        </button>
+    <div className={`relative [perspective:1400px] ${leaving ? "card-leave" : "card-deal"}`}>
+      {/* the rest of the deck, peeking out underneath */}
+      {remaining > 2 && (
+        <div aria-hidden className="paper-card absolute inset-x-7 -bottom-5 top-8 rounded-[26px] opacity-70" style={{ rotate: "-1.4deg" }} />
+      )}
+      {remaining > 1 && (
+        <div aria-hidden className="paper-card absolute inset-x-3.5 -bottom-2.5 top-4 rounded-[26px]" style={{ rotate: "1.1deg" }} />
       )}
 
-      {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
-        <p className="ka text-sm text-ink mt-4 leading-relaxed">{word.explanationKa}</p>
-      )}
-
-      {(() => {
-        // Authored enrichment covers all 980 words; the older context file only
-        // covered 74. Prefer the word's own collocations, fall back to context.
-        const colls = (word.collocations && word.collocations.length > 0)
-          ? word.collocations
-          : (ctx?.collocations ?? []);
-        if (colls.length === 0) return null;
-        return (
-        <div className="mt-4">
-          <p className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold">როგორ იყენებენ</p>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {colls.slice(0, 3).map((c) => (
-              <span
-                key={c.en}
-                title={c.ka}
-                className="text-[11px] px-2 py-1 rounded-lg bg-gold/15 border border-gold/35 text-wine font-medium"
-              >
-                {c.en}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={turn}
+        onKeyDown={onKey}
+        aria-label={side === "front" ? `${word.en}: გადააბრუნე მნიშვნელობის სანახავად` : `${word.ka}: გადააბრუნე ინგლისურ მხარეზე`}
+        className={`paper-card relative cursor-pointer select-none rounded-[26px] outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-cream ${
+          phase === "out" ? "card-turn-out" : phase === "in" ? "card-turn-in" : ""
+        }`}
+      >
+        {side === "front" ? (
+          <div className="p-6 sm:p-8 min-h-[320px] flex flex-col">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-ink-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-cta" /> English
               </span>
-            ))}
-          </div>
-        </div>
-        );
-      })()}
-
-      <div className="mt-4">
-        <div className="p-3 rounded-xl bg-cream border border-line">
-          <p className="text-sm text-wine">"{word.exampleEn}"</p>
-          <p className="ka text-xs text-ink-muted mt-1">{word.exampleKa}</p>
-        </div>
-        {(() => {
-          // Second example: authored for all 980 words; context file is fallback.
-          const ex2 = (word.example2En && word.example2En.trim())
-            ? { en: word.example2En, ka: word.example2Ka }
-            : (ctx?.examples[0] ?? null);
-          if (!ex2) return null;
-          return (
-            <div className="mt-2 p-3 rounded-xl bg-cream border border-line">
-              <p className="text-sm text-wine">"{ex2.en}"</p>
-              <p className="ka text-xs text-ink-muted mt-1">{ex2.ka}</p>
+              <span onClick={stop} onKeyDown={stop}>
+                <ReadAloudButton text={word.en} storageKey={word.key} size="md" />
+              </span>
             </div>
-          );
-        })()}
 
-        <ReportWordButton word={word} />
+            <div className="flex-1 flex flex-col justify-center py-8">
+              <h2 className="text-[2.6rem] sm:text-5xl font-extrabold tracking-tight text-ink leading-[1.05] break-words">
+                {word.en}
+              </h2>
+              {word.pronunciation && (
+                <p className="ka mt-2 text-sm text-ink-muted">[{word.pronunciation}]</p>
+              )}
+            </div>
+
+            <div className="flex items-end justify-between gap-3">
+              {onToggleClaim ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleClaim();
+                  }}
+                  onKeyDown={stop}
+                  className={`press ka text-[12px] px-3 py-2 rounded-full border font-semibold transition-colors
+                    ${claimed
+                      ? "border-gold bg-gold text-white"
+                      : "border-ink/20 text-ink-muted hover:border-ink/40 hover:text-ink"}
+                  `}
+                >
+                  {claimed ? "✓ ვიცი, ქვიზში დავადასტურებ" : "ვიცი ეს სიტყვა"}
+                </button>
+              ) : (
+                <span />
+              )}
+              <span className="ka inline-flex items-center gap-1.5 text-[12px] font-semibold text-ink-muted">
+                <RotateCcw size={13} strokeWidth={2.25} /> შეეხე, რომ გადააბრუნო
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 sm:p-8 min-h-[320px]">
+            <div className="flex items-center justify-between gap-3">
+              <span className="ka inline-flex items-center gap-2 text-[11px] font-semibold text-ink-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-cta" /> ქართულად
+              </span>
+              <span onClick={stop} onKeyDown={stop}>
+                <ReadAloudButton text={word.en} storageKey={word.key} size="md" />
+              </span>
+            </div>
+
+            <h2 className="ka mt-5 text-3xl sm:text-[2.1rem] font-extrabold text-ink leading-tight">{word.ka}</h2>
+            <p className="mt-1 text-sm font-semibold text-ink-muted">{word.en}</p>
+
+            {word.explanationKa && word.explanationKa.trim() !== word.ka.trim() && (
+              <p className="ka text-[15px] text-ink mt-4 leading-relaxed">{word.explanationKa}</p>
+            )}
+
+            {colls.length > 0 && (
+              <div className="mt-4">
+                <p className="ka text-[10px] uppercase tracking-wider text-ink-muted font-semibold">როგორ იყენებენ</p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {colls.slice(0, 3).map((c, i) => (
+                    <span
+                      key={c.en}
+                      title={c.ka}
+                      style={{ ["--i" as string]: i }}
+                      className="pop-in text-[12px] px-2.5 py-1 rounded-lg bg-paper-btn text-paper-btn-fg font-semibold"
+                    >
+                      {c.en}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 space-y-2" onClick={stop}>
+              <div className="p-3.5 rounded-xl bg-cream border border-line">
+                <p className="text-sm text-ink font-medium">"{word.exampleEn}"</p>
+                <p className="ka text-xs text-ink-muted mt-1">{word.exampleKa}</p>
+              </div>
+              {ex2 && (
+                <div className="p-3.5 rounded-xl bg-cream border border-line">
+                  <p className="text-sm text-ink font-medium">"{ex2.en}"</p>
+                  <p className="ka text-xs text-ink-muted mt-1">{ex2.ka}</p>
+                </div>
+              )}
+              <ReportWordButton word={word} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1572,11 +1679,11 @@ function QuestionCard({
             key={i}
             disabled={revealed}
             onClick={() => setSelected(value)}
-            className={`relative overflow-visible text-left px-4 py-3 rounded-xl border text-sm transition-all
+            className={`press relative overflow-visible text-left px-4 py-3.5 min-h-[48px] rounded-xl border text-[15px] font-semibold transition-all
               ${isCorrect ? "border-sage bg-sage-soft text-ink biz-bounce" : ""}
               ${isWrongPick ? "border-danger bg-danger-soft text-ink biz-shake" : ""}
-              ${!revealed && isSelected ? "border-wine bg-cream text-wine" : ""}
-              ${!revealed && !isSelected ? "border-line bg-card text-wine hover:bg-cream" : ""}
+              ${!revealed && isSelected ? "border-gold ring-2 ring-gold/40 bg-card text-ink" : ""}
+              ${!revealed && !isSelected ? "border-line bg-card text-ink hover:border-ink/40" : ""}
               ${revealed && !isCorrect && !isWrongPick ? "border-line bg-card text-ink-muted opacity-60" : ""}
             `}
           >
@@ -1592,7 +1699,7 @@ function QuestionCard({
     switch (q.type) {
     case "mc_meaning":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">აირჩიე სწორი თარგმანი</p>
           <div className="mt-3 flex items-center gap-2">
             <h3 className="text-2xl font-bold text-wine">{q.en}</h3>
@@ -1603,7 +1710,7 @@ function QuestionCard({
       );
     case "tr_en_to_ka":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">English → ქართული</p>
           <h3 className="text-2xl font-bold text-wine mt-3">{q.en}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1611,7 +1718,7 @@ function QuestionCard({
       );
     case "tr_ka_to_en":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">ქართული → English</p>
           <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1619,7 +1726,7 @@ function QuestionCard({
       );
     case "fill_blank":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი</p>
           <p className="text-lg text-wine mt-3 leading-relaxed">{q.sentence}</p>
           {/* Georgian shown only after answering: some translations contain the
@@ -1632,7 +1739,7 @@ function QuestionCard({
       );
     case "true_false":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">სწორი თუ არასწორი თარგმანი?</p>
           <div className="mt-3 p-4 rounded-xl bg-cream border border-line">
             <p className="text-xl font-bold text-wine">{q.en}</p>
@@ -1649,7 +1756,7 @@ function QuestionCard({
       );
     case "sentence_correct":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-sm text-wine">{q.promptKa}</p>
           {renderChoices(
             q.choices.map((c, i) => ({ label: c, value: i })),
@@ -1659,7 +1766,7 @@ function QuestionCard({
       );
     case "georgian_mistake":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-[11px] uppercase tracking-wider text-ink font-semibold">გავრცელებული შეცდომა</p>
           <p className="ka text-sm text-wine mt-2">{q.promptKa}</p>
           {renderChoices(
@@ -1673,7 +1780,7 @@ function QuestionCard({
       );
     case "odd_one_out":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           {renderChoices(
             q.options.map((o, i) => ({ label: `${o.en}, ${o.ka}`, value: i })),
@@ -1683,7 +1790,7 @@ function QuestionCard({
       );
     case "synonym_match":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
           {renderChoices(q.choices, q.correct)}
@@ -1691,7 +1798,7 @@ function QuestionCard({
       );
     case "sentence_definition":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="text-lg text-ink mt-3 leading-relaxed">
             {q.before}
@@ -1705,7 +1812,7 @@ function QuestionCard({
       );
     case "definition_match":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="ka text-base text-ink mt-3 leading-relaxed">{q.definitionKa}</p>
           {renderChoices(q.choices, q.correct)}
@@ -1713,7 +1820,7 @@ function QuestionCard({
       );
     case "collocation":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">{q.promptKa}</p>
           <p className="text-2xl font-bold text-wine mt-3 tracking-tight">{q.phraseEn}</p>
           {revealed && (
@@ -1724,7 +1831,7 @@ function QuestionCard({
       );
     case "listening":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">მოისმინე და აირჩიე მნიშვნელობა</p>
           <div className="mt-4 flex flex-col items-center gap-2">
             <div className="p-5 rounded-full bg-cream border border-line">
@@ -1747,7 +1854,7 @@ function QuestionCard({
       return <TypeWordCard q={q} revealed={revealed} submit={(v) => setSelected(v)} />;
     case "context_cloze":
       return (
-        <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+        <div className="paper-card rounded-[26px] p-6 sm:p-7">
           <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">შეავსე ცარიელი ადგილი სიტუაციაში</p>
           <span className="ka inline-block mt-2 text-[11px] text-wine bg-gold/20 border border-gold/35 px-2 py-0.5 rounded-md font-semibold">
             {q.titleKa}
@@ -1820,8 +1927,8 @@ function AnswerReveal({
 
   return (
     <div
-      className={`mt-3 rounded-2xl border p-4 animate-[bizFade_.3s_ease-out_both] ${
-        ok ? "border-sage-line bg-sage-soft" : "border-danger-line bg-danger-soft"
+      className={`paper-card rise mt-3 rounded-[22px] p-4 sm:p-5 ring-2 ${
+        ok ? "ring-sage/70" : "ring-danger/60"
       }`}
     >
       <p className={`ka text-sm font-bold ${ok ? "text-sage-deep" : "text-danger-deep"}`}>
@@ -1872,7 +1979,7 @@ function TypeWordCard({
   };
 
   return (
-    <div className="bg-card border border-line rounded-3xl p-6 shadow-sm animate-[bizFade_.3s_ease-out_both]">
+    <div className="paper-card rounded-[26px] p-6 sm:p-7">
       <p className="ka text-xs text-ink-muted uppercase tracking-wider font-semibold">დაწერე სიტყვა ინგლისურად</p>
       <h3 className="ka text-2xl font-bold text-wine mt-3">{q.ka}</h3>
       <p className="text-lg font-mono tracking-[0.25em] text-ink-muted mt-2">{q.hint}</p>
@@ -1988,7 +2095,7 @@ function Results({
   return (
     <div className="space-y-4 animate-[bizFade_.4s_ease-out_both]">
       {streakCelebration && streakCelebration.to > 0 && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-panel via-wine-deep dark:via-wine-soft to-panel text-on-dark ring-1 ring-gold/50 p-4 text-center shadow-lg animate-[bizFade_.5s_ease-out_both]">
+        <div className="relative overflow-hidden rounded-2xl bg-paper-btn text-on-dark ring-2 ring-gold/60 p-4 text-center shadow-lg animate-[bizFade_.5s_ease-out_both]">
           <div className="relative flex items-center justify-center gap-3">
             <span className={`text-4xl ${streakGrew ? "biz-flame" : ""}`}>🔥</span>
             <div className="text-left">
@@ -2003,7 +2110,7 @@ function Results({
           </div>
         </div>
       )}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-panel-soft to-panel-deep text-on-dark p-6 text-center">
+      <div className="rise relative overflow-hidden rounded-[26px] bg-paper-btn border border-on-dark/10 text-on-dark p-6 text-center shadow-[0_18px_40px_-20px_rgba(0,0,0,0.6)]">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-panel/15 blur-2xl pointer-events-none" />
         <div className="relative">
           <p className="ka text-[11px] uppercase tracking-wider text-gold-soft font-semibold">სესიის შედეგი</p>
@@ -2012,7 +2119,7 @@ function Results({
           <p className="ka text-sm text-gold-soft mt-3 font-semibold">{message}</p>
 
           {masteredMilestone !== null && (
-            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold text-panel-deep">
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold text-white">
               <span className="text-sm">✦</span>
               <span className="ka text-[13px] font-bold">
                 {masteredMilestone} სიტყვა უკვე იცი
@@ -2208,8 +2315,8 @@ function NameAsk({ onSettled }: { onSettled: () => void }) {
 
 function SummaryStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-card border border-line rounded-xl p-3 text-center">
-      <p className="text-xl font-bold text-wine">{value}</p>
+    <div className="paper-card pop-in rounded-2xl p-3 text-center">
+      <p className="text-2xl font-extrabold text-ink tabular-nums"><CountUp to={value} /></p>
       <p className="ka text-[10px] text-ink-muted leading-tight break-words mt-0.5">{label}</p>
     </div>
   );

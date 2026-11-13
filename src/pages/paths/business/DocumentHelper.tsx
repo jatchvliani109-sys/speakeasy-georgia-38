@@ -333,7 +333,7 @@ function HomeView({
             <button
               key={t.id}
               onClick={() => onTool(t.id)}
-              className="text-left bg-card border border-line rounded-lg p-4 hover:border-wine/50 transition-colors"
+              className="text-left paper-card rounded-2xl p-4 hover:border-wine/50 transition-colors"
             >
               <span className="w-9 h-9 rounded-md bg-panel-soft text-on-dark grid place-items-center mb-3">
                 <Icon size={16} strokeWidth={2} />
@@ -379,7 +379,7 @@ function DocRow({ doc, onClick }: { doc: BusinessDocument; onClick: () => void }
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-card border border-line rounded-md p-3 hover:border-wine/50 transition-colors flex items-center gap-3"
+      className="w-full text-left paper-card rounded-2xl p-3 hover:border-wine/50 transition-colors flex items-center gap-3"
     >
       <span className="w-9 h-9 rounded-md bg-wine/5 border border-line text-wine grid place-items-center shrink-0">
         <Icon size={16} strokeWidth={2} />
@@ -1228,7 +1228,7 @@ function DocView({
 
       {/* Document — hidden for bio (BioVersions covers all three) */}
       {!(doc.doc_type === "bio" && !editing) && (
-        <article className="bg-card border border-line rounded-2xl p-6 shadow-[0_1px_2px_rgba(92,26,46,0.04),0_8px_24px_-12px_rgba(92,26,46,0.12)]">
+        <article className="paper-card rounded-2xl p-6 ">
           {editing ? (
             <textarea
               value={editContent}
@@ -1273,7 +1273,7 @@ function DocView({
                 შედარება, ორიგინალი / გაუმჯობესებული
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-card border border-line rounded-2xl p-4">
+                <div className="paper-card rounded-2xl p-4">
                   <p className="ka text-[10px] uppercase tracking-wider text-danger font-semibold mb-2">ორიგინალი</p>
                   <p className="text-xs whitespace-pre-wrap font-serif text-wine leading-relaxed">{original}</p>
                 </div>
@@ -1290,7 +1290,7 @@ function DocView({
                 </p>
                 <ul className="space-y-2">
                   {changes.map((c, i) => (
-                    <li key={i} className="bg-card border border-line rounded-xl p-3">
+                    <li key={i} className="paper-card rounded-xl p-3">
                       <div className="text-[11px] grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div className="bg-danger-soft rounded-md px-2 py-1.5">
                           <span className="ka font-semibold text-danger">Before: </span>

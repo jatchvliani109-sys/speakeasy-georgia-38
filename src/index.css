@@ -6,7 +6,12 @@
 
 @layer base {
   :root {
-    /* SpeakBusy — Executive burgundy, charcoal & gold
+    /* SpeakBusy, Nov 2026 palette: sand paper, brown ink, charcoal, and ONE
+       contrasting colour, electric cobalt #2B4EFF, for what should be clicked.
+       The old token NAMES (wine, gold) are kept so hundreds of existing
+       classes keep working: "wine" now means ink (headings, text, outlines)
+       and "gold" now means cobalt (the accent).
+       Previous palette, for reference:
        Primary    wine burgundy #5C1A2E → hsl(343 56% 23%)
        Secondary  dark charcoal #1C1C1E → hsl(240 3% 12%)
        Accent     warm gold     #C9A84C → hsl(43 54% 54%)
@@ -26,10 +31,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 3% 12%;
 
-    --primary: 343 56% 23%;
+    --primary: 230 100% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 43 54% 54%;
-    --primary-hover: 343 56% 28%;
+    --primary-glow: 230 100% 70%;
+    --primary-hover: 231 76% 50%;
 
     --secondary: 240 3% 12%;
     --secondary-foreground: 0 0% 100%;
@@ -37,8 +42,8 @@
     --muted: 30 19% 92%;
     --muted-foreground: 0 0% 29%;
 
-    --accent: 43 54% 54%;
-    --accent-foreground: 240 3% 12%;
+    --accent: 40 25% 88%;
+    --accent-foreground: 30 16% 12%;
 
     --success: 135 21% 45%;
     --success-foreground: 0 0% 100%;
@@ -48,29 +53,29 @@
 
     --border: 30 19% 84%;
     --input: 30 19% 84%;
-    --ring: 343 56% 23%;
+    --ring: 230 100% 58%;
 
     --radius: 1.25rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(343 56% 23%) 0%, hsl(240 3% 12%) 70%, hsl(43 54% 54%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(240 3% 12%) 0%, hsl(240 3% 16%) 70%, hsl(230 100% 58%) 100%);
     --gradient-soft: linear-gradient(180deg, hsl(36 36% 96%) 0%, hsl(30 19% 92%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(343 56% 23%), hsl(43 54% 54%));
+    --gradient-accent: linear-gradient(135deg, hsl(230 100% 58%), hsl(231 76% 50%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(36 36% 98%));
 
-    --shadow-soft: 0 4px 20px -4px hsl(343 56% 23% / 0.18);
-    --shadow-warm: 0 8px 30px -6px hsl(43 54% 54% / 0.22);
+    --shadow-soft: 0 4px 20px -4px hsl(30 30% 10% / 0.16);
+    --shadow-warm: 0 8px 30px -6px hsl(230 100% 58% / 0.22);
     --shadow-card: 0 2px 12px -2px hsl(240 3% 12% / 0.08);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Brand palette tokens (light) */
-    --wine: 343 56% 23%;
-    --wine-deep: 343 57% 18%;
-    --wine-soft: 345 30% 87%;
-    --gold: 43 54% 54%;
-    --gold-soft: 43 55% 78%;
-    --gold-2: 43 58% 60%;
-    --gold-deep: 43 49% 34%;   /* 4.85:1 on cream — 36% fell just under AA */
+    --wine: 30 16% 14%;        /* brown ink, 15:1 on cream */
+    --wine-deep: 30 16% 9%;
+    --wine-soft: 40 25% 88%;   /* light sand tint */
+    --gold: 230 100% 58%;      /* cobalt; white text on it 5.8:1 */
+    --gold-soft: 230 100% 90%;
+    --gold-2: 231 76% 50%;     /* hover */
+    --gold-deep: 231 76% 46%;  /* cobalt as text on cream, 6.9:1 */
     --ink: 240 3% 12%;
     --ink-muted: 0 0% 29%;
     --ink-muted-2: 0 0% 41%;   /* 42% was 4.48:1 on the auth card — a hair under AA */
@@ -135,15 +140,15 @@
     --card-foreground: 36 36% 96%;
     --popover: 240 4% 12%;
     --popover-foreground: 36 36% 96%;
-    --primary: 43 54% 54%;
-    --primary-foreground: 240 5% 8%;
-    --primary-glow: 43 62% 66%;
-    --primary-hover: 43 60% 62%;
+    --primary: 230 100% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 230 100% 72%;
+    --primary-hover: 230 100% 64%;
     --secondary: 240 4% 20%;
     --secondary-foreground: 36 36% 96%;
     --muted: 240 4% 18%;
     --muted-foreground: 30 10% 70%;
-    --accent: 216 16% 42%;
+    --accent: 240 4% 20%;
     --accent-foreground: 36 36% 96%;
     --success: 135 30% 55%;
     --success-foreground: 240 5% 8%;
@@ -151,16 +156,16 @@
     --destructive-foreground: 0 0% 100%;
     --border: 240 4% 22%;
     --input: 240 4% 22%;
-    --ring: 43 54% 54%;
+    --ring: 230 100% 64%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(216 18% 24%) 0%, hsl(240 5% 8%) 70%, hsl(43 54% 44%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(240 4% 16%) 0%, hsl(240 5% 8%) 70%, hsl(230 100% 50%) 100%);
     --gradient-soft: linear-gradient(180deg, hsl(240 5% 8%) 0%, hsl(240 4% 11%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(216 16% 42%), hsl(43 60% 55%));
+    --gradient-accent: linear-gradient(135deg, hsl(230 100% 58%), hsl(230 100% 66%));
 
     --gradient-card: linear-gradient(180deg, hsl(240 4% 13%), hsl(240 4% 11%));
 
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.5);
-    --shadow-warm: 0 8px 30px -6px hsl(43 54% 30% / 0.35);
+    --shadow-warm: 0 8px 30px -6px hsl(230 100% 40% / 0.35);
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.45);
 
     /* Brand palette tokens (dark)
@@ -171,14 +176,15 @@
        dark enough to carry near-black text when used as a button fill.
        Buttons that fill with wine must use `dark:text-panel-deep`, since
        --on-dark is near-white in both themes. */
-    --wine: 345 16% 66%;
-    --wine-deep: 345 16% 59%;
-    --wine-soft: 345 14% 22%;
+    /* "wine" = ink: sand on the dark page. "gold" = cobalt. */
+    --wine: 41 19% 71%;
+    --wine-deep: 41 19% 64%;
+    --wine-soft: 240 4% 18%;
 
-    --gold: 43 62% 62%;
-    --gold-soft: 43 55% 80%;
-    --gold-2: 43 62% 66%;
-    --gold-deep: 43 55% 66%;
+    --gold: 230 100% 58%;
+    --gold-soft: 230 100% 82%;
+    --gold-2: 230 100% 64%;
+    --gold-deep: 230 100% 74%;  /* cobalt as text on the dark page */
     --ink: 36 30% 93%;
     --ink-muted: 30 8% 70%;
     --ink-muted-2: 30 8% 66%;
@@ -613,4 +619,95 @@
 @keyframes bizFade {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+/* ===== Paper scope =====
+   A .paper-card is a sheet of the sand paper in BOTH themes. Everything inside
+   it is re-coloured for the sand by redefining the theme tokens on the card
+   itself: an existing `text-ink`, `border-line`, `bg-cream` or `text-wine`
+   inside a paper card resolves to its paper version automatically, in light
+   and dark mode alike. That is what lets the whole app move to paper without
+   rewriting every class. */
+.paper-card {
+  --background: 41 19% 71%;
+  --foreground: 30 16% 12%;
+  --card: 40 21% 78%;
+  --card-foreground: 30 16% 12%;
+  --muted: 41 18% 64%;
+  --muted-foreground: 33 14% 25%;
+  --border: 38 16% 58%;
+  --input: 38 16% 58%;
+  --ink: 30 16% 12%;
+  --ink-muted: 33 14% 25%;
+  --ink-muted-2: 33 12% 28%;
+  --ink-subtle: 33 10% 31%;
+  --cream: 40 21% 78%;
+  --cream-2: 40 20% 74%;
+  --line: 38 16% 58%;
+  --line-2: 38 16% 56%;
+  --wine: 30 16% 12%;
+  --wine-deep: 30 16% 8%;
+  --wine-soft: 30 12% 16%;   /* only ever used as a dark fill (dark: classes) */
+  --gold: 231 76% 50%;       /* cobalt, a shade deeper for the sand: 4.2:1 */
+  --gold-2: 231 80% 44%;
+  --gold-soft: 230 60% 86%;
+  --gold-deep: 231 80% 40%;
+  --primary: 231 76% 50%;
+  --sage: 135 24% 30%;
+  --sage-deep: 135 28% 25%;
+  --sage-soft: 120 22% 80%;
+  --sage-line: 120 16% 58%;
+  --danger: 8 72% 36%;
+  --danger-deep: 8 72% 32%;
+  --danger-soft: 10 45% 84%;
+  --danger-line: 8 35% 60%;
+  --info: 205 60% 32%;
+  --rule: 30 16% 12%;
+}
+
+/* Cobalt as TEXT needs a lighter shade on dark surfaces (fills keep the
+   standard cobalt so white text on them stays readable). */
+.dark .text-gold { color: hsl(230 100% 74%); }
+.dark .paper-card .text-gold { color: hsl(var(--gold)); }
+.bg-panel .text-gold,
+.bg-panel-soft .text-gold,
+.bg-panel-deep .text-gold,
+.bg-paper-btn .text-gold,
+.text-on-dark .text-gold,
+.bg-panel.text-gold { color: hsl(230 100% 76%); }
+
+/* Inside pages: content rises in when a page opens. */
+@keyframes pageRise {
+  from { opacity: 0; translate: 0 14px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.page-rise { animation: pageRise 560ms cubic-bezier(0.19, 1, 0.22, 1) backwards; }
+/* Children dealt in one after another: give each a --i. */
+.rise { animation: pageRise 620ms cubic-bezier(0.19, 1, 0.22, 1) backwards; animation-delay: calc(var(--i, 0) * 70ms + 60ms); }
+@keyframes popIn {
+  0%   { scale: 0.4; opacity: 0; }
+  70%  { scale: 1.12; opacity: 1; }
+  100% { scale: 1; }
+}
+.pop-in { animation: popIn 460ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; animation-delay: calc(var(--i, 0) * 60ms + 200ms); }
+/* A bar that fills from empty when it first appears. */
+@keyframes barGrow { from { scale: 0 1; } to { scale: 1 1; } }
+.bar-grow { transform-origin: left; animation: barGrow 1100ms cubic-bezier(0.19, 1, 0.22, 1) backwards; animation-delay: var(--d, 250ms); }
+/* Flashcards in a session: dealt in, turned over, slid off the deck. */
+@keyframes cardDeal {
+  from { opacity: 0; translate: 0 22px; scale: 0.95; }
+  to   { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes cardLeave {
+  to { opacity: 0; translate: -115% -12px; rotate: -9deg; }
+}
+@keyframes cardTurnOut { from { rotate: y 0deg; } to { rotate: y 90deg; } }
+@keyframes cardTurnIn  { from { rotate: y -90deg; } to { rotate: y 0deg; } }
+.card-deal { animation: cardDeal 520ms cubic-bezier(0.19, 1, 0.22, 1) backwards; }
+.card-leave { animation: cardLeave 260ms cubic-bezier(0.55, 0, 1, 0.45) forwards; pointer-events: none; }
+.card-turn-out { animation: cardTurnOut 170ms cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+.card-turn-in { animation: cardTurnIn 340ms cubic-bezier(0.19, 1, 0.22, 1) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-rise, .rise, .pop-in, .bar-grow, .card-deal { animation-name: bizFade; animation-duration: 250ms; animation-delay: 0ms; }
+  .card-leave, .card-turn-out, .card-turn-in { animation: none; }
 }

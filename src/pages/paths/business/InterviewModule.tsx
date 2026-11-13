@@ -1076,7 +1076,7 @@ export default function InterviewModule() {
           {/* Conversation */}
           <div
             ref={chatRef}
-            className="bg-card border border-line rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
+            className="paper-card rounded-2xl p-3 max-h-[420px] overflow-y-auto space-y-2"
           >
             {history.map((t, i) => (
               <div

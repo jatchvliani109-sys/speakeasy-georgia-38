@@ -250,7 +250,7 @@ function PhrasesTab() {
             const KindIcon = isInterview ? Briefcase : isMeeting ? Users : Mail;
             const date = formatKaDate(r.completed_at);
             return (
-              <div key={r.id} className="bg-card border border-line-2 rounded-lg overflow-hidden transition">
+              <div key={r.id} className="paper-card rounded-2xl overflow-hidden transition">
                 <button
                   onClick={() => setOpen((p) => ({ ...p, [r.id]: !p[r.id] }))}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-cream-2 transition"
@@ -468,7 +468,7 @@ function WordsTab() {
             const w = progressToWord(r);
             if (!w) return null;
             return (
-              <div key={r.word_key} className="bg-card border border-line-2 rounded-2xl p-4">
+              <div key={r.word_key} className="paper-card rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">

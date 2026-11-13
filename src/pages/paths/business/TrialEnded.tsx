@@ -124,7 +124,7 @@ export default function TrialEnded() {
               track("trial_end_upgrade_clicked", { source: "trial_ended" });
               navigate("/path/business/premium");
             }}
-            className="w-full h-12 bg-gold hover:bg-gold-2 text-ink dark:text-panel-deep font-bold rounded-full text-base"
+            className="w-full h-12 bg-gold hover:bg-gold-2 text-white font-bold rounded-full text-base"
           >
             პრემიუმის ნახვა, 13.99 ლარი/თვე
           </Button>

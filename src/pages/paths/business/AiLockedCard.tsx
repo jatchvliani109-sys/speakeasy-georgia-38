@@ -32,7 +32,7 @@ export default function AiLockedCard({
   if (typeof unlockProgress === "number" && typeof unlockTarget === "number") {
     const pct = Math.min(100, Math.round((unlockProgress / unlockTarget) * 100));
     return (
-      <div className="rounded-2xl border border-line bg-card p-6 text-center">
+      <div className="rounded-2xl paper-card p-6 text-center">
         <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-gold/15 text-gold">
           <Sparkles size={20} strokeWidth={2} />
         </span>
@@ -68,7 +68,7 @@ export default function AiLockedCard({
 
         <Link
           to="/path/business/vocabulary"
-          className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
+          className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-cta text-cta-fg text-sm font-bold hover:bg-cta-hover transition-colors press"
         >
           სესიის დაწყება
           <ArrowRight size={16} strokeWidth={2.25} />
@@ -78,7 +78,7 @@ export default function AiLockedCard({
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-card p-6 text-center">
+    <div className="rounded-2xl paper-card p-6 text-center">
       <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-wine/8 text-wine">
         <Lock size={20} strokeWidth={2} />
       </span>
@@ -120,7 +120,7 @@ export default function AiLockedCard({
 
       <Link
         to="/path/business/premium"
-        className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold hover:bg-wine-deep transition-colors"
+        className="ka mt-5 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-cta text-cta-fg text-sm font-bold hover:bg-cta-hover transition-colors press"
       >
         {trialAvailable ? "7 დღით პრემიუმის უფასოდ დატესტვა" : "პრემიუმის ნახვა"}
         <ArrowRight size={16} strokeWidth={2.25} />
@@ -131,4 +131,4 @@ export default function AiLockedCard({
       </p>
     </div>
   );
-}
+}

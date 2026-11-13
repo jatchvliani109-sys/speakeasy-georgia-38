@@ -25,6 +25,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { formatDateKa } from "@/lib/formatDate";
+import { useCountUp } from "@/lib/motion";
+import { RevealHeading } from "@/components/landing/Reveal";
 
 import {
   BusinessIntensity,
@@ -546,14 +548,19 @@ export default function BusinessHome() {
       {/* 1. Greeting */}
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-ink-muted font-bold">
-            SpeakBusy
-          </p>
-          <h1 className="ka text-2xl font-bold text-wine mt-1 leading-tight">
-            გამარჯობა{displayName ? `, ${displayName}` : ""} 👋
-          </h1>
+          {/* key: replays the reveal once the name arrives */}
+          <RevealHeading
+            key={displayName ?? ""}
+            as="h1"
+            immediate
+            text={`გამარჯობა${displayName ? `, ${displayName}` : ""} 👋`}
+            className="ka text-[1.7rem] sm:text-3xl font-extrabold tracking-tight text-ink leading-tight"
+          />
           {plan && (
-            <span className="ka inline-block mt-1.5 text-[10px] font-semibold text-ink-muted border border-line bg-card px-2 py-0.5 rounded-full">
+            <span
+              className="pop-in ka inline-block mt-2 text-[11px] font-semibold text-ink-muted border border-ink/15 px-2.5 py-0.5 rounded-full"
+              style={{ ["--i" as string]: 3 }}
+            >
               {LEVEL_LABELS[s.level ?? plan.level]}
             </span>
           )}
@@ -561,7 +568,7 @@ export default function BusinessHome() {
       </header>
 
       {levelUnmeasured && (
-        <BizCard className="mb-4 border-l-2 border-l-gold">
+        <BizCard className="rise mb-4">
           <p className="ka text-sm text-ink">
             შენი დონე ვარაუდით არის განსაზღვრული. ზუსტი შეფასებისთვის გაიარე მოკლე ტესტი (no pressure!)
           </p>
@@ -576,18 +583,18 @@ export default function BusinessHome() {
       {plan && (
         <>
           {/* Daily streak, drama scales with the count. */}
-          <section className="mb-5">
+          <section className="rise mb-5" style={{ ["--i" as string]: 1 }}>
+            {/* Paper for a young Streak; from tier 3 the card turns charcoal
+                and the cobalt days glow, so a long Streak looks earned. */}
             <div
-              className={`rounded-lg p-4 border transition-colors ${
+              className={`rounded-[22px] p-5 transition-colors ${
                 streakTier === 4
-                  ? "bg-gradient-to-br from-panel-soft via-panel-line to-gold-deep border-gold text-on-dark shadow-lg"
+                  ? "bg-paper-btn text-on-dark border border-gold/60 shadow-[0_22px_44px_-20px_hsl(var(--cta)/0.75)]"
                   : streakTier === 3
-                    ? "bg-gradient-to-br from-panel-soft to-panel border-wine text-on-dark shadow-md"
+                    ? "bg-paper-btn text-on-dark border border-on-dark/10 shadow-[0_18px_40px_-20px_hsl(var(--cta)/0.55)]"
                     : streakTier === 2
-                      ? "bg-gradient-to-br from-gold/30 to-white border-gold"
-                      : streakTier === 1
-                        ? "bg-card border-gold/60"
-                        : "bg-card border-line"
+                      ? "paper-card ring-2 ring-gold/70"
+                      : "paper-card"
               }`}
             >
               <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -595,7 +602,7 @@ export default function BusinessHome() {
                   <span
                     className={`leading-none ${
                       streakTier >= 3 ? "text-4xl" : streakTier === 2 ? "text-3xl" : "text-2xl"
-                    } ${streak === 0 ? "grayscale opacity-50" : ""}`}
+                    } ${streak === 0 ? "grayscale opacity-50" : "biz-flame"}`}
                   >
                     🔥
                   </span>
@@ -629,9 +636,10 @@ export default function BusinessHome() {
                   {last7.map((d, i) => (
                     <div key={i} className="flex flex-col items-center gap-1">
                       <span
-                        className={`w-5 h-5 rounded-full grid place-items-center text-[9px] font-bold transition-colors
-                          ${d.done ? "bg-gold text-panel-deep" : d.frozen ? "bg-info/30 border border-info/60" : streakDark ? "border border-cream/30 text-transparent" : "border border-line text-transparent"}
-                          ${d.isToday && !d.done && !d.frozen ? (streakDark ? "border-gold border-dashed" : "border-wine/50 border-dashed") : ""}`}
+                        style={{ ["--i" as string]: i }}
+                        className={`w-6 h-6 rounded-full grid place-items-center text-[10px] font-bold transition-colors
+                          ${d.done ? "pop-in bg-gold text-white shadow-[0_4px_10px_-4px_hsl(var(--cta)/0.8)]" : d.frozen ? "bg-info/30 border border-info/60" : streakDark ? "border border-on-dark/30 text-transparent" : "border border-ink/25 text-transparent"}
+                          ${d.isToday && !d.done && !d.frozen ? "border-gold border-dashed border-2" : ""}`}
                         title={d.frozen ? "გაყინვა გამოყენებულია" : undefined}
                       >
                         {d.done ? "✓" : d.frozen ? "❄" : "·"}
@@ -655,9 +663,9 @@ export default function BusinessHome() {
               </div>
               {nextMilestone !== null && (
                 <div className="mt-3">
-                  <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-cream/15" : "bg-cream"}`}>
+                  <div className={`h-1.5 rounded-full overflow-hidden ${streakDark ? "bg-on-dark/15" : "bg-cream"}`}>
                     <div
-                      className="h-full bg-gold rounded-full transition-all"
+                      className="bar-grow h-full bg-gold rounded-full transition-all"
                       style={{ width: `${Math.min(100, Math.round((streak / nextMilestone) * 100))}%` }}
                     />
                   </div>
@@ -737,7 +745,7 @@ export default function BusinessHome() {
           )}
 
           {brokenStreak !== null && (
-            <BizCard className="mb-4 border-l-2 border-l-gold">
+            <BizCard className="rise mb-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="ka text-sm font-bold text-ink">
@@ -767,7 +775,7 @@ export default function BusinessHome() {
               <Link
                 to="/path/business/vocabulary"
                 onClick={() => setBrokenStreak(null)}
-                className="ka mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-wine dark:bg-wine-soft text-on-dark text-sm font-bold"
+                className="press ka mt-4 w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-cta text-cta-fg hover:bg-cta-hover text-sm font-bold"
               >
                 სესიის დაწყება
                 <ArrowRight size={15} strokeWidth={2.25} />
@@ -781,8 +789,9 @@ export default function BusinessHome() {
           {s && isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
-              className={`w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-left shadow-sm hover:opacity-95 transition-opacity mb-4 ${
-                trialEndingSoon(s) ? "ring-1 ring-gold/60" : ""
+              style={{ ["--i" as string]: 2 }}
+              className={`rise press group w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 bg-paper-btn border border-on-dark/10 text-left shadow-[0_14px_30px_-18px_rgba(0,0,0,0.6)] hover:bg-paper-btn/90 transition-colors mb-5 ${
+                trialEndingSoon(s) ? "ring-2 ring-gold/70" : ""
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
@@ -800,7 +809,7 @@ export default function BusinessHome() {
                   </p>
                 </div>
               </div>
-              <ArrowRight size={15} className="text-gold shrink-0" />
+              <ArrowRight size={15} className="text-gold shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           )}
 
@@ -808,7 +817,8 @@ export default function BusinessHome() {
           {s && !s.mockPro && !isTrialActive(s) && (
             <button
               onClick={() => navigate("/path/business/premium")}
-              className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 bg-gradient-to-r from-panel-soft to-panel text-left shadow-sm hover:opacity-95 transition-opacity"
+              style={{ ["--i" as string]: 2 }}
+              className="rise press group w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 bg-paper-btn border border-on-dark/10 text-left shadow-[0_14px_30px_-18px_rgba(0,0,0,0.6)] hover:bg-paper-btn/90 transition-colors mb-5"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-gold shrink-0"><Star size={16} className="fill-gold" /></span>
@@ -817,12 +827,12 @@ export default function BusinessHome() {
                   <p className="ka text-[11px] text-on-dark/70 leading-snug">7 AI სესია კვირაში · გასაუბრებები · დოკუმენტები</p>
                 </div>
               </div>
-              <ArrowRight size={15} className="text-gold shrink-0" />
+              <ArrowRight size={15} className="text-gold shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           )}
 
           {/* 2. Today's Focus */}
-          <section className="mb-5">
+          <section className="rise mb-6" style={{ ["--i" as string]: 3 }}>
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <Target size={12} strokeWidth={2.25} /> დღევანდელი ფოკუსი
             </p>
@@ -859,10 +869,7 @@ export default function BusinessHome() {
                 tokens would flip the text light in dark mode and leave it
                 unreadable on this pale card.
                 Measured contrast: body 8.6:1, muted 5.2:1, both above AA. */}
-            <div
-              className="relative rounded-lg p-6 border"
-              style={{ background: "#C4BBA8", borderColor: "rgba(92,26,46,.35)", color: "#241F1A" }}
-            >
+            <div className="paper-card relative rounded-[26px] p-6 sm:p-7">
               {tikiStage === "wake" && (
                 <div className="pointer-events-none absolute inset-0" style={{ left: "76%", right: 0 }}>
                   {/* No delay: any pause here is a gap where the sleeping cat has
@@ -896,41 +903,41 @@ export default function BusinessHome() {
               )}
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className="ka text-[10px] uppercase tracking-wider font-semibold" style={{ color: "#4A4238" }}>
+                  <span className="ka text-[10px] uppercase tracking-wider font-semibold text-ink-muted">
                     {focusDoneToday ? "დღევანდელი მისია შესრულებულია" : "შენი დღევანდელი მისია"}
                   </span>
                   {focusDoneToday ? (
-                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-wine/25 px-2 py-0.5 rounded-md font-semibold" style={{ color: "#4A4238" }}>
+                    <span className="ka text-[10px] inline-flex items-center gap-1 border border-wine/25 px-2 py-0.5 rounded-md font-semibold text-ink-muted">
                       <Check size={11} strokeWidth={2.5} /> დასრულდა
                     </span>
                   ) : (
-                    <span className="ka text-[10px] inline-flex items-center gap-1" style={{ color: "#4A4238" }}>
+                    <span className="ka text-[10px] inline-flex items-center gap-1 text-ink-muted">
                       <Clock size={11} strokeWidth={2.25} /> ~{focusMinutes}
                     </span>
                   )}
                 </div>
-                <h2 className="ka text-xl font-bold leading-snug">
+                <h2 className="ka text-2xl font-extrabold tracking-tight leading-snug">
                   {focusDoneToday ? focusCopy.doneTitle : focusCopy.title}
                 </h2>
-                <p className="ka text-sm mt-2 leading-relaxed" style={{ color: "#4A4238" }}>
+                <p className="ka text-sm mt-2 leading-relaxed text-ink-muted">
                   {focusDoneToday ? focusCopy.doneSubtitle : focusCopy.subtitle}
                 </p>
                 {focusDoneToday && (s?.mockPro || isTrialActive(s)) && scenarioToday && (
-                  <p className="ka text-[11px] font-semibold mt-2" style={{ color: "#4A4238" }}>
+                  <p className="ka text-[11px] font-semibold mt-2 text-ink-muted">
                     🎬 შემდეგი სესია, სცენარი: {scenarioToday.titleKa}
                   </p>
                 )}
                 {!focusDoneToday && (
                   <div className="mt-3 space-y-2">
                     {scenarioToday && (
-                      <p className="ka text-[11px] font-semibold" style={{ color: "#4A4238" }}>
+                      <p className="ka text-[11px] font-semibold text-ink-muted">
                         🎬 სცენარი: {scenarioToday.titleKa}
                       </p>
                     )}
-                    <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
+                    <p className="ka text-[11px] text-ink-muted">
                       ლექსიკონში {vocabWordCount} სიტყვა გაქვს
                     </p>
-                    <p className="ka text-[11px]" style={{ color: "#4A4238" }}>
+                    <p className="ka text-[11px] text-ink-muted">
                       {vocabNewToday > 0
                         ? `${vocabNewToday} ახალი სიტყვა · ${vocabReviewToday} გასამეორებელი`
                         : vocabReviewToday > 0
@@ -944,7 +951,7 @@ export default function BusinessHome() {
                   {focusDoneToday && (s?.mockPro || isTrialActive(s)) && (
                     <button
                       onClick={() => navigate("/path/business/module/vocabulary")}
-                      className="ka inline-flex items-center justify-center gap-2 bg-gold text-ink dark:text-panel-deep hover:bg-gold-2 transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                      className="press group ka inline-flex items-center justify-center gap-2 h-12 bg-cta text-cta-fg hover:bg-cta-hover shadow-[0_12px_26px_-12px_hsl(var(--cta)/0.75)] transition-colors px-6 rounded-xl font-bold text-[15px] w-full sm:w-auto"
                     >
                       კიდევ ერთი სესია ⭐
                       <ArrowRight size={14} strokeWidth={2.25} />
@@ -954,7 +961,11 @@ export default function BusinessHome() {
                     onClick={() =>
                       navigate(focusDoneToday ? "/path/business/lexicon?tab=words" : "/path/business/module/vocabulary")
                     }
-                    className="ka inline-flex items-center justify-center gap-2 bg-panel text-on-dark hover:bg-panel-line transition-colors px-5 py-2.5 rounded-md font-bold text-sm w-full sm:w-auto"
+                    className={`press group ka inline-flex items-center justify-center gap-2 h-12 transition-colors px-6 rounded-xl font-bold text-[15px] w-full sm:w-auto ${
+                      focusDoneToday
+                        ? "bg-paper-btn text-paper-btn-fg hover:bg-paper-btn/90"
+                        : "bg-cta text-cta-fg hover:bg-cta-hover shadow-[0_12px_26px_-12px_hsl(var(--cta)/0.75)]"
+                    }`}
                   >
                     {focusDoneToday ? "ნასწავლი სიტყვების ნახვა" : "დაწყება"}
                     <ArrowRight size={14} strokeWidth={2.25} />
@@ -966,7 +977,7 @@ export default function BusinessHome() {
 
 
           {!hasResume && (
-            <BizCard className="mb-5 border-dashed">
+            <BizCard className="rise mb-6 border-dashed">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold">
@@ -990,11 +1001,11 @@ export default function BusinessHome() {
           )}
 
           {/* 5. More, compact rows for everything that used to be big cards */}
-          <section className="mb-5">
+          <section className="rise mb-6" style={{ ["--i" as string]: 5 }}>
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1">
               მეტი
             </p>
-            <div className="bg-card border border-line rounded-lg divide-y divide-cream">
+            <div className="paper-card rounded-[22px] overflow-hidden divide-y divide-line/70">
               {/* Review-only practice. The mode existed in the code for months
                   with nothing able to start it. Unlimited for everyone: it
                   hands out no new words, so there is nothing to meter. */}
@@ -1047,7 +1058,7 @@ export default function BusinessHome() {
           </section>
 
           {/* 6. Progress */}
-          <section>
+          <section className="rise" style={{ ["--i" as string]: 6 }}>
             <p className="ka text-[11px] uppercase tracking-wider text-ink-muted font-semibold mb-2 px-1 inline-flex items-center gap-1.5">
               <BarChart2 size={12} strokeWidth={2.25} /> პროგრესი
             </p>
@@ -1073,15 +1084,15 @@ export default function BusinessHome() {
                         {vocabSummary.fresh} ახალი
                       </p>
                     </div>
-                    <p className="text-2xl font-extrabold text-wine tabular-nums leading-none">
-                      {vocabSummary.percent}%
+                    <p className="text-3xl font-extrabold text-ink tabular-nums leading-none">
+                      <CountNum value={vocabSummary.percent} />%
                     </p>
                   </div>
 
                   <div className="h-2.5 rounded-full bg-cream overflow-hidden">
                     {/* Two segments: solid for mastered, lighter for in-progress,
                         so the bar shows momentum rather than only finished work. */}
-                    <div className="h-full flex">
+                    <div className="bar-grow h-full flex">
                       <div
                         className="h-full bg-wine transition-all duration-700"
                         style={{ width: `${(vocabSummary.known / vocabSummary.total) * 100}%` }}
@@ -1099,14 +1110,14 @@ export default function BusinessHome() {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="🔥 Streak" value={String(streak)} />
-                <Stat label="ბიზნეს სიტყვები" value={String(vocabWordCount)} />
-                <Stat label="გასაუბრებები" value={String(interviewCount)} />
-                <Stat label="სესიები სულ" value={String(interviewCount + (progress.vocabulary?.count ?? 0))} />
+                <Stat label="🔥 Streak" value={streak} />
+                <Stat label="ბიზნეს სიტყვები" value={vocabWordCount} />
+                <Stat label="გასაუბრებები" value={interviewCount} />
+                <Stat label="სესიები სულ" value={interviewCount + (progress.vocabulary?.count ?? 0)} />
               </div>
               <Link
                 to="/path/business/lexicon"
-                className="ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 py-3 rounded-md bg-panel-soft text-on-dark hover:bg-panel-deep transition-colors text-sm font-semibold"
+                className="press group ka mt-4 w-full inline-flex items-center justify-between gap-2 px-4 h-12 rounded-xl bg-paper-btn text-paper-btn-fg hover:bg-paper-btn/90 transition-colors text-sm font-bold"
               >
                 <span className="flex items-center gap-2">
                   <Library size={15} strokeWidth={2} />
@@ -1146,9 +1157,9 @@ function MoreRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-cream transition-colors first:rounded-t-lg last:rounded-b-lg"
+      className="group w-full text-left px-4 py-3.5 flex items-center gap-3 hover:bg-cream active:bg-cream transition-colors"
     >
-      <span className="w-8 h-8 rounded-md bg-wine/5 text-wine border border-line grid place-items-center shrink-0">
+      <span className="w-9 h-9 rounded-xl bg-paper-btn text-paper grid place-items-center shrink-0 transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-105">
         {icon}
       </span>
       <span className="flex-1 min-w-0">
@@ -1158,7 +1169,7 @@ function MoreRow({
             the row just gets a second line. */}
         <span className="ka block text-[11px] text-ink-muted mt-0.5 leading-snug">{sub}</span>
       </span>
-      <ArrowRight size={14} strokeWidth={2.25} className="text-ink-muted shrink-0" />
+      <ArrowRight size={14} strokeWidth={2.25} className="text-ink-muted shrink-0 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-gold" />
     </button>
   );
 }
@@ -1194,7 +1205,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
     >
       <MilestoneConfetti />
       <div
-        className="relative w-full max-w-sm rounded-3xl bg-gradient-to-br from-wine to-wine-deep dark:from-wine-soft dark:to-wine-soft text-on-dark p-7 text-center shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]"
+        className="pop-in relative w-full max-w-sm rounded-3xl bg-paper-btn border border-on-dark/10 text-on-dark p-7 text-center shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-5xl">🎉</div>
@@ -1219,7 +1230,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
 
         <button
           onClick={onClose}
-          className="ka mt-6 w-full h-12 rounded-2xl bg-gold text-ink dark:text-panel-deep text-sm font-bold"
+          className="press ka mt-6 w-full h-12 rounded-2xl bg-cta text-cta-fg hover:bg-cta-hover text-sm font-bold"
         >
           გავაგრძელოთ
         </button>
@@ -1230,7 +1241,7 @@ function MilestoneCelebration({ pct, onClose }: { pct: number; onClose: () => vo
 
 function MilestoneConfetti() {
   const pieces = useMemo(() => {
-    const colors = ["#C9A84C", "#E5D4A8", "#F8F5F0", "#5A8A6A"];
+    const colors = ["#2B4EFF", "#C4BBA8", "#F8F5F0", "#7D93FF"];
     return Array.from({ length: 40 }).map((_, i) => ({
       id: i,
       left: Math.random() * 100,
@@ -1312,10 +1323,23 @@ function SocialRow() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+/** A number that counts up from zero when it first appears. */
+function CountNum({ value }: { value: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useCountUp(ref, value, true, 1100);
   return (
-    <div className="bg-cream border border-line rounded-md px-3 py-3">
-      <div className="text-xl font-bold text-wine">{value}</div>
+    <span ref={ref} className="tabular-nums">
+      {value}
+    </span>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-cream border border-line rounded-xl px-3.5 py-3">
+      <div className="text-2xl font-extrabold text-ink">
+        <CountNum value={value} />
+      </div>
       <div className="ka text-[11px] text-ink-muted mt-0.5">{label}</div>
     </div>
   );

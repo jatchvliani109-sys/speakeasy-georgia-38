@@ -228,7 +228,7 @@ export default function TrialGift() {
           {/* dark celebratory surface */}
           <div className="bg-gradient-to-br from-panel-soft to-panel-deep px-7 pt-9 pb-8 text-center relative">
             <span
-              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-gold text-ink dark:text-panel-deep"
+              className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-gold text-white "
               style={{
                 opacity: stage >= 1 ? 1 : 0,
                 transform: stage >= 1 ? "scale(1) rotate(0deg)" : "scale(.6) rotate(-12deg)",
@@ -328,7 +328,7 @@ export default function TrialGift() {
               </button>
             </>
           ) : (
-            <div className="rounded-2xl border border-line bg-card p-5 text-center">
+            <div className="rounded-2xl paper-card p-5 text-center">
               <p className="ka text-sm text-ink font-semibold">
                 დარწმუნებული ხარ?
               </p>
@@ -402,4 +402,4 @@ const keyframes = `
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-`;
+`;
