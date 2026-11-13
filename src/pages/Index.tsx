@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight,
+  ArrowDown,
   BookOpen,
   Target,
   TrendingUp,
@@ -13,69 +14,36 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import DemoSession from "@/components/demo/DemoSession";
+import HeroDeck from "@/components/landing/HeroDeck";
+import InkThread from "@/components/landing/InkThread";
+import WordMarquee from "@/components/landing/WordMarquee";
+import MatchBoard from "@/components/landing/MatchBoard";
+import ValueDeck from "@/components/landing/ValueDeck";
+import ModuleStack from "@/components/landing/ModuleStack";
+import ScrollTiki from "@/components/landing/ScrollTiki";
+import { FloatChips, HeroBackdrop } from "@/components/landing/HeroField";
+import { RevealHeading, SplitWords } from "@/components/landing/Reveal";
 import Wordmark from "@/components/Wordmark";
 import SEO from "@/components/SEO";
 import { track } from "@/lib/track";
-
-/* ─────────────── decorative shapes ─────────────── */
-const Dots = ({ className = "" }: { className?: string }) => (
-  <svg
-    className={`absolute pointer-events-none ${className}`}
-    width="140"
-    height="140"
-    viewBox="0 0 140 140"
-    fill="none"
-    aria-hidden
-  >
-    <pattern id="dots-bg" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.8" fill="currentColor" opacity="0.25" />
-    </pattern>
-    <rect width="140" height="140" fill="url(#dots-bg)" />
-  </svg>
-);
-
-const CircleRing = ({ className = "" }: { className?: string }) => (
-  <div
-    className={`absolute rounded-full border border-current opacity-10 pointer-events-none ${className}`}
-    aria-hidden
-  />
-);
-
-const GoldLine = ({ className = "" }: { className?: string }) => (
-  <div className={`absolute h-px bg-gold pointer-events-none ${className}`} aria-hidden />
-);
-
-/* ─────────────── curved divider ─────────────── */
-const WaveDivider = ({
-  fill,
-  flip = false,
-  className = "",
-}: {
-  fill: string;
-  flip?: boolean;
-  className?: string;
-}) => (
-  <div
-    className={`relative w-full overflow-hidden leading-[0] ${className}`}
-    style={{ transform: flip ? "rotate(180deg)" : undefined }}
-    aria-hidden
-  >
-    <svg
-      viewBox="0 0 1440 120"
-      preserveAspectRatio="none"
-      className="relative block w-full h-16 sm:h-24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill={fill} />
-    </svg>
-  </div>
-);
+import {
+  easeOutCubic,
+  progress,
+  useMagnetic,
+  useReducedMotion,
+  useRevealClass,
+  useScrollFrame,
+  useScrollProgress,
+  useScrolledPast,
+} from "@/lib/motion";
 
 /* ─────────────── data ─────────────── */
 const valueCards = [
   {
     icon: BookOpen,
-    title: "980 ბიზნეს სიტყვა, ქართულად ახსნილი",
+    // The leading number counts up when the card is dealt.
+    count: 980,
+    title: "ბიზნეს სიტყვა, ქართულად ახსნილი",
     body:
       "ყოველი სიტყვა ქართული ახსნით, აუდიო გამოთქმით და რეალური სამუშაო მაგალითებით.",
   },
@@ -147,6 +115,66 @@ const Index = () => {
 
   if (user) return <Navigate to="/dashboard" replace />;
 
+  // The page itself is its own component so its motion hooks mount together
+  // with the elements they attach to (they would miss them during "loading").
+  return <Landing />;
+};
+
+function Landing() {
+  const reduced = useReducedMotion();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  const deckWrapRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const heroCtaRef = useRef<HTMLAnchorElement>(null);
+  const finalCtaRef = useRef<HTMLAnchorElement>(null);
+  const ctaCardRef = useRef<HTMLDivElement>(null);
+  const ctaStationRef = useRef<HTMLDivElement>(null);
+  const tikiTrackRef = useRef<HTMLDivElement>(null);
+
+  useScrollProgress(progressRef);
+  useMagnetic(heroCtaRef);
+  useMagnetic(finalCtaRef);
+  // the hero writes itself in as soon as the page opens
+  useRevealClass(heroTextRef, { immediate: true });
+  // Once the hero's buttons have scrolled away, the sign-up button follows
+  // along in the header, so it is always one tap away.
+  const pastHero = useScrolledPast(520);
+
+  // Scroll-driven movement that belongs to the page itself:
+  //  - leaving the hero, the text drifts down and fades while the deck rises
+  //    faster (depth);
+  //  - the closing card straightens up and grows into place as it arrives.
+  const ctaTop = useRef(0);
+  useScrollFrame(
+    {
+      read: () => {
+        const st = ctaStationRef.current;
+        if (st) ctaTop.current = st.getBoundingClientRect().top;
+      },
+      write: (f) => {
+        if (f.y < f.vh * 1.3) {
+          const text = heroTextRef.current;
+          const deck = deckWrapRef.current;
+          if (text) {
+            text.style.transform = `translate3d(0, ${(f.y * 0.16).toFixed(1)}px, 0)`;
+            text.style.opacity = Math.max(0, 1 - f.y / (f.vh * 0.85)).toFixed(3);
+          }
+          if (deck) {
+            deck.style.transform = `translate3d(0, ${(-f.y * 0.14).toFixed(1)}px, 0) rotate(${(f.y * 0.012).toFixed(2)}deg)`;
+          }
+        }
+        const card = ctaCardRef.current;
+        if (card) {
+          const e = easeOutCubic(progress(f.vh - ctaTop.current, 0, f.vh * 0.6));
+          card.style.transform = `scale(${(0.9 + 0.1 * e).toFixed(4)}) rotate(${(-2.5 * (1 - e)).toFixed(2)}deg)`;
+        }
+      },
+    },
+    !reduced,
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-cream text-ink">
       <SEO
@@ -155,207 +183,248 @@ const Index = () => {
         path="/"
       />
       {/* ═══════════════ NAV ═══════════════ */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-cream/85 border-b border-line-2">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-wine-deep hover:opacity-80 transition-opacity">
+      <header className="sticky top-0 z-40 bg-cream border-b border-rule/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          <Link to="/" className="flex items-center text-ink hover:opacity-75 transition-opacity">
             <Wordmark size="md" />
           </Link>
-          <Link
-            to="/auth?mode=login"
-            className="inline-flex items-center gap-1.5 h-10 px-5 rounded-lg border border-ink/15 text-sm font-semibold text-ink hover:bg-panel hover:text-on-dark transition-colors ka"
-          >
-            შესვლა
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/auth?mode=login"
+              className={`press items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg border border-rule/20 text-sm font-semibold text-ink hover:bg-rule/10 hover:border-rule/35 transition-colors ka ${
+                pastHero ? "hidden sm:inline-flex" : "inline-flex"
+              }`}
+            >
+              შესვლა
+            </Link>
+            <Link
+              to="/auth?mode=signup"
+              aria-hidden={!pastHero}
+              tabIndex={pastHero ? 0 : -1}
+              className={`press inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-cta text-cta-fg text-sm font-bold hover:bg-cta-hover ka transition-[opacity,transform,background-color] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+                pastHero ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none absolute sm:static"
+              }`}
+            >
+              დაიწყე ახლავე უფასოდ
+            </Link>
+          </div>
         </div>
+        {/* how far down the page you are */}
+        <div
+          ref={progressRef}
+          aria-hidden
+          className="absolute left-0 right-0 bottom-[-1px] h-[2px] bg-cta-line origin-left"
+          style={{ transform: "scaleX(0)" }}
+        />
       </header>
 
       <main className="flex-1">
-        {/* ═══════════════ HERO ═══════════════ */}
-        <section className="relative overflow-hidden bg-panel text-on-dark">
-          <CircleRing className="w-[520px] h-[520px] -top-40 -right-40" />
-          <CircleRing className="w-[320px] h-[320px] top-1/2 -left-24" />
-          <Dots className="top-10 right-10 text-on-dark opacity-40" />
-          <Dots className="bottom-14 left-10 text-on-dark opacity-25" />
-          <GoldLine className="top-28 left-0 w-28" />
-          <GoldLine className="bottom-10 right-0 w-20" />
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-gold opacity-60" aria-hidden />
-          <div className="absolute bottom-1/4 left-1/3 w-3 h-3 rounded-full bg-gold opacity-40" aria-hidden />
+        {/* Everything inside this wrapper sits on top of the ink thread. */}
+        <div ref={rootRef} className="relative">
+          <InkThread rootRef={rootRef} />
 
-          {/* Padding halved (was pt-14 pb-20 sm:pt-24 sm:pb-28) to pull the
-              demo up into the first screenful on a phone. The demo is the
-              advert; the hero only has to say who this is for. */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 pb-10 sm:pt-12 sm:pb-14 relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <span className="h-px w-8 bg-gold" />
-              <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold ka">
-                SpeakBusy
-              </span>
-            </div>
+          {/* ═══════════════ HERO ═══════════════ */}
+          <section ref={heroRef} className="relative z-[1] overflow-hidden">
+            <HeroBackdrop heroRef={heroRef} />
+            {/* Padding kept tight so the demo still starts within the first
+                screenful on a phone. The demo is the advert; the hero only has
+                to say who this is for. */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-16 sm:pb-24 relative z-10 grid gap-12 lg:gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] items-center">
+              <div ref={heroTextRef} className="min-w-0 will-change-transform">
+                {/* The headline is the line that made people click the ad. A
+                    visitor who arrives on a different thought than the one they
+                    clicked has to be re-convinced, and they will not wait. */}
+                <h1
+                  aria-label="ბიზნეს ინგლისური ქართველი პროფესიონალებისთვის."
+                  className="text-[1.5rem] min-[400px]:text-[1.8rem] sm:text-[2.6rem] md:text-5xl lg:text-[2.7rem] xl:text-[3.3rem] font-extrabold leading-[1.16] tracking-tight ka max-w-3xl text-ink"
+                >
+                  <SplitWords text="ბიზნეს ინგლისური" />{" "}
+                  <span className="text-sand-ink">
+                    <SplitWords text="ქართველი" start={2} />{" "}
+                    {/* "პროფესიონალებისთვის." is 20 characters with no break
+                        opportunity, so the type size is chosen so that one word
+                        fits a 360px phone. */}
+                    <span className="relative inline-block">
+                      <SplitWords text="პროფესიონალებისთვის." start={3} />
+                      <svg
+                        aria-hidden
+                        viewBox="0 0 300 20"
+                        preserveAspectRatio="none"
+                        className="draw-line pointer-events-none absolute left-0 -bottom-[0.22em] h-[0.34em] w-[96%] text-cta-line"
+                        style={{ ["--d" as string]: "750ms" }}
+                      >
+                        <path
+                          pathLength={1}
+                          d="M4 13 C 60 5, 130 3, 190 8 S 268 16, 296 6"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={3.2}
+                          strokeLinecap="round"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </h1>
 
-            {/* The headline is the line that made people click the ad. A
-                visitor who arrives on a different thought than the one they
-                clicked has to be re-convinced, and they will not wait. */}
-            <h1 className="text-[1.9rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight ka max-w-3xl">
-              ბიზნეს ინგლისური{" "}
-              {/* Allowed to wrap on its own rather than forced onto fixed
-                  lines: "პროფესიონალებისთვის." is 20 characters with no break
-                  opportunity, so a hard line at phone width would run off the
-                  screen. */}
-              <span className="text-gold">ქართველი პროფესიონალებისთვის.</span>
-            </h1>
-
-            {/* The button no longer asks for an account. It scrolls to the
-                demo below, because nobody registers to find out what a product
-                is: 250 visitors from the first ad, 8 reached the signup form,
-                0 finished. */}
-            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <a
-                href="#demo"
-                className="group w-full sm:w-auto inline-flex items-center justify-center text-center gap-2 px-6 sm:px-8 py-4 rounded-xl bg-gold text-ink dark:text-panel-deep text-base font-bold hover:bg-gold-2 transition-colors ka"
-              >
-                <span>გამოსცადე რეგისტრაციის გარეშე</span>
-                <ArrowRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-y-0.5 sm:group-hover:translate-x-0.5" />
-              </a>
-              <Link
-                to="/auth?mode=login"
-                className="text-sm font-semibold text-on-dark-subtle hover:text-on-dark transition-colors ka underline-offset-4 hover:underline"
-              >
-                უკვე გაქვს ანგარიში? შედი
-              </Link>
-            </div>
-
-            <p className="mt-5 ka text-sm text-on-dark-subtle relative z-10">
-              12 კითხვა, ორი წუთი. ანგარიში არ სჭირდება.
-            </p>
-          </div>
-
-          <WaveDivider fill="hsl(var(--cream))" />
-        </section>
-
-        {/* ═══════════════ DEMO ═══════════════ */}
-        {/* The product IS the advert. This is the first thing under the fold,
-            and the only call to action above it. */}
-        <section id="demo" className="bg-cream pt-4 pb-16 sm:pb-24 scroll-mt-16">
-          <div className="max-w-xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-wine mb-3">
-                <span className="h-px w-6 bg-wine" />
-                DEMO
-                <span className="h-px w-6 bg-wine" />
+                {/* Three ways in, in order of weight: create an account, try it
+                    without one, or log back in. The try-first path stays because
+                    nobody registers to find out what a product is: 250 visitors
+                    from the first ad, 8 reached the signup form, 0 finished. */}
+                <div className="fade-up mt-10" style={{ ["--d" as string]: "420ms" }}>
+                  <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center lg:items-start xl:items-center gap-3">
+                    <Link
+                      ref={heroCtaRef}
+                      to="/auth?mode=signup"
+                      className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-16 px-8 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
+                    >
+                      <span>დაიწყე ახლავე უფასოდ</span>
+                      <ArrowRight className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                    </Link>
+                    <a
+                      href="#demo"
+                      className="press group w-full sm:w-auto inline-flex items-center justify-center gap-2 h-14 sm:h-16 px-6 rounded-2xl border border-rule/25 text-ink text-base font-semibold hover:bg-rule/5 hover:border-rule/45 transition-colors ka"
+                    >
+                      <span>გამოსცადე რეგისტრაციის გარეშე</span>
+                      <ArrowDown className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-y-0.5" />
+                    </a>
+                  </div>
+                  <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <p className="ka text-sm text-ink-muted">12 კითხვა, ორი წუთი. ანგარიში არ სჭირდება.</p>
+                    <Link
+                      to="/auth?mode=login"
+                      className="text-sm font-semibold text-ink hover:opacity-75 transition-opacity ka underline underline-offset-4 decoration-rule/35"
+                    >
+                      უკვე გაქვს ანგარიში? შედი
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight ka text-ink">
-                სცადე ახლავე
-              </h2>
-              <p className="ka mt-2 text-sm text-ink-muted">
-                ნამდვილი სესია, ისეთივე როგორიც აპლიკაციაშია.
+
+              {/* the moving part: paper flashcards turning English ⇄ Georgian,
+                  with word chips floating around them. The outer box is where
+                  the ink thread starts, so it is never transformed. */}
+              <div data-thread className="relative min-w-0 pb-8 lg:pb-0">
+                <div ref={deckWrapRef} className="will-change-transform">
+                  <div className="relative mx-auto w-fit">
+                    <FloatChips heroRef={heroRef} />
+                    <HeroDeck pointerArea={heroRef} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a
+              href="#demo"
+              aria-label="დემოზე გადასვლა"
+              className="scroll-cue hidden sm:flex absolute left-1/2 -translate-x-1/2 bottom-6 z-10 h-9 w-9 items-center justify-center rounded-full border border-rule/20 text-ink-muted hover:text-ink"
+            >
+              <ArrowDown className="w-4 h-4" />
+            </a>
+          </section>
+
+          {/* ═══════════════ DEMO ═══════════════ */}
+          {/* The product IS the advert. This is the first thing under the fold. */}
+          <section id="demo" className="relative z-[1] pt-8 pb-16 sm:pb-24 scroll-mt-16">
+            <div className="max-w-xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-8">
+                <div data-thread className="station inline-block rounded-2xl px-5 py-2">
+                  <RevealHeading
+                    text="სცადე ახლავე"
+                    className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-ink"
+                  />
+                  <p className="ka mt-2 text-sm text-ink-muted">ნამდვილი სესია, ისეთივე როგორიც აპლიკაციაშია.</p>
+                </div>
+              </div>
+
+              <div data-thread>
+                <DemoSession />
+              </div>
+
+              <p
+                data-thread
+                className="station mt-10 rounded-2xl px-3 py-2 text-center text-base sm:text-lg text-ink-muted leading-relaxed ka"
+              >
+                980 სიტყვა და ფრაზა, რომლებიც სამსახურში ყოველდღე ხმარებაშია.
+                ქართული ახსნებით, აუდიოთი და რეალური მაგალითებით.
               </p>
             </div>
+          </section>
 
-            <DemoSession />
-
-            {/* Moved down from the hero. NOTE THE COLOUR: it was
-                text-on-dark-subtle, which is for the dark hero — on this cream
-                section that would have been near-invisible. */}
-            <p className="mt-8 text-center text-base sm:text-lg text-ink-muted leading-relaxed ka">
-              980 სიტყვა და ფრაზა, რომლებიც სამსახურში ყოველდღე ხმარებაშია.
-              ქართული ახსნებით, აუდიოთი და რეალური მაგალითებით.
-            </p>
+          {/* ═══════════════ WORDS IN MOTION ═══════════════ */}
+          <div className="relative z-[1] overflow-x-clip py-6 sm:py-10">
+            <WordMarquee />
           </div>
-        </section>
 
-        {/* ═══════════════ VALUE CARDS ═══════════════ */}
-        <section className="bg-cream py-20 sm:py-28">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-wine mb-3">
-                <span className="h-px w-6 bg-wine" />
-                Why SpeakBusy
-                <span className="h-px w-6 bg-wine" />
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-ink">
-                რატომ SpeakBusy?
-              </h2>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3">
-              {valueCards.map(({ icon: Icon, title, body }) => (
-                <div
-                  key={title}
-                  className="group relative bg-card border border-line-2 rounded-2xl p-8 hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.25)] transition-all"
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-wine dark:bg-wine-soft text-gold mb-5">
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-lg font-bold ka text-ink mb-2">{title}</h3>
-                  <p className="text-sm text-ink-muted leading-relaxed ka">{body}</p>
+          {/* ═══════════════ WHY ═══════════════ */}
+          <section className="relative z-[1] py-16 sm:py-24">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-10 sm:mb-12">
+                <div data-thread className="station inline-block rounded-2xl px-5 py-2">
+                  <RevealHeading
+                    text="რატომ SpeakBusy?"
+                    className="text-3xl sm:text-5xl font-extrabold tracking-tight ka text-ink"
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* curved transition into modules */}
-        <WaveDivider fill="hsl(var(--cream))" flip className="bg-card" />
-
-        {/* ═══════════════ MODULES ═══════════════ */}
-        <section className="bg-card py-20 sm:py-28">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-gold-deep dark:text-gold mb-3">
-                <span className="h-px w-6 bg-gold" />
-                Modules
-                <span className="h-px w-6 bg-gold" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight ka text-ink">
-                რას ისწავლი?
-              </h2>
-            </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {modules.map(({ icon: Icon, title, body }) => (
-                <div
-                  key={title}
-                  className="relative bg-cream border border-line-2 rounded-2xl p-6 hover:bg-card hover:border-wine/40 hover:shadow-[0_8px_30px_-12px_rgba(92,26,46,0.2)] transition-all"
-                >
-                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-panel text-gold mb-4">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold ka text-ink mb-1.5">{title}</h3>
-                  <p className="text-sm text-ink-muted leading-relaxed ka">{body}</p>
+              {/* the matching exercise, played by the scroll */}
+              <div className="mb-16 sm:mb-24">
+                <MatchBoard />
+              </div>
+
+              {/* the reasons, dealt out of a deck */}
+              <ValueDeck items={valueCards} />
+            </div>
+          </section>
+
+          {/* ═══════════════ MODULES ═══════════════ */}
+          <section className="relative z-[1] py-16 sm:py-24">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-10 sm:mb-14">
+                <div data-thread className="station inline-block rounded-2xl px-5 py-2">
+                  <RevealHeading
+                    text="რას ისწავლი?"
+                    className="text-3xl sm:text-5xl font-extrabold tracking-tight ka text-ink"
+                  />
                 </div>
-              ))}
+              </div>
+              <ModuleStack items={modules} />
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* curved transition into CTA */}
-        <WaveDivider fill="hsl(var(--card))" flip className="bg-wine" />
-
-        {/* ═══════════════ FINAL CTA ═══════════════ */}
-        <section className="relative bg-wine dark:bg-wine-soft text-on-dark overflow-hidden">
-          <CircleRing className="w-[400px] h-[400px] -top-32 -left-32 text-on-dark" />
-          <CircleRing className="w-[300px] h-[300px] -bottom-20 -right-20 text-on-dark" />
-          <GoldLine className="top-16 right-10 w-24" />
-          <Dots className="bottom-10 right-20 text-on-dark opacity-20" />
-
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center relative z-10">
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight">
-              მზად ხარ პროფესიონალურ ინგლისურს დაეუფლო?
-            </h2>
-            <p className="mt-5 text-base sm:text-lg text-on-dark/85 ka leading-relaxed">
-              შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
-            </p>
-            <div className="mt-10">
-              <Link
-                to="/auth?mode=signup"
-                className="group inline-flex items-center gap-2 h-14 px-8 rounded-xl bg-gold text-ink dark:text-panel-deep text-base font-bold hover:bg-gold-2 transition-colors ka"
+          {/* ═══════════════ FINAL CTA ═══════════════ */}
+          <section className="relative z-[1] px-4 sm:px-6 lg:px-8 pt-8 pb-20 sm:pb-28">
+            <div ref={ctaStationRef} data-thread className="max-w-4xl mx-auto">
+              <div
+                ref={ctaCardRef}
+                className="paper-card relative overflow-hidden rounded-[32px] px-6 sm:px-14 pt-14 sm:pt-20 pb-4 text-center will-change-transform"
               >
-                დაიწყე ახლავე უფასოდ
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+                <RevealHeading
+                  text="მზად ხარ პროფესიონალურ ინგლისურს დაეუფლო?"
+                  className="text-3xl sm:text-5xl font-extrabold tracking-tight ka leading-tight text-paper-ink"
+                />
+                <p className="mt-5 text-base sm:text-lg text-paper-ink-muted ka leading-relaxed max-w-2xl mx-auto">
+                  შეუერთდი ქართველ პროფესიონალებს, რომლებიც უკვე სწავლობენ SpeakBusy-ით.
+                </p>
+                <div className="mt-10">
+                  <Link
+                    ref={finalCtaRef}
+                    to="/auth?mode=signup"
+                    className="press group inline-flex items-center gap-2.5 h-16 px-7 sm:px-10 rounded-2xl bg-cta text-cta-fg text-base sm:text-lg font-bold whitespace-nowrap hover:bg-cta-hover shadow-[0_18px_36px_-14px_hsl(var(--cta)/0.55)] ka"
+                  >
+                    დაიწყე ახლავე უფასოდ
+                    <ArrowRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+                  </Link>
+                </div>
+                {/* Tiki walks in along the bottom of the card and naps */}
+                <div ref={tikiTrackRef} className="mt-8 border-b border-paper-edge/30">
+                  <ScrollTiki trackRef={tikiTrackRef} size={74} />
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
         {/* ═══════════════ FOOTER ═══════════════ */}
         <footer className="bg-panel text-on-dark-subtle">
@@ -377,7 +446,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy Instagram-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-gold/50 transition-colors"
+                  className="press inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-paper/50 transition-colors"
                 >
                   <Instagram size={16} strokeWidth={2} />
                   Instagram
@@ -387,7 +456,7 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="SpeakBusy TikTok-ზე"
-                  className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-gold/50 transition-colors"
+                  className="press inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/15 text-on-dark text-sm font-semibold hover:bg-card/5 hover:border-paper/50 transition-colors"
                 >
                   <TikTokIcon />
                   TikTok
@@ -395,13 +464,13 @@ const Index = () => {
               </div>
               <Link
                 to="/contact"
-                className="ka inline-block mt-4 mr-4 text-[13px] text-on-dark-subtle hover:text-gold transition-colors underline underline-offset-4"
+                className="ka inline-block mt-4 mr-4 text-[13px] text-on-dark-subtle hover:text-paper transition-colors underline underline-offset-4"
               >
                 დაგვიკავშირდით
               </Link>
               <a
                 href="mailto:speakbusy@gmail.com"
-                className="ka inline-block mt-4 text-[13px] text-on-dark-subtle hover:text-gold transition-colors underline underline-offset-4"
+                className="ka inline-block mt-4 text-[13px] text-on-dark-subtle hover:text-paper transition-colors underline underline-offset-4"
               >
                 speakbusy@gmail.com
               </a>
@@ -414,7 +483,7 @@ const Index = () => {
             <div className="pt-8 pb-8 border-b border-white/10 text-center">
               <p className="ka text-[13px] text-on-dark-subtle leading-relaxed max-w-lg mx-auto">
                 უფასო ვერსია, 0 ₾, დღიური ლიმიტით და რეკლამების გარეშე.
-                პრემიუმი, <b className="text-gold">13.99 ₾ თვეში</b>.
+                პრემიუმი, <b className="text-paper">13.99 ₾ თვეში</b>.
                 პირველი 7 დღე უფასოა, ბარათის მითითების გარეშე.
                 <br />
                 გამოწერა ავტომატურად განახლდება ყოველთვიურად, სანამ არ გააუქმებ.
@@ -446,6 +515,7 @@ const Index = () => {
       </main>
     </div>
   );
-};
+}
+
 
 export default Index;

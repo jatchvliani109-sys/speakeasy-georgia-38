@@ -95,6 +95,37 @@
     --sage-soft: 140 40% 96%;
     --sage-line: 140 25% 87%;
     --info: 205 55% 67%;
+
+    /* Paper: the sand of the dashboard session card (#C4BBA8), the colour of
+       a page in a book. It is deliberately the SAME in light and dark mode,
+       like that card, so none of these tokens is redefined in
+       .dark. Text on paper must use the paper-ink tokens, never ink, because
+       ink flips to near-white in dark mode. */
+    --paper: 41 19% 71%;          /* #C4BBA8 */
+    --paper-2: 40 21% 78%;        /* #D2CABA lighter inset */
+    --paper-3: 41 18% 64%;        /* darker sand: hover, rules */
+    --paper-ink: 30 16% 12%;      /* #241F1A 8.5:1 on paper */
+    --paper-ink-muted: 33 14% 25%;/* #4A4238 5.2:1 on paper */
+    --paper-edge: 30 22% 28%;     /* warm brown edge, used at low alpha */
+    --paper-btn: 240 3% 11%;      /* charcoal button */
+    --paper-btn-fg: 43 33% 96%;   /* cream text on it */
+    --paper-sage: 135 24% 30%;    /* correct icons, 3.8:1 */
+    --paper-danger: 8 72% 36%;    /* wrong icons, 3.9:1 */
+
+    /* Landing palette on the PAGE background (these flip in dark mode).
+       sand-ink: the accent text colour. Brown on cream, sand on charcoal.
+       cta:      the main button. Charcoal on cream, sand on charcoal.
+       rule:     lines, the scroll thread, focus rings. */
+    --sand-ink: 33 14% 25%;       /* #4A4238, 8.4:1 on cream */
+    --rule: 30 16% 12%;
+    /* The ONE contrasting colour: electric cobalt #2B4EFF. Only on what we
+       want clicked (register buttons) and small live details (the thread's
+       pen and stops, the headline underline, the scroll line, matched words,
+       focus rings). Never on large surfaces. White on it is 5.8:1. */
+    --cta: 230 100% 58%;
+    --cta-fg: 0 0% 100%;
+    --cta-hover: 231 76% 50%;
+    --cta-line: 230 100% 58%;     /* strokes and dots */
   }
 
   .dark {
@@ -172,6 +203,13 @@
     --sage-soft: 140 25% 13%;
     --sage-line: 140 18% 26%;
     --info: 205 60% 70%;
+
+    --sand-ink: 41 19% 71%;       /* the paper colour, 9:1 on the dark page */
+    --rule: 41 19% 71%;
+    --cta: 230 100% 58%;
+    --cta-fg: 0 0% 100%;
+    --cta-hover: 230 100% 64%;
+    --cta-line: 230 100% 68%;     /* a touch lighter, so thin lines carry on the dark page */
   }
 
 }
@@ -180,6 +218,13 @@
   * { @apply border-border; }
   html { font-family: 'Inter', 'Noto Sans Georgian', system-ui, sans-serif; }
   html, body { overflow-x: hidden; max-width: 100%; }
+  /* `hidden` turns body into its own scroll box, which silently breaks every
+     `position: sticky` header on the site (they scroll away). `clip` stops the
+     sideways overflow the same way without that side effect. Older browsers
+     that lack `clip` keep `hidden`. */
+  @supports (overflow: clip) {
+    html, body { overflow-x: clip; }
+  }
   body {
     @apply bg-background text-foreground antialiased;
     background: var(--gradient-soft);
@@ -189,6 +234,226 @@
   :lang(ka), .ka {
     font-family: 'Noto Sans Georgian', 'Inter', system-ui, sans-serif;
   }
+}
+
+@layer base {
+  /* Browser surfaces carry the palette too. */
+  ::selection { background: hsl(var(--paper-ink)); color: hsl(var(--paper)); }
+  :focus-visible { outline: 2px solid hsl(var(--cta-line)); outline-offset: 3px; }
+}
+
+@layer components {
+  /* A sheet of paper: the session card's look, reusable anywhere. */
+  .paper-card {
+    background: hsl(var(--paper));
+    color: hsl(var(--paper-ink));
+    border: 1px solid hsl(var(--paper-edge) / 0.32);
+    /* A faint paper grain, drawn once by the browser (a static SVG noise
+       tile, not a live filter), so the sand reads as a page, not plastic. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .14 0 0 0 0 .12 0 0 0 0 .1 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.35) inset,
+      0 12px 32px -14px hsl(30 30% 10% / 0.45);
+  }
+  .dark .paper-card {
+    box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.3) inset,
+      0 14px 36px -12px hsl(0 0% 0% / 0.7);
+  }
+  .paper-inset {
+    background: hsl(var(--paper-2));
+    border: 1px solid hsl(var(--paper-edge) / 0.22);
+  }
+
+  /* Press feedback for anything tappable: answers the finger at once. */
+  .press { transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+  .press:active { transform: scale(0.97); }
+
+  /* Lift on hover, mouse only (a tap on a phone would leave it stuck up). */
+  .lift {
+    transition:
+      transform 260ms cubic-bezier(0.23, 1, 0.32, 1),
+      rotate 260ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 260ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  /* A sheet resting slightly askew on the desk; it squares up on hover. */
+  .sheet { rotate: var(--tilt, 0deg); }
+  @media (hover: hover) and (pointer: fine) {
+    .lift:hover { transform: translateY(-4px); }
+    .sheet:hover { rotate: 0deg; }
+    .paper-card.lift:hover {
+      box-shadow:
+        0 1px 0 hsl(0 0% 100% / 0.35) inset,
+        0 22px 40px -16px hsl(30 30% 10% / 0.5);
+    }
+  }
+}
+
+/* ===== Landing page motion =====
+   Entrances use the individual `translate` / `rotate` properties so they
+   compose with the inline `transform` the scroll and pointer effects write.
+   Everything scroll-driven lives in JS (src/lib/motion.ts) and writes
+   transform / opacity / stroke-dashoffset only. */
+@keyframes heroDeal {
+  from { opacity: 0; translate: 0 70px; rotate: 9deg; }
+  to   { opacity: 1; translate: 0 0; rotate: 0deg; }
+}
+.hero-deal { animation: heroDeal 950ms cubic-bezier(0.23, 1, 0.32, 1) backwards; }
+
+/* Word-by-word mask reveal. Each word sits in a clipping box and slides up
+   into it. The padding keeps Georgian ascenders and descenders unclipped. */
+.rw {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.1em 0.02em 0.16em;
+  margin: -0.1em -0.02em -0.16em;
+}
+.rw > span {
+  display: inline-block;
+  translate: 0 115%;
+  rotate: 4deg;
+  transform-origin: left bottom;
+  transition:
+    translate 950ms cubic-bezier(0.19, 1, 0.22, 1),
+    rotate 950ms cubic-bezier(0.19, 1, 0.22, 1);
+  transition-delay: calc(var(--i, 0) * 65ms + var(--d, 0ms));
+}
+.revealed .rw > span { translate: 0 0; rotate: 0deg; }
+
+/* Fade and rise, for whatever follows a headline. */
+.fade-up {
+  opacity: 0;
+  translate: 0 22px;
+  transition:
+    opacity 800ms cubic-bezier(0.23, 1, 0.32, 1),
+    translate 800ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition-delay: var(--d, 0ms);
+}
+.revealed .fade-up, .fade-up.revealed { opacity: 1; translate: 0 0; }
+
+/* A hand-drawn stroke that draws itself (paths use pathLength="1"). */
+.draw-line path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: var(--d, 0ms);
+}
+.revealed .draw-line path, .draw-line.revealed path { stroke-dashoffset: 0; }
+
+@keyframes scrollCue {
+  0%, 100% { translate: 0 0; opacity: 0.55; }
+  50%      { translate: 0 5px; opacity: 1; }
+}
+.scroll-cue { animation: scrollCue 1.8s ease-in-out infinite; }
+
+/* ── hero field ── */
+.hero-dots {
+  background-image: radial-gradient(hsl(var(--rule) / 0.13) 1.2px, transparent 1.6px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, #000 30%, transparent 78%);
+}
+.hero-light {
+  background: radial-gradient(circle, hsl(var(--paper) / 0.55) 0%, hsl(var(--paper) / 0) 65%);
+}
+.dark .hero-light {
+  background: radial-gradient(circle, hsl(var(--paper) / 0.16) 0%, hsl(var(--paper) / 0) 65%);
+}
+@keyframes chipIn {
+  from { opacity: 0; scale: 0.6; }
+  to   { opacity: 1; scale: 1; }
+}
+@keyframes floatBob {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -7px; }
+}
+.float-bob {
+  animation:
+    chipIn 700ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--in-delay, 0ms) backwards,
+    floatBob var(--bob, 6s) ease-in-out var(--bob-delay, 0s) infinite;
+}
+
+/* ── the ink thread ── */
+.thread-ink {
+  stroke: hsl(var(--rule) / 0.55);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-dasharray: 0 100000; /* hidden until measured */
+}
+.thread-guide {
+  stroke: hsl(var(--rule) / 0.2);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 9;
+}
+.thread-dot {
+  fill: hsl(var(--cream));
+  stroke: hsl(var(--rule) / 0.35);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill 300ms ease, stroke 300ms ease, scale 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.thread-dot.is-lit { fill: hsl(var(--cta-line)); stroke: hsl(var(--cta-line)); scale: 1.35; }
+.thread-pen-halo { fill: hsl(var(--cta-line) / 0.2); }
+.thread-pen-tip { fill: hsl(var(--cta-line)); }
+
+/* A label on the thread's path: the page colour behind it hides the line. */
+.station { background: hsl(var(--cream)); }
+
+/* ── the matching board ── */
+.match-chip {
+  background: hsl(var(--paper-2));
+  color: hsl(var(--paper-ink));
+  border: 1px solid hsl(var(--paper-edge) / 0.22);
+  transition:
+    background-color 320ms ease,
+    color 320ms ease,
+    border-color 320ms ease,
+    scale 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.match-chip.is-matched {
+  background: hsl(var(--cta));
+  color: hsl(var(--cta-fg));
+  border-color: hsl(var(--cta));
+  scale: 1.04;
+}
+.match-ink {
+  stroke: hsl(var(--paper-ink) / 0.8);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0 100000;
+}
+.match-guide {
+  stroke: hsl(var(--paper-ink) / 0.18);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 7;
+}
+
+/* Tiki's sleep z's on the closing card. */
+@keyframes tikiZ {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.6) rotate(-8deg); }
+  15%  { opacity: 0.6; }
+  70%  { opacity: 0.35; }
+  100% { opacity: 0; transform: translate(9px, -22px) scale(1.05) rotate(10deg); }
+}
+.tiki-z { position: absolute; opacity: 0; font-weight: 700; line-height: 1; }
+.tiki-asleep .tiki-z { animation: tikiZ 2.8s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Fewer and gentler, not none: keep the fades, drop the travel. */
+  .hero-deal { animation-name: bizFade; animation-duration: 300ms; }
+  .rw > span { translate: 0 0; rotate: 0deg; transition: none; }
+  .fade-up { translate: 0 0; transition-property: opacity; transition-duration: 300ms; }
+  .draw-line path { stroke-dashoffset: 0; transition: none; }
+  .scroll-cue { animation: none; }
+  .lift:hover { transform: none; }
+  .sheet, .sheet:hover { rotate: 0deg; }
+  .tiki-asleep .tiki-z { animation: none; }
+  .float-bob { animation: bizFade 300ms backwards; }
+  .match-chip, .thread-dot { transition: none; }
 }
 
 @layer utilities {

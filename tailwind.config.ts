@@ -92,6 +92,24 @@ export default {
         "sage-soft": "hsl(var(--sage-soft))",
         "sage-line": "hsl(var(--sage-line))",
         info: "hsl(var(--info))",
+        /* "Paper": the sand of the session card. Fixed in both themes. */
+        paper: "hsl(var(--paper))",
+        "paper-2": "hsl(var(--paper-2))",
+        "paper-3": "hsl(var(--paper-3))",
+        "paper-ink": "hsl(var(--paper-ink))",
+        "paper-ink-muted": "hsl(var(--paper-ink-muted))",
+        "paper-edge": "hsl(var(--paper-edge))",
+        /* Landing accents on the page background. These flip in dark mode. */
+        "sand-ink": "hsl(var(--sand-ink))",
+        cta: "hsl(var(--cta))",
+        "cta-fg": "hsl(var(--cta-fg))",
+        "cta-hover": "hsl(var(--cta-hover))",
+        "cta-line": "hsl(var(--cta-line))",
+        rule: "hsl(var(--rule))",
+        "paper-btn": "hsl(var(--paper-btn))",
+        "paper-btn-fg": "hsl(var(--paper-btn-fg))",
+        "paper-sage": "hsl(var(--paper-sage))",
+        "paper-danger": "hsl(var(--paper-danger))",
       },
 
       borderRadius: {
