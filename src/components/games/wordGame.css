@@ -1,0 +1,78 @@
+/* src/components/games/wordGame.css
+   Motion and sizing for the daily word games. Colours come from the site's
+   own tokens (sand paper, brown ink, charcoal, cobalt); nothing new is added. */
+
+/* ---- the floating chip ---- */
+@keyframes wgChipIn {
+  from { opacity: 0; translate: 0 18px; scale: 0.92; }
+  to   { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes wgDrift {
+  0%, 100% { translate: 0 0; rotate: -1.2deg; }
+  50%      { translate: 0 -5px; rotate: 0.8deg; }
+}
+.wg-chip { animation: wgChipIn 520ms cubic-bezier(0.19, 1, 0.22, 1) backwards; }
+.wg-chip-drift { animation: wgDrift 6.5s ease-in-out infinite; }
+
+/* ---- the sheet ---- */
+@keyframes wgFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wgSheetUp {
+  from { opacity: 0; translate: 0 40px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.wg-overlay { animation: wgFade 220ms ease-out both; }
+.wg-sheet { animation: wgSheetUp 380ms cubic-bezier(0.19, 1, 0.22, 1) both; }
+.wg-rise { animation: wgSheetUp 420ms cubic-bezier(0.19, 1, 0.22, 1) backwards; }
+
+/* ---- tiles: one size rule for every board ----
+   --n is how many tiles must fit across; the tile never grows past --max. */
+.wg-board { container-type: inline-size; width: 100%; }
+.wg-tiles { --gap: 5px; --t: min(var(--max, 46px), calc((100cqw - (var(--n) - 1) * var(--gap)) / var(--n))); }
+.wg-tile {
+  width: var(--t);
+  height: var(--t);
+  font-size: calc(var(--t) * 0.5);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  border-radius: calc(var(--t) * 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* a guess being marked: each tile turns over in its turn */
+@keyframes wgTurn {
+  0%   { rotate: x 0deg; background: hsl(var(--paper-2)); color: hsl(var(--paper-ink)); border-color: hsl(var(--paper-edge) / 0.45); }
+  49%  { rotate: x 90deg; background: hsl(var(--paper-2)); color: hsl(var(--paper-ink)); border-color: hsl(var(--paper-edge) / 0.45); }
+  50%  { rotate: x 90deg; }
+  100% { rotate: x 0deg; }
+}
+.wg-turn { animation: wgTurn 460ms ease-in-out backwards; animation-delay: calc(var(--i, 0) * 110ms); }
+
+@keyframes wgShake {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -4px 0; } 80% { translate: 3px 0; }
+}
+.wg-shake { animation: wgShake 360ms ease-in-out; }
+
+@keyframes wgPop {
+  0% { scale: 1; } 45% { scale: 1.14; } 100% { scale: 1; }
+}
+.wg-pop { animation: wgPop 240ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes wgWipe {
+  0%   { scale: 1; opacity: 1; }
+  100% { scale: 0.3; opacity: 0; }
+}
+.wg-wipe { animation: wgWipe 420ms cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: calc(var(--i, 0) * 45ms); }
+
+/* the find grid must not scroll the page while a finger traces a word */
+.wg-grid { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wg-chip, .wg-sheet, .wg-rise { animation-name: wgFade; animation-duration: 200ms; }
+  .wg-chip-drift, .wg-shake, .wg-pop { animation: none; }
+  .wg-turn { animation-name: wgFade; animation-duration: 200ms; animation-delay: 0ms; }
+  .wg-wipe { animation-name: wgFade; animation-direction: reverse; animation-duration: 200ms; animation-delay: 0ms; }
+}

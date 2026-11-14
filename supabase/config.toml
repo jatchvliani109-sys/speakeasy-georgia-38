@@ -9,3 +9,5 @@ project_id = "hmpwjhzrmfyapijikkuc"
     verify_jwt = false
   [functions.daily-tasks]
     verify_jwt = false
+  [functions.word-game]
+    verify_jwt = false

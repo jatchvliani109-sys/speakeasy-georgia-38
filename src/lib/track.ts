@@ -65,6 +65,12 @@ export type TrackEvent =
   | "premium_activated"
   | "premium_cancelled"
   | "ai_quota_exhausted"
+  // daily word games (the floating "დღევანდელი სიტყვების თამაში" chip). props are enums and
+  // counts only: { game, day, solved, tries, hints } / { where } / { viewer }
+  | "game_opened"
+  | "game_finished"
+  | "game_shared"
+  | "game_signup_clicked"
   // account
   | "data_exported"
   | "account_deleted";

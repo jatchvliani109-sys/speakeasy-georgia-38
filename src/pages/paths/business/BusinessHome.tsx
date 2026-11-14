@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { formatDateKa } from "@/lib/formatDate";
 import { useCountUp } from "@/lib/motion";
 import { RevealHeading } from "@/components/landing/Reveal";
+import WordGameChip from "@/components/games/WordGameChip";
 
 import {
   BusinessIntensity,
@@ -1138,6 +1139,8 @@ export default function BusinessHome() {
           )}
         </>
       )}
+      {/* the daily word games: the same small chip as on the landing page */}
+      <WordGameChip />
     </BusinessShell>
   );
 }

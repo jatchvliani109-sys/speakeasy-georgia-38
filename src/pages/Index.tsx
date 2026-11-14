@@ -22,6 +22,7 @@ import ValueDeck from "@/components/landing/ValueDeck";
 import ModuleStack from "@/components/landing/ModuleStack";
 import ScrollTiki from "@/components/landing/ScrollTiki";
 import ArrowThread from "@/components/landing/ArrowThread";
+import WordGameChip from "@/components/games/WordGameChip";
 import { FloatChips, HeroBackdrop } from "@/components/landing/HeroField";
 import { RevealHeading, SplitWords } from "@/components/landing/Reveal";
 import Wordmark from "@/components/Wordmark";
@@ -276,7 +277,7 @@ function Landing() {
                     nobody registers to find out what a product is: 250 visitors
                     from the first ad, 8 reached the signup form, 0 finished. */}
                 <div className="fade-up mt-10" style={{ ["--d" as string]: "420ms" }}>
-                  <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center lg:items-start xl:items-center gap-3">
+                  <div data-wg-avoid className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center lg:items-start xl:items-center gap-3">
                     <Link
                       ref={heroCtaRef}
                       to="/auth?mode=signup"
@@ -343,7 +344,7 @@ function Landing() {
                 </div>
               </div>
 
-              <div data-thread>
+              <div data-thread data-wg-avoid>
                 <DemoSession />
               </div>
 
@@ -404,6 +405,7 @@ function Landing() {
             <div ref={ctaStationRef} data-thread className="max-w-4xl mx-auto">
               <div
                 ref={ctaCardRef}
+                data-wg-avoid
                 className="paper-card relative overflow-hidden rounded-[32px] px-6 sm:px-14 pt-14 sm:pt-20 pb-4 text-center will-change-transform origin-bottom-left"
               >
                 <RevealHeading
@@ -434,7 +436,7 @@ function Landing() {
         </div>
 
         {/* ═══════════════ FOOTER ═══════════════ */}
-        <footer className="bg-panel text-on-dark-subtle">
+        <footer data-wg-avoid className="bg-panel text-on-dark-subtle">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Feedback invitation. Placed above the legal row because it is an
                 invitation, not fine print, and social is where a Georgian
@@ -520,6 +522,8 @@ function Landing() {
           </div>
         </footer>
       </main>
+      {/* the daily word games: a small chip, bottom left, after a little scrolling */}
+      <WordGameChip wait />
     </div>
   );
 }
