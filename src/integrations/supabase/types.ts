@@ -1020,6 +1020,60 @@ export type Database = {
           },
         ]
       }
+      word_game_plays: {
+        Row: {
+          anon_id: string | null
+          created_at: string
+          day_number: number
+          duration_ms: number
+          game: string
+          hints: number
+          id: number
+          solved: boolean
+          tries: number
+          user_id: string | null
+        }
+        Insert: {
+          anon_id?: string | null
+          created_at?: string
+          day_number: number
+          duration_ms?: number
+          game: string
+          hints?: number
+          id?: never
+          solved: boolean
+          tries?: number
+          user_id?: string | null
+        }
+        Update: {
+          anon_id?: string | null
+          created_at?: string
+          day_number?: number
+          duration_ms?: number
+          game?: string
+          hints?: number
+          id?: never
+          solved?: boolean
+          tries?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      word_game_settings: {
+        Row: {
+          id: number
+          launch_date: string
+        }
+        Insert: {
+          id?: number
+          launch_date: string
+        }
+        Update: {
+          id?: number
+          launch_date?: string
+        }
+        Relationships: []
+      }
       word_reports: {
         Row: {
           created_at: string
